@@ -214,7 +214,7 @@ def read_board_full(path):
                 B["widths"][float(m.group(1))] += 1
             continue
         if head not in ("footprint", "via", "setup", "general", "layers", "gr_line", "gr_rect", "gr_arc",
-                        "gr_circle", "gr_poly", "gr_text"):
+                        "gr_circle", "gr_poly", "gr_curve", "gr_text"):
             continue
         node = sexp(chunk)[0]
         if head == "footprint":
@@ -278,7 +278,7 @@ def _footprint(fp, B):
             bx, by = to_board(pat[0], pat[1], at, layer)
             B["drills"].append((bx, by, drill))
     for g in fp:
-        if isinstance(g, list) and g and g[0] in ("fp_line", "fp_rect", "fp_arc", "fp_circle", "fp_poly"):
+        if isinstance(g, list) and g and g[0] in ("fp_line", "fp_rect", "fp_arc", "fp_circle", "fp_poly", "fp_curve"):
             lay = kid(g, "layer")
             if lay and lay[1] == "Edge.Cuts":
                 B["edges"].append(_shape_points(g, at, layer))
@@ -308,6 +308,12 @@ def _shape_points(g, at, layer):
     elif head.endswith("poly"):
         pl = kid(g, "pts")
         pts = [tuple(nums(xy, 2)) for xy in kids(pl, "xy")] if pl else []
+    elif head.endswith("curve"):                  # a cubic Bezier: four control points
+        pl = kid(g, "pts")
+        c = [tuple(nums(xy, 2)) for xy in kids(pl, "xy")] if pl else []
+        if len(c) == 4:
+            pts = [tuple((1 - t) ** 3 * c[0][k] + 3 * (1 - t) ** 2 * t * c[1][k] + 3 * (1 - t) * t * t * c[2][k]
+                         + t ** 3 * c[3][k] for k in (0, 1)) for t in (i / 64.0 for i in range(65))]
     if at is not None:
         pts = [to_board(x, y, at, layer) for x, y in pts]
     return pts

@@ -295,18 +295,18 @@ def build_bat(sch):
 
 def build_owl(sch):
     return tank(sch, 400, "the owl token", "COIL_TOKEN", "11.5uH coil", "C100N_C0G",
-                [("LED_ORANGE", "orange", "R150", True), ("LED_VIOLET", "violet", "R150", False)],
+                [("LED_ORANGE", "orange", "R150", True), ("LED_PURPLE", "purple", "R150", False)],
                 "The owl familiar: put it on the owl's perch and it lights. L401 (7 turns on each "
                 "of 4 layers, 11.5 uH) with C401 (100 nF C0G) resonates at 148 kHz; the owl perch "
-                "drives there. Orange lights first; violet joins as the drive rises (its photons "
-                "carry 3.1 eV against orange's 2.0). 150 R in each leg: the 4.8 V bridge cannot "
+                "drives there. Orange lights first; purple joins as the drive rises (its blue-violet "
+                "photons carry about 3 eV against orange's 2.0). 150 R in each leg: the 4.8 V bridge cannot "
                 "push either LED past about 20 mA, whatever the firmware does. At the cat's "
                 "frequency (316 kHz) this tank shrinks the voltage and stays dark.", "owl")
 
 
 def build_cat(sch):
     return tank(sch, 500, "the cat token", "COIL_TOKEN", "11.5uH coil", "C22N_C0G",
-                [("LED_ORANGE", "orange", "R150", True), ("LED_VIOLET", "violet", "R150", False)],
+                [("LED_ORANGE", "orange", "R150", True), ("LED_PURPLE", "purple", "R150", False)],
                 "The cat familiar: the same coil, tuned higher: C501 (22 nF C0G) with L501 resonates "
                 "at 316 kHz, where the cat's perch drives. Below about 0.2 A of perch current the "
                 "other familiar stays completely dark, so each perch lights only its own token "

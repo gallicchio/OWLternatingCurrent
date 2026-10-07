@@ -75,7 +75,7 @@ WISPS = [(48.0, 106.0), (68.0, 102.0), (84.0, 99.0), (128.0, 99.0), (146.0, 103.
 # pendulum (the quantum ghost walks it, STAR0 at the left), four more scattered in the sky
 # (the moon's side and behind; behind the tree itself sit the RP2354A and its parts)
 STAR_ARC = dict(cx=107.0, cy=160.0, r=105.0, a0=245.0, a1=295.0)    # degrees, on the arc
-STARX = [(68.0, 10.0), (128.0, 10.0), (72.0, 44.0), (182.0, 62.0)]
+STARX = [(68.0, 10.0), (138.0, 30.0), (72.0, 44.0), (182.0, 72.0)]
 
 
 def star_arc():
@@ -93,8 +93,8 @@ MCU = (105.0, 15.0)                              # U4, on top, behind the tree
 JACK = (150.0, 10.15)                            # J1: plug from the back edge
 USB = (95.0, 2.45)                               # J2: plug from the back edge (GPiBridge's USB layout)
 SPEAKER = (176.0, 36.0)                          # LS1, 23 mm
-SOUND_SWITCH = (183.0, 118.0)                    # SW3, its lever at the right edge
-SPELL_BUTTON = (168.0, 121.0)                    # SW2
+SOUND_SWITCH = (172.0, 122.0)                    # SW3, by the front edge
+SPELL_BUTTON = (156.0, 122.0)                    # SW2
 LIGHT_SENSOR = (150.0, 26.0)                     # U16 looks at the room
 BOOT_BUTTON_BOTTOM = (60.0, 30.0)                # SW1, underneath
 

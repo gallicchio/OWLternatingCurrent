@@ -120,7 +120,7 @@ b.put("L6", *L.OWL_PERCH)
 b.put("L7", *L.CAT_PERCH)
 b.put("J1", L.JACK[0], L.JACK[1], 270)                                   # plug from behind
 b.put("LS1", *L.SPEAKER)
-b.put("SW3", L.SOUND_SWITCH[0], L.SOUND_SWITCH[1], 90)
+b.put("SW3", L.SOUND_SWITCH[0], L.SOUND_SWITCH[1], 0)
 b.put("SW2", L.SPELL_BUTTON[0], L.SPELL_BUTTON[1], 0)
 b.put("U16", *L.LIGHT_SENSOR)
 b.put("C1", 166.0, 9.0, 0)                                               # 470 uF, 12.6 mm tall
@@ -144,108 +144,102 @@ for who, (cx, cy) in (("OWLRING", L.OWL_PERCH), ("CATRING", L.CAT_PERCH)):
         b.put("led:%s%d" % (who, i), cx + L.RING_R * math.cos(t), cy + L.RING_R * math.sin(t), (90 - a) % 360)
 
 # ---- underneath ----------------------------------------------------------------------
+# (bottom parts are mirrored in y before they turn: Board.near takes offsets in the part's
+# own frame, so the same tile works on either side)
 # power: the jack's line through F1 and Q1, the clamp, then the buck in the corner
 b.put("F1", 140.0, 20.0, 0, "B")
 b.put("Q1", 130.0, 20.0, 0, "B")
 b.put("D1", 130.0, 26.5, 0, "B")
-b.put("R1", 124.0, 24.0, 90, "B")
+b.put("R1", 124.5, 24.0, 90, "B")
 b.put("D2", 159.0, 20.0, 0, "B")
-b.put("C2", 152.0, 25.0, 0, "B")
+b.put("C2", 152.0, 25.5, 0, "B")
 b.put("TP1", 145.0, 26.0, 0, "B")
 b.put("U1", 172.0, 18.0, 0, "B")
-b.put("L1", 182.0, 23.0, 90, "B")
+b.put("L1", 182.5, 23.0, 90, "B")
 b.put("buck:cin", 166.5, 16.0, 90, "B")
-b.put("buck:cin_hf", 168.5, 19.5, 90, "B")
-b.put("buck:en_top", 166.0, 22.5, 90, "B")
-b.put("buck:en_bot", 166.0, 26.0, 90, "B")
-b.put("buck:boot", 176.0, 15.0, 0, "B")
-b.put("buck:fb_top", 175.0, 27.0, 0, "B")
-b.put("buck:fb_bot", 171.0, 27.0, 0, "B")
-b.put("buck:cout1", 187.0, 18.0, 90, "B")
-b.put("buck:cout2", 187.0, 23.0, 90, "B")
+b.put("buck:cin_hf", 168.5, 20.0, 90, "B")
+b.put("buck:en_top", 166.0, 23.5, 90, "B")
+b.put("buck:en_bot", 168.0, 26.5, 90, "B")
+b.put("buck:boot", 176.0, 14.5, 0, "B")
+b.put("buck:fb_top", 175.5, 27.5, 0, "B")
+b.put("buck:fb_bot", 171.5, 27.5, 0, "B")
+b.put("buck:cout1", 187.5, 17.0, 90, "B")
+b.put("buck:cout2", 187.5, 28.0, 90, "B")
 b.put("tp:5v", 180.0, 14.0, 0, "B")
+# the pulls on the RP2354A's lines, under its corner
+for k, who in enumerate(("drv:pd_sleep", "drv:pu_fault", "fam:pd_en", "i2c:pu_scl", "i2c:pu_sda")):
+    b.put(who, 117.0 + 2.0 * k, 32.0, 90, "B")
 
-# the LED driver, centrally under the arc, and its parts
-b.put("U3", 92.0, 52.0, 0, "B")
-b.near("u3:cvcc", "U3", -1.0, -5.5, 0)
-b.near("u3:cvcc_hf", "U3", 1.5, -5.5, 0)
-b.near("u3:cvcap", "U3", 5.0, 3.0, 90)
-b.near("u3:riref", "U3", 5.0, 6.0, 90)
-b.put("i2c:pu_scl", 120.0, 31.0, 0, "B")
-b.put("i2c:pu_sda", 120.0, 33.0, 0, "B")
-b.put("U15", 80.0, 52.0, 0, "B")                    # the IMU
-b.near("u15:cvdd", "U15", -3.5, -3.0, 90)
-b.near("u15:cvddio", "U15", -3.5, 3.0, 90)
-b.near("u16:cvdd", "U16", 3.0, 0.0, 90)
+# the LED driver, centrally under the star arc
+b.put("U3", 92.0, 50.0, 0, "B")
+b.near("u3:cvcc", "U3", -1.0, -5.6, 90)
+b.near("u3:cvcc_hf", "U3", 1.0, -5.6, 90)
+b.near("u3:cvcap", "U3", 5.4, 2.6, 90)
+b.near("u3:riref", "U3", 5.4, 5.6, 90)
+b.put("U15", 79.0, 50.0, 0, "B")                    # the IMU
+b.near("u15:cvdd", "U15", -3.6, -1.6, 90)
+b.near("u15:cvddio", "U15", -3.6, 1.6, 90)
+b.near("u16:cvdd", "U16", 3.2, 0.0, 90)
 b.put("U17", L.PEND_REST[0], L.PEND_REST[1], 0, "B")    # under the pendulum's rest point
-b.put("u17:cvcc", L.PEND_REST[0], L.PEND_REST[1] - 22.0, 0, "B")
+b.put("u17:cvcc", L.PEND_REST[0], L.PEND_REST[1] - 21.0, 0, "B")
 
 # the coil bridges: the levitation bridge by the tree's socket, each pendulum bridge
-# beside its coil
-DRV = {"tile0": ("U8", 126.0, 50.0, 0), "tile1": ("U5", 79.0, 110.0, 0),
+# beside its coil.  The tile, in the HTSSOP's own frame: its top row (y -2.85) is PGND 9,
+# OUT2 10, VM 11, VCP 12, CPH 13, CPL 14, GND 15, PMODE 16 from right to left; its bottom
+# row (y +2.85) IN1 1 ... OUT1 8 from left to right.
+DRV = {"tile0": ("U8", 126.0, 52.0, 0), "tile1": ("U5", 79.0, 110.0, 0),
        "tile2": ("U6", 64.0, 70.0, 0), "tile3": ("U7", 143.5, 78.0, 90)}
 for tile, (ref, x, y, rot) in DRV.items():
     b.put(ref, x, y, rot, "B")
-    # (the HTSSOP's top row: PGND 9, OUT2 10, VM 11, VCP 12, CPH 13, CPL 14, GND 15,
-    # PMODE 16 from right to left; bottom row: IN1 1 ... OUT1 8 from left to right)
-    b.near(tile + ":ccp", ref, -0.65, -4.6, 0)
-    b.near(tile + ":cvcp", ref, 1.6, -6.2, 0)
+    b.near(tile + ":ccp", ref, -0.65, -5.4, 0)
+    b.near(tile + ":cvcp", ref, 1.9, -7.2, 0)
     b.near(tile + ":cvm", ref, 4.6, -3.4, 90)
     b.near(tile + ":cvm_bulk", ref, 6.6, -3.4, 90)
-    b.near(tile + ":ripropi", ref, 0.975, 5.0, 90)
-    b.near(tile + ":rf", ref, 2.7, 5.4, 90)
-    b.near(tile + ":cf", ref, 4.4, 5.4, 90)
-b.put("drv:pd_sleep", 118.0, 31.0, 0, "B")
-b.put("drv:pu_fault", 118.0, 33.0, 0, "B")
+    b.near(tile + ":ripropi", ref, 0.975, 5.8, 90)
+    b.near(tile + ":rf", ref, 2.7, 5.8, 90)
+    b.near(tile + ":cf", ref, 4.4, 5.8, 90)
 
-# the mux, the perch-current amplifier and the dividers, by the MCU's analog pins
-b.put("U11", 138.0, 50.0, 0, "B")
-b.near("mux:cvcc", "U11", 0.0, -4.5, 0)
+# the mux and its dividers, then the perch-current amplifier, between the levitation
+# bridge and the audio
+b.put("U11", 141.0, 50.0, 0, "B")
+b.near("mux:cvcc", "U11", 0.0, -4.4, 0)
 for k, name in enumerate(("V12_SENSE", "V5_SENSE", "VBUS_SENSE")):
-    b.put("div:%s:top" % name, 146.0 + 2.5 * k, 44.0, 90, "B")
-    b.put("div:%s:bot" % name, 146.0 + 2.5 * k, 48.0, 90, "B")
-b.put("U18", 138.0, 60.0, 0, "B")
-b.near("u18:cvcc", "U18", 0.0, -4.0, 0)
+    b.put("div:%s:top" % name, 136.0 + 2.5 * k, 57.5, 90, "B")
+    b.put("div:%s:bot" % name, 136.0 + 2.5 * k, 61.5, 90, "B")
+b.put("U18", 151.0, 62.0, 0, "B")
+b.near("u18:cvcc", "U18", 0.0, -4.4, 0)
+
+# the audio amplifier by the speaker, its filter in two rows to its left
+b.put("U14", 171.0, 48.0, 0, "B")
+b.near("audio:cvcc", "U14", -1.2, -3.8, 0)
+b.near("audio:cvcc_bulk", "U14", 2.4, -3.9, 0)
+for k, who in enumerate(("audio:r1", "audio:c1", "audio:r2", "audio:c2", "audio:cinp", "audio:rinp")):
+    b.put(who, 153.0 + 2.2 * k, 44.0, 90, "B")
+for k, who in enumerate(("audio:rinn", "audio:cinn", "audio:cbyp", "audio:rctrl", "audio:rctrl_pd")):
+    b.put(who, 155.0 + 2.2 * k, 51.0, 90, "B")
+b.put("spell:r", 160.0, 116.0, 0, "B")
 
 # the perch bridges, each beside its perch
-BR = {1: ("U9", 63.0, 92.0, 0), 2: ("U10", 164.0, 59.0, 0)}
+BR = {1: ("U9", 63.0, 92.0, 0), 2: ("U10", 178.0, 66.0, 0)}
 for k, (ref, x, y, rot) in BR.items():
     b.put(ref, x, y, rot, "B")
-    b.near("br%d:cvdd" % k, ref, 0.0, -4.4, 0)
-    b.near("br%d:cvdd_hf" % k, ref, 2.6, -4.4, 0)
-    b.near("br%d:cblock" % k, ref, 5.6, -1.3, 90)
-    b.near("br%d:rshunt" % k, ref, -1.0, 5.0, 0)
-    b.near("br%d:rf" % k, ref, 3.0, 5.0, 0)
-    b.near("br%d:cf" % k, ref, 3.0, 7.0, 0)
-    b.near("br%d:rgain_f" % k, ref, -4.0, 7.0, 0)
-    b.near("br%d:rgain_g" % k, ref, 0.0, 7.0, 0)
-b.put("fam:pd_en", 118.0, 35.0, 0, "B")
+    b.near("br%d:cvdd" % k, ref, -1.0, -4.4, 90)
+    b.near("br%d:cvdd_hf" % k, ref, 1.0, -4.4, 90)
+    b.near("br%d:cblock" % k, ref, 5.8, -0.8, 90)
+    b.near("br%d:rshunt" % k, ref, -2.6, 4.6, 0)
+    b.near("br%d:rf" % k, ref, 2.2, 4.6, 0)
+    b.near("br%d:cf" % k, ref, 2.2, 6.6, 0)
+    b.near("br%d:rgain_f" % k, ref, -2.6, 6.8, 0)
+    b.near("br%d:rgain_g" % k, ref, -2.6, 8.8, 0)
 
 # the theremin's oscillators, each by its antenna's pad
-for name, ant, (x, y) in (("PITCH", "AE1", (64.0, 38.0)), ("VOL", "AE2", (42.0, 116.0))):
+for name, (x, y) in (("PITCH", (64.0, 38.0)), ("VOL", (42.0, 116.0))):
     u = "U12" if name == "PITCH" else "U13"
     b.put(u, x, y, 0, "B")
-    b.near("osc_%s:cvcc" % name, u, -1.0, -3.4, 0)
-    b.near("osc_%s:rout" % name, u, 3.6, 0.0, 90)
-    b.near("osc_%s:rf" % name, u, 0.0, 3.4, 0)
-    b.near("osc_%s:ct" % name, u, -3.6, 0.0, 90)
-
-# the audio amplifier and its filter, by the speaker
-b.put("U14", 162.0, 46.0, 0, "B")
-b.near("audio:cvcc", "U14", -1.0, -3.6, 0)
-b.near("audio:cvcc_bulk", "U14", 2.0, -3.8, 0)
-b.near("audio:cbyp", "U14", -4.0, 2.0, 90)
-b.near("audio:rinp", "U14", -4.0, -1.0, 90)
-b.near("audio:cinp", "U14", -6.0, -1.0, 90)
-b.near("audio:rinn", "U14", -8.0, -1.0, 90)
-b.near("audio:cinn", "U14", -10.0, -1.0, 90)
-b.near("audio:r2", "U14", -6.0, 3.0, 0)
-b.near("audio:c2", "U14", -6.0, 5.0, 0)
-b.near("audio:r1", "U14", -10.0, 3.0, 0)
-b.near("audio:c1", "U14", -10.0, 5.0, 0)
-b.near("audio:rctrl", "U14", -2.0, 4.5, 0)
-b.near("audio:rctrl_pd", "U14", 2.0, 4.5, 0)
-b.put("spell:r", 160.0, 116.0, 0, "B")
+    b.near("osc_%s:cvcc" % name, u, -1.0, -3.6, 0)
+    b.near("osc_%s:rout" % name, u, 3.8, 0.0, 90)
+    b.near("osc_%s:rf" % name, u, 0.0, 3.6, 0)
+    b.near("osc_%s:ct" % name, u, -3.8, 0.0, 90)
 
 
 # ======================================================================================
@@ -256,11 +250,13 @@ b.put("spell:r", 160.0, 116.0, 0, "B")
 HEADER_BODY_FACE = 6.58          # PinHeader_2x08_P2.54mm_Horizontal: pin column to the body's far face
 TREE = Board("tree")
 t = TREE
-t.put("J101", L.TREE_BASE_PLUG[0] + 8.89, L.TREE_H - HEADER_BODY_FACE, 270, "B")   # pins down into the base
-t.put("J102", L.TREE_TOP_PLUG[0] - 8.89, HEADER_BODY_FACE, 90, "B")                 # pins up into the perch
+# (on the back, turned 270: the pins point down and run toward +x from pin 1; turned 90
+# for the top header: up, and toward -x)
+t.put("J101", L.TREE_BASE_PLUG[0] - 8.89, L.TREE_H - HEADER_BODY_FACE, 270, "B")   # pins down into the base
+t.put("J102", L.TREE_TOP_PLUG[0] + 8.89, HEADER_BODY_FACE, 90, "B")                 # pins up into the perch
 t.put("U101", L.TREE_W / 2, 62.0, 0, "B")
-t.near("u101:cvcc", "U101", -1.0, -5.5, 0)
-t.near("u101:cvcc_hf", "U101", 1.5, -5.5, 0)
+t.near("u101:cvcc", "U101", -1.0, -5.6, 90)
+t.near("u101:cvcc_hf", "U101", 1.0, -5.6, 90)
 t.near("u101:cvcap", "U101", 5.0, 3.0, 90)
 t.near("u101:riref", "U101", 5.0, 6.0, 90)
 t.put("tree:c5v", L.TREE_W / 2 + 14.0, L.TREE_H - 16.0, 90, "B")
@@ -279,7 +275,7 @@ for i, (x, y) in enumerate(L.TREE_WISPS):
 PERCH = Board("perch")
 p_ = PERCH
 p_.put("L201", 0.0, 0.0)
-p_.put("J201", -8.89, L.PERCH_SOCKET_Y - 1.27, 90, "B")
+p_.put("J201", 8.89, L.PERCH_SOCKET_Y - 1.27, 90, "B")      # underneath: its pins run toward -x
 p_.put("U201", 0.0, 0.0, 0, "B")                       # in the coil's hole, under the bat
 p_.put("perch:rhall", 0.0, 19.0, 90, "B")
 p_.put("perch:chall", 2.0, 19.0, 90, "B")
@@ -309,11 +305,11 @@ TOKENS = {}
 for who in ("owl", "cat"):
     tk = Board(who + "_token")
     tk.put("L401" if who == "owl" else "L501", 0.0, 0.0)
-    tk.put("%s:ctank" % who, 0.0, 14.2, 0)
-    tk.put("%s:r1" % who, -5.0, 14.2, 90)
-    tk.put("%s:r2" % who, 5.0, 14.2, 90)
-    tk.put("%s:led1" % who, -3.0, 16.8, 0)
-    tk.put("%s:led2" % who, 3.4, 16.8, 0)
+    tk.put("%s:ctank" % who, 0.0, 14.8, 0)
+    tk.put("%s:r1" % who, -4.6, 14.3, 90)
+    tk.put("%s:r2" % who, 4.6, 14.3, 90)
+    tk.put("%s:led1" % who, -2.0, 17.2, 0)
+    tk.put("%s:led2" % who, 2.0, 17.2, 0)
     TOKENS[who] = tk
 
 BOARDS = {"base": BASE, "tree": TREE, "perch": PERCH, "bat": BAT, "owl_token": TOKENS["owl"],

@@ -19,7 +19,7 @@ import board_info as BI
 
 PCB = BI.PCB
 OUT = os.path.join(BI.CHECKS, "drc.json")
-ORIGIN = (100.0, 100.0)                  # gen/board.py puts the board's corner here
+ORIGIN = (50.0, 50.0)                    # gen/board.py puts the panel's corner here
 
 
 def main():

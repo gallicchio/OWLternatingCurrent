@@ -35,7 +35,7 @@ PARTS = {
     # --- chips -------------------------------------------------------------------------
     "RP2354A": P("RP2354A", "RP2350A_QFN-60_7x7mm_P0.4mm_RPi", "rpi", "C41378174", "RP2354A", "RP2354A",
                  ["RP2354A"], "RP2350 with 2 MB flash in the package; Raspberry Pi's layout, as on GPiBridge"),
-    "LP5036": P("LP5036", "VQFN-46-1EP_5x6mm_P0.4mm_EP2.8x3.8mm_ThermalVias", "stock:Package_DFN_QFN", "C701961", "LP5036RJVR", "LP5036",
+    "LP5036": P("LP5036", "VQFN-46-1EP_5x6mm_P0.4mm_EP2.8x3.8mm", "stock:Package_DFN_QFN", "C701961", "LP5036RJVR", "LP5036",
                 ["LP5036"], "36 constant-current LED outputs, 12-bit PWM at 29 kHz: no visible flicker"),
     "DRV8874": P("DRV8874", "HTSSOP-16-1EP_4.4x5mm_P0.65mm_EP3.55x2.46mm_TI_PWP0016J", "gen", "C1855818", "DRV8874PWPR",
                  "DRV8874", ["DRV8874"], "12 V H-bridge, 6 A peak, current sense and limit built in; PWM to 100 kHz"),
@@ -129,6 +129,8 @@ PARTS = {
                     mpn="", value="antenna", match=[], note="the pad where a gold copper shape (the moon, the ghost) joins its oscillator"),
     "TP": dict(sym=LIB + ":TestPoint", fp=LIB + ":TestPoint_Pad_D1.5mm", fp_src="stock:TestPoint", lcsc=None,
                mpn="", value="", match=[], note="bare pad"),
+    "TP1MM": dict(sym=LIB + ":TestPoint", fp=LIB + ":TestPoint_Pad_D1.0mm", fp_src="stock:TestPoint", lcsc=None,
+                  mpn="", value="", match=[], note="bare pad (the RP2354A's corner, GPiBridge's size)"),
     "FOOTHOLE": dict(sym=LIB + ":MountingHole", fp=LIB + ":MountingHole_3.2mm_M3", fp_src="stock:MountingHole",
                      lcsc=None, mpn="", value="", match=[], note="a printed foot snaps in here"),
     "PWR_FLAG": dict(sym=LIB + ":PWR_FLAG", fp=LIB + ":", fp_src=None, lcsc=None, mpn="", value="PWR_FLAG",
@@ -138,7 +140,9 @@ PARTS = {
 
 def passive(kind, value, size, lcsc, mpn, match, note="", sym=None):
     sym = sym or {"R": "R", "C": "C"}[kind]
-    fp, src = {("R", "0603"): ("R_0603_1608Metric", "stock:Resistor_SMD"),
+    fp, src = {("R", "0402"): ("R_0402_1005Metric", "stock:Resistor_SMD"),
+               ("C", "0402"): ("C_0402_1005Metric", "stock:Capacitor_SMD"),
+               ("R", "0603"): ("R_0603_1608Metric", "stock:Resistor_SMD"),
                ("C", "0603"): ("C_0603_1608Metric", "stock:Capacitor_SMD"),
                ("C", "0805"): ("C_0805_2012Metric", "stock:Capacitor_SMD"),
                ("C", "1206"): ("C_1206_3216Metric", "stock:Capacitor_SMD"),
@@ -149,6 +153,16 @@ def passive(kind, value, size, lcsc, mpn, match, note="", sym=None):
 
 
 PARTS.update({
+    # the RP2354A's corner uses GPiBridge's 0402 parts (same codes), so its layout fits as drawn
+    "C100N_0402": passive("C", "100n", "0402", "C1525", "CL05B104KO5NNNC", ["100nF", "0402"]),
+    "C15P_0402": passive("C", "15p", "0402", "C1548", "0402CG150J500NT", ["15pF", "C0G", "0402"]),
+    "C1U_0402": passive("C", "1u", "0402", "C52923", "CL05A105KA5NQNC", ["1uF", "25V", "0402"]),
+    "C10U_0603": passive("C", "10u", "0603", "C19702", "CL10A106KP8NNNC", ["10uF", "0603"]),
+    "R27_0402": passive("R", "27", "0402", "C25100", "0402WGF270JTCE", ["27Ω", "0402"],
+                        "USB series resistors: RP2350 datasheet, 27 ohms; 0402 as in Raspberry Pi's layout"),
+    "R100_0402": passive("R", "100", "0402", "C25076", "0402WGF1000TCE", ["100Ω", "0402"]),
+    "R1K_0402": passive("R", "1k", "0402", "C11702", "0402WGF1001TCE", ["1kΩ", "0402"]),
+    "R5K1_0402": passive("R", "5.1k", "0402", "C25905", "0402WGF5101TCE", ["5.1kΩ", "0402"]),
     # capacitors (Basic unless said)
     "C100N": passive("C", "100n", "0603", "C14663", "CC0603KRX7R9BB104", ["100nF", "0603"]),
     "C10N": passive("C", "10n", "0603", "C57112", "0603B103K500NT", ["10nF", "0603"]),

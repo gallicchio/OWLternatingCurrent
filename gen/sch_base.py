@@ -180,13 +180,13 @@ def vsys_ldo(x0):
     flag("VSYS", xf, yv)
     W((xf, yv), (xf, yv + G))
     pwr_flag(xf, yv + G, rot=180)
-    tag("ldo:cin"); down("C1U", xc, yv)
+    tag("ldo:cin"); down("C1U_0402", xc, yv)
     xo, xfl, xt = vo[0] + 5.08, vo[0] + 15.24, vo[0] + 20.32
     line(yv, [vo[0], xo, xfl, xt])
-    tag("ldo:cout"); down("C1U", xo, yv)
+    tag("ldo:cout"); down("C1U_0402", xo, yv)
     flag("+3V3", xfl, yv)
-    tag("tp:3v3"); tp(xt, yv, "+3V3")
-    tag("tp:vsys"); tp(xn, yv - 7.62, "VSYS")
+    tag("tp:3v3"); tp(xt, yv, "+3V3", key="TP1MM")
+    tag("tp:vsys"); tp(xn, yv - 7.62, "VSYS", key="TP1MM")
     W((xn, yv), (xn, yv - 7.62))
     note(x0 + 2.54, 82.55,
          "VSYS is 4.8 V less a Schottky drop, or USB's 5 V less one: so the RP2354A, the "
@@ -208,7 +208,7 @@ def mcu():
     ytop = pin("46")[1]
     Y33, Y11, Yj = ytop - 27.94, ytop - 20.32, ytop - 15.24
 
-    def decap(num, key="C100N"):
+    def decap(num, key="C100N_0402"):
         """The capacitor hangs beside its pin's wire; its name and value sit centred
         under its ground, between the wires."""
         x = xs[num]
@@ -259,7 +259,7 @@ def mcu():
     for n in ("47", "61"):
         gnd(*pin(n))
     x11 = xs[dv[-1]] - 3.81
-    tag("tp:1v1"); tp(x11, Y11, "+1V1")
+    tag("tp:1v1"); tp(x11, Y11, "+1V1", key="TP1MM")
     J(x11, Y11)
     note(xs["46"] - 3.0, Y33 - 21.0,
          "Core regulator (1.1 V): Raspberry Pi's parts and layout, copied exactly "
@@ -286,18 +286,18 @@ def mcu_left():
         W(J2.pin(a), (xst, J2.pin(a)[1]), (xst, J2.pin(b)[1]), J2.pin(b))
     ydm, ydp = J2.pin("B7")[1], J2.pin("A6")[1]
     J(xst, ydm); J(xst, ydp)
-    tag("usb:r_dm"); l, r = hpart("R27", nref("R"), xL - 17.78, ydm)
+    tag("usb:r_dm"); l, r = hpart("R27_0402", nref("R"), xL - 17.78, ydm)
     W((xst, ydm), l); W(r, pin("51"))
     label(xst + 3.0, ydm, "USB_D-"); label(r[0] + 1.0, ydm, "USB_DM")
-    tag("usb:r_dp"); l, r = hpart("R27", nref("R"), xL - 30.48, ydp, ref_at=(xL - 34.29, ydp + 3.0), val_at=(xL - 30.48, ydp + 1.6))
+    tag("usb:r_dp"); l, r = hpart("R27_0402", nref("R"), xL - 30.48, ydp, ref_at=(xL - 34.29, ydp + 3.0), val_at=(xL - 30.48, ydp + 1.6))
     W((xst, ydp), l); W(r, pin("52"))
     label(xst + 3.0, ydp, "USB_D+"); label(r[0] + 1.0, ydp, "USB_DP")
     note(xL - 52.0, ydp + 4.6, "USB 2.0 full speed, 12 Mbit/s. 27 R at the chip (RP2350 datasheet).", cols=40)
     cc1, cc2 = J2.pin("A5"), J2.pin("B5")
-    tag("usb:r_cc2"); l, r = hpart("R5K1", nref("R"), cc2[0] + 7.62, cc2[1], ref_at=(cc2[0] + 3.2, cc2[1] + 3.0),
+    tag("usb:r_cc2"); l, r = hpart("R5K1_0402", nref("R"), cc2[0] + 7.62, cc2[1], ref_at=(cc2[0] + 3.2, cc2[1] + 3.0),
                  val_at=(cc2[0] + 3.2, cc2[1] + 3.0))
     W(cc2, l); gnd(*r)
-    tag("usb:r_cc1"); l, r = hpart("R5K1", nref("R"), cc1[0] + 20.32, cc1[1], ref_at=(cc1[0] + 15.24, cc1[1] - 1.6),
+    tag("usb:r_cc1"); l, r = hpart("R5K1_0402", nref("R"), cc1[0] + 20.32, cc1[1], ref_at=(cc1[0] + 15.24, cc1[1] - 1.6),
                  val_at=(cc1[0] + 21.6, cc1[1] - 2.9))
     W(cc1, l); gnd(*r)
     note(cc1[0] + 27.0, cc1[1] + 1.4, "CC1, CC2: 5.1 k to ground say 'device'; the host then gives 5 V.", cols=32)
@@ -312,8 +312,8 @@ def mcu_left():
     pwr_flag(xvb + G, vb[1])
     flag("VBUS", xvb, yvb)
     line(yvb, [xvb, xvb + 7.62, xvb + 15.24])
-    tag("usb:c_vbus"); down("C10U", xvb + 7.62, yvb)
-    tag("tp:vbus"); tp(xvb + 15.24, yvb, "VBUS")
+    tag("usb:c_vbus"); down("C10U_0603", xvb + 7.62, yvb)
+    tag("tp:vbus"); tp(xvb + 15.24, yvb, "VBUS", key="TP1MM")
     note(J2x - 20.0, ry("51") + 31.0, "USB-C: programming and the console. It powers the logic (about "
          "110 mA), never the LEDs or coils.", cols=36)
 
@@ -323,11 +323,11 @@ def mcu_left():
     yc = (yi + yo) / 2
     Y1 = part("Y12M", "Y1", Xc, yc, rot=270, ref_at=(Xc + 4.4, yc - 0.3), val_at=(Xc + 4.4, yc + 0.3))
     W(pin("21"), (Xc, yi), Y1.pin("1"))
-    tag("xtal:r"); l, r = hpart("R1K", nref("R"), xL - 15.24, yo)
+    tag("xtal:r"); l, r = hpart("R1K_0402", nref("R"), xL - 15.24, yo)
     W(pin("22"), r); W(l, (Xc, yo), Y1.pin("3"))
     for yy, nm in ((yi, "xtal:c_in"), (yo, "xtal:c_out")):
         tag(nm)
-        l, r = hpart("C15P", nref("C"), Xc - 7.62, yy, ref_at=(Xc - 12.7, yy - 2.6), val_at=(Xc - 5.6, yy - 2.6))
+        l, r = hpart("C15P_0402", nref("C"), Xc - 7.62, yy, ref_at=(Xc - 12.7, yy - 2.6), val_at=(Xc - 5.6, yy - 2.6))
         W(r, (Xc, yy)); gnd(*l)
         J(Xc, yy)
     gnd(*Y1.pin("2"))
@@ -339,9 +339,9 @@ def mcu_left():
     J4x = J2x
     J4 = part("JSTSH3", "J4", J4x, ysd, value="SWD", sym="Conn_SWD", ref_at=(J4x - 3.81, ysd - 6.4),
               val_at=(J4x + 4.6, ysd - 6.4))
-    tag("swd:r_clk"); l, r = hpart("R100", nref("R"), xL - 15.24, ysc)
+    tag("swd:r_clk"); l, r = hpart("R100_0402", nref("R"), xL - 15.24, ysc)
     W(J4.pin("1"), l); W(r, pin("24"))
-    tag("swd:r_dio"); l, r = hpart("R100", nref("R"), xL - 27.94, ysd, ref_at=(xL - 32.2, ysd + 3.0), val_at=(xL - 26.4, ysd + 1.6))
+    tag("swd:r_dio"); l, r = hpart("R100_0402", nref("R"), xL - 27.94, ysd, ref_at=(xL - 32.2, ysd + 3.0), val_at=(xL - 26.4, ysd + 1.6))
     W(J4.pin("3"), l); W(r, pin("25"))
     gnd(*J4.pin("2")); gnd(*J4.pin("MP"))
     note(J4x - 18.0, ysd + 14.5, "Raspberry Pi debug connector (JST-SH 3-pin): the Debug Probe's 'D' "
@@ -350,7 +350,7 @@ def mcu_left():
     # ---- RUN and BOOT -----------------------------------------------------------------
     yb = ry("60")
     S().nc(*pin("26"))
-    tag("boot:r"); l, r = hpart("R1K", nref("R"), xL - 15.24, yb)
+    tag("boot:r"); l, r = hpart("R1K_0402", nref("R"), xL - 15.24, yb)
     W(pin("60"), r)
     sw = part("BUTTON", "SW1", xL - 33.02, yb, value="BOOT", ref_at=(xL - 38.1, yb - 3.3), val_at=(xL - 30.48, yb - 3.3))
     W(l, sw.pin("2"))
@@ -366,9 +366,9 @@ def mcu_left():
     yrx, ytx = ry(gpin("UART_RX")), ry(gpin("UART_TX"))
     J5 = part("JSTSH3", "J5", J4x, ytx, value="UART", sym="Conn_UART", ref_at=(J4x - 3.81, ytx - 6.4),
               val_at=(J4x + 4.6, ytx - 6.4))
-    tag("uart:r_rx"); l, r = hpart("R100", nref("R"), xL - 15.24, yrx)
+    tag("uart:r_rx"); l, r = hpart("R100_0402", nref("R"), xL - 15.24, yrx)
     W(J5.pin("1"), l); W(r, pin(gpin("UART_RX")))
-    tag("uart:r_tx"); l, r = hpart("R100", nref("R"), xL - 27.94, ytx, ref_at=(xL - 32.2, ytx + 3.0), val_at=(xL - 26.4, ytx + 1.6))
+    tag("uart:r_tx"); l, r = hpart("R100_0402", nref("R"), xL - 27.94, ytx, ref_at=(xL - 32.2, ytx + 3.0), val_at=(xL - 26.4, ytx + 1.6))
     W(J5.pin("3"), l); W(r, pin(gpin("UART_TX")))
     gnd(*J5.pin("2")); gnd(*J5.pin("MP"))
     note(J4x - 18.0, ytx + 14.5, "UART0 console, 115200 baud: the Debug Probe's 'U' cable. Works when USB "

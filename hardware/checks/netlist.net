@@ -2,7 +2,7 @@
 	(version "E")
 	(design
 		(source "../OWLternatingCurrent.kicad_sch")
-		(date "2026-10-07T14:31:17")
+		(date "2026-10-07T14:50:04")
 		(tool "Eeschema 10.0.6")
 		(textvar
 			(name "DATE") "2026-10-07")
@@ -905,14 +905,14 @@
 		(comp
 			(ref "C8")
 			(value "1u")
-			(footprint "OWL:C_0603_1608Metric")
+			(footprint "OWL:C_0402_1005Metric")
 			(fields
 				(field
-					(name "LCSC") "C15849")
+					(name "LCSC") "C52923")
 				(field
-					(name "MPN") "CL10A105KB8NNNC")
+					(name "MPN") "CL05A105KA5NQNC")
 				(field
-					(name "Footprint") "OWL:C_0603_1608Metric")
+					(name "Footprint") "OWL:C_0402_1005Metric")
 				(field
 					(name "Datasheet")
 				)
@@ -927,11 +927,11 @@
 			)
 			(property
 				(name "LCSC")
-				(value "C15849")
+				(value "C52923")
 			)
 			(property
 				(name "MPN")
-				(value "CL10A105KB8NNNC")
+				(value "CL05A105KA5NQNC")
 			)
 			(property
 				(name "Sheetname")
@@ -971,14 +971,14 @@
 		(comp
 			(ref "C9")
 			(value "1u")
-			(footprint "OWL:C_0603_1608Metric")
+			(footprint "OWL:C_0402_1005Metric")
 			(fields
 				(field
-					(name "LCSC") "C15849")
+					(name "LCSC") "C52923")
 				(field
-					(name "MPN") "CL10A105KB8NNNC")
+					(name "MPN") "CL05A105KA5NQNC")
 				(field
-					(name "Footprint") "OWL:C_0603_1608Metric")
+					(name "Footprint") "OWL:C_0402_1005Metric")
 				(field
 					(name "Datasheet")
 				)
@@ -993,11 +993,11 @@
 			)
 			(property
 				(name "LCSC")
-				(value "C15849")
+				(value "C52923")
 			)
 			(property
 				(name "MPN")
-				(value "CL10A105KB8NNNC")
+				(value "CL05A105KA5NQNC")
 			)
 			(property
 				(name "Sheetname")
@@ -1235,14 +1235,14 @@
 		(comp
 			(ref "C13")
 			(value "100n")
-			(footprint "OWL:C_0603_1608Metric")
+			(footprint "OWL:C_0402_1005Metric")
 			(fields
 				(field
-					(name "LCSC") "C14663")
+					(name "LCSC") "C1525")
 				(field
-					(name "MPN") "CC0603KRX7R9BB104")
+					(name "MPN") "CL05B104KO5NNNC")
 				(field
-					(name "Footprint") "OWL:C_0603_1608Metric")
+					(name "Footprint") "OWL:C_0402_1005Metric")
 				(field
 					(name "Datasheet")
 				)
@@ -1257,11 +1257,11 @@
 			)
 			(property
 				(name "LCSC")
-				(value "C14663")
+				(value "C1525")
 			)
 			(property
 				(name "MPN")
-				(value "CC0603KRX7R9BB104")
+				(value "CL05B104KO5NNNC")
 			)
 			(property
 				(name "Sheetname")
@@ -1301,14 +1301,14 @@
 		(comp
 			(ref "C14")
 			(value "100n")
-			(footprint "OWL:C_0603_1608Metric")
+			(footprint "OWL:C_0402_1005Metric")
 			(fields
 				(field
-					(name "LCSC") "C14663")
+					(name "LCSC") "C1525")
 				(field
-					(name "MPN") "CC0603KRX7R9BB104")
+					(name "MPN") "CL05B104KO5NNNC")
 				(field
-					(name "Footprint") "OWL:C_0603_1608Metric")
+					(name "Footprint") "OWL:C_0402_1005Metric")
 				(field
 					(name "Datasheet")
 				)
@@ -1323,11 +1323,11 @@
 			)
 			(property
 				(name "LCSC")
-				(value "C14663")
+				(value "C1525")
 			)
 			(property
 				(name "MPN")
-				(value "CC0603KRX7R9BB104")
+				(value "CL05B104KO5NNNC")
 			)
 			(property
 				(name "Sheetname")
@@ -1367,14 +1367,14 @@
 		(comp
 			(ref "C15")
 			(value "100n")
-			(footprint "OWL:C_0603_1608Metric")
+			(footprint "OWL:C_0402_1005Metric")
 			(fields
 				(field
-					(name "LCSC") "C14663")
+					(name "LCSC") "C1525")
 				(field
-					(name "MPN") "CC0603KRX7R9BB104")
+					(name "MPN") "CL05B104KO5NNNC")
 				(field
-					(name "Footprint") "OWL:C_0603_1608Metric")
+					(name "Footprint") "OWL:C_0402_1005Metric")
 				(field
 					(name "Datasheet")
 				)
@@ -1389,11 +1389,11 @@
 			)
 			(property
 				(name "LCSC")
-				(value "C14663")
+				(value "C1525")
 			)
 			(property
 				(name "MPN")
-				(value "CC0603KRX7R9BB104")
+				(value "CL05B104KO5NNNC")
 			)
 			(property
 				(name "Sheetname")
@@ -1433,14 +1433,14 @@
 		(comp
 			(ref "C16")
 			(value "100n")
-			(footprint "OWL:C_0603_1608Metric")
+			(footprint "OWL:C_0402_1005Metric")
 			(fields
 				(field
-					(name "LCSC") "C14663")
+					(name "LCSC") "C1525")
 				(field
-					(name "MPN") "CC0603KRX7R9BB104")
+					(name "MPN") "CL05B104KO5NNNC")
 				(field
-					(name "Footprint") "OWL:C_0603_1608Metric")
+					(name "Footprint") "OWL:C_0402_1005Metric")
 				(field
 					(name "Datasheet")
 				)
@@ -1455,11 +1455,11 @@
 			)
 			(property
 				(name "LCSC")
-				(value "C14663")
+				(value "C1525")
 			)
 			(property
 				(name "MPN")
-				(value "CC0603KRX7R9BB104")
+				(value "CL05B104KO5NNNC")
 			)
 			(property
 				(name "Sheetname")
@@ -1499,14 +1499,14 @@
 		(comp
 			(ref "C17")
 			(value "100n")
-			(footprint "OWL:C_0603_1608Metric")
+			(footprint "OWL:C_0402_1005Metric")
 			(fields
 				(field
-					(name "LCSC") "C14663")
+					(name "LCSC") "C1525")
 				(field
-					(name "MPN") "CC0603KRX7R9BB104")
+					(name "MPN") "CL05B104KO5NNNC")
 				(field
-					(name "Footprint") "OWL:C_0603_1608Metric")
+					(name "Footprint") "OWL:C_0402_1005Metric")
 				(field
 					(name "Datasheet")
 				)
@@ -1521,11 +1521,11 @@
 			)
 			(property
 				(name "LCSC")
-				(value "C14663")
+				(value "C1525")
 			)
 			(property
 				(name "MPN")
-				(value "CC0603KRX7R9BB104")
+				(value "CL05B104KO5NNNC")
 			)
 			(property
 				(name "Sheetname")
@@ -1565,14 +1565,14 @@
 		(comp
 			(ref "C18")
 			(value "100n")
-			(footprint "OWL:C_0603_1608Metric")
+			(footprint "OWL:C_0402_1005Metric")
 			(fields
 				(field
-					(name "LCSC") "C14663")
+					(name "LCSC") "C1525")
 				(field
-					(name "MPN") "CC0603KRX7R9BB104")
+					(name "MPN") "CL05B104KO5NNNC")
 				(field
-					(name "Footprint") "OWL:C_0603_1608Metric")
+					(name "Footprint") "OWL:C_0402_1005Metric")
 				(field
 					(name "Datasheet")
 				)
@@ -1587,11 +1587,11 @@
 			)
 			(property
 				(name "LCSC")
-				(value "C14663")
+				(value "C1525")
 			)
 			(property
 				(name "MPN")
-				(value "CC0603KRX7R9BB104")
+				(value "CL05B104KO5NNNC")
 			)
 			(property
 				(name "Sheetname")
@@ -1631,14 +1631,14 @@
 		(comp
 			(ref "C19")
 			(value "100n")
-			(footprint "OWL:C_0603_1608Metric")
+			(footprint "OWL:C_0402_1005Metric")
 			(fields
 				(field
-					(name "LCSC") "C14663")
+					(name "LCSC") "C1525")
 				(field
-					(name "MPN") "CC0603KRX7R9BB104")
+					(name "MPN") "CL05B104KO5NNNC")
 				(field
-					(name "Footprint") "OWL:C_0603_1608Metric")
+					(name "Footprint") "OWL:C_0402_1005Metric")
 				(field
 					(name "Datasheet")
 				)
@@ -1653,11 +1653,11 @@
 			)
 			(property
 				(name "LCSC")
-				(value "C14663")
+				(value "C1525")
 			)
 			(property
 				(name "MPN")
-				(value "CC0603KRX7R9BB104")
+				(value "CL05B104KO5NNNC")
 			)
 			(property
 				(name "Sheetname")
@@ -1697,14 +1697,14 @@
 		(comp
 			(ref "C20")
 			(value "100n")
-			(footprint "OWL:C_0603_1608Metric")
+			(footprint "OWL:C_0402_1005Metric")
 			(fields
 				(field
-					(name "LCSC") "C14663")
+					(name "LCSC") "C1525")
 				(field
-					(name "MPN") "CC0603KRX7R9BB104")
+					(name "MPN") "CL05B104KO5NNNC")
 				(field
-					(name "Footprint") "OWL:C_0603_1608Metric")
+					(name "Footprint") "OWL:C_0402_1005Metric")
 				(field
 					(name "Datasheet")
 				)
@@ -1719,11 +1719,11 @@
 			)
 			(property
 				(name "LCSC")
-				(value "C14663")
+				(value "C1525")
 			)
 			(property
 				(name "MPN")
-				(value "CC0603KRX7R9BB104")
+				(value "CL05B104KO5NNNC")
 			)
 			(property
 				(name "Sheetname")
@@ -1763,14 +1763,14 @@
 		(comp
 			(ref "C21")
 			(value "100n")
-			(footprint "OWL:C_0603_1608Metric")
+			(footprint "OWL:C_0402_1005Metric")
 			(fields
 				(field
-					(name "LCSC") "C14663")
+					(name "LCSC") "C1525")
 				(field
-					(name "MPN") "CC0603KRX7R9BB104")
+					(name "MPN") "CL05B104KO5NNNC")
 				(field
-					(name "Footprint") "OWL:C_0603_1608Metric")
+					(name "Footprint") "OWL:C_0402_1005Metric")
 				(field
 					(name "Datasheet")
 				)
@@ -1785,11 +1785,11 @@
 			)
 			(property
 				(name "LCSC")
-				(value "C14663")
+				(value "C1525")
 			)
 			(property
 				(name "MPN")
-				(value "CC0603KRX7R9BB104")
+				(value "CL05B104KO5NNNC")
 			)
 			(property
 				(name "Sheetname")
@@ -1829,14 +1829,14 @@
 		(comp
 			(ref "C22")
 			(value "100n")
-			(footprint "OWL:C_0603_1608Metric")
+			(footprint "OWL:C_0402_1005Metric")
 			(fields
 				(field
-					(name "LCSC") "C14663")
+					(name "LCSC") "C1525")
 				(field
-					(name "MPN") "CC0603KRX7R9BB104")
+					(name "MPN") "CL05B104KO5NNNC")
 				(field
-					(name "Footprint") "OWL:C_0603_1608Metric")
+					(name "Footprint") "OWL:C_0402_1005Metric")
 				(field
 					(name "Datasheet")
 				)
@@ -1851,11 +1851,11 @@
 			)
 			(property
 				(name "LCSC")
-				(value "C14663")
+				(value "C1525")
 			)
 			(property
 				(name "MPN")
-				(value "CC0603KRX7R9BB104")
+				(value "CL05B104KO5NNNC")
 			)
 			(property
 				(name "Sheetname")
@@ -1895,14 +1895,14 @@
 		(comp
 			(ref "C23")
 			(value "100n")
-			(footprint "OWL:C_0603_1608Metric")
+			(footprint "OWL:C_0402_1005Metric")
 			(fields
 				(field
-					(name "LCSC") "C14663")
+					(name "LCSC") "C1525")
 				(field
-					(name "MPN") "CC0603KRX7R9BB104")
+					(name "MPN") "CL05B104KO5NNNC")
 				(field
-					(name "Footprint") "OWL:C_0603_1608Metric")
+					(name "Footprint") "OWL:C_0402_1005Metric")
 				(field
 					(name "Datasheet")
 				)
@@ -1917,11 +1917,11 @@
 			)
 			(property
 				(name "LCSC")
-				(value "C14663")
+				(value "C1525")
 			)
 			(property
 				(name "MPN")
-				(value "CC0603KRX7R9BB104")
+				(value "CL05B104KO5NNNC")
 			)
 			(property
 				(name "Sheetname")
@@ -1961,14 +1961,14 @@
 		(comp
 			(ref "C24")
 			(value "100n")
-			(footprint "OWL:C_0603_1608Metric")
+			(footprint "OWL:C_0402_1005Metric")
 			(fields
 				(field
-					(name "LCSC") "C14663")
+					(name "LCSC") "C1525")
 				(field
-					(name "MPN") "CC0603KRX7R9BB104")
+					(name "MPN") "CL05B104KO5NNNC")
 				(field
-					(name "Footprint") "OWL:C_0603_1608Metric")
+					(name "Footprint") "OWL:C_0402_1005Metric")
 				(field
 					(name "Datasheet")
 				)
@@ -1983,11 +1983,11 @@
 			)
 			(property
 				(name "LCSC")
-				(value "C14663")
+				(value "C1525")
 			)
 			(property
 				(name "MPN")
-				(value "CC0603KRX7R9BB104")
+				(value "CL05B104KO5NNNC")
 			)
 			(property
 				(name "Sheetname")
@@ -2026,15 +2026,15 @@
 		)
 		(comp
 			(ref "C25")
-			(value "10u 25V")
-			(footprint "OWL:C_0805_2012Metric")
+			(value "10u")
+			(footprint "OWL:C_0603_1608Metric")
 			(fields
 				(field
-					(name "LCSC") "C15850")
+					(name "LCSC") "C19702")
 				(field
-					(name "MPN") "CL21A106KAYNNNE")
+					(name "MPN") "CL10A106KP8NNNC")
 				(field
-					(name "Footprint") "OWL:C_0805_2012Metric")
+					(name "Footprint") "OWL:C_0603_1608Metric")
 				(field
 					(name "Datasheet")
 				)
@@ -2049,11 +2049,11 @@
 			)
 			(property
 				(name "LCSC")
-				(value "C15850")
+				(value "C19702")
 			)
 			(property
 				(name "MPN")
-				(value "CL21A106KAYNNNE")
+				(value "CL10A106KP8NNNC")
 			)
 			(property
 				(name "Sheetname")
@@ -2093,14 +2093,14 @@
 		(comp
 			(ref "C26")
 			(value "15p")
-			(footprint "OWL:C_0603_1608Metric")
+			(footprint "OWL:C_0402_1005Metric")
 			(fields
 				(field
-					(name "LCSC") "C1644")
+					(name "LCSC") "C1548")
 				(field
-					(name "MPN") "CL10C150JB8NNNC")
+					(name "MPN") "0402CG150J500NT")
 				(field
-					(name "Footprint") "OWL:C_0603_1608Metric")
+					(name "Footprint") "OWL:C_0402_1005Metric")
 				(field
 					(name "Datasheet")
 				)
@@ -2115,11 +2115,11 @@
 			)
 			(property
 				(name "LCSC")
-				(value "C1644")
+				(value "C1548")
 			)
 			(property
 				(name "MPN")
-				(value "CL10C150JB8NNNC")
+				(value "0402CG150J500NT")
 			)
 			(property
 				(name "Sheetname")
@@ -2159,14 +2159,14 @@
 		(comp
 			(ref "C27")
 			(value "15p")
-			(footprint "OWL:C_0603_1608Metric")
+			(footprint "OWL:C_0402_1005Metric")
 			(fields
 				(field
-					(name "LCSC") "C1644")
+					(name "LCSC") "C1548")
 				(field
-					(name "MPN") "CL10C150JB8NNNC")
+					(name "MPN") "0402CG150J500NT")
 				(field
-					(name "Footprint") "OWL:C_0603_1608Metric")
+					(name "Footprint") "OWL:C_0402_1005Metric")
 				(field
 					(name "Datasheet")
 				)
@@ -2181,11 +2181,11 @@
 			)
 			(property
 				(name "LCSC")
-				(value "C1644")
+				(value "C1548")
 			)
 			(property
 				(name "MPN")
-				(value "CL10C150JB8NNNC")
+				(value "0402CG150J500NT")
 			)
 			(property
 				(name "Sheetname")
@@ -9311,14 +9311,14 @@
 		(comp
 			(ref "R7")
 			(value "27")
-			(footprint "OWL:R_0603_1608Metric")
+			(footprint "OWL:R_0402_1005Metric")
 			(fields
 				(field
-					(name "LCSC") "C25190")
+					(name "LCSC") "C25100")
 				(field
-					(name "MPN") "0603WAF270JT5E")
+					(name "MPN") "0402WGF270JTCE")
 				(field
-					(name "Footprint") "OWL:R_0603_1608Metric")
+					(name "Footprint") "OWL:R_0402_1005Metric")
 				(field
 					(name "Datasheet")
 				)
@@ -9333,11 +9333,11 @@
 			)
 			(property
 				(name "LCSC")
-				(value "C25190")
+				(value "C25100")
 			)
 			(property
 				(name "MPN")
-				(value "0603WAF270JT5E")
+				(value "0402WGF270JTCE")
 			)
 			(property
 				(name "Sheetname")
@@ -9377,14 +9377,14 @@
 		(comp
 			(ref "R8")
 			(value "27")
-			(footprint "OWL:R_0603_1608Metric")
+			(footprint "OWL:R_0402_1005Metric")
 			(fields
 				(field
-					(name "LCSC") "C25190")
+					(name "LCSC") "C25100")
 				(field
-					(name "MPN") "0603WAF270JT5E")
+					(name "MPN") "0402WGF270JTCE")
 				(field
-					(name "Footprint") "OWL:R_0603_1608Metric")
+					(name "Footprint") "OWL:R_0402_1005Metric")
 				(field
 					(name "Datasheet")
 				)
@@ -9399,11 +9399,11 @@
 			)
 			(property
 				(name "LCSC")
-				(value "C25190")
+				(value "C25100")
 			)
 			(property
 				(name "MPN")
-				(value "0603WAF270JT5E")
+				(value "0402WGF270JTCE")
 			)
 			(property
 				(name "Sheetname")
@@ -9443,14 +9443,14 @@
 		(comp
 			(ref "R9")
 			(value "5.1k")
-			(footprint "OWL:R_0603_1608Metric")
+			(footprint "OWL:R_0402_1005Metric")
 			(fields
 				(field
-					(name "LCSC") "C23186")
+					(name "LCSC") "C25905")
 				(field
-					(name "MPN") "0603WAF5101T5E")
+					(name "MPN") "0402WGF5101TCE")
 				(field
-					(name "Footprint") "OWL:R_0603_1608Metric")
+					(name "Footprint") "OWL:R_0402_1005Metric")
 				(field
 					(name "Datasheet")
 				)
@@ -9465,11 +9465,11 @@
 			)
 			(property
 				(name "LCSC")
-				(value "C23186")
+				(value "C25905")
 			)
 			(property
 				(name "MPN")
-				(value "0603WAF5101T5E")
+				(value "0402WGF5101TCE")
 			)
 			(property
 				(name "Sheetname")
@@ -9509,14 +9509,14 @@
 		(comp
 			(ref "R10")
 			(value "5.1k")
-			(footprint "OWL:R_0603_1608Metric")
+			(footprint "OWL:R_0402_1005Metric")
 			(fields
 				(field
-					(name "LCSC") "C23186")
+					(name "LCSC") "C25905")
 				(field
-					(name "MPN") "0603WAF5101T5E")
+					(name "MPN") "0402WGF5101TCE")
 				(field
-					(name "Footprint") "OWL:R_0603_1608Metric")
+					(name "Footprint") "OWL:R_0402_1005Metric")
 				(field
 					(name "Datasheet")
 				)
@@ -9531,11 +9531,11 @@
 			)
 			(property
 				(name "LCSC")
-				(value "C23186")
+				(value "C25905")
 			)
 			(property
 				(name "MPN")
-				(value "0603WAF5101T5E")
+				(value "0402WGF5101TCE")
 			)
 			(property
 				(name "Sheetname")
@@ -9575,14 +9575,14 @@
 		(comp
 			(ref "R11")
 			(value "1k")
-			(footprint "OWL:R_0603_1608Metric")
+			(footprint "OWL:R_0402_1005Metric")
 			(fields
 				(field
-					(name "LCSC") "C21190")
+					(name "LCSC") "C11702")
 				(field
-					(name "MPN") "0603WAF1001T5E")
+					(name "MPN") "0402WGF1001TCE")
 				(field
-					(name "Footprint") "OWL:R_0603_1608Metric")
+					(name "Footprint") "OWL:R_0402_1005Metric")
 				(field
 					(name "Datasheet")
 				)
@@ -9597,11 +9597,11 @@
 			)
 			(property
 				(name "LCSC")
-				(value "C21190")
+				(value "C11702")
 			)
 			(property
 				(name "MPN")
-				(value "0603WAF1001T5E")
+				(value "0402WGF1001TCE")
 			)
 			(property
 				(name "Sheetname")
@@ -9641,14 +9641,14 @@
 		(comp
 			(ref "R12")
 			(value "100")
-			(footprint "OWL:R_0603_1608Metric")
+			(footprint "OWL:R_0402_1005Metric")
 			(fields
 				(field
-					(name "LCSC") "C22775")
+					(name "LCSC") "C25076")
 				(field
-					(name "MPN") "0603WAF1000T5E")
+					(name "MPN") "0402WGF1000TCE")
 				(field
-					(name "Footprint") "OWL:R_0603_1608Metric")
+					(name "Footprint") "OWL:R_0402_1005Metric")
 				(field
 					(name "Datasheet")
 				)
@@ -9663,11 +9663,11 @@
 			)
 			(property
 				(name "LCSC")
-				(value "C22775")
+				(value "C25076")
 			)
 			(property
 				(name "MPN")
-				(value "0603WAF1000T5E")
+				(value "0402WGF1000TCE")
 			)
 			(property
 				(name "Sheetname")
@@ -9707,14 +9707,14 @@
 		(comp
 			(ref "R13")
 			(value "100")
-			(footprint "OWL:R_0603_1608Metric")
+			(footprint "OWL:R_0402_1005Metric")
 			(fields
 				(field
-					(name "LCSC") "C22775")
+					(name "LCSC") "C25076")
 				(field
-					(name "MPN") "0603WAF1000T5E")
+					(name "MPN") "0402WGF1000TCE")
 				(field
-					(name "Footprint") "OWL:R_0603_1608Metric")
+					(name "Footprint") "OWL:R_0402_1005Metric")
 				(field
 					(name "Datasheet")
 				)
@@ -9729,11 +9729,11 @@
 			)
 			(property
 				(name "LCSC")
-				(value "C22775")
+				(value "C25076")
 			)
 			(property
 				(name "MPN")
-				(value "0603WAF1000T5E")
+				(value "0402WGF1000TCE")
 			)
 			(property
 				(name "Sheetname")
@@ -9773,14 +9773,14 @@
 		(comp
 			(ref "R14")
 			(value "1k")
-			(footprint "OWL:R_0603_1608Metric")
+			(footprint "OWL:R_0402_1005Metric")
 			(fields
 				(field
-					(name "LCSC") "C21190")
+					(name "LCSC") "C11702")
 				(field
-					(name "MPN") "0603WAF1001T5E")
+					(name "MPN") "0402WGF1001TCE")
 				(field
-					(name "Footprint") "OWL:R_0603_1608Metric")
+					(name "Footprint") "OWL:R_0402_1005Metric")
 				(field
 					(name "Datasheet")
 				)
@@ -9795,11 +9795,11 @@
 			)
 			(property
 				(name "LCSC")
-				(value "C21190")
+				(value "C11702")
 			)
 			(property
 				(name "MPN")
-				(value "0603WAF1001T5E")
+				(value "0402WGF1001TCE")
 			)
 			(property
 				(name "Sheetname")
@@ -9839,14 +9839,14 @@
 		(comp
 			(ref "R15")
 			(value "100")
-			(footprint "OWL:R_0603_1608Metric")
+			(footprint "OWL:R_0402_1005Metric")
 			(fields
 				(field
-					(name "LCSC") "C22775")
+					(name "LCSC") "C25076")
 				(field
-					(name "MPN") "0603WAF1000T5E")
+					(name "MPN") "0402WGF1000TCE")
 				(field
-					(name "Footprint") "OWL:R_0603_1608Metric")
+					(name "Footprint") "OWL:R_0402_1005Metric")
 				(field
 					(name "Datasheet")
 				)
@@ -9861,11 +9861,11 @@
 			)
 			(property
 				(name "LCSC")
-				(value "C22775")
+				(value "C25076")
 			)
 			(property
 				(name "MPN")
-				(value "0603WAF1000T5E")
+				(value "0402WGF1000TCE")
 			)
 			(property
 				(name "Sheetname")
@@ -9905,14 +9905,14 @@
 		(comp
 			(ref "R16")
 			(value "100")
-			(footprint "OWL:R_0603_1608Metric")
+			(footprint "OWL:R_0402_1005Metric")
 			(fields
 				(field
-					(name "LCSC") "C22775")
+					(name "LCSC") "C25076")
 				(field
-					(name "MPN") "0603WAF1000T5E")
+					(name "MPN") "0402WGF1000TCE")
 				(field
-					(name "Footprint") "OWL:R_0603_1608Metric")
+					(name "Footprint") "OWL:R_0402_1005Metric")
 				(field
 					(name "Datasheet")
 				)
@@ -9927,11 +9927,11 @@
 			)
 			(property
 				(name "LCSC")
-				(value "C22775")
+				(value "C25076")
 			)
 			(property
 				(name "MPN")
-				(value "0603WAF1000T5E")
+				(value "0402WGF1000TCE")
 			)
 			(property
 				(name "Sheetname")
@@ -12836,10 +12836,10 @@
 		(comp
 			(ref "TP3")
 			(value "+3V3")
-			(footprint "OWL:TestPoint_Pad_D1.5mm")
+			(footprint "OWL:TestPoint_Pad_D1.0mm")
 			(fields
 				(field
-					(name "Footprint") "OWL:TestPoint_Pad_D1.5mm")
+					(name "Footprint") "OWL:TestPoint_Pad_D1.0mm")
 				(field
 					(name "Datasheet")
 				)
@@ -12887,10 +12887,10 @@
 		(comp
 			(ref "TP4")
 			(value "VSYS")
-			(footprint "OWL:TestPoint_Pad_D1.5mm")
+			(footprint "OWL:TestPoint_Pad_D1.0mm")
 			(fields
 				(field
-					(name "Footprint") "OWL:TestPoint_Pad_D1.5mm")
+					(name "Footprint") "OWL:TestPoint_Pad_D1.0mm")
 				(field
 					(name "Datasheet")
 				)
@@ -12938,10 +12938,10 @@
 		(comp
 			(ref "TP5")
 			(value "+1V1")
-			(footprint "OWL:TestPoint_Pad_D1.5mm")
+			(footprint "OWL:TestPoint_Pad_D1.0mm")
 			(fields
 				(field
-					(name "Footprint") "OWL:TestPoint_Pad_D1.5mm")
+					(name "Footprint") "OWL:TestPoint_Pad_D1.0mm")
 				(field
 					(name "Datasheet")
 				)
@@ -12989,10 +12989,10 @@
 		(comp
 			(ref "TP6")
 			(value "VBUS")
-			(footprint "OWL:TestPoint_Pad_D1.5mm")
+			(footprint "OWL:TestPoint_Pad_D1.0mm")
 			(fields
 				(field
-					(name "Footprint") "OWL:TestPoint_Pad_D1.5mm")
+					(name "Footprint") "OWL:TestPoint_Pad_D1.0mm")
 				(field
 					(name "Datasheet")
 				)
@@ -13187,14 +13187,14 @@
 		(comp
 			(ref "U3")
 			(value "LP5036")
-			(footprint "OWL:VQFN-46-1EP_5x6mm_P0.4mm_EP2.8x3.8mm_ThermalVias")
+			(footprint "OWL:VQFN-46-1EP_5x6mm_P0.4mm_EP2.8x3.8mm")
 			(fields
 				(field
 					(name "LCSC") "C701961")
 				(field
 					(name "MPN") "LP5036RJVR")
 				(field
-					(name "Footprint") "OWL:VQFN-46-1EP_5x6mm_P0.4mm_EP2.8x3.8mm_ThermalVias")
+					(name "Footprint") "OWL:VQFN-46-1EP_5x6mm_P0.4mm_EP2.8x3.8mm")
 				(field
 					(name "Datasheet")
 				)
@@ -16533,14 +16533,14 @@
 		(comp
 			(ref "U101")
 			(value "LP5036")
-			(footprint "OWL:VQFN-46-1EP_5x6mm_P0.4mm_EP2.8x3.8mm_ThermalVias")
+			(footprint "OWL:VQFN-46-1EP_5x6mm_P0.4mm_EP2.8x3.8mm")
 			(fields
 				(field
 					(name "LCSC") "C701961")
 				(field
 					(name "MPN") "LP5036RJVR")
 				(field
-					(name "Footprint") "OWL:VQFN-46-1EP_5x6mm_P0.4mm_EP2.8x3.8mm_ThermalVias")
+					(name "Footprint") "OWL:VQFN-46-1EP_5x6mm_P0.4mm_EP2.8x3.8mm")
 				(field
 					(name "Datasheet")
 				)
@@ -17872,15 +17872,15 @@
 		)
 		(comp
 			(ref "D402")
-			(value "violet")
-			(footprint "OWL:LED_Everlight-SMD3528_3.5x2.8mm_67-21ST")
+			(value "purple")
+			(footprint "OWL:LED_0603_1608Metric")
 			(fields
 				(field
-					(name "LCSC") "C516136")
+					(name "LCSC") "C51933300")
 				(field
-					(name "MPN") "HL-A-3528S7VC-S1-13HL")
+					(name "MPN") "GL0603PU01")
 				(field
-					(name "Footprint") "OWL:LED_Everlight-SMD3528_3.5x2.8mm_67-21ST")
+					(name "Footprint") "OWL:LED_0603_1608Metric")
 				(field
 					(name "Datasheet")
 				)
@@ -17895,11 +17895,11 @@
 			)
 			(property
 				(name "LCSC")
-				(value "C516136")
+				(value "C51933300")
 			)
 			(property
 				(name "MPN")
-				(value "HL-A-3528S7VC-S1-13HL")
+				(value "GL0603PU01")
 			)
 			(property
 				(name "Sheetname")
@@ -18254,15 +18254,15 @@
 		)
 		(comp
 			(ref "D502")
-			(value "violet")
-			(footprint "OWL:LED_Everlight-SMD3528_3.5x2.8mm_67-21ST")
+			(value "purple")
+			(footprint "OWL:LED_0603_1608Metric")
 			(fields
 				(field
-					(name "LCSC") "C516136")
+					(name "LCSC") "C51933300")
 				(field
-					(name "MPN") "HL-A-3528S7VC-S1-13HL")
+					(name "MPN") "GL0603PU01")
 				(field
-					(name "Footprint") "OWL:LED_Everlight-SMD3528_3.5x2.8mm_67-21ST")
+					(name "Footprint") "OWL:LED_0603_1608Metric")
 				(field
 					(name "Datasheet")
 				)
@@ -18277,11 +18277,11 @@
 			)
 			(property
 				(name "LCSC")
-				(value "C516136")
+				(value "C51933300")
 			)
 			(property
 				(name "MPN")
-				(value "HL-A-3528S7VC-S1-13HL")
+				(value "GL0603PU01")
 			)
 			(property
 				(name "Sheetname")

@@ -205,10 +205,10 @@ def series(key, xc, y, ref=None, above=True, fsize=1.0):
     return hpart(key, ref, xc, y, ref_at=(xc, y + 3.9), val_at=(xc, y + 4.3), fsize=fsize, justify="center")
 
 
-def tp(x, y, value, ref=None):
+def tp(x, y, value, ref=None, key="TP"):
     """A test pad at (x, y), labelled with what it reads."""
     ref = ref or nref("TP")
-    part("TP", ref, x, y, value=value, ref_at=(x + 1.5, y - 3.6), val_at=(x + 1.5, y - 1.9), fsize=1.0)
+    part(key, ref, x, y, value=value, ref_at=(x + 1.5, y - 3.6), val_at=(x + 1.5, y - 1.9), fsize=1.0)
     return ref
 
 

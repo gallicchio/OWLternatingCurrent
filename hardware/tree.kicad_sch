@@ -2558,7 +2558,7 @@
 		(uuid "3d40202b-48e8-3fdc-6854-ec9c794f4c3f")
 		(property "Reference" "U101" (at 115.5700 81.2800 0) (effects (font (size 1.27 1.27)) (justify right top)))
 		(property "Value" "LP5036" (at 127.0000 177.8000 0) (effects (font (size 1.27 1.27)) (justify right bottom)))
-		(property "Footprint" "OWL:VQFN-46-1EP_5x6mm_P0.4mm_EP2.8x3.8mm_ThermalVias" (at 124.4600 130.8100 0) (effects (font (size 1.27 1.27)) (justify left) (hide yes)))
+		(property "Footprint" "OWL:VQFN-46-1EP_5x6mm_P0.4mm_EP2.8x3.8mm" (at 124.4600 130.8100 0) (effects (font (size 1.27 1.27)) (justify left) (hide yes)))
 		(property "Datasheet" "~" (at 124.4600 130.8100 0) (effects (font (size 1.27 1.27)) (justify left) (hide yes)))
 		(property "Description" "" (at 124.4600 130.8100 0) (effects (font (size 1.27 1.27)) (justify left) (hide yes)))
 		(property "LCSC" "C701961" (at 124.4600 130.8100 0) (effects (font (size 1.27 1.27)) (justify left) (hide yes)))

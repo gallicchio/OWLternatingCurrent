@@ -24,12 +24,12 @@ sys.path.insert(0, os.path.join(ROOT, "tools"))
 sys.path.insert(0, HERE)
 import sch_util as U
 from sch_util import (G, part, hpart, vpart, gnd, flag, W, J, pwr_flag, label, note, title, box, nref, down,
-                      up, series, tp, line, vline, diode)
+                      up, series, tp, line, vline, diode, tag)
 import symbols as SYMB
 import pins as PINS
 import leds as LEDS
 
-UX, UY = 419.1, 266.7                  # the RP2354A's centre
+UX, UY = 419.1, 266.7                  # the RP2354A's centre (on the sheet)
 U4 = None
 
 
@@ -117,10 +117,10 @@ def buck(x0):
     xf, xc1, xc2, xr = x0 + 5.08, x0 + 12.7, x0 + 25.4, x0 + 38.1
     flag("+12V", xf, Y12)
     line(Y12, [xf, xc1, xc2, xr, vin[0]])
-    down("C10U", xc1, Y12)
-    down("C100N", xc2, Y12)
-    _, b2 = down("R100K", xr, Y12, net=None)
-    down("R22K", xr, b2[1])
+    tag("buck:cin"); down("C10U", xc1, Y12)
+    tag("buck:cin_hf"); down("C100N", xc2, Y12)
+    tag("buck:en_top"); _, b2 = down("R100K", xr, Y12, net=None)
+    tag("buck:en_bot"); down("R22K", xr, b2[1])
     xe = en[0] - G
     W(b2, (xe, b2[1]), (xe, en[1]), en)
     J(*b2)
@@ -128,7 +128,7 @@ def buck(x0):
     xs = sw[0] + 10.16
     yb = boot[1] - 7.62
     W(boot, (boot[0] + G, boot[1]), (boot[0] + G, yb), (xs, yb))
-    t, b = vpart("C100N", nref("C"), xs, yb + 3.81, fsize=1.0)
+    tag("buck:boot"); t, b = vpart("C100N", nref("C"), xs, yb + 3.81, fsize=1.0)
     W(b, (xs, sw[1]))
     l1, r1 = hpart("L10U", "L1", xs + 10.16, sw[1], ref_at=(xs + 10.16, sw[1] - 3.0),
                    val_at=(xs + 10.16, sw[1] + 3.3))
@@ -137,17 +137,17 @@ def buck(x0):
     # 2 x 22 uF, the +5V flag and the test pad
     xfb, x5a, x5b, xflag, xtp = r1[0] + 5.08, r1[0] + 15.24, r1[0] + 27.94, r1[0] + 38.1, r1[0] + 43.18
     line(sw[1], [r1[0], xfb, x5a, x5b, xflag, xtp])
-    _, b4 = down("R36K", xfb, sw[1], net=None)
-    down("R5K1", xfb, b4[1])
+    tag("buck:fb_top"); _, b4 = down("R36K", xfb, sw[1], net=None)
+    tag("buck:fb_bot"); down("R5K1", xfb, b4[1])
     xfw = fb[0] + 5.08
     W(fb, (xfw, fb[1]), (xfw, b4[1]), b4)
     J(*b4)
-    down("C22U", x5a, sw[1])
-    down("C22U", x5b, sw[1])
+    tag("buck:cout1"); down("C22U", x5a, sw[1])
+    tag("buck:cout2"); down("C22U", x5b, sw[1])
     flag("+5V", xflag, sw[1])
     W((xflag, sw[1]), (xflag, sw[1] + G))
     pwr_flag(xflag, sw[1] + G, rot=180)
-    tp(xtp, sw[1], "+4.8V")
+    tag("tp:5v"); tp(xtp, sw[1], "+4.8V")
     note(x0 + 2.54, 82.55,
          "U1, TPS54302: 12 V to 4.8 V, 3 A, 400 kHz. "
          "4.8 V, not 5: 0.596 V x (1 + 36k/5.1k) = 4.80 V from a Preferred and a Basic "
@@ -180,13 +180,13 @@ def vsys_ldo(x0):
     flag("VSYS", xf, yv)
     W((xf, yv), (xf, yv + G))
     pwr_flag(xf, yv + G, rot=180)
-    down("C1U", xc, yv)
+    tag("ldo:cin"); down("C1U", xc, yv)
     xo, xfl, xt = vo[0] + 5.08, vo[0] + 15.24, vo[0] + 20.32
     line(yv, [vo[0], xo, xfl, xt])
-    down("C1U", xo, yv)
+    tag("ldo:cout"); down("C1U", xo, yv)
     flag("+3V3", xfl, yv)
-    tp(xt, yv, "+3V3")
-    tp(xn, yv - 7.62, "VSYS")
+    tag("tp:3v3"); tp(xt, yv, "+3V3")
+    tag("tp:vsys"); tp(xn, yv - 7.62, "VSYS")
     W((xn, yv), (xn, yv - 7.62))
     note(x0 + 2.54, 82.55,
          "VSYS is 4.8 V less a Schottky drop, or USB's 5 V less one: so the RP2354A, the "
@@ -213,13 +213,14 @@ def mcu():
         under its ground, between the wires."""
         x = xs[num]
         W((x, Yj), (x + G, Yj))
+        tag("decap:%s" % num)
         t, b = vpart(key, nref("C"), x + G, Yj + 3.81, fsize=1.0, justify="center",
                      ref_at=(x + G, ytop - 2.0), val_at=(x + G, ytop - 2.0))
         gnd(*b)
         J(x, Yj)
 
     x = xs["46"]                                    # VREG_AVDD: 33 R and 4.7 uF (Raspberry Pi's R3, C9)
-    t, b = vpart("R33_RPI", nref("R"), x, Y33 + 3.81, fsize=1.0)
+    tag("rp:r33"); t, b = vpart("R33_RPI", nref("R"), x, Y33 + 3.81, fsize=1.0)
     W(b, (x, ytop))
     W((x, b[1] + G), (x - G, b[1] + G))
     J(x, b[1] + G)
@@ -258,7 +259,7 @@ def mcu():
     for n in ("47", "61"):
         gnd(*pin(n))
     x11 = xs[dv[-1]] - 3.81
-    tp(x11, Y11, "+1V1")
+    tag("tp:1v1"); tp(x11, Y11, "+1V1")
     J(x11, Y11)
     note(xs["46"] - 3.0, Y33 - 21.0,
          "Core regulator (1.1 V): Raspberry Pi's parts and layout, copied exactly "
@@ -285,18 +286,18 @@ def mcu_left():
         W(J2.pin(a), (xst, J2.pin(a)[1]), (xst, J2.pin(b)[1]), J2.pin(b))
     ydm, ydp = J2.pin("B7")[1], J2.pin("A6")[1]
     J(xst, ydm); J(xst, ydp)
-    l, r = hpart("R27", nref("R"), xL - 17.78, ydm)
+    tag("usb:r_dm"); l, r = hpart("R27", nref("R"), xL - 17.78, ydm)
     W((xst, ydm), l); W(r, pin("51"))
     label(xst + 3.0, ydm, "USB_D-"); label(r[0] + 1.0, ydm, "USB_DM")
-    l, r = hpart("R27", nref("R"), xL - 30.48, ydp, ref_at=(xL - 34.29, ydp + 3.0), val_at=(xL - 30.48, ydp + 1.6))
+    tag("usb:r_dp"); l, r = hpart("R27", nref("R"), xL - 30.48, ydp, ref_at=(xL - 34.29, ydp + 3.0), val_at=(xL - 30.48, ydp + 1.6))
     W((xst, ydp), l); W(r, pin("52"))
     label(xst + 3.0, ydp, "USB_D+"); label(r[0] + 1.0, ydp, "USB_DP")
     note(xL - 52.0, ydp + 4.6, "USB 2.0 full speed, 12 Mbit/s. 27 R at the chip (RP2350 datasheet).", cols=40)
     cc1, cc2 = J2.pin("A5"), J2.pin("B5")
-    l, r = hpart("R5K1", nref("R"), cc2[0] + 7.62, cc2[1], ref_at=(cc2[0] + 3.2, cc2[1] + 3.0),
+    tag("usb:r_cc2"); l, r = hpart("R5K1", nref("R"), cc2[0] + 7.62, cc2[1], ref_at=(cc2[0] + 3.2, cc2[1] + 3.0),
                  val_at=(cc2[0] + 3.2, cc2[1] + 3.0))
     W(cc2, l); gnd(*r)
-    l, r = hpart("R5K1", nref("R"), cc1[0] + 20.32, cc1[1], ref_at=(cc1[0] + 15.24, cc1[1] - 1.6),
+    tag("usb:r_cc1"); l, r = hpart("R5K1", nref("R"), cc1[0] + 20.32, cc1[1], ref_at=(cc1[0] + 15.24, cc1[1] - 1.6),
                  val_at=(cc1[0] + 21.6, cc1[1] - 2.9))
     W(cc1, l); gnd(*r)
     note(cc1[0] + 27.0, cc1[1] + 1.4, "CC1, CC2: 5.1 k to ground say 'device'; the host then gives 5 V.", cols=32)
@@ -311,8 +312,8 @@ def mcu_left():
     pwr_flag(xvb + G, vb[1])
     flag("VBUS", xvb, yvb)
     line(yvb, [xvb, xvb + 7.62, xvb + 15.24])
-    down("C10U", xvb + 7.62, yvb)
-    tp(xvb + 15.24, yvb, "VBUS")
+    tag("usb:c_vbus"); down("C10U", xvb + 7.62, yvb)
+    tag("tp:vbus"); tp(xvb + 15.24, yvb, "VBUS")
     note(J2x - 20.0, ry("51") + 31.0, "USB-C: programming and the console. It powers the logic (about "
          "110 mA), never the LEDs or coils.", cols=36)
 
@@ -322,9 +323,10 @@ def mcu_left():
     yc = (yi + yo) / 2
     Y1 = part("Y12M", "Y1", Xc, yc, rot=270, ref_at=(Xc + 4.4, yc - 0.3), val_at=(Xc + 4.4, yc + 0.3))
     W(pin("21"), (Xc, yi), Y1.pin("1"))
-    l, r = hpart("R1K", nref("R"), xL - 15.24, yo)
+    tag("xtal:r"); l, r = hpart("R1K", nref("R"), xL - 15.24, yo)
     W(pin("22"), r); W(l, (Xc, yo), Y1.pin("3"))
-    for yy in (yi, yo):
+    for yy, nm in ((yi, "xtal:c_in"), (yo, "xtal:c_out")):
+        tag(nm)
         l, r = hpart("C15P", nref("C"), Xc - 7.62, yy, ref_at=(Xc - 12.7, yy - 2.6), val_at=(Xc - 5.6, yy - 2.6))
         W(r, (Xc, yy)); gnd(*l)
         J(Xc, yy)
@@ -337,9 +339,9 @@ def mcu_left():
     J4x = J2x
     J4 = part("JSTSH3", "J4", J4x, ysd, value="SWD", sym="Conn_SWD", ref_at=(J4x - 3.81, ysd - 6.4),
               val_at=(J4x + 4.6, ysd - 6.4))
-    l, r = hpart("R100", nref("R"), xL - 15.24, ysc)
+    tag("swd:r_clk"); l, r = hpart("R100", nref("R"), xL - 15.24, ysc)
     W(J4.pin("1"), l); W(r, pin("24"))
-    l, r = hpart("R100", nref("R"), xL - 27.94, ysd, ref_at=(xL - 32.2, ysd + 3.0), val_at=(xL - 26.4, ysd + 1.6))
+    tag("swd:r_dio"); l, r = hpart("R100", nref("R"), xL - 27.94, ysd, ref_at=(xL - 32.2, ysd + 3.0), val_at=(xL - 26.4, ysd + 1.6))
     W(J4.pin("3"), l); W(r, pin("25"))
     gnd(*J4.pin("2")); gnd(*J4.pin("MP"))
     note(J4x - 18.0, ysd + 14.5, "Raspberry Pi debug connector (JST-SH 3-pin): the Debug Probe's 'D' "
@@ -348,7 +350,7 @@ def mcu_left():
     # ---- RUN and BOOT -----------------------------------------------------------------
     yb = ry("60")
     S().nc(*pin("26"))
-    l, r = hpart("R1K", nref("R"), xL - 15.24, yb)
+    tag("boot:r"); l, r = hpart("R1K", nref("R"), xL - 15.24, yb)
     W(pin("60"), r)
     sw = part("BUTTON", "SW1", xL - 33.02, yb, value="BOOT", ref_at=(xL - 38.1, yb - 3.3), val_at=(xL - 30.48, yb - 3.3))
     W(l, sw.pin("2"))
@@ -364,9 +366,9 @@ def mcu_left():
     yrx, ytx = ry(gpin("UART_RX")), ry(gpin("UART_TX"))
     J5 = part("JSTSH3", "J5", J4x, ytx, value="UART", sym="Conn_UART", ref_at=(J4x - 3.81, ytx - 6.4),
               val_at=(J4x + 4.6, ytx - 6.4))
-    l, r = hpart("R100", nref("R"), xL - 15.24, yrx)
+    tag("uart:r_rx"); l, r = hpart("R100", nref("R"), xL - 15.24, yrx)
     W(J5.pin("1"), l); W(r, pin(gpin("UART_RX")))
-    l, r = hpart("R100", nref("R"), xL - 27.94, ytx, ref_at=(xL - 32.2, ytx + 3.0), val_at=(xL - 26.4, ytx + 1.6))
+    tag("uart:r_tx"); l, r = hpart("R100", nref("R"), xL - 27.94, ytx, ref_at=(xL - 32.2, ytx + 3.0), val_at=(xL - 26.4, ytx + 1.6))
     W(J5.pin("3"), l); W(r, pin(gpin("UART_TX")))
     gnd(*J5.pin("2")); gnd(*J5.pin("MP"))
     note(J4x - 18.0, ytx + 14.5, "UART0 console, 115200 baud: the Debug Probe's 'U' cable. Works when USB "
@@ -374,7 +376,7 @@ def mcu_left():
 
     # ---- the SPELL button ---------------------------------------------------------------
     ybt = ry(gpin("BUTTON"))
-    l, r = hpart("R1K", nref("R"), xL - 15.24, ybt)
+    tag("spell:r"); l, r = hpart("R1K", nref("R"), xL - 15.24, ybt)
     W(pin(gpin("BUTTON")), r)
     sw2 = part("BUTTON", "SW2", xL - 33.02, ybt, value="SPELL", ref_at=(xL - 38.1, ybt - 3.3),
                val_at=(xL - 30.48, ybt - 3.3))
@@ -409,18 +411,18 @@ def audio_theremin():
     title(22.86, y_in - 27.94, "AUDIO")
     W((xa_dn, ya), (xa_dn, y_in))
     x = xa_dn
-    l1, r1 = series("R1K", x - 7.62, y_in)
+    tag("audio:r1"); l1, r1 = series("R1K", x - 7.62, y_in)
     xc1 = l1[0] - 5.08
-    l2, r2 = series("R1K", xc1 - 7.62, y_in)
+    tag("audio:r2"); l2, r2 = series("R1K", xc1 - 7.62, y_in)
     xc2 = l2[0] - 5.08
-    l3, r3 = series("C22N", xc2 - 7.62, y_in)
-    l4, r4 = series("R100K", l3[0] - 7.62, y_in)
+    tag("audio:cinp"); l3, r3 = series("C22N", xc2 - 7.62, y_in)
+    tag("audio:rinp"); l4, r4 = series("R100K", l3[0] - 7.62, y_in)
     line(y_in, [x, r1[0]])
     line(y_in, [l1[0], xc1, r2[0]])
     line(y_in, [l2[0], xc2, r3[0]])
     W(l3, r4)
-    down("C10N", xc1, y_in)
-    down("C10N", xc2, y_in)
+    tag("audio:c1"); down("C10N", xc1, y_in)
+    tag("audio:c2"); down("C10N", xc2, y_in)
     # U14 mirrored: inputs on its right, outputs on its left; INP on the audio line
     xu = l4[0] - G - 11.43
     yu = y_in + G
@@ -431,8 +433,8 @@ def audio_theremin():
     # INN: the same 100k and 22n, to ground, rising away from the signal line
     yn = inn[1] - 10.16
     W(inn, (inn[0] + G, inn[1]), (inn[0] + G, yn))
-    l5, r5 = series("R100K", inn[0] + G + 6.35, yn)
-    l6, r6 = series("C22N", r5[0] + 6.35, yn)
+    tag("audio:rinn"); l5, r5 = series("R100K", inn[0] + G + 6.35, yn)
+    tag("audio:cinn"); l6, r6 = series("C22N", r5[0] + 6.35, yn)
     W((inn[0] + G, yn), l5); W(r5, l6)
     gnd(*r6)
     # supply: 4.8 V, 10 uF and 1 uF
@@ -441,18 +443,18 @@ def audio_theremin():
     W(vcc, (vcc[0], yr))
     flag("+5V", vcc[0], yr)
     line(yr, [vcc[0], vcc[0] - 7.62, vcc[0] - 20.32])
-    down("C10U", vcc[0] - 7.62, yr, text="left")
-    down("C1U", vcc[0] - 20.32, yr, text="left")
+    tag("audio:cvcc_bulk"); down("C10U", vcc[0] - 7.62, yr, text="left")
+    tag("audio:cvcc"); down("C1U", vcc[0] - 20.32, yr, text="left")
     gnd(*u14.pin("7"))
     # BYPASS: 1 uF; CTRL: the sound switch through 10k, held low by 100k between
     xb = byp[0] + 5.08
     W(byp, (xb, byp[1]))
-    down("C1U", xb, byp[1])
+    tag("audio:cbyp"); down("C1U", xb, byp[1])
     xcv = ctrl[0] + 15.24
     ys = ctrl[1] + 22.86
     W(ctrl, (xcv, ctrl[1]), (xcv, ys))
-    down("R100K", xcv, ys, text="left")
-    l7, r7 = series("R10K", xcv + 8.89, ys)
+    tag("audio:rctrl_pd"); down("R100K", xcv, ys, text="left")
+    tag("audio:rctrl"); l7, r7 = series("R10K", xcv + 8.89, ys)
     W((xcv, ys), l7)
     sw3 = part("SLIDE", "SW3", r7[0] + 10.16, ys, value="SOUND", ref_at=(r7[0] + 7.6, ys - 5.0),
                val_at=(r7[0] + 7.6, ys + 4.5))
@@ -489,9 +491,9 @@ def audio_theremin():
         W(vcc, (vcc[0], yr))
         flag("+3V3", vcc[0], yr)
         W((vcc[0], yr), (vcc[0] + 7.62, yr))
-        down("C100N", vcc[0] + 7.62, yr)
+        tag("osc_%s:cvcc" % name); down("C100N", vcc[0] + 7.62, yr)
         # output through 33 R to the RP2354A
-        lo, ro = series("R33", o[0] + 7.62, ydst, above=False)
+        tag("osc_%s:rout" % name); lo, ro = series("R33", o[0] + 7.62, ydst, above=False)
         xn = o[0] + 2.54
         line(ydst, [o[0], xn, lo[0]])
         W(ro, (xdn, ydst), (xdn, ycol))
@@ -499,13 +501,13 @@ def audio_theremin():
         yf = ydst + 15.24
         xi = i[0] - 5.08
         W((xn, ydst), (xn, yf))
-        lf, rf = series("R100K", (xn + xi) / 2, yf, above=False)
+        tag("osc_%s:rf" % name); lf, rf = series("R100K", (xn + xi) / 2, yf, above=False)
         W((xn, yf), rf); W(lf, (xi, yf), (xi, ydst))
         W(i, (xi, ydst))
         # the timing capacitor and the antenna (the copper shape) on the input
         xa = xi - 7.62
         W((xi, ydst), (xa, ydst))
-        down("C15P", xa, ydst)
+        tag("osc_%s:ct" % name); down("C15P", xa, ydst)
         ant = part("ANTENNA", "AE1" if name == "PITCH" else "AE2", xa - 7.62, ydst - 5.08,
                    value=antenna, ref_at=(xa - 11.0, ydst - 7.0), val_at=(xa - 11.0, ydst - 7.0), justify="right")
         W((xa, ydst), ant.pin("1"))
@@ -556,8 +558,8 @@ def bus_left():
     xpc, xpd = xr + 12.7, xr + 20.32
     line(yc, [xr, xpc, X_SCL])
     line(yd, [xr, xpd, X_SDA])
-    up("R2K2", xpc, yc, "+3V3")
-    up("R2K2", xpd, yd, "+3V3", rise=5.08)
+    tag("i2c:pu_scl"); up("R2K2", xpc, yc, "+3V3")
+    tag("i2c:pu_sda"); up("R2K2", xpd, yd, "+3V3", rise=5.08)
     label(xr + 25.0, yc, "SCL"); label(xr + 25.0, yd, "SDA")
     # EN high; ADDR0 = ADDR1 = ground: address 0x30
     en, a0, a1 = u3.pin("43"), u3.pin("38"), u3.pin("39")
@@ -571,13 +573,13 @@ def bus_left():
     W(vcc, (vcc[0], yr))
     flag("+3V3", vcc[0], yr)
     line(yr, [vcc[0], vcc[0] + 5.08, vcc[0] + 12.7])
-    down("C1U", vcc[0] + 5.08, yr)
-    down("C100N", vcc[0] + 12.7, yr)
+    tag("u3:cvcc"); down("C1U", vcc[0] + 5.08, yr)
+    tag("u3:cvcc_hf"); down("C100N", vcc[0] + 12.7, yr)
     vcap, iref = u3.pin("45"), u3.pin("44")
     W(vcap, (vcap[0] + 15.24, vcap[1]))
-    down("C1U", vcap[0] + 15.24, vcap[1])
+    tag("u3:cvcap"); down("C1U", vcap[0] + 15.24, vcap[1])
     W(iref, (iref[0] + 5.08, iref[1]))
-    down("R3K3", iref[0] + 5.08, iref[1])
+    tag("u3:riref"); down("R3K3", iref[0] + 5.08, iref[1])
     gnd(*u3.pin("37"))
     # the LEDs: three staggered columns, each LED on its output's row, anode to 4.8 V
     xo = u3.pin("1")[0]
@@ -590,6 +592,7 @@ def bus_left():
         key = {"violet": "LED_VIOLET", "purple": "LED_PURPLE", "amber5050": "LED_AMBER5050",
                "orange": "LED_ORANGE"}[colour]
         dref = nref("D")
+        tag("led:%s" % name)
         d = part(key, dref, xc, out[1], rot=180, value={"amber5050": "orange x3"}.get(colour, colour),
                  ref_at=(xc - 15.24, out[1] - 0.3), val_at=(xc - 15.24, out[1] + 0.3), justify="right", fsize=1.0)
         k, a = d.pin("1"), d.pin("4") if key == "LED_AMBER5050" else d.pin("2")
@@ -625,8 +628,8 @@ def bus_left():
     W(vdd, (vdd[0], ys)); W(vio, (vio[0], ys))
     line(ys, [vio[0], vdd[0], vdd[0] - 7.62, vdd[0] - 15.24, vdd[0] - 22.86])
     flag("+3V3", vdd[0] - 22.86, ys)
-    down("C100N", vdd[0] - 7.62, ys)
-    down("C100N", vdd[0] - 15.24, ys, text="left")
+    tag("u15:cvdd"); down("C100N", vdd[0] - 7.62, ys)
+    tag("u15:cvddio"); down("C100N", vdd[0] - 15.24, ys, text="left")
     for n in ("6", "7"):
         gnd(*u15.pin(n))
     # U16, LTR-303ALS: ambient light (0x29)
@@ -641,7 +644,7 @@ def bus_left():
     W(vdd, (vdd[0], ys - G))
     flag("+3V3", vdd[0], ys - G)
     W((vdd[0], ys), (vdd[0] - 10.16, ys))
-    down("C1U", vdd[0] - 10.16, ys, text="left")
+    tag("u16:cvdd"); down("C1U", vdd[0] - 10.16, ys, text="left")
     J(vdd[0], ys)
     gnd(*u16.pin("3"))
     # U17, TMAG5273A2: the 3-axis Hall sensor under the pendulum (0x35)
@@ -656,7 +659,7 @@ def bus_left():
     W(vcc, (vcc[0], ys - G))
     flag("+3V3", vcc[0], ys - G)
     W((vcc[0], ys), (vcc[0] - 10.16, ys))
-    down("C100N", vcc[0] - 10.16, ys, text="left")
+    tag("u17:cvcc"); down("C100N", vcc[0] - 10.16, ys, text="left")
     J(vcc[0], ys)
     gnd(*u17.pin("2")); gnd(*u17.pin("3"))
     note(212.09, 403.86,
@@ -713,11 +716,11 @@ def drv_tiles():
     yj = 187.96
     W((xs8, yj), (535.94, yj))
     J(xs8, yj)
-    down("R4K7", 535.94, yj)
+    tag("drv:pd_sleep"); down("R4K7", 535.94, yj)
     yk = 210.82
     W((xs9, yk), (546.1, yk))
     J(xs9, yk)
-    up("R10K", 546.1, yk, "+3V3")
+    tag("drv:pu_fault"); up("R10K", 546.1, yk, "+3V3")
     for k, u in enumerate(tiles):
         tile(u, YD[k], k)
     note(701.04, 58.42,
@@ -746,17 +749,17 @@ def tile(u, yd, k):
     # charge pump: 22n CPH-CPL, 100n VCP-VM
     cph, cpl, vcp, vm = u.pin("13"), u.pin("14"), u.pin("12"), u.pin("11")
     yc = cph[1] - 5.08
-    l, r = series("C22N", (cph[0] + cpl[0]) / 2, yc)
+    tag("tile%d:ccp" % k); l, r = series("C22N", (cph[0] + cpl[0]) / 2, yc)
     W(cph, l); W(cpl, r)
-    l, r = series("C100N", (vcp[0] + vm[0]) / 2, yc)
+    tag("tile%d:cvcp" % k); l, r = series("C100N", (vcp[0] + vm[0]) / 2, yc)
     W(vcp, l)
     yr = yc - 5.08
     W(vm, r, (vm[0], yr))
     J(*r)
     flag("+12V", vm[0], yr)
     line(yr, [vm[0], vm[0] + 7.62, vm[0] + 17.78])
-    down("C100N", vm[0] + 7.62, yr)
-    down("C10U", vm[0] + 17.78, yr)
+    tag("tile%d:cvm" % k); down("C100N", vm[0] + 7.62, yr)
+    tag("tile%d:cvm_bulk" % k); down("C10U", vm[0] + 17.78, yr)
     for n in ("9", "15", "17"):
         gnd(*u.pin(n))
     # the coil, or the lines to the perch
@@ -775,10 +778,10 @@ def tile(u, yd, k):
         label(o2[0] + 1.0, o2[1], "PEND%d_B" % k, size=0.9)
     # current sense: 2.2k to ground (ITRIP), then 1k and 10n to the ADC or the mux
     xr = ip[0] + 7.62
-    down("R2K2", xr, ip[1], text="left")
-    l, r = series("R1K", ip[0] + 15.24, ip[1], above=False)
+    tag("tile%d:ripropi" % k); down("R2K2", xr, ip[1], text="left")
+    tag("tile%d:rf" % k); l, r = series("R1K", ip[0] + 15.24, ip[1], above=False)
     xc = r[0] + 3.81
-    down("C10N", xc, ip[1])
+    tag("tile%d:cf" % k); down("C10N", xc, ip[1])
     line(ip[1], [ip[0], xr, l[0]])
     if k == 0:
         W(r, (xc, ip[1]), (X_LEV_IPROPI, ip[1]))
@@ -814,7 +817,7 @@ def mux():
     yr = vcc[1] - 7.62
     W(vcc, (vcc[0], yr))
     flag("+3V3", vcc[0], yr)
-    l, r = series("C100N", vcc[0] + 5.08, vcc[1] - G)
+    tag("mux:cvcc"); l, r = series("C100N", vcc[0] + 5.08, vcc[1] - G)
     W((vcc[0], vcc[1] - G), l)
     J(vcc[0], vcc[1] - G)
     gnd(*r)
@@ -836,8 +839,8 @@ def mux():
     for num, rail, xcol, yt, xt, rtop, rbot in taps:
         q = u.pin(num)
         W(q, (xcol, q[1]), (xcol, yt), (xt, yt))
-        up(rtop, xt, yt, rail, text="left")
-        down(rbot, xt, yt, text="left")
+        tag("div:%s:top" % names[num]); up(rtop, xt, yt, rail, text="left")
+        tag("div:%s:bot" % names[num]); down(rbot, xt, yt, text="left")
         J(xt, yt)
         label(xt + 1.0, yt, names[num])
     return u
@@ -876,7 +879,7 @@ def bridges(u11):
     J(xe, e1[1])
     label(pe[0] + 1.0, pe[1], "FAM_EN")
     J(xe, e2[1])
-    down("R4K7", xe, e2[1], text="left")
+    tag("fam:pd_en"); down("R4K7", xe, e2[1], text="left")
     for k in (1, 2):
         bridge(us[k], YU[k], k, u11)
 
@@ -891,10 +894,10 @@ def bridge(u, yu, k, u11):
     W(vdd, (vdd[0], yr))
     flag("+5V", vdd[0], yr)
     line(yr, [vdd[0], vdd[0] + 7.62, vdd[0] + 17.78])
-    down("C1U", vdd[0] + 7.62, yr)
-    down("C100N", vdd[0] + 17.78, yr)
+    tag("br%d:cvdd" % k); down("C1U", vdd[0] + 7.62, yr)
+    tag("br%d:cvdd_hf" % k); down("C100N", vdd[0] + 17.78, yr)
     oa, ob = u.pin("7"), u.pin("5")
-    l, r = series("C10U", oa[0] + 8.89, oa[1])
+    tag("br%d:cblock" % k); l, r = series("C10U", oa[0] + 8.89, oa[1])
     W(oa, l)
     xl = r[0] + 5.08
     L = part("COIL_PERCH", "L%d" % (5 + k), xl, oa[1] + 5.08, rot=270, value="28uH coil",
@@ -910,14 +913,14 @@ def bridge(u, yu, k, u11):
     g = u.pin("3")
     yn = g[1] + G
     W(g, (g[0], yn))
-    down("R0R5", g[0], yn, text="left")
+    tag("br%d:rshunt" % k); down("R0R5", g[0], yn, text="left")
     W((g[0], yn), (g[0] - 5.08, yn))
     pwr_flag(g[0] - 5.08, yn)               # the chip's ground: GND through 0.5 R
-    l, r = series("R10K", g[0] + 8.89, yn, above=False)
+    tag("br%d:rf" % k); l, r = series("R10K", g[0] + 8.89, yn, above=False)
     xc = r[0] + 5.08
     W((g[0], yn), l)
     J(g[0], yn)
-    down("C100N", xc, yn)
+    tag("br%d:cf" % k); down("C100N", xc, yn)
     # x 20.6 (U18, OPA2333, zero drift): 0.5 R x 20.6 = 10.3 V per amp, 80 uA a count, so
     # the firmware's low-duty sweep sees a token's 0.2-0.5 mA
     xa = xc + 20.32
@@ -925,11 +928,11 @@ def bridge(u, yu, k, u11):
     pp, pn, po = amp.pin("3" if k == 1 else "5"), amp.pin("2" if k == 1 else "6"), amp.pin("1" if k == 1 else "7")
     W(r, (xc, yn), pp)
     xo, yf, xn = po[0] + G, pn[1] + 5.08, pn[0] - G
-    l2, r2 = series("R100K", (xn + xo) / 2, yf, above=False)
+    tag("br%d:rgain_f" % k); l2, r2 = series("R100K", (xn + xo) / 2, yf, above=False)
     W(po, (xo, po[1]), (xo, yf), r2)
     W(l2, (xn, yf), (xn, pn[1]), pn)
     J(xo, po[1])
-    down("R5K1", xn, yf, text="left")
+    tag("br%d:rgain_g" % k); down("R5K1", xn, yf, text="left")
     J(xn, yf)
     x = X_ISENSE[k]
     W((xo, po[1]), (x, po[1]))
@@ -945,7 +948,7 @@ def bridge(u, yu, k, u11):
         flag("+3V3", vp[0], vp[1] - G)
         W((vp[0], vp[1] - G), (vp[0] - 7.62, vp[1] - G))
         J(vp[0], vp[1] - G)
-        down("C100N", vp[0] - 7.62, vp[1] - G, text="left")
+        tag("u18:cvcc"); down("C100N", vp[0] - 7.62, vp[1] - G, text="left")
         gnd(*vn)
 
 
@@ -989,6 +992,15 @@ def S():
     return U.S
 
 
+def feet():
+    """The four holes the printed feet snap into (gen/layout.py FEET, gen/mech.py)."""
+    x0, y0 = 22.86, 543.56
+    for k in range(4):
+        part("FOOTHOLE", "H%d" % (k + 1), x0 + 12.7 * k, y0, value="foot", ref_at=(x0 + 12.7 * k - 2.0, y0 - 4.5),
+             val_at=(x0 + 12.7 * k - 2.0, y0 + 4.5), fsize=1.0)
+    note(x0 + 50.8, y0 - 5.08, "H1-H4: 3.2 mm holes at the corners; the printed feet snap into them.", cols=40)
+
+
 def build(sch):
     U.begin(sch, ref_base=0)
     sch.text(17.78, 20.32, "OWLternating Current: the base board", size=3.5, bold=True)
@@ -1003,4 +1015,5 @@ def build(sch):
     u11 = mux()
     bridges(u11)
     tree_socket()
+    feet()
     return sch

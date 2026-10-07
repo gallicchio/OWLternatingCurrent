@@ -2,7 +2,7 @@
 	(version "E")
 	(design
 		(source "../OWLternatingCurrent.kicad_sch")
-		(date "2026-10-07T14:23:08")
+		(date "2026-10-07T14:31:17")
 		(tool "Eeschema 10.0.6")
 		(textvar
 			(name "DATE") "2026-10-07")
@@ -7775,6 +7775,194 @@
 							(num "2")
 						)
 					)
+				)
+			)
+		)
+		(comp
+			(ref "H1")
+			(value "foot")
+			(footprint "OWL:MountingHole_3.2mm_M3")
+			(fields
+				(field
+					(name "Footprint") "OWL:MountingHole_3.2mm_M3")
+				(field
+					(name "Datasheet")
+				)
+				(field
+					(name "Description")
+				)
+			)
+			(libsource
+				(lib "OWL")
+				(part "MountingHole")
+				(description "Mounting Hole without connection")
+			)
+			(property
+				(name "Sheetname")
+				(value "Base")
+			)
+			(property
+				(name "Sheetfile")
+				(value "base.kicad_sch")
+			)
+			(property
+				(name "ki_keywords")
+				(value "mounting hole")
+			)
+			(property
+				(name "ki_fp_filters")
+				(value "MountingHole*")
+			)
+			(sheetpath
+				(names "/Base/")
+				(tstamps "/8f976193-3ca0-4b18-df0e-ba7338335e40/")
+			)
+			(tstamps "b856416d-b9ce-3fec-d2b3-21432c3b0d89")
+			(units
+				(unit
+					(name "A")
+					(pins)
+				)
+			)
+		)
+		(comp
+			(ref "H2")
+			(value "foot")
+			(footprint "OWL:MountingHole_3.2mm_M3")
+			(fields
+				(field
+					(name "Footprint") "OWL:MountingHole_3.2mm_M3")
+				(field
+					(name "Datasheet")
+				)
+				(field
+					(name "Description")
+				)
+			)
+			(libsource
+				(lib "OWL")
+				(part "MountingHole")
+				(description "Mounting Hole without connection")
+			)
+			(property
+				(name "Sheetname")
+				(value "Base")
+			)
+			(property
+				(name "Sheetfile")
+				(value "base.kicad_sch")
+			)
+			(property
+				(name "ki_keywords")
+				(value "mounting hole")
+			)
+			(property
+				(name "ki_fp_filters")
+				(value "MountingHole*")
+			)
+			(sheetpath
+				(names "/Base/")
+				(tstamps "/8f976193-3ca0-4b18-df0e-ba7338335e40/")
+			)
+			(tstamps "7604aa23-1ae2-fc0a-872d-7c8b38cd29f1")
+			(units
+				(unit
+					(name "A")
+					(pins)
+				)
+			)
+		)
+		(comp
+			(ref "H3")
+			(value "foot")
+			(footprint "OWL:MountingHole_3.2mm_M3")
+			(fields
+				(field
+					(name "Footprint") "OWL:MountingHole_3.2mm_M3")
+				(field
+					(name "Datasheet")
+				)
+				(field
+					(name "Description")
+				)
+			)
+			(libsource
+				(lib "OWL")
+				(part "MountingHole")
+				(description "Mounting Hole without connection")
+			)
+			(property
+				(name "Sheetname")
+				(value "Base")
+			)
+			(property
+				(name "Sheetfile")
+				(value "base.kicad_sch")
+			)
+			(property
+				(name "ki_keywords")
+				(value "mounting hole")
+			)
+			(property
+				(name "ki_fp_filters")
+				(value "MountingHole*")
+			)
+			(sheetpath
+				(names "/Base/")
+				(tstamps "/8f976193-3ca0-4b18-df0e-ba7338335e40/")
+			)
+			(tstamps "3790ce9a-92e4-4b61-d76e-e54eb6238605")
+			(units
+				(unit
+					(name "A")
+					(pins)
+				)
+			)
+		)
+		(comp
+			(ref "H4")
+			(value "foot")
+			(footprint "OWL:MountingHole_3.2mm_M3")
+			(fields
+				(field
+					(name "Footprint") "OWL:MountingHole_3.2mm_M3")
+				(field
+					(name "Datasheet")
+				)
+				(field
+					(name "Description")
+				)
+			)
+			(libsource
+				(lib "OWL")
+				(part "MountingHole")
+				(description "Mounting Hole without connection")
+			)
+			(property
+				(name "Sheetname")
+				(value "Base")
+			)
+			(property
+				(name "Sheetfile")
+				(value "base.kicad_sch")
+			)
+			(property
+				(name "ki_keywords")
+				(value "mounting hole")
+			)
+			(property
+				(name "ki_fp_filters")
+				(value "MountingHole*")
+			)
+			(sheetpath
+				(names "/Base/")
+				(tstamps "/8f976193-3ca0-4b18-df0e-ba7338335e40/")
+			)
+			(tstamps "c7183a1a-7734-1de9-c6f2-41f8367ab28b")
+			(units
+				(unit
+					(name "A")
+					(pins)
 				)
 			)
 		)
@@ -19620,6 +19808,28 @@
 					(name "SDA")
 					(type "bidirectional")
 				)
+			)
+		)
+		(libpart
+			(lib "OWL")
+			(part "MountingHole")
+			(description "Mounting Hole without connection")
+			(footprints
+				(fp "MountingHole*")
+			)
+			(fields
+				(field
+					(name "Reference") "H")
+				(field
+					(name "Value") "MountingHole")
+				(field
+					(name "Footprint")
+				)
+				(field
+					(name "Datasheet")
+				)
+				(field
+					(name "Description") "Mounting Hole without connection")
 			)
 		)
 		(libpart

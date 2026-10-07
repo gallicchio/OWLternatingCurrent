@@ -26,6 +26,15 @@ _flags = None
 
 _n = {}
 _base = 0
+ROLES = {}               # role -> ref: what each part is for, for the placement (gen/placement.py)
+_tag = None
+
+
+def tag(name):
+    """Name the role of the next part placed (part(), down(), up(), series()...)."""
+    global _tag
+    assert name not in ROLES, "role %s used twice" % name
+    _tag = name
 
 
 def begin(sch, ref_base=0):
@@ -61,6 +70,10 @@ def part(key, ref, x, y, rot=0, unit=1, value=None, mirror=None, text="auto", fs
     pl = S.sym(p["sym"], x, y, rot=rot, ref=ref, value=value, footprint=p["fp"], unit=unit, mirror=mirror,
                lcsc=p["lcsc"], fields=fields, fsize=fsize, **kw)
     REFS[ref] = key
+    global _tag
+    if _tag:
+        ROLES[_tag] = ref
+        _tag = None
     return pl
 
 

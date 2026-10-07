@@ -61,6 +61,9 @@ def draw():
 
 def main():
     root, sheets = draw()
+    # what each part is for, for gen/placement.py (refs change when the sheets change)
+    import json
+    json.dump(dict(sorted(U.ROLES.items())), open(os.path.join(HW, "checks", "roles.json"), "w"), indent=1)
     bad = 0
     for s in [root] + sheets:
         touches, nets, over = s.touches(), s.nets(), s.overlaps()

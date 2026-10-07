@@ -13,7 +13,7 @@ sys.path.insert(0, os.path.join(ROOT, "tools"))
 sys.path.insert(0, HERE)
 import sch_util as U
 from sch_util import (G, part, hpart, vpart, gnd, flag, W, J, pwr_flag, label, note, title, nref, down, up,
-                      series, line, vline)
+                      series, line, vline, tag)
 import leds as LEDS
 import connectors as CONN
 from parts import COILS
@@ -100,16 +100,16 @@ def build_tree(sch):
     W(vcc, (vcc[0], yr))
     flag(v3, vcc[0], yr)
     line(yr, [vcc[0], vcc[0] + 5.08, vcc[0] + 15.24])
-    down("C1U", vcc[0] + 5.08, yr, net=gt)
-    down("C100N", vcc[0] + 15.24, yr, net=gt)
+    tag("u101:cvcc"); down("C1U", vcc[0] + 5.08, yr, net=gt)
+    tag("u101:cvcc_hf"); down("C100N", vcc[0] + 15.24, yr, net=gt)
     W((vcc[0], yr + 5.08), (vcc[0] - G, yr + 5.08))
     J(vcc[0], yr + 5.08)
     pwr_flag(vcc[0] - G, yr + 5.08)             # 3.3 V arrives through J101
     vcap, iref = u.pin("45"), u.pin("44")
     W(vcap, (vcap[0] + 10.16, vcap[1]))
-    down("C1U", vcap[0] + 10.16, vcap[1], net=gt)
+    tag("u101:cvcap"); down("C1U", vcap[0] + 10.16, vcap[1], net=gt)
     W(iref, (iref[0] + G, iref[1]))
-    down("R3K3", iref[0] + G, iref[1], net=gt)
+    tag("u101:riref"); down("R3K3", iref[0] + G, iref[1], net=gt)
     gnd(*u.pin("37"), net=gt)
     # the LEDs: two staggered columns, anodes to 4.8 V
     xo = u.pin("1")[0]
@@ -122,6 +122,7 @@ def build_tree(sch):
             downs[name] = out
             continue
         xc = xo - 16.51 - 35.56 * (ch % 2)
+        tag("led:%s" % name)
         d = part(KEY[colour], nref("D"), xc, out[1], rot=180, value=colour,
                  ref_at=(xc - 15.24, out[1] - 0.3), val_at=(xc - 15.24, out[1] + 0.3), justify="right", fsize=1.0)
         k, a = d.pin("1"), d.pin("2")
@@ -142,7 +143,7 @@ def build_tree(sch):
     label(o33[0] + 60.0, yb0, "DOWN0"); label(o33[0] + 60.0, yb1, "DOWN1")
     # 4.8 V: 10 uF at the plug
     xc = 220.98
-    t, b = vpart("C10U", nref("C"), xc, 140.97, fsize=1.0)
+    tag("tree:c5v"); t, b = vpart("C10U", nref("C"), xc, 140.97, fsize=1.0)
     flag(v5, *t)
     gnd(*b, net=gt)
     W(t, (t[0] - 5.08, t[1]))
@@ -202,18 +203,18 @@ def build_perch(sch):
     xu = 30.48
     u = part("DRV5055", "U201", xu, p[1][1], ref_at=(xu + 2.0, p[1][1] - 12.5), val_at=(xu + 3.0, p[1][1] + 9.0))
     out = u.pin("2")
-    l, r = series("R1K", out[0] + 10.16, out[1])
+    tag("perch:rhall"); l, r = series("R1K", out[0] + 10.16, out[1])
     W(out, l)
     xc = r[0] + 7.62
     W(r, (xc, out[1]), p[1])
-    down("C10N", xc, out[1], net=gp_)
+    tag("perch:chall"); down("C10N", xc, out[1], net=gp_)
     label(xc + 2.0, out[1], "HALL")
     vcc = u.pin("1")
     yr = vcc[1] - 7.62
     W(vcc, (vcc[0], yr))
     flag(v3, vcc[0], yr)
     W((vcc[0], yr), (vcc[0] - 7.62, yr))
-    down("C100N", vcc[0] - 7.62, yr, net=gp_, text="left")
+    tag("perch:cvcc"); down("C100N", vcc[0] - 7.62, yr, net=gp_, text="left")
     J(vcc[0], yr)
     W((vcc[0], yr + G), (vcc[0] + G, yr + G))
     J(vcc[0], yr + G)
@@ -223,12 +224,13 @@ def build_perch(sch):
     for n, name, dx in ((13, "DOWN0", 25.4), (15, "DOWN1", 45.72)):
         q = p[n]
         xd = q[0] - dx
+        tag("led:PERCH_" + name)
         d = part("LED_VIOLET", nref("D"), xd, q[1] - 3.81, rot=90, value="violet",
                  ref_at=(xd + 2.2, q[1] - 4.1), val_at=(xd + 2.2, q[1] - 3.5), fsize=1.0)
         W(d.pin("1"), q)
         flag(v5, *d.pin("2"))
         label(xd + 3.0, q[1], name)
-    t, b = vpart("C1U", nref("C"), 78.74, 76.2, fsize=1.0)
+    tag("perch:c5v"); t, b = vpart("C1U", nref("C"), 78.74, 76.2, fsize=1.0)
     flag(v5, *t)
     gnd(*b, net=gp_)
     W(t, (t[0] + 5.08, t[1]))
@@ -247,7 +249,7 @@ def build_perch(sch):
 # ======================================================================================
 # The bat and the two familiar tokens: a coil, a capacitor, LEDs
 # ======================================================================================
-def tank(sch, base, title_, coil_key, coil_val, cap_key, leds, text):
+def tank(sch, base, title_, coil_key, coil_val, cap_key, leds, text, who):
     """A receiver: the coil and the capacitor in parallel (resonant at the drive's
     frequency), and LEDs across them, each direction through its own resistor."""
     U.begin(sch, ref_base=base)
@@ -258,14 +260,16 @@ def tank(sch, base, title_, coil_key, coil_val, cap_key, leds, text):
              ref_at=(xl - 2.5, (yt + yb) / 2 - 0.4), val_at=(xl - 2.5, (yt + yb) / 2 + 0.4), justify="right",
              fsize=1.0)
     W(L.pin("1"), (xl, yt)); W(L.pin("2"), (xl, yb))
-    t, b = vpart(cap_key, nref("C"), xc, (yt + yb) / 2, fsize=1.0)
+    tag("%s:ctank" % who); t, b = vpart(cap_key, nref("C"), xc, (yt + yb) / 2, fsize=1.0)
     W(t, (xc, yt)); W(b, (xc, yb))
     x = xc + 20.32
     xs = [xl, xc]
     for k, (key, colour, rkey, down_) in enumerate(leds):
         xd = x + 15.24 * k
         rr = nref("R")
+        U.ROLES["%s:r%d" % (who, k + 1)] = rr
         t2, b2 = vpart(rkey, rr, xd, yt + 6.35, fsize=1.0)
+        tag("%s:led%d" % (who, k + 1))
         d = part(key, nref("D"), xd, yb - 6.35, rot=90 if down_ else 270, value=colour,
                  ref_at=(xd + 2.2, yb - 6.65), val_at=(xd + 2.2, yb - 6.05), fsize=1.0)
         W((xd, yt), t2)
@@ -286,7 +290,7 @@ def build_bat(sch):
                 "bridge adds its carrier. The two eyes (side-view orange LEDs at the head's edge) "
                 "light on alternate half-cycles: about 4 mA each at 0.4 A of carrier, 7 mA at "
                 "0.5 A (sim/physics/bat_power.py). No battery, no wires: the magnet in the printed "
-                "cap holds it up, the field lights it.")
+                "cap holds it up, the field lights it.", "bat")
 
 
 def build_owl(sch):
@@ -297,7 +301,7 @@ def build_owl(sch):
                 "drives there. Orange lights first; violet joins as the drive rises (its photons "
                 "carry 3.1 eV against orange's 2.0). 150 R in each leg: the 4.8 V bridge cannot "
                 "push either LED past about 20 mA, whatever the firmware does. At the cat's "
-                "frequency (316 kHz) this tank shrinks the voltage and stays dark.")
+                "frequency (316 kHz) this tank shrinks the voltage and stays dark.", "owl")
 
 
 def build_cat(sch):
@@ -306,4 +310,4 @@ def build_cat(sch):
                 "The cat familiar: the same coil, tuned higher: C501 (22 nF C0G) with L501 resonates "
                 "at 316 kHz, where the cat's perch drives. Below about 0.2 A of perch current the "
                 "other familiar stays completely dark, so each perch lights only its own token "
-                "(sim/physics/README.md).")
+                "(sim/physics/README.md).", "cat")

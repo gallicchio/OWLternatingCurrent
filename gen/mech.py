@@ -22,25 +22,25 @@ COPPER_TO_SURFACE = 0.05 # top copper to the top of the solder mask, roughly
 # Origin: the levitation coil's centre.  The board runs from the coil (front, -y,
 # toward the viewer) back to the socket over the tree (+y).
 PERCH_W = 34.0           # across (x), wider than the coil
-PERCH_FRONT = -18.0      # y of the front edge (the owl slides on from here)
+PERCH_FRONT = -18.0      # y of the front edge (toward the viewer)
 PERCH_BACK = 38.0        # y of the back edge, behind the socket
 COIL_R_OUT = 15.0        # the levitation coil (4 layers)
 COIL_R_IN = 3.0
 COIL_TURNS = 12          # per layer, 0.6 mm track at 1 mm pitch
-# The owl: a U-channel that slides onto the perch from the front edge, gripping the
-# board's two side edges, stopped by a key in a notch, with the bias magnet in its
-# body.  The magnet's bottom face sits OWL_LIFT above the perch's top copper.
+# The owl holds the bias magnet: its body stands over the coil's centre, and two
+# springy arms snap round the perch's side edges into notches that fix it in y.
+# The magnet's bottom face sits OWL_LIFT above the perch's top copper.
 OWL_LIFT = 14.0
-OWL_NOTCH_W = 3.0        # notch in the perch's front edge, centred on x = 0
-OWL_NOTCH_D = 2.0
-OWL_CHANNEL_GAP = PCB_T + 0.25     # slot the board slides into
+OWL_NOTCH_Y = (-3.0, 3.0)    # notches in both side edges (x = +-PERCH_W/2), this long
+OWL_NOTCH_D = 1.0            # and this deep
+OWL_HOOK = 0.8               # how far each arm's hook reaches under the board
+OWL_KEEPOUT = 2.0            # copper- and part-free band inside each side edge near the notches
 # A 1.2 mm hole for the pendulum's thread, in front of the coil (the bat hangs from it
 # when it swings instead of floating).
 THREAD_HOLE = (0.0, PERCH_FRONT + 2.5)
 THREAD_HOLE_D = 1.2
 
-# --- the bat (horizontal while floating; flies in the +y direction... toward the
-# viewer is -y) ---------------------------------------------------------------------------
+# --- the bat (horizontal while it floats; its head points toward the viewer, -y) --
 # Origin: the magnet's axis.  Its receive coil (4 layers, fine pitch) surrounds it.
 BAT_SPAN = 48.0          # wingtip to wingtip (x)
 BAT_HEAD_Y = -13.0       # front edge of the head (toward the viewer)

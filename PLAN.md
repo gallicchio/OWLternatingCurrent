@@ -106,7 +106,7 @@ gap that takes 0.8 A and 2.3 W; at 8 mm, 1.5 A and 7 W.
 
 | # | idea | the physics | diff. | cost | works first time | cute | physics |
 |---|---|---|:-:|:-:|:-:|:-:|:-:|
-| D1 | **A bat-wing 2.4 GHz antenna** on an ESP32, simulated in openEMS (`sim/antenna/`): the wings are a dipole; a 46 mm span has S11 below −17 dB across the whole band (preliminary; it needs a balun). A phone "spell book" page; the time for the moon phase | antennas, resonance, radiation | 4 | $3-4 | 75 % | 3 | 5 |
+| D1 | **A character-shaped 2.4 GHz antenna** on an ESP32, simulated in openEMS (`sim/antenna/README.md`, 58 cases, validated against TI's measured DN007 within 1.8 %): **a ghost-shaped monopole, 17 × 20 mm, needs no matching parts** (worst S11 in band −19.5 dB, 98 % efficient); a tail-fed bat needs two. A phone "spell book" page; the time for the moon phase. **Rev B.** | antennas, resonance, radiation | 4 | $3-4 | 85-90 % (ghost) | 4 | 5 |
 | D2 | "Entangled pumpkins": two boards linked (ESP-NOW, or by light); touch one and the other answers | (networking) | 2-3 | $0-2 | 85 % | 4 | 2 |
 | D3 | Data over the familiar link: amplitude modulation down, load modulation back, like Qi and NFC (needs a tiny MCU in each familiar) | near-field communication | 4 | $0.5 + programming | 70 % | 3 | 4 |
 | D4 | A bat detector: an ultrasonic microphone heterodyned down to audible | heterodyning; real bats' calls | 3 | $2 + speaker | 75 % | 4 | 5 |

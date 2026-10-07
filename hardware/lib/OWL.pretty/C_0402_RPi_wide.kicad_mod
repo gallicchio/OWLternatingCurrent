@@ -8,7 +8,7 @@
 		(at -1.5 0 0)
 		(unlocked yes)
 		(layer "F.SilkS")
-		(uuid "5365e296-3983-4b03-bd91-f2f00fc5fbce")
+		(uuid "15c19dc9-3ead-5bc9-8157-66ed7b83d744")
 		(effects
 			(font
 				(size 0.8 0.5)
@@ -22,7 +22,7 @@
 		(unlocked yes)
 		(layer "F.Fab")
 		(hide yes)
-		(uuid "6e66a9fd-b020-4284-aaab-b7e50642c268")
+		(uuid "8b823761-c34a-519e-b4b9-65c81540b54f")
 		(effects
 			(font
 				(size 0.8 0.5)
@@ -36,7 +36,7 @@
 		(unlocked yes)
 		(layer "F.Fab")
 		(hide yes)
-		(uuid "4d1acb89-d6e1-46a9-9a6b-3ec175a989db")
+		(uuid "79e953ea-f285-5432-b5ee-8df9ab50f6f5")
 		(effects
 			(font
 				(size 1 1)
@@ -48,7 +48,7 @@
 		(at 0 0 0)
 		(layer "F.Fab")
 		(hide yes)
-		(uuid "b37f768a-f2ec-4685-a317-363bdfb28ecb")
+		(uuid "021fd6b0-cc7c-50e3-bbc3-4e40f370e6f2")
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -68,7 +68,7 @@
 		)
 		(fill no)
 		(layer "F.CrtYd")
-		(uuid "822bfb23-1e12-4f08-9206-2ed8510f9f1d")
+		(uuid "776cf0dd-0aa8-551b-8925-34ff3e3edbf5")
 	)
 	(fp_rect
 		(start -0.5 -0.25)
@@ -79,7 +79,7 @@
 		)
 		(fill no)
 		(layer "F.Fab")
-		(uuid "fa593564-674c-43c2-bb26-018d2964a2f2")
+		(uuid "21074f3d-250e-545b-852a-e35398135168")
 	)
 	(fp_rect
 		(start -0.25 -0.25)
@@ -90,13 +90,13 @@
 		)
 		(fill no)
 		(layer "F.Fab")
-		(uuid "635592b1-2c6b-4838-83e2-f6de24d69b5e")
+		(uuid "73c0a77b-f1cb-5efe-81ff-daba6221f871")
 	)
 	(fp_text user "${REFERENCE}"
 		(at 0 0 0)
 		(unlocked yes)
 		(layer "F.Fab")
-		(uuid "c68685a4-7090-4c85-af11-66db04e11f6c")
+		(uuid "063b3b4d-c9be-5f5a-ad0a-1db96d9803b8")
 		(effects
 			(font
 				(size 0.8 0.5)
@@ -109,14 +109,14 @@
 		(size 0.47 0.55)
 		(layers "F.Cu" "F.Mask" "F.Paste")
 		(clearance 0.125)
-		(uuid "1a0d517e-50e6-4260-aaed-bb5c6d3174b1")
+		(uuid "ef75ae69-d353-55f0-b593-0ac678abd6e8")
 	)
 	(pad "2" smd rect
 		(at 0.515 0)
 		(size 0.47 0.55)
 		(layers "F.Cu" "F.Mask" "F.Paste")
 		(clearance 0.125)
-		(uuid "0187b2f7-0b36-4f0a-8dde-2fa38e09eb1b")
+		(uuid "899f7000-fac1-58e8-ab03-e0c186cb9c2b")
 	)
 	(embedded_fonts no)
 	(model "${KIPRJMOD}/lib/OWL.3dshapes/C_0402_1005Metric.step"

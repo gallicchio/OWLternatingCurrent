@@ -8,7 +8,7 @@
 		(at 0 -1.55 0)
 		(unlocked yes)
 		(layer "F.SilkS")
-		(uuid "f5a9beac-2281-40ce-8622-65b2dd57a478")
+		(uuid "77f6d471-f900-56af-b99f-4f2290ce4360")
 		(effects
 			(font
 				(size 0.8 0.5)
@@ -21,7 +21,7 @@
 		(unlocked yes)
 		(layer "F.Fab")
 		(hide yes)
-		(uuid "504a98ac-8be0-4814-97a5-75a0a5e1234b")
+		(uuid "6886863f-2dd2-5624-ad63-70a2f8452df6")
 		(effects
 			(font
 				(size 0.8 0.5)
@@ -34,7 +34,7 @@
 		(unlocked yes)
 		(layer "F.Fab")
 		(hide yes)
-		(uuid "daa60fef-d40f-4f15-8fdc-6f9f73547224")
+		(uuid "950730da-f169-5e20-adee-3d1e68c8ee39")
 		(effects
 			(font
 				(size 0.8 0.5)
@@ -46,7 +46,7 @@
 		(at 0 0 0)
 		(layer "F.Fab")
 		(hide yes)
-		(uuid "455d865b-be16-430c-b28c-72c9adffd28c")
+		(uuid "1e673665-9eeb-5bd9-a139-5df2760df9eb")
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -66,7 +66,7 @@
 		)
 		(fill yes)
 		(layer "F.SilkS")
-		(uuid "60ca362d-1729-42a9-b403-368cd7b4c9c3")
+		(uuid "6c0ab6ce-b28e-50f3-bf18-08a6f01d76ac")
 	)
 	(fp_rect
 		(start -1.1 0.9)
@@ -77,7 +77,7 @@
 		)
 		(fill no)
 		(layer "F.CrtYd")
-		(uuid "fed4a8d0-2d13-4095-877f-3f8e1c83e183")
+		(uuid "79d223ea-19ce-5c24-a536-548866340c6d")
 	)
 	(fp_rect
 		(start -1 0.8)
@@ -88,7 +88,7 @@
 		)
 		(fill no)
 		(layer "F.Fab")
-		(uuid "5cfc320e-9bc5-46fd-8175-20366651a2f9")
+		(uuid "371d73ed-497e-5899-a982-0354efc7aad2")
 	)
 	(fp_rect
 		(start -0.4 0.8)
@@ -99,7 +99,7 @@
 		)
 		(fill no)
 		(layer "F.Fab")
-		(uuid "1da00c4b-6b23-4623-bc6b-bf804b3d79e5")
+		(uuid "dc94871f-bdad-514c-bec1-3ec530aef558")
 	)
 	(fp_circle
 		(center -0.7 0.55)
@@ -110,13 +110,13 @@
 		)
 		(fill yes)
 		(layer "F.Fab")
-		(uuid "80ee5c32-b144-4b1f-b17d-9142e3ed2475")
+		(uuid "3fe2fc1a-3db1-5889-83cd-6dcafb26822b")
 	)
 	(fp_text user "${REFERENCE}"
 		(at 0 0 0)
 		(unlocked yes)
 		(layer "F.Fab")
-		(uuid "fb68abe2-f57e-4263-8141-60e31f034a99")
+		(uuid "dd50dab4-aae5-5acc-970a-4fd12f8607aa")
 		(effects
 			(font
 				(size 0.8 0.5)
@@ -128,13 +128,13 @@
 		(at -0.7 0)
 		(size 0.7 1.7)
 		(layers "F.Cu" "F.Mask" "F.Paste")
-		(uuid "c20e4d42-86fa-4502-b316-7a08158c173f")
+		(uuid "3c1c1fff-d9e0-5cc2-925d-54a1cfc92f8a")
 	)
 	(pad "2" smd rect
 		(at 0.7 0)
 		(size 0.7 1.7)
 		(layers "F.Cu" "F.Mask" "F.Paste")
-		(uuid "fce775a8-7d74-488f-a3b2-e81dafa87fa8")
+		(uuid "9bef6bc5-492b-528d-b9a4-f97ace293aff")
 	)
 	(embedded_fonts no)
 	(model "${KIPRJMOD}/lib/OWL.3dshapes/L_Abracon_AOTA-B201610.wrl"

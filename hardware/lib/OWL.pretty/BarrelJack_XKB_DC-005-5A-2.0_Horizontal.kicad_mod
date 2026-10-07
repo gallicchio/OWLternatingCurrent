@@ -8,7 +8,7 @@
 	(property "Reference" "REF**"
 		(at 0 -3 0)
 		(layer "F.SilkS")
-		(uuid "9232615a-9e76-447d-8f87-b408dd903e26")
+		(uuid "f12fe48b-63e5-5441-a3eb-cd7903011b9e")
 		(effects
 			(font
 				(size 1 1)
@@ -19,7 +19,7 @@
 	(property "Value" "BarrelJack_XKB_DC-005-5A-2.0_Horizontal"
 		(at 0 3 0)
 		(layer "F.Fab")
-		(uuid "9366979d-2747-47eb-b5ed-b0cbe0c63992")
+		(uuid "cf041224-12b2-510b-a7ea-6379a387e227")
 		(effects
 			(font
 				(size 1 1)
@@ -31,7 +31,7 @@
 		(at 0 0 0)
 		(layer "F.Fab")
 		(hide yes)
-		(uuid "881348a7-91e3-4c38-88f8-232aee9ad62b")
+		(uuid "4fec6e6c-c1cf-56fe-81b7-9e4ee3929b87")
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -42,7 +42,7 @@
 		(at 0 0 0)
 		(layer "F.Fab")
 		(hide yes)
-		(uuid "67c436df-fab9-41c5-82a9-176561749812")
+		(uuid "0815fc70-7922-5f02-a008-8864442517a4")
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -59,7 +59,7 @@
 			(type solid)
 		)
 		(layer "F.SilkS")
-		(uuid "a28ce847-a5ff-42c7-8d81-1728c3b1cdc2")
+		(uuid "88aa4017-609c-580c-8ed5-99eef1e63454")
 	)
 	(fp_line
 		(start -10.65 4.5)
@@ -69,7 +69,7 @@
 			(type solid)
 		)
 		(layer "F.SilkS")
-		(uuid "594ac03d-4cc4-4a96-89eb-c357ba6e29b2")
+		(uuid "080f2ba1-dd33-5b49-ae3a-1cd379eaf895")
 	)
 	(fp_line
 		(start 3.75 -4.5)
@@ -79,7 +79,7 @@
 			(type solid)
 		)
 		(layer "F.SilkS")
-		(uuid "1d3b5ccc-0896-453e-9d41-6e10ab36daaf")
+		(uuid "b179e9ca-dd07-5539-b298-fa5813aa797d")
 	)
 	(fp_rect
 		(start -10.9 -5)
@@ -90,7 +90,7 @@
 		)
 		(fill no)
 		(layer "F.CrtYd")
-		(uuid "da4d9445-7760-413c-9682-1c3ed353974a")
+		(uuid "9820ceb9-f216-55cb-aee6-ff26d587bf56")
 	)
 	(fp_rect
 		(start -10.65 -4.5)
@@ -101,7 +101,7 @@
 		)
 		(fill no)
 		(layer "F.Fab")
-		(uuid "f52b972e-f1e1-4d90-8f6b-50efcbd30087")
+		(uuid "8dafa4ce-3b5a-5331-b923-56221e5c10cd")
 	)
 	(pad "1" thru_hole oval
 		(at 2.95 -2.35)
@@ -109,7 +109,7 @@
 		(drill oval 1 3.5)
 		(layers "*.Cu" "*.Mask")
 		(remove_unused_layers no)
-		(uuid "4ef79376-754f-4ddf-ba7d-8b0246dcd222")
+		(uuid "c546b631-13dd-5c31-b967-e3f2f43d4f34")
 	)
 	(pad "2" thru_hole oval
 		(at -2.95 -2.35)
@@ -117,7 +117,7 @@
 		(drill oval 1 3.5)
 		(layers "*.Cu" "*.Mask")
 		(remove_unused_layers no)
-		(uuid "3898987e-6085-4344-8578-4e367a7cd053")
+		(uuid "b03a43bf-af34-536c-99c2-d604435eaffb")
 	)
 	(pad "3" thru_hole oval
 		(at 0 2.35)
@@ -125,7 +125,7 @@
 		(drill oval 3.5 1)
 		(layers "*.Cu" "*.Mask")
 		(remove_unused_layers no)
-		(uuid "e6db1412-9901-4f28-ade2-0428d3025c5c")
+		(uuid "5c418ae9-ce83-5f4a-a940-d2d605ecafc9")
 	)
 	(embedded_fonts no)
 	(model "${KIPRJMOD}/lib/OWL.3dshapes/BarrelJack_Horizontal.step"

@@ -18,7 +18,7 @@ our footprints against (mfg/footprint_check.py), as on GPiBridge.
 
     python3 gen/library.py
 """
-import os, re, shutil, sys
+import os, re, shutil, sys, uuid
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
 sys.path.insert(0, os.path.join(ROOT, "tools"))
@@ -39,7 +39,7 @@ MODEL_PATH = "${KIPRJMOD}/lib/" + LIB + ".3dshapes/"
 STOCK_SYMBOLS = {
     "R": "Device:R", "C": "Device:C", "C_Polarized": "Device:C_Polarized", "L": "Device:L",
     "LED": "Device:LED", "D_Schottky": "Device:D_Schottky", "D_TVS": "Device:D_TVS", "D_Zener": "Device:D_Zener",
-    "Polyfuse": "Device:Polyfuse", "Crystal_GND24": "Device:Crystal_GND24", "Speaker": "Device:Speaker",
+    "Polyfuse": "Device:Polyfuse", "Antenna": "Device:Antenna", "Crystal_GND24": "Device:Crystal_GND24", "Speaker": "Device:Speaker",
     "SW_Push": "Switch:SW_Push", "SW_SPDT": "Switch:SW_SPDT",
     "USB_C_Receptacle_USB2.0_16P": "Connector:USB_C_Receptacle_USB2.0_16P",
     "Barrel_Jack_Switch": "Connector:Barrel_Jack_Switch",
@@ -271,6 +271,21 @@ def lib_tables():
     write(os.path.join(LIBDIR, "README.md"), LIB_README)
 
 
+def fixed_uuids(directory):
+    """KiCad's upgrade gives every item a fresh random UUID on every run; replace them with
+    ones derived from the file name and the item's order, so rebuilding the library
+    changes nothing that git can see unless a footprint really changed."""
+    for name in sorted(os.listdir(directory)):
+        if not name.endswith(".kicad_mod"):
+            continue
+        path = os.path.join(directory, name)
+        text = open(path).read()
+        n = iter(range(10 ** 6))
+        text = re.sub(r'\(uuid "[0-9a-f-]+"\)',
+                      lambda m: '(uuid "%s")' % uuid.uuid5(uuid.NAMESPACE_URL, "owl/%s/%d" % (name, next(n))), text)
+        write(path, text)
+
+
 def main():
     share = kienv.share()
     ns = build_symbols(share)
@@ -280,6 +295,7 @@ def main():
     lib_tables()
     # bring every footprint to KiCad 10's own format (ours are written as KiCad 8)
     kienv.run_cli(["fp", "upgrade", "--force", PRETTY])
+    fixed_uuids(PRETTY)
     print("library: %d symbols, %d footprints, %d 3D models%s"
           % (ns, nf, have, ("; MISSING 3D models: " + ", ".join(missing)) if missing else ""))
     return 0          # missing 3D models only affect renders: drawn later (PLAN.md work list)

@@ -8,7 +8,7 @@
 	(property "Reference" "REF**"
 		(at 0 -3 0)
 		(layer "F.SilkS")
-		(uuid "d57bf9d7-1ded-4262-8822-07a692ca5379")
+		(uuid "8aab0127-58c2-561a-a5e1-3164f54c0bfb")
 		(effects
 			(font
 				(size 1 1)
@@ -19,7 +19,7 @@
 	(property "Value" "Speaker_GSPK2307P_D23mm_P10mm"
 		(at 0 3 0)
 		(layer "F.Fab")
-		(uuid "353c5f8e-779c-40e8-96b5-43eb56f82e46")
+		(uuid "5163ea36-96ea-5490-a3a9-7286b0bb6c9a")
 		(effects
 			(font
 				(size 1 1)
@@ -31,7 +31,7 @@
 		(at 0 0 0)
 		(layer "F.Fab")
 		(hide yes)
-		(uuid "0d8b9695-eae4-46f7-abf1-cecd911cb49c")
+		(uuid "6a5a5bff-99e7-51a5-b5f0-36552bde0955")
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -42,7 +42,7 @@
 		(at 0 0 0)
 		(layer "F.Fab")
 		(hide yes)
-		(uuid "a2aa6898-7b7a-4c80-83fa-f6bd30fb61a4")
+		(uuid "100c9c3e-75b2-5211-9688-cdf7d26d43f2")
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -60,7 +60,7 @@
 		)
 		(fill no)
 		(layer "F.SilkS")
-		(uuid "247e8dc6-87ff-4e63-bfd8-dc7f0bfe3998")
+		(uuid "c48250cf-18db-5702-933c-9721ed2b7aaa")
 	)
 	(fp_circle
 		(center 0 0)
@@ -71,7 +71,7 @@
 		)
 		(fill no)
 		(layer "F.CrtYd")
-		(uuid "7b2d11d2-a43f-4ede-bdf8-4a989dfaac58")
+		(uuid "780cc6b8-770b-5055-82e8-8d6f99b5bd2f")
 	)
 	(fp_circle
 		(center 0 0)
@@ -82,7 +82,7 @@
 		)
 		(fill no)
 		(layer "F.Fab")
-		(uuid "39f81d7f-b074-481b-8b1d-ab4d62eaafc8")
+		(uuid "964e1f9e-d2e5-5ae0-99e7-a1f566779bf1")
 	)
 	(pad "1" thru_hole rect
 		(at -5 0)
@@ -90,7 +90,7 @@
 		(drill 1.1)
 		(layers "*.Cu" "*.Mask")
 		(remove_unused_layers no)
-		(uuid "a383cf71-b72a-4c40-90d6-72145f095e09")
+		(uuid "942fcd5e-33c4-5a3a-9d11-597af712b3f3")
 	)
 	(pad "2" thru_hole circle
 		(at 5 0)
@@ -98,7 +98,7 @@
 		(drill 1.1)
 		(layers "*.Cu" "*.Mask")
 		(remove_unused_layers no)
-		(uuid "22962ba7-cadd-40ea-a518-f56d89b0fcd5")
+		(uuid "4cf80382-2b78-5c01-a554-5ee260e6bedb")
 	)
 	(embedded_fonts no)
 )

@@ -120,6 +120,8 @@ PARTS = {
     "COIL_BAT": dict(sym=LIB + ":Coil", fp=LIB + ":NetTie-2_SMD_Pad0.5mm", fp_src="stock:NetTie", lcsc=None,
                      mpn="PCB coil", value="38uH", match=[], note="4-layer fine-pitch spiral, copper"),
     # --- bare pads, holes, flags (not placed by JLCPCB) ---------------------------------------
+    "ANTENNA": dict(sym=LIB + ":Antenna", fp=LIB + ":TestPoint_Pad_D1.5mm", fp_src="stock:TestPoint", lcsc=None,
+                    mpn="", value="antenna", match=[], note="the pad where a gold copper shape (the moon, the ghost) joins its oscillator"),
     "TP": dict(sym=LIB + ":TestPoint", fp=LIB + ":TestPoint_Pad_D1.5mm", fp_src="stock:TestPoint", lcsc=None,
                mpn="", value="", match=[], note="bare pad"),
     "FOOTHOLE": dict(sym=LIB + ":MountingHole", fp=LIB + ":MountingHole_3.2mm_M3", fp_src="stock:MountingHole",
@@ -145,6 +147,8 @@ PARTS.update({
     # capacitors (Basic unless said)
     "C100N": passive("C", "100n", "0603", "C14663", "CC0603KRX7R9BB104", ["100nF", "0603"]),
     "C10N": passive("C", "10n", "0603", "C57112", "0603B103K500NT", ["10nF", "0603"]),
+    "C22N": passive("C", "22n", "0603", "C21122", "CL10B223KB8NNNC", ["22nF", "50V", "0603"],
+                    "the DRV8874's charge-pump flying capacitor: 22 nF, VM-rated (datasheet)"),
     "C2N2": passive("C", "2.2n", "0603", "C1604", "0603B222K500NT", ["2.2nF", "0603"]),
     "C15P": passive("C", "15p", "0603", "C1644", "CL10C150JB8NNNC", ["15pF", "C0G", "0603"]),
     "C1U": passive("C", "1u", "0603", "C15849", "CL10A105KB8NNNC", ["1uF", "0603"]),

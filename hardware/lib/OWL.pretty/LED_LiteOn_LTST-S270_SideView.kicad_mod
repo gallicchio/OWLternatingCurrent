@@ -8,7 +8,7 @@
 	(property "Reference" "REF**"
 		(at 0 -3 0)
 		(layer "F.SilkS")
-		(uuid "b6c88a61-3f94-492c-a465-bfc72f8ced7c")
+		(uuid "f0a5f451-5eeb-5b5b-b443-4beefd5a6c48")
 		(effects
 			(font
 				(size 1 1)
@@ -19,7 +19,7 @@
 	(property "Value" "LED_LiteOn_LTST-S270_SideView"
 		(at 0 3 0)
 		(layer "F.Fab")
-		(uuid "8da606de-be92-492d-ac27-4b7632aeff48")
+		(uuid "ae9b8dd9-3492-5b7b-ab4b-794b8b53338b")
 		(effects
 			(font
 				(size 1 1)
@@ -31,7 +31,7 @@
 		(at 0 0 0)
 		(layer "F.Fab")
 		(hide yes)
-		(uuid "1affe9cc-0a7f-4e74-9146-34389d4d6200")
+		(uuid "38703b08-16a5-551c-b740-ce060a795c9d")
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -42,7 +42,7 @@
 		(at 0 0 0)
 		(layer "F.Fab")
 		(hide yes)
-		(uuid "6ee9fc24-9cf9-443a-978f-088e659ca685")
+		(uuid "81eb2a27-2c7e-51b5-890d-f072d64b853e")
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -59,7 +59,7 @@
 			(type solid)
 		)
 		(layer "F.SilkS")
-		(uuid "2eed9337-0849-4b71-96ab-876edebf5cb1")
+		(uuid "eee4d2c0-59f2-5e88-b349-967984648fb9")
 	)
 	(fp_line
 		(start -0.3 -1)
@@ -69,7 +69,7 @@
 			(type solid)
 		)
 		(layer "F.SilkS")
-		(uuid "8becc477-9716-4704-a4b4-cff500cf4242")
+		(uuid "247f6385-2450-5ad9-9287-49aef72364db")
 	)
 	(fp_line
 		(start 0 -1)
@@ -79,7 +79,7 @@
 			(type solid)
 		)
 		(layer "F.SilkS")
-		(uuid "3fb99d4b-d343-497e-8a75-2ae7e591f21f")
+		(uuid "9c8487d2-9ad9-58df-bf71-0ee719b4260f")
 	)
 	(fp_rect
 		(start -1.8 -1.45)
@@ -90,7 +90,7 @@
 		)
 		(fill no)
 		(layer "F.CrtYd")
-		(uuid "6e5cc4af-5736-4663-980d-3a1f75e594a5")
+		(uuid "01e7c09e-1919-5ed7-94c4-d158704dcaaf")
 	)
 	(fp_rect
 		(start -0.83 -0.3)
@@ -101,21 +101,21 @@
 		)
 		(fill no)
 		(layer "F.Fab")
-		(uuid "edeafa51-308c-4095-bc56-5741bd80c4ed")
+		(uuid "0badbe08-763f-50cd-932a-7d02496f83c6")
 	)
 	(pad "1" smd roundrect
 		(at -1 0)
 		(size 1.1 1.1)
 		(layers "F.Cu" "F.Mask" "F.Paste")
 		(roundrect_rratio 0.25)
-		(uuid "1ef97982-5209-482f-a60d-1484acac79ff")
+		(uuid "316de011-f4ee-5eb5-9589-c4bfb08589ee")
 	)
 	(pad "2" smd roundrect
 		(at 1 0)
 		(size 1.1 1.1)
 		(layers "F.Cu" "F.Mask" "F.Paste")
 		(roundrect_rratio 0.25)
-		(uuid "40e3c8fd-69bd-4688-9bb4-0fac1c9bd069")
+		(uuid "e03d8ee4-fb10-582b-935d-8afafc0b690b")
 	)
 	(embedded_fonts no)
 	(model "${KIPRJMOD}/lib/OWL.3dshapes/LED_0603_1608Metric.step"

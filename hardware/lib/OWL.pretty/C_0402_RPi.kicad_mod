@@ -8,7 +8,7 @@
 		(at 0 -1 180)
 		(unlocked yes)
 		(layer "F.SilkS")
-		(uuid "882cd147-582e-4851-88b9-851b5c551e4b")
+		(uuid "8c66461a-5c39-5609-bebf-4ab18402f7d3")
 		(effects
 			(font
 				(size 0.8 0.5)
@@ -22,7 +22,7 @@
 		(unlocked yes)
 		(layer "F.Fab")
 		(hide yes)
-		(uuid "2b8e45b3-7948-4ed2-9643-e703da57ceef")
+		(uuid "1c4f0773-24d7-5e77-81b6-75b0745da966")
 		(effects
 			(font
 				(size 0.8 0.5)
@@ -36,7 +36,7 @@
 		(unlocked yes)
 		(layer "F.Fab")
 		(hide yes)
-		(uuid "3a0b0fcf-6a46-4646-ab7a-eb9282f36dda")
+		(uuid "0b3048df-992c-53fd-aa4a-205d286ce895")
 		(effects
 			(font
 				(size 1 1)
@@ -48,7 +48,7 @@
 		(at 0 0 0)
 		(layer "F.Fab")
 		(hide yes)
-		(uuid "9556032f-580d-4903-b985-1a1503b088ec")
+		(uuid "7a51efab-81da-5dcf-bb3d-48f8772ca90b")
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -68,7 +68,7 @@
 		)
 		(fill no)
 		(layer "F.CrtYd")
-		(uuid "04756a01-b490-4afc-9d75-d39f9737eed5")
+		(uuid "394bcf41-8dd5-5dee-9ff7-429858cdb8e1")
 	)
 	(fp_rect
 		(start -0.5 -0.25)
@@ -79,7 +79,7 @@
 		)
 		(fill no)
 		(layer "F.Fab")
-		(uuid "9f1d783d-be3f-4878-a568-e19f580b51ea")
+		(uuid "48451aeb-b056-5b5d-9b44-ba677e29f75c")
 	)
 	(fp_rect
 		(start -0.25 -0.25)
@@ -90,13 +90,13 @@
 		)
 		(fill no)
 		(layer "F.Fab")
-		(uuid "d607b7c0-3d2d-45a7-bb6c-7fbb4314e429")
+		(uuid "2498c487-1e9e-5d6f-8cd9-926f6e2216c1")
 	)
 	(fp_text user "${REFERENCE}"
 		(at 0 0 0)
 		(unlocked yes)
 		(layer "F.Fab")
-		(uuid "4a6f6b37-9972-4ced-9aba-7a053caf0eae")
+		(uuid "ad509ae7-51d9-5acd-a89f-34f6ce19cc51")
 		(effects
 			(font
 				(size 0.8 0.5)
@@ -108,13 +108,13 @@
 		(at -0.475 0)
 		(size 0.55 0.55)
 		(layers "F.Cu" "F.Mask" "F.Paste")
-		(uuid "266f5db7-a720-420c-9ac2-25e132221717")
+		(uuid "0725c6ba-dc52-5038-a6f8-de962f675348")
 	)
 	(pad "2" smd rect
 		(at 0.475 0)
 		(size 0.55 0.55)
 		(layers "F.Cu" "F.Mask" "F.Paste")
-		(uuid "0234e63d-739c-4ae3-8edd-c7d1879b264f")
+		(uuid "6b0f3058-756d-5d41-b814-d675c927d653")
 	)
 	(embedded_fonts no)
 	(model "${KIPRJMOD}/lib/OWL.3dshapes/C_0402_1005Metric.step"

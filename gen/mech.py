@@ -24,9 +24,9 @@ COPPER_TO_SURFACE = 0.05 # top copper to the top of the solder mask, roughly
 PERCH_W = 34.0           # across (x), wider than the coil
 PERCH_FRONT = -18.0      # y of the front edge (toward the viewer)
 PERCH_BACK = 38.0        # y of the back edge, behind the socket
-COIL_R_OUT = 15.0        # the levitation coil (4 layers)
-COIL_R_IN = 3.0
-COIL_TURNS = 12          # per layer, 0.6 mm track at 1 mm pitch
+COIL_R_OUT = 15.0        # the levitation coil: three layers (F.Cu, In1, In2; B.Cu stays free
+COIL_R_IN = 4.0          # for the Hall sensor's lines), about 14 turns each of 0.5 mm track
+COIL_TURNS = 14          # (gen/parts.py COILS["COIL_LEV"], drawn by gen/coils.py)
 # The owl holds the bias magnet: its body stands over the coil's centre, and two
 # springy arms snap round the perch's side edges into notches that fix it in y.
 # The magnet's bottom face sits OWL_LIFT above the perch's top copper.
@@ -36,8 +36,9 @@ OWL_NOTCH_D = 1.0            # and this deep
 OWL_HOOK = 0.8               # how far each arm's hook reaches under the board
 OWL_KEEPOUT = 2.0            # copper- and part-free band inside each side edge near the notches
 # A 1.2 mm hole for the pendulum's thread, in front of the coil (the bat hangs from it
-# when it swings instead of floating).
-THREAD_HOLE = (0.0, PERCH_FRONT + 2.5)
+# when it swings instead of floating): clear of the coil's keep-out (r 15.3) by 0.7 mm,
+# 0.8 mm of board in front of it.
+THREAD_HOLE = (0.0, -16.6)
 THREAD_HOLE_D = 1.2
 
 # --- the bat (horizontal while it floats; its head points toward the viewer, -y) --
@@ -59,9 +60,7 @@ RX_R_IN = 7.0
 CAP_ARM_W = 5.0          # arm width where it hooks the edge
 CAP_HOOK = 0.8           # how far each hook reaches under the board
 
-# --- the base ------------------------------------------------------------------------
-BASE_W = 170.0
-BASE_H = 120.0
+# --- the base (gen/layout.py has its size, 190 x 130 mm) ------------------------------
 FOOT_HOLE_D = 3.2        # the printed feet snap into these
-FOOT_INSET = 5.0         # hole centres from the board's corners (x and y)
+FOOT_INSET = 6.0         # hole centres from the board's corners (x and y): gen/layout.py's
 FOOT_HEIGHT = 6.0        # clears the through-hole pins (about 2 mm) with room

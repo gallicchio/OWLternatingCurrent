@@ -307,15 +307,23 @@ class Router:
     # ---- routing --------------------------------------------------------------
     def route_net(self, net, width, layers=(0, 1, 2), layer_cost=None, via_cost=R.VIA_COST,
                   max_pop=1500000, allow_via=True, bbox_margin=None):
+        """Join the net's pieces, the smallest to the rest each time.  A piece that cannot
+        be joined is set aside (the others may still reach it) and the rest go on: one
+        blocked pad does not leave the whole net unrouted.  True if it ends in one piece."""
         cls = R.width_class(width)
         tries = 0
+        stuck = set()                                 # items of pieces that failed as a start
+        ok = True
         while True:
             groups = self.groups(net)
             if len(groups) < 2:
-                return True
+                return ok
             groups.sort(key=lambda g: len(self.cells_of(g)))
-            src = groups[0]
-            others = [i for g in groups[1:] for i in g]
+            free = [g for g in groups if not stuck.intersection(g)]
+            if not free:
+                return False
+            src = free[0]
+            others = [i for g in groups if g is not src for i in g]
             starts = self.cells_of(src, layers, inner=True)
             goals = self.cells_of(others, layers, inner=True)
             if not starts or not goals:
@@ -337,11 +345,13 @@ class Router:
                 self.drop(net)
             if path is None:
                 what = ",".join(sorted(self.items[i].what for i in src if self.items[i].what not in ("track", "via")))
-                self.failed.append((net, "from %s" % (what or "a track")))
-                return False
+                self.failed.append((net, "from %s: %s" % (what or "a track", getattr(self.g, "last_why", "?"))))
+                stuck.update(src)
+                ok = False
+                continue
             self.lay(net, path, width)
             tries += 1
-            if tries > 60:
+            if tries > 200:
                 self.failed.append((net, "too many pieces"))
                 return False
 
@@ -408,8 +418,9 @@ class Router:
                 frontier.sort(key=lambda k: (self.g.pos(k)[0] - sx) ** 2 + (self.g.pos(k)[1] - sy) ** 2)
                 poly = self.planes.get(net)
                 for k in frontier:
+                    # (a via needs no free track cell: keep only bars tracks, as on
+                    # a plane's layer; novia holds the via keep-outs)
                     if k not in it.cells[L] and not self.g.novia[k] and all(not v[k] for v in vg) \
-                            and not any(self.g.keep[LL][k] for LL in range(R.NL)) \
                             and (not poly or point_in_poly(*self.g.pos(k), poly)):
                         path = []
                         c = k

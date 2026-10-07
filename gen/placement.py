@@ -114,18 +114,36 @@ b.near("uart:r_tx", "J5", 1.0, -5.2, 90)
 
 # ---- the scene, on top -----------------------------------------------------------------
 b.put("J3", L.TREE_SOCKET[0] - 8.89, L.TREE_SOCKET[1] - 1.27, 90)     # the tree's socket
+# Each coil (gen/coils.py) has its two terminals at its own +y: turned by 90 - phi, they
+# point along phi (degrees from +x toward +y) on the board.  The pendulum coils' point
+# outward from the swing's rest point (toward their bridges, away from the Hall sensor
+# between them); the perches' toward their bridges, between their ring LEDs.
+def coil_rot(phi):
+    return round((90.0 - phi) % 360, 1)
+
+
 for ref in ("L3", "L4", "L5"):
-    b.put(ref, *L.pend_coil(ref))
-b.put("L6", *L.OWL_PERCH)
-b.put("L7", *L.CAT_PERCH)
+    b.put(ref, *L.pend_coil(ref), rot=coil_rot(L.PEND_COILS[ref]))
+for ref, (cx, cy), drv in (("L6", L.OWL_PERCH, (63.0, 92.0)), ("L7", L.CAT_PERCH, (178.0, 66.0))):
+    b.put(ref, cx, cy, rot=coil_rot(math.degrees(math.atan2(drv[1] - cy, drv[0] - cx))))
 b.put("J1", L.JACK[0], L.JACK[1], 270)                                   # plug from behind
 b.put("LS1", *L.SPEAKER)
 b.put("SW3", L.SOUND_SWITCH[0], L.SOUND_SWITCH[1], 0)
 b.put("SW2", L.SPELL_BUTTON[0], L.SPELL_BUTTON[1], 0)
 b.put("U16", *L.LIGHT_SENSOR)
 b.put("C1", 166.0, 9.0, 0)                                               # 470 uF, 12.6 mm tall
-b.put("AE1", L.MOON[0] + L.MOON[2] - 3.0, L.MOON[1])                     # on the moon's edge
-b.put("AE2", L.GHOST[0] + L.GHOST[2] - 3.0, L.GHOST[1])                  # on the ghost's edge
+# the antennas' pads where gen/art.py puts them (inside each shape, at its edge toward
+# its oscillator: hardware/art.json), else on the shape's right-hand edge
+def antenna_pad(net, fallback):
+    try:
+        art = json.load(open(os.path.join(ROOT, "hardware", "art.json")))
+        return tuple(next(a["pad"] for a in art["antennas"] if a["net"] == net))
+    except (OSError, StopIteration, KeyError, ValueError):
+        return fallback
+
+
+b.put("AE1", *antenna_pad("MOON", (L.MOON[0] + L.MOON[2] - 3.0, L.MOON[1])))
+b.put("AE2", *antenna_pad("GHOST", (L.GHOST[0] + L.GHOST[2] - 3.0, L.GHOST[1])))
 for k, (x, y) in enumerate(L.FEET):
     b.put("H%d" % (k + 1), x, y)
 
@@ -146,25 +164,30 @@ for who, (cx, cy) in (("OWLRING", L.OWL_PERCH), ("CATRING", L.CAT_PERCH)):
 # ---- underneath ----------------------------------------------------------------------
 # (bottom parts are mirrored in y before they turn: Board.near takes offsets in the part's
 # own frame, so the same tile works on either side)
-# power: the jack's line through F1 and Q1, the clamp, then the buck in the corner
-b.put("F1", 140.0, 20.0, 0, "B")
-b.put("Q1", 130.0, 20.0, 0, "B")
-b.put("D1", 130.0, 26.5, 0, "B")
-b.put("R1", 124.5, 24.0, 90, "B")
-b.put("D2", 159.0, 20.0, 0, "B")
-b.put("C2", 152.0, 25.5, 0, "B")
-b.put("TP1", 145.0, 26.0, 0, "B")
-b.put("U1", 172.0, 18.0, 0, "B")
-b.put("L1", 182.5, 23.0, 90, "B")
-b.put("buck:cin", 166.5, 16.0, 90, "B")
-b.put("buck:cin_hf", 168.5, 20.0, 90, "B")
+# power: the jack's centre pin straight down through F1 and Q1 (drain up, source down) to
+# the 12 V hub under them (gen/routes.py pours it), where the clamp, a bulk capacitor and
+# the test point sit; Q1's gate network to the west; then the buck in the corner
+b.put("F1", 152.35, 20.5, 270, "B")      # pad 1 up, under the jack's centre pin
+b.put("Q1", 152.35, 30.0, 90, "B")       # drain (5-8) up, source (1-3) down, gate at its west end
+b.put("R1", 147.5, 29.5, 90, "B")        # gate pull-down: pad 1 (gate) down
+b.put("D1", 147.5, 34.0, 90, "B")        # gate clamp: anode (gate) up, cathode in the hub
+b.put("D2", 158.5, 35.0, 0, "B")         # cathode (pad 1) west, in the hub
+b.put("C2", 150.5, 40.0, 270, "B")       # pad 1 up, in the hub
+b.put("TP1", 155.5, 38.5, 0, "B")
+# the buck turned so that GND, SW and VIN (pins 1-3) face east: the input capacitors
+# beside VIN, SW straight across to the inductor, the boot capacitor over GND to SW,
+# the dividers on the signal side (west and south)
+b.put("U1", 172.0, 18.0, 180, "B")
+b.put("L1", 182.5, 23.0, 270, "B")       # pad 1 (SW) up
+b.put("buck:cin_hf", 174.6, 20.4, 0, "B")
+b.put("buck:cin", 174.8, 23.0, 0, "B")
 b.put("buck:en_top", 166.0, 23.5, 90, "B")
 b.put("buck:en_bot", 168.0, 26.5, 90, "B")
-b.put("buck:boot", 176.0, 14.5, 0, "B")
+b.put("buck:boot", 174.6, 15.6, 0, "B")
 b.put("buck:fb_top", 175.5, 27.5, 0, "B")
 b.put("buck:fb_bot", 171.5, 27.5, 0, "B")
-b.put("buck:cout1", 187.5, 17.0, 90, "B")
-b.put("buck:cout2", 187.5, 28.0, 90, "B")
+b.put("buck:cout1", 181.5, 29.5, 270, "B")     # under the inductor's output pad, pad 1 up
+b.put("buck:cout2", 183.5, 29.5, 270, "B")
 b.put("tp:5v", 180.0, 14.0, 0, "B")
 # the pulls on the RP2354A's lines, under its corner
 for k, who in enumerate(("drv:pd_sleep", "drv:pu_fault", "fam:pd_en", "i2c:pu_scl", "i2c:pu_sda")):
@@ -290,7 +313,8 @@ p_.put("led:PERCH_DOWN1", 13.5, -14.0, 0, "B")
 # ======================================================================================
 BAT = Board("bat")
 bt = BAT
-bt.put("L301", 0.0, 0.0)
+bt.put("L301", 0.0, 0.0, rot=270)          # terminals toward the left wing and C301 (the head and
+                                           # tail edges are only 1 mm beyond the coil)
 bt.put("bat:led1", -4.6, L.BAT_HEAD_Y + 0.9, 0)
 bt.put("bat:led2", 4.6, L.BAT_HEAD_Y + 0.9, 0)
 bt.put("bat:ctank", -15.5, 0.0, 90, "B")

@@ -37,16 +37,17 @@
                                               (tPD 400 ns, rise/fall 150 ns, dead time 100 ns) */
 #define PEND_PWM_HZ           30000u       /* [CHOICE] pendulum and film drive: above hearing */
 #define LEV_PWM_HZ            40000u       /* [CHOICE] levitation, carrier off: 4 periods per tick */
-#define LEV_CARRIER_HZ        80000u       /* [SIM] bat_power.py: the bat's tank is 84 kHz with a Q of
-                                              2.5; 80 kHz is exactly 8 PWM periods a control tick and
-                                              gets 97 % of the resonance */
+#define LEV_CARRIER_HZ        80000u       /* [SIM] bat_power.py: the bat's tank is 82 kHz as drawn
+                                              (gen/coils.py: 37 uH with 100 nF) with a Q of 2.5; 80 kHz
+                                              is exactly 8 PWM periods a control tick and gets 99 % of
+                                              the resonance */
 
 /* ---- the coils (all four are the canonical 4-layer spiral) --------------------------- */
-#define COIL_R20_OHM          2.2f         /* [SIM] README "canonical coil", 1 oz inner copper
-                                              (3.35 ohm with 0.5 oz inner) */
-#define COIL_L_H              31.5e-6f     /* [SIM] the canonical coil (the pendulum coils) */
-#define LEV_COIL_L_H          30.3e-6f     /* [SIM] bat_power.py: the levitation coil as built
-                                              (gen/parts.py: 11 turns a layer, r 4-15 mm) */
+#define COIL_R20_OHM          2.29f        /* [SIM] gen/coils.py: the pendulum coil as drawn, 1 oz on
+                                              every layer, 20 degC, leads and vias included */
+#define COIL_L_H              33.2e-6f     /* [SIM] gen/coils.py: the pendulum coil as drawn (49 turns) */
+#define LEV_COIL_L_H          30.1e-6f     /* [SIM] gen/coils.py: the levitation coil as drawn (3 layers,
+                                              43 turns, r 4-15 mm; 2.56 ohm) */
 #define COPPER_TEMPCO         0.0039f      /* copper: +0.39 %/degC; the coil is its own thermometer */
 #define COIL_SURFACE_LIMIT_C  45.0f        /* [CHOICE] PLAN.md 7: nothing a hand reaches passes ~45 C */
 #define COIL_DERATE_FROM_C    40.0f        /* [CHOICE] current limits shrink from here to the limit */
@@ -82,15 +83,19 @@
 #define FAM_I_MAX_A           0.2f         /* [SIM] familiar.py: 0.1-0.2 A; the other token stays dark */
 #define FAM_F_MIN_HZ          100000.0f    /* [CHOICE] sweep range */
 #define FAM_F_MAX_HZ          400000.0f
-#define FAM_OWL_HZ            150000.0f    /* [SIM] the owl token's tank */
-#define FAM_CAT_HZ            330000.0f    /* [SIM] the cat token's tank */
+#define FAM_OWL_HZ            142000.0f    /* [SIM] the owl token's tank: 12.5 uH (gen/coils.py) with 100 nF */
+#define FAM_CAT_HZ            303000.0f    /* [SIM] the cat token's tank: 12.5 uH with 22 nF */
 
 /* ---- the pendulum (TMAG5273 under the swing, three coils round it) ------------------- */
-#define PEND_LENGTH_M         0.15f        /* [SIM] coil_forces.py: a 15 cm thread [ASSUMED] */
-#define PEND_SENSOR_DEPTH_M   0.012f       /* [ASSUMED] TMAG5273 to the bat's magnet at rest */
+#define PEND_LENGTH_M         0.119f       /* the board: the perch's underside 129 mm over the base
+                                              (8.5 mm socket, 112 mm tree, 8.5 mm socket), the bat's
+                                              magnet 10 mm over it at rest (ORDER_LIST.md, the thread) */
+#define PEND_SENSOR_DEPTH_M   0.012f       /* the thread is cut for it: the TMAG5273 sits under the base
+                                              (its die 2 mm below the top copper), the magnet 10 mm above */
 #define PEND_COIL_RADIUS_M    0.018f       /* the designer: coil centres 18 mm from the rest point (31 mm
                                               apart; the coils are 30 mm across) */
-#define PEND_COIL_ANGLE0_DEG  90.0f        /* [ASSUMED] coil 1 at 90 deg (toward the viewer), then +120 */
+#define PEND_COIL_ANGLE0_DEG  90.0f        /* gen/layout.py PEND_COILS: coil 1 (L3) at 90 deg, toward the
+                                              viewer; coil 2 (L4) at 210, coil 3 (L5) at 330 */
 #define TMAG_RATE_HZ          400u         /* [CHOICE] >= 200 Hz */
 
 /* ---- theremin and audio --------------------------------------------------------------- */

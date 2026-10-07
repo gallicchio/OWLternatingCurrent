@@ -27,11 +27,14 @@ sys.path.insert(0, HERE)
 
 if "--inside" not in sys.argv:
     import subprocess, kienv
-    r = subprocess.run(kienv.python() + [os.path.abspath(__file__), "--inside"] + sys.argv[1:],
-                       cwd=ROOT, text=True, capture_output=True, env=dict(os.environ, PYTHONHASHSEED="0"))
-    sys.stdout.write("\n".join(l for l in r.stdout.splitlines() if "Font '" not in l) + ("\n" if r.stdout else ""))
-    sys.stderr.write("\n".join(l for l in r.stderr.splitlines() if "Font '" not in l))
-    sys.exit(r.returncode)
+    p = subprocess.Popen(kienv.python() + ["-u", os.path.abspath(__file__), "--inside"] + sys.argv[1:],
+                         cwd=ROOT, text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+                         env=dict(os.environ, PYTHONHASHSEED="0"))
+    for line in p.stdout:                       # as it comes, so a long route shows its progress
+        if "Font '" not in line:
+            sys.stdout.write(line)
+            sys.stdout.flush()
+    sys.exit(p.wait())
 
 import pcbnew
 from sexp import parse, kids, kid, val
@@ -43,10 +46,7 @@ HW = BI.HW
 PCB = BI.PCB
 LIBDIR = os.path.join(HW, "lib", "OWL.pretty")
 ORIGIN = (50.0, 50.0)
-PANEL_W = max(L.PANEL_OFFSETS["base"][0] + L.BASE_W, L.PANEL_OFFSETS["tree"][0] + L.TREE_W,
-              L.PANEL_OFFSETS["owl_token"][0] + L.TOKEN_R) + L.GAP + L.RAIL
-PANEL_H = max(L.PANEL_OFFSETS["base"][1] + L.BASE_H, L.PANEL_OFFSETS["bat"][1] + L.BAT_TAIL_Y,
-              L.PANEL_OFFSETS["cat_token"][1] + L.TOKEN_R) + L.GAP + L.RAIL
+PANEL_W, PANEL_H = L.PANEL_W, L.PANEL_H
 
 
 def mm(v):
@@ -59,11 +59,15 @@ def PP(x, y):
 
 
 class Frame:
-    """One board's frame on the panel: P(x, y) for its own coordinates."""
+    """One board's frame on the panel: P(x, y) for its own coordinates.  A board the panel
+    turns (gen/layout.py PANEL_ROT: the tree) is built unturned with its origin at its
+    PANEL_OFFSETS point, then turned about that point as a whole (turn()), so nothing
+    that builds it needs to know."""
 
     def __init__(self, name):
         self.name = name
         self.ox, self.oy = L.PANEL_OFFSETS[name]
+        self.rot = L.PANEL_ROT.get(name, 0.0)
 
     def P(self, x, y):
         return PP(self.ox + x, self.oy + y)
@@ -220,29 +224,198 @@ def place_parts(board, comps, nets):
     return fps, netinfo
 
 
-# ---------------------------------------------------------------------------
-# The panel: a frame round the boards, joined to them by mouse-bite tabs
-# ---------------------------------------------------------------------------
-def panel(board, outl):
-    """The frame's outer edge and the boards' edges are Edge.Cuts; the frame's inner
-    edge follows the boards at GAP, as a routed slot that the tabs bridge.  Simplest
-    form that JLCPCB accepts: each board's own outline is cut, the frame is the panel's
-    rectangle minus the region round the boards; tabs are short bridges with a row of
-    0.5 mm holes (mouse bites) on each side."""
-    poly_edge(board, rounded_rect(0, 0, PANEL_W, PANEL_H, 2.0))
-    # the frame's inner edge: a rectangle round all the boards (the area between the
-    # boards is milled out; tabs join each board to the frame or to its neighbour)
-    poly_edge(board, rounded_rect(L.RAIL, L.RAIL, PANEL_W - L.RAIL, PANEL_H - L.RAIL, 1.0))
-    # fiducials and tooling holes on the frame: three of each, as far apart as possible
-    marks = [(L.RAIL / 2 + 3, L.RAIL / 2), (PANEL_W - L.RAIL / 2 - 3, L.RAIL / 2), (L.RAIL / 2 + 3, PANEL_H - L.RAIL / 2)]
-    return marks
+def panel_edges(outl):
+    """Each board's outer edge and its own holes, in panel millimetres, where they end up
+    (a turned board turned)."""
+    import panel as PN
+    edges = {n: [PN.to_panel(n, x, y) for x, y in polys[0]] for n, polys in outl.items()}
+    holes = [[PN.to_panel(n, x, y) for x, y in pts] for n, polys in outl.items() for pts in polys[1:]]
+    return edges, holes
 
 
-def draw_outlines(board, outl):
-    for name, polys in outl.items():
+def inset(pts, d):
+    """A polygon (board millimetres) shrunk by d: where a pour may reach, d inside the
+    board's edge everywhere, the tabs' breakaway lines included."""
+    ps = pcbnew.SHAPE_POLY_SET()
+    ps.NewOutline()
+    for x, y in pts:
+        ps.Append(mm(x), mm(y))
+    ps.Inflate(-mm(d), pcbnew.CORNER_STRATEGY_ROUND_ALL_CORNERS, mm(0.005))
+    c = ps.Outline(0)
+    return [(pcbnew.ToMM(c.CPoint(i).x), pcbnew.ToMM(c.CPoint(i).y)) for i in range(c.PointCount())]
+
+
+# (KiCad 10's GetLayerID knows only the long names, F.Silkscreen: the short ones give an
+# undefined layer, which kicad-cli then refuses to load)
+ART_LAYERS = {"F.SilkS": pcbnew.F_SilkS, "B.SilkS": pcbnew.B_SilkS, "F.Mask": pcbnew.F_Mask, "B.Mask": pcbnew.B_Mask,
+              "F.Cu": pcbnew.F_Cu, "B.Cu": pcbnew.B_Cu, "F.Fab": pcbnew.F_Fab, "B.Fab": pcbnew.B_Fab}
+JUSTIFY = {"left": pcbnew.GR_TEXT_H_ALIGN_LEFT, "center": pcbnew.GR_TEXT_H_ALIGN_CENTER,
+           "right": pcbnew.GR_TEXT_H_ALIGN_RIGHT}
+
+
+def shape(board, layer, kind, width=0.0, filled=False, net=None):
+    s = pcbnew.PCB_SHAPE(board)
+    s.SetShape(kind)
+    s.SetLayer(layer)
+    s.SetWidth(mm(width))
+    if filled:
+        s.SetFilled(True)
+    if net is not None:
+        s.SetNet(net)
+    return s
+
+
+def polygon(board, layer, F, pts, net=None):
+    s = shape(board, layer, pcbnew.SHAPE_T_POLY, filled=True, net=net)
+    s.SetPolyPoints([F.P(x, y) for x, y in pts])
+    board.Add(s)
+
+
+def draw_art(board, art, netinfo):
+    """gen/art.py's drawing (hardware/art.json): silkscreen, mask openings and copper on
+    each board, and the theremin's two antennas: their gold (copper on the antenna's net,
+    solid, with the mask open over it) and, round each, no pour on any layer."""
+    n = 0
+    for name in PL.BOARDS:
         F = FRAMES[name]
-        for pts in polys:
-            poly_edge(board, [(F.ox + x, F.oy + y) for x, y in pts])
+        for lname, items in art.art(name).items():
+            layer = ART_LAYERS[lname]
+            back = lname.startswith("B.")
+            for it in items:
+                kind = it[0]
+                if kind == "poly":
+                    polygon(board, layer, F, it[1])
+                elif kind == "polyline":
+                    for a, b in zip(it[1], it[1][1:]):
+                        sg = shape(board, layer, pcbnew.SHAPE_T_SEGMENT, it[2])
+                        sg.SetStart(F.P(*a)); sg.SetEnd(F.P(*b))
+                        board.Add(sg)
+                elif kind == "circle":
+                    _, cx, cy, r, w = it
+                    c = shape(board, layer, pcbnew.SHAPE_T_CIRCLE, w)
+                    c.SetCenter(F.P(cx, cy)); c.SetEnd(F.P(cx + r, cy))
+                    board.Add(c)
+                elif kind == "arc":
+                    _, cx, cy, r, a0, a1, w = it
+                    pt = lambda a: F.P(cx + r * math.cos(math.radians(a)), cy + r * math.sin(math.radians(a)))
+                    c = shape(board, layer, pcbnew.SHAPE_T_ARC, w)
+                    c.SetArcGeometry(pt(a0), pt((a0 + a1) / 2), pt(a1))
+                    board.Add(c)
+                elif kind == "text":
+                    _, txt, x, y, h, ang, just = it
+                    t = pcbnew.PCB_TEXT(board)
+                    t.SetText(txt)
+                    t.SetLayer(layer)
+                    t.SetTextSize(pcbnew.VECTOR2I(mm(h), mm(h)))
+                    t.SetTextThickness(mm(art.text_thickness(h)))
+                    t.SetHorizJustify(JUSTIFY[just])
+                    t.SetVertJustify(pcbnew.GR_TEXT_V_ALIGN_CENTER)
+                    t.SetMirrored(back)
+                    t.SetTextAngleDegrees(ang)
+                    t.SetPosition(F.P(x, y))
+                    board.Add(t)
+                n += 1
+    F = FRAMES["base"]
+    for a in art.antennas():
+        net = netinfo["/Base/" + a["net"]]
+        for pts in a["copper"]:
+            polygon(board, pcbnew.F_Cu, F, pts, net=net)
+        for pts in a["mask_open"]:
+            polygon(board, pcbnew.F_Mask, F, pts)
+        n += len(a["copper"]) + len(a["mask_open"])
+    return n
+
+
+def turn(board, name):
+    """Turn everything of a turned board (built unturned at its origin: gen/layout.py)
+    about that origin: footprints, copper, zones, drawings, text."""
+    F = FRAMES[name]
+    if not F.rot:
+        return 0
+    pivot = PP(F.ox, F.oy)
+    ang = pcbnew.EDA_ANGLE(F.rot, pcbnew.DEGREES_T)
+    w, h = {"tree": (L.TREE_W, L.TREE_H)}[name]
+    lo, hi = PP(F.ox - 1.0, F.oy - 1.0), PP(F.ox + w + 1.0, F.oy + h + 1.0)
+
+    def mine(item):
+        c = item.GetBoundingBox().Centre()
+        return lo.x <= c.x <= hi.x and lo.y <= c.y <= hi.y
+    items = [f for f in board.GetFootprints() if PL.board_of(f.GetReference()) == name]
+    items += [t for t in board.GetTracks() if mine(t)]
+    items += [z for z in board.Zones() if mine(z)]
+    items += [d for d in board.GetDrawings() if mine(d)]
+    for it in items:
+        it.Rotate(pivot, ang)
+    return len(items)
+
+
+# ---------------------------------------------------------------------------
+# Copper: a router per board (gen/routing.py), the planned copper and the rest
+# (gen/routes.py), then the pours
+# ---------------------------------------------------------------------------
+def router(board, name, polys):
+    """The router for one board, in its own millimetres shifted so that the outline's
+    bounding box starts at 0, 0 (the base's does already)."""
+    import routing as RT
+    F = FRAMES[name]
+    xs = [x for p in polys for x, _ in p]
+    ys = [y for p in polys for _, y in p]
+    x0, y0 = math.floor(min(xs)), math.floor(min(ys))
+    w, h = math.ceil(max(xs)) - x0, math.ceil(max(ys)) - y0
+
+    def P(x, y):
+        return F.P(x + x0, y + y0)
+
+    def B(v):
+        x, y = F.B(v)
+        return (x - x0, y - y0)
+    R = RT.Router(board, P, B, w, h, refs=set(PL.BOARDS[name].place), planes={},
+                  outline=[[(x - x0, y - y0) for x, y in p] for p in polys], name=name)
+    R.x0, R.y0 = x0, y0
+    R.outline = [[(x - x0, y - y0) for x, y in p] for p in polys]
+    R.pour_edge = [(x - x0, y - y0) for x, y in inset(polys[0], 0.5)]
+    return R
+
+
+def copper(board, outl, args):
+    import time
+    import routes as RS
+    out = {}
+    for name in PL.BOARDS:
+        t = time.time()
+        seed("copper:" + name)
+        R = router(board, name, outl[name])
+        R.load_pads()
+        RS.plan(name, R)
+        if "--planned" not in args:
+            RS.route(name, R)
+        left = {n: R.unrouted(n) for n in R.by_net if not n.startswith("<") and R.unrouted(n)}
+        print("copper %-9s %5d tracks %4d vias, %.0f s; %d nets with unjoined pieces%s"
+              % (name, R.n_tracks, R.n_vias, time.time() - t, len(left),
+                 (": " + ", ".join("%s(%d)" % kv for kv in sorted(left.items())))[:400] if left else ""))
+        for net, why in R.failed[:30]:
+            print("   UNROUTED %s: %s" % (net, why))
+        out[name] = R
+    return out
+
+
+def pours_only(board, routers):
+    import routes as RS
+    for name, R in routers.items():
+        seed("pours:" + name)
+        RS.pours(name, R)
+
+
+def fill(board):
+    # the filler drops islands it judges unconnected from the board's connectivity,
+    # which a board built in memory has not computed yet
+    board.BuildConnectivity()
+    filler = pcbnew.ZONE_FILLER(board)
+    filler.Fill(board.Zones())
+    zs = [z for z in board.Zones() if not z.GetIsRuleArea()]
+    n = sum(1 for z in zs if z.HasFilledPolysForLayer(z.GetFirstLayer())
+            and z.GetFilledPolysList(z.GetFirstLayer()).OutlineCount())
+    print("pours: %d zones, %d filled" % (len(zs), n))
 
 
 # ---------------------------------------------------------------------------
@@ -253,16 +426,43 @@ def main():
     board = pcbnew.CreateEmptyBoard()
     setup(board)
     outl, art = outlines()
-    seed("outlines")
-    draw_outlines(board, outl)
-    seed("panel")
-    panel(board, outl)
     fps, netinfo = place_parts(board, comps, nets)
+    if art:
+        seed("art")
+        n_art = draw_art(board, art, netinfo)
+        print("art: %d items" % n_art)
+    routers = None
+    if "--place" not in args:
+        routers = copper(board, outl, args)
+        pours_only(board, routers)
+    import silk as SK
+    seed("silk")
+    n_ref = n_fab = 0
+    for name in PL.BOARDS:
+        F = FRAMES[name]
+        S = SK.apply(board, name, set(PL.BOARDS[name].place), F.B, inset(outl[name][0], SK.EDGE), art, F)
+        n_ref += S.placed
+        n_fab += S.to_fab
+    print("silk: %d designators printed underneath, %d on the fab layer only" % (n_ref, n_fab))
+    for name in PL.BOARDS:
+        n = turn(board, name)
+        if n:
+            print("panel: %s turned %g degrees (%d items)" % (name, FRAMES[name].rot, n))
+    import panel as PN
+    edges, holes = panel_edges(outl)
+    tabs, n_bites, per = PN.build(board, PP, mm, edges, holes, load_fp, seed)
+    print("panel: %.1f x %.1f mm, %d tabs (%s), %d mouse-bite holes, 3 fiducials, 4 tooling holes"
+          % (PANEL_W, PANEL_H, len(tabs), ", ".join("%s %d" % kv for kv in sorted(per.items())), n_bites))
+    for n in PL.BOARDS:
+        if per.get(n, 0) < 2:
+            print("   PANEL: %s has %d tab(s)" % (n, per.get(n, 0)))
+    if routers:
+        fill(board)
     board.Save(PCB)
     import project
     project.write(HW)
-    print("board: %d footprints on %d boards, panel %.1f x %.1f mm%s -> %s"
-          % (len(fps), len(PL.BOARDS), PANEL_W, PANEL_H, "" if art else " (placeholder outlines: no gen/art.py yet)",
+    print("board: %d footprints on %d boards%s -> %s"
+          % (len(fps), len(PL.BOARDS), "" if art else " (placeholder outlines: no gen/art.py yet)",
              os.path.relpath(PCB, ROOT)))
     return 0
 

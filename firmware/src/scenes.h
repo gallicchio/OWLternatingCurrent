@@ -52,7 +52,8 @@ typedef enum {
 #define SCENE_FIREFLY_S    140.0f
 #define SCENE_QUANTUM_S    15.0f
 #define SCENE_RING_SWIRL_S 8.0f
-#define SCENE_MOON_STAR    11          /* [ASSUMED] the arc's star nearest the moon (theremin) */
+#define SCENE_MOON_STAR    0           /* the arc's star nearest the moon (theremin): STAR0, at the
+                                          arc's left end (gen/layout.py: the moon is at the left) */
 
 enum { FAMILIAR_NONE = 0, FAMILIAR_OWL = 1, FAMILIAR_CAT = 2, FAMILIAR_UNKNOWN = 3 };
 #define SCENE_LUX_PENDING (-2.0f)

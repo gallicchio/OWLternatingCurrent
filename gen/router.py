@@ -232,6 +232,7 @@ class Grid:
                 continue
             pops += 1
             if pops > max_pop:
+                self.last_why = "search budget (%d steps)" % max_pop
                 break
             if (L, k) in goal:
                 found = (L, k)
@@ -272,6 +273,8 @@ class Grid:
                         par[(LL, k)] = (L, k)
                         heapq.heappush(pq, (ng + h(i, j), ng, LL, k, -1))
         if found is None:
+            if pops <= max_pop:
+                self.last_why = "walled in (%d steps)" % pops
             return None
         path, cur = [], found
         while cur is not None:

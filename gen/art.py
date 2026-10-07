@@ -126,6 +126,20 @@ def font():
     return _FONT
 
 
+def tank_khz(who):
+    """A token's resonance from its coil and its capacitor (gen/parts.py, the schematic's
+    choice of C401 and C501), rounded to the kHz."""
+    import re
+    from parts import PARTS
+
+    def si(v):
+        m = re.match(r"([\d.]+)\s*([pnum]?)", v)
+        return float(m.group(1)) * {"p": 1e-12, "n": 1e-9, "u": 1e-6, "m": 1e-3, "": 1.0}[m.group(2)]
+    l = si(PARTS["COIL_TOKEN"]["value"])
+    c = si(PARTS["C100N_C0G" if who == "owl" else "C22N_C0G"]["value"])
+    return int(round(1.0 / (2 * math.pi * math.sqrt(l * c)) / 1e3))
+
+
 def text_thickness(h):
     """The stroke width of silkscreen text h mm high (board.py uses the same rule)."""
     return round(max(0.15, 0.15 * h), 3)
@@ -1412,8 +1426,9 @@ def spell_book(cv):
           "A changing magnet field pushes electrons round a coil.|That is how the tokens light up, with no "
           "battery and no wires.", U_(ox), oy, 13.8, stars=(270, 135))
     spell(bv, "Resonance", "f = 1/(2π√(LC))",
-          "Each token rings at its own note, like a swing pushed in time.|The owl's is 148\u00a0kHz, "
-          "the cat's 316\u00a0kHz: the perch hears who is there.", U_(cx), cy, 13.8)
+          "Each token rings at its own note, like a swing pushed in time.|The owl's is %d\u00a0kHz, "
+          "the cat's %d\u00a0kHz: the perch hears who is there." % (tank_khz("owl"), tank_khz("cat")),
+          U_(cx), cy, 13.8)
     x3, y3 = L.pend_coil("L3")
     spell(bv, "The pendulum", "T = 2π√(l/g)",
           "A bat on a thread swings in the same time however far it goes.|The coils give it a tiny "
@@ -1810,7 +1825,7 @@ def build(verbose=False):
         else:
             cv.keep_clear(TOP, box(*TOKEN_PATCH))
             keep += (owl_token_front if board == "owl_token" else cat_token_front)(cv)
-            token_back(cv, "OWL" if board == "owl_token" else "CAT", 148 if board == "owl_token" else 316)
+            token_back(cv, "OWL" if board == "owl_token" else "CAT", tank_khz(board.split("_")[0]))
         _CANVAS[board] = cv
         out["boards"][board] = {
             "outline": [[list(p) for p in ring_pts(edge)]] + [[[round(x, 4), round(y, 4)] for x, y in h] for h in holes],

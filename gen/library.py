@@ -241,7 +241,28 @@ def build_footprints(share, models_needed):
         else:
             raise SystemExit("unknown footprint source %r for %s" % (src, key))
         done.add(name)
+    # the panel's own marks (gen/panel.py places them; no part, so no schematic symbol)
+    path = os.path.join(share, "footprints", "Fiducial.pretty", "Fiducial_1mm_Mask2mm.kicad_mod")
+    write(os.path.join(PRETTY, "Fiducial_1mm_Mask2mm.kicad_mod"), ser(parse(open(path, encoding="utf-8").read())[0]) + "\n")
+    for name, d, what in (("Tooling_NPTH_2mm", 2.0, "a 2 mm tooling hole on the panel's rail (JLCPCB's assembly line)"),
+                          ("MouseBite_NPTH_0.5mm", 0.5, "one mouse-bite hole of a breakaway tab")):
+        write(os.path.join(PRETTY, name + ".kicad_mod"), PANEL_HOLE % dict(name=name, d=d, what=what,
+                                                                        cy=d / 2 + 0.25) + "\n")
+    done |= {"Fiducial_1mm_Mask2mm", "Tooling_NPTH_2mm", "MouseBite_NPTH_0.5mm"}
     return len(done)
+
+
+PANEL_HOLE = """(footprint "%(name)s"
+	(version 20260206)
+	(generator "owl_library")
+	(layer "F.Cu")
+	(descr "%(what)s: unplated, %(d)g mm; board only, out of the BOM and the placement file")
+	(property "Reference" "REF**" (at 0 -1.5 0) (layer "F.Fab") (hide yes) (effects (font (size 0.5 0.5) (thickness 0.08))))
+	(property "Value" "%(name)s" (at 0 1.5 0) (layer "F.Fab") (hide yes) (effects (font (size 0.5 0.5) (thickness 0.08))))
+	(attr board_only exclude_from_pos_files exclude_from_bom)
+	(fp_circle (center 0 0) (end %(cy)g 0) (stroke (width 0.05) (type solid)) (fill no) (layer "F.CrtYd"))
+	(pad "" np_thru_hole circle (at 0 0) (size %(d)g %(d)g) (drill %(d)g) (layers "*.Cu" "*.Mask"))
+)"""
 
 
 def copy_models(share, models_needed):

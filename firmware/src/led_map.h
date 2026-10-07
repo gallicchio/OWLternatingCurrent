@@ -26,11 +26,11 @@ typedef struct {
 #define LED_UNPLACED 49   /* positions no hardware/checks/led_positions.json yet; TODO: x/y = 0 until the placement writes them */
 
 enum {
-    LED_WISP0 = 0,
-    LED_PUMPKIN1 = 1,
-    LED_WISP2 = 2,
-    LED_PUMPKIN0 = 3,
-    LED_WISP1 = 4,
+    LED_PUMPKIN1 = 0,
+    LED_PUMPKIN0 = 1,
+    LED_WISP1 = 2,
+    LED_WISP0 = 3,
+    LED_WISP2 = 4,
     LED_OWLRING0 = 5,
     LED_STAR3 = 6,
     LED_OWLRING2 = 7,
@@ -41,18 +41,18 @@ enum {
     LED_STARX2 = 12,
     LED_STARX0 = 13,
     LED_STARX1 = 14,
-    LED_STAR8 = 15,
-    LED_STAR7 = 16,
-    LED_STAR9 = 17,
-    LED_STAR10 = 18,
-    LED_STARX3 = 19,
+    LED_STARX3 = 15,
+    LED_STAR8 = 16,
+    LED_STAR7 = 17,
+    LED_STAR9 = 18,
+    LED_STAR10 = 19,
     LED_STAR11 = 20,
     LED_CATRING2 = 21,
     LED_STAR6 = 22,
-    LED_WISP4 = 23,
-    LED_WISP3 = 24,
-    LED_WISP5 = 25,
-    LED_PUMPKIN2 = 26,
+    LED_WISP5 = 23,
+    LED_WISP4 = 24,
+    LED_PUMPKIN2 = 25,
+    LED_WISP3 = 26,
     LED_CATRING0 = 27,
     LED_CATRING1 = 28,
     LED_STAR5 = 29,
@@ -78,11 +78,11 @@ enum {
 };
 
 static const led_info LED_MAP[LED_COUNT] = {
-    {LED_DRV_BASE,  0, "WISP0", LED_COL_PURPLE, 0.00f, 0.00f, LED_BOARD_BASE},   /* along the hill, left to right, 0 of 6 */
-    {LED_DRV_BASE,  1, "PUMPKIN1", LED_COL_AMBER5050, 0.00f, 0.00f, LED_BOARD_BASE},   /* pumpkin 1's face, left to right */
-    {LED_DRV_BASE,  2, "WISP2", LED_COL_PURPLE, 0.00f, 0.00f, LED_BOARD_BASE},   /* along the hill, left to right, 2 of 6 */
-    {LED_DRV_BASE,  3, "PUMPKIN0", LED_COL_AMBER5050, 0.00f, 0.00f, LED_BOARD_BASE},   /* pumpkin 0's face, left to right */
-    {LED_DRV_BASE,  4, "WISP1", LED_COL_PURPLE, 0.00f, 0.00f, LED_BOARD_BASE},   /* along the hill, left to right, 1 of 6 */
+    {LED_DRV_BASE,  0, "PUMPKIN1", LED_COL_AMBER5050, 0.00f, 0.00f, LED_BOARD_BASE},   /* pumpkin 1's face, left to right */
+    {LED_DRV_BASE,  1, "PUMPKIN0", LED_COL_AMBER5050, 0.00f, 0.00f, LED_BOARD_BASE},   /* pumpkin 0's face, left to right */
+    {LED_DRV_BASE,  2, "WISP1", LED_COL_PURPLE, 0.00f, 0.00f, LED_BOARD_BASE},   /* along the hill, left to right, 1 of 6 */
+    {LED_DRV_BASE,  3, "WISP0", LED_COL_PURPLE, 0.00f, 0.00f, LED_BOARD_BASE},   /* along the hill, left to right, 0 of 6 */
+    {LED_DRV_BASE,  4, "WISP2", LED_COL_PURPLE, 0.00f, 0.00f, LED_BOARD_BASE},   /* along the hill, left to right, 2 of 6 */
     {LED_DRV_BASE,  5, "OWLRING0", LED_COL_PURPLE, 0.00f, 0.00f, LED_BOARD_PERCH},   /* round the owl's perch, at 0 degrees */
     {LED_DRV_BASE,  6, "STAR3", LED_COL_VIOLET, 0.00f, 0.00f, LED_BOARD_BASE},   /* sky arc, position 3 of 12, left to right */
     {LED_DRV_BASE,  7, "OWLRING2", LED_COL_PURPLE, 0.00f, 0.00f, LED_BOARD_PERCH},   /* round the owl's perch, at 240 degrees */
@@ -93,18 +93,18 @@ static const led_info LED_MAP[LED_COUNT] = {
     {LED_DRV_BASE, 12, "STARX2", LED_COL_VIOLET, 0.00f, 0.00f, LED_BOARD_BASE},   /* scattered sky star 2 */
     {LED_DRV_BASE, 13, "STARX0", LED_COL_VIOLET, 0.00f, 0.00f, LED_BOARD_BASE},   /* scattered sky star 0 */
     {LED_DRV_BASE, 19, "STARX1", LED_COL_VIOLET, 0.00f, 0.00f, LED_BOARD_BASE},   /* scattered sky star 1 */
-    {LED_DRV_BASE, 20, "STAR8", LED_COL_VIOLET, 0.00f, 0.00f, LED_BOARD_BASE},   /* sky arc, position 8 of 12, left to right */
-    {LED_DRV_BASE, 21, "STAR7", LED_COL_VIOLET, 0.00f, 0.00f, LED_BOARD_BASE},   /* sky arc, position 7 of 12, left to right */
-    {LED_DRV_BASE, 22, "STAR9", LED_COL_VIOLET, 0.00f, 0.00f, LED_BOARD_BASE},   /* sky arc, position 9 of 12, left to right */
-    {LED_DRV_BASE, 23, "STAR10", LED_COL_VIOLET, 0.00f, 0.00f, LED_BOARD_BASE},   /* sky arc, position 10 of 12, left to right */
-    {LED_DRV_BASE, 24, "STARX3", LED_COL_VIOLET, 0.00f, 0.00f, LED_BOARD_BASE},   /* scattered sky star 3 */
+    {LED_DRV_BASE, 20, "STARX3", LED_COL_VIOLET, 0.00f, 0.00f, LED_BOARD_BASE},   /* scattered sky star 3 */
+    {LED_DRV_BASE, 21, "STAR8", LED_COL_VIOLET, 0.00f, 0.00f, LED_BOARD_BASE},   /* sky arc, position 8 of 12, left to right */
+    {LED_DRV_BASE, 22, "STAR7", LED_COL_VIOLET, 0.00f, 0.00f, LED_BOARD_BASE},   /* sky arc, position 7 of 12, left to right */
+    {LED_DRV_BASE, 23, "STAR9", LED_COL_VIOLET, 0.00f, 0.00f, LED_BOARD_BASE},   /* sky arc, position 9 of 12, left to right */
+    {LED_DRV_BASE, 24, "STAR10", LED_COL_VIOLET, 0.00f, 0.00f, LED_BOARD_BASE},   /* sky arc, position 10 of 12, left to right */
     {LED_DRV_BASE, 25, "STAR11", LED_COL_VIOLET, 0.00f, 0.00f, LED_BOARD_BASE},   /* sky arc, position 11 of 12, left to right */
     {LED_DRV_BASE, 26, "CATRING2", LED_COL_PURPLE, 0.00f, 0.00f, LED_BOARD_PERCH},   /* round the cat's perch, at 240 degrees */
     {LED_DRV_BASE, 27, "STAR6", LED_COL_VIOLET, 0.00f, 0.00f, LED_BOARD_BASE},   /* sky arc, position 6 of 12, left to right */
-    {LED_DRV_BASE, 28, "WISP4", LED_COL_PURPLE, 0.00f, 0.00f, LED_BOARD_BASE},   /* along the hill, left to right, 4 of 6 */
-    {LED_DRV_BASE, 29, "WISP3", LED_COL_PURPLE, 0.00f, 0.00f, LED_BOARD_BASE},   /* along the hill, left to right, 3 of 6 */
-    {LED_DRV_BASE, 30, "WISP5", LED_COL_PURPLE, 0.00f, 0.00f, LED_BOARD_BASE},   /* along the hill, left to right, 5 of 6 */
-    {LED_DRV_BASE, 31, "PUMPKIN2", LED_COL_AMBER5050, 0.00f, 0.00f, LED_BOARD_BASE},   /* pumpkin 2's face, left to right */
+    {LED_DRV_BASE, 28, "WISP5", LED_COL_PURPLE, 0.00f, 0.00f, LED_BOARD_BASE},   /* along the hill, left to right, 5 of 6 */
+    {LED_DRV_BASE, 29, "WISP4", LED_COL_PURPLE, 0.00f, 0.00f, LED_BOARD_BASE},   /* along the hill, left to right, 4 of 6 */
+    {LED_DRV_BASE, 30, "PUMPKIN2", LED_COL_AMBER5050, 0.00f, 0.00f, LED_BOARD_BASE},   /* pumpkin 2's face, left to right */
+    {LED_DRV_BASE, 31, "WISP3", LED_COL_PURPLE, 0.00f, 0.00f, LED_BOARD_BASE},   /* along the hill, left to right, 3 of 6 */
     {LED_DRV_BASE, 32, "CATRING0", LED_COL_PURPLE, 0.00f, 0.00f, LED_BOARD_PERCH},   /* round the cat's perch, at 0 degrees */
     {LED_DRV_BASE, 33, "CATRING1", LED_COL_PURPLE, 0.00f, 0.00f, LED_BOARD_PERCH},   /* round the cat's perch, at 120 degrees */
     {LED_DRV_BASE, 34, "STAR5", LED_COL_VIOLET, 0.00f, 0.00f, LED_BOARD_BASE},   /* sky arc, position 5 of 12, left to right */
@@ -136,16 +136,16 @@ static const int8_t LED_OF_CHANNEL[LED_DRIVERS][LED_DRIVER_CHANNELS] = {
 };
 
 /* named groups, in order (the scenes walk these) */
-#define LED_N_WISP         6
-static const uint8_t LED_GROUP_WISP[LED_N_WISP] = {0, 2, 4, 23, 24, 25};
 #define LED_N_PUMPKIN      3
-static const uint8_t LED_GROUP_PUMPKIN[LED_N_PUMPKIN] = {1, 3, 26};
+static const uint8_t LED_GROUP_PUMPKIN[LED_N_PUMPKIN] = {0, 1, 25};
+#define LED_N_WISP         6
+static const uint8_t LED_GROUP_WISP[LED_N_WISP] = {2, 3, 4, 23, 24, 26};
 #define LED_N_OWLRING      3
 static const uint8_t LED_GROUP_OWLRING[LED_N_OWLRING] = {5, 7, 11};
 #define LED_N_STAR         12
-static const uint8_t LED_GROUP_STAR[LED_N_STAR] = {6, 8, 9, 10, 15, 16, 17, 18, 20, 22, 29, 30};
+static const uint8_t LED_GROUP_STAR[LED_N_STAR] = {6, 8, 9, 10, 16, 17, 18, 19, 20, 22, 29, 30};
 #define LED_N_STARX        4
-static const uint8_t LED_GROUP_STARX[LED_N_STARX] = {12, 13, 14, 19};
+static const uint8_t LED_GROUP_STARX[LED_N_STARX] = {12, 13, 14, 15};
 #define LED_N_CATRING      3
 static const uint8_t LED_GROUP_CATRING[LED_N_CATRING] = {21, 27, 28};
 #define LED_N_OWLEYE       6

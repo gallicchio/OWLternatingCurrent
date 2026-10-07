@@ -53,7 +53,7 @@ static const uint8_t PIN_IN1[COIL_COUNT] = {PIN_PEND1_IN1, PIN_PEND2_IN1, PIN_PE
 
 /* ---- the world -------------------------------------------------------------------------- */
 static float v12 = 0.0f, v5 = 0.0f, vbus = 5.0f;
-static float coil_r[COIL_COUNT] = {2.2f, 2.2f, 2.2f, 2.2f};   /* the real coils at 25 C */
+static float coil_r[COIL_COUNT] = {COIL_R20_OHM, COIL_R20_OHM, COIL_R20_OHM, COIL_R20_OHM};   /* the real coils at 25 C */
 static float coil_t[COIL_COUNT] = {25.0f, 25.0f, 25.0f, 25.0f}; /* their temperature: one node, 2.8 J/K, 43 K/W */
 static float hall_bias_mT = 6.36f;                             /* the owl's magnet at the sensor */
 static float hall_coil_mT_per_A = LEV_BCOIL_MT_PER_A;           /* the coil at the sensor, per forward amp */
@@ -376,7 +376,7 @@ static void test_mirrors(void)
     run_ms(60);
     CHECK(rt.faults & RT_FAULT_OPEN_COIL, "an open coil not caught");
     CHECK(rt_coil_owner(COIL_PEND1) == RT_OWNER_NONE, "an open coil's request still held");
-    coil_r[COIL_PEND1] = 2.2f;
+    coil_r[COIL_PEND1] = COIL_R20_OHM;
     rt.clear_req++;
     run_ms(1200);
     printf("mirrors: a shorted coil (overcurrent) and an open one are caught and released\n");

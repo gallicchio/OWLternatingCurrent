@@ -273,7 +273,7 @@ mean energy (0.46) is below the wall's top (0.50), and about a third of it tunne
     FAMn_ISENSE is the bridge's 4.8 V supply current, at 10.3 V/A.
   - A token shows a resonance peak (the coupled mode, ~15 % above its tuning). A fit of the
     coupled-tank model, third harmonic included, gives the token's own tuning f_t: owl
-    105-195 kHz, cat 264-412 kHz, else unknown.
+    116-168 kHz, cat 248-358 kHz (each 18 % round its own: familiar.c FAM_ID_TOL), else unknown.
   - The perch is driven at f_t, never at the peak: there a token only raises the perch's
     impedance, so the empty-perch duty cap (0.92 × 0.2 A into an empty perch) bounds the
     current with or without a token.

@@ -324,11 +324,16 @@ static bool fit_run(fam_perch *p)
     return false;
 }
 
+/* A token is named when its tank is within FAM_ID_TOL of its own frequency: real tokens
+ * are within about 7 % (C0G capacitors and the drawn coils, 5 % each), and a stranger
+ * between the two (240 kHz, between the owl's 142 and the cat's 303) is "unknown". */
+#define FAM_ID_TOL 0.18f
+
 static fam_who classify(float ft)
 {
-    if (ft > 0.70f * FAM_OWL_HZ && ft < 1.30f * FAM_OWL_HZ)
+    if (ft > (1.0f - FAM_ID_TOL) * FAM_OWL_HZ && ft < (1.0f + FAM_ID_TOL) * FAM_OWL_HZ)
         return FAM_OWL;
-    if (ft > 0.80f * FAM_CAT_HZ && ft < 1.25f * FAM_CAT_HZ)
+    if (ft > (1.0f - FAM_ID_TOL) * FAM_CAT_HZ && ft < (1.0f + FAM_ID_TOL) * FAM_CAT_HZ)
         return FAM_CAT;
     return FAM_UNKNOWN;
 }

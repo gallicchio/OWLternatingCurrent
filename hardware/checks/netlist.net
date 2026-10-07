@@ -2,7 +2,7 @@
 	(version "E")
 	(design
 		(source "../OWLternatingCurrent.kicad_sch")
-		(date "2026-10-07T15:48:34")
+		(date "2026-10-07T16:06:39")
 		(tool "Eeschema 10.0.6")
 		(textvar
 			(name "DATE") "2026-10-07")
@@ -5656,15 +5656,15 @@
 		)
 		(comp
 			(ref "D5")
-			(value "purple")
-			(footprint "OWL:LED_0603_1608Metric")
+			(value "orange x3")
+			(footprint "OWL:LED_RGB_5050-6")
 			(fields
 				(field
-					(name "LCSC") "C51933300")
+					(name "LCSC") "C516304")
 				(field
-					(name "MPN") "GL0603PU01")
+					(name "MPN") "HL-AF-5060S22OC-3-S1-THL")
 				(field
-					(name "Footprint") "OWL:LED_0603_1608Metric")
+					(name "Footprint") "OWL:LED_RGB_5050-6")
 				(field
 					(name "Datasheet")
 				)
@@ -5674,16 +5674,16 @@
 			)
 			(libsource
 				(lib "OWL")
-				(part "LED")
-				(description "Light emitting diode")
+				(part "LED_3die")
+				(description "three LED dice in one package, driven in parallel")
 			)
 			(property
 				(name "LCSC")
-				(value "C51933300")
+				(value "C516304")
 			)
 			(property
 				(name "MPN")
-				(value "GL0603PU01")
+				(value "HL-AF-5060S22OC-3-S1-THL")
 			)
 			(property
 				(name "Sheetname")
@@ -5692,14 +5692,6 @@
 			(property
 				(name "Sheetfile")
 				(value "base.kicad_sch")
-			)
-			(property
-				(name "ki_keywords")
-				(value "LED diode")
-			)
-			(property
-				(name "ki_fp_filters")
-				(value "LED* LED_SMD:* LED_THT:*")
 			)
 			(sheetpath
 				(names "/Base/")
@@ -5711,10 +5703,22 @@
 					(name "A")
 					(pins
 						(pin
+							(num "4")
+						)
+						(pin
+							(num "5")
+						)
+						(pin
+							(num "6")
+						)
+						(pin
 							(num "1")
 						)
 						(pin
 							(num "2")
+						)
+						(pin
+							(num "3")
 						)
 					)
 				)
@@ -5763,7 +5767,7 @@
 				(names "/Base/")
 				(tstamps "/8f976193-3ca0-4b18-df0e-ba7338335e40/")
 			)
-			(tstamps "503c43dd-58f9-a9d9-31fe-c8bc1b6742e9")
+			(tstamps "84016c16-6116-eba7-5799-a25abacfe3da")
 			(units
 				(unit
 					(name "A")
@@ -5841,7 +5845,7 @@
 				(names "/Base/")
 				(tstamps "/8f976193-3ca0-4b18-df0e-ba7338335e40/")
 			)
-			(tstamps "f4ff6b53-52e8-ba36-f0ee-35b10e4d2c12")
+			(tstamps "551d8ad1-4cd5-3b06-35de-ce301e5a4f30")
 			(units
 				(unit
 					(name "A")
@@ -5858,15 +5862,15 @@
 		)
 		(comp
 			(ref "D8")
-			(value "orange x3")
-			(footprint "OWL:LED_RGB_5050-6")
+			(value "purple")
+			(footprint "OWL:LED_0603_1608Metric")
 			(fields
 				(field
-					(name "LCSC") "C516304")
+					(name "LCSC") "C51933300")
 				(field
-					(name "MPN") "HL-AF-5060S22OC-3-S1-THL")
+					(name "MPN") "GL0603PU01")
 				(field
-					(name "Footprint") "OWL:LED_RGB_5050-6")
+					(name "Footprint") "OWL:LED_0603_1608Metric")
 				(field
 					(name "Datasheet")
 				)
@@ -5876,16 +5880,16 @@
 			)
 			(libsource
 				(lib "OWL")
-				(part "LED_3die")
-				(description "three LED dice in one package, driven in parallel")
+				(part "LED")
+				(description "Light emitting diode")
 			)
 			(property
 				(name "LCSC")
-				(value "C516304")
+				(value "C51933300")
 			)
 			(property
 				(name "MPN")
-				(value "HL-AF-5060S22OC-3-S1-THL")
+				(value "GL0603PU01")
 			)
 			(property
 				(name "Sheetname")
@@ -5895,32 +5899,28 @@
 				(name "Sheetfile")
 				(value "base.kicad_sch")
 			)
+			(property
+				(name "ki_keywords")
+				(value "LED diode")
+			)
+			(property
+				(name "ki_fp_filters")
+				(value "LED* LED_SMD:* LED_THT:*")
+			)
 			(sheetpath
 				(names "/Base/")
 				(tstamps "/8f976193-3ca0-4b18-df0e-ba7338335e40/")
 			)
-			(tstamps "e5829665-595e-e55c-0c7b-796ca169b95f")
+			(tstamps "2b2b7c2c-0fe7-b3f1-d8f2-a386f071bcb2")
 			(units
 				(unit
 					(name "A")
 					(pins
 						(pin
-							(num "4")
-						)
-						(pin
-							(num "5")
-						)
-						(pin
-							(num "6")
-						)
-						(pin
 							(num "1")
 						)
 						(pin
 							(num "2")
-						)
-						(pin
-							(num "3")
 						)
 					)
 				)
@@ -7314,6 +7314,76 @@
 		)
 		(comp
 			(ref "D30")
+			(value "orange x3")
+			(footprint "OWL:LED_RGB_5050-6")
+			(fields
+				(field
+					(name "LCSC") "C516304")
+				(field
+					(name "MPN") "HL-AF-5060S22OC-3-S1-THL")
+				(field
+					(name "Footprint") "OWL:LED_RGB_5050-6")
+				(field
+					(name "Datasheet")
+				)
+				(field
+					(name "Description")
+				)
+			)
+			(libsource
+				(lib "OWL")
+				(part "LED_3die")
+				(description "three LED dice in one package, driven in parallel")
+			)
+			(property
+				(name "LCSC")
+				(value "C516304")
+			)
+			(property
+				(name "MPN")
+				(value "HL-AF-5060S22OC-3-S1-THL")
+			)
+			(property
+				(name "Sheetname")
+				(value "Base")
+			)
+			(property
+				(name "Sheetfile")
+				(value "base.kicad_sch")
+			)
+			(sheetpath
+				(names "/Base/")
+				(tstamps "/8f976193-3ca0-4b18-df0e-ba7338335e40/")
+			)
+			(tstamps "fe803a76-de77-e245-a4ca-9b607a08b86e")
+			(units
+				(unit
+					(name "A")
+					(pins
+						(pin
+							(num "4")
+						)
+						(pin
+							(num "5")
+						)
+						(pin
+							(num "6")
+						)
+						(pin
+							(num "1")
+						)
+						(pin
+							(num "2")
+						)
+						(pin
+							(num "3")
+						)
+					)
+				)
+			)
+		)
+		(comp
+			(ref "D31")
 			(value "purple")
 			(footprint "OWL:LED_0603_1608Metric")
 			(fields
@@ -7363,7 +7433,7 @@
 				(names "/Base/")
 				(tstamps "/8f976193-3ca0-4b18-df0e-ba7338335e40/")
 			)
-			(tstamps "fe803a76-de77-e245-a4ca-9b607a08b86e")
+			(tstamps "5550ca18-2f98-bfbc-b602-dd80f5bba4d5")
 			(units
 				(unit
 					(name "A")
@@ -7373,76 +7443,6 @@
 						)
 						(pin
 							(num "2")
-						)
-					)
-				)
-			)
-		)
-		(comp
-			(ref "D31")
-			(value "orange x3")
-			(footprint "OWL:LED_RGB_5050-6")
-			(fields
-				(field
-					(name "LCSC") "C516304")
-				(field
-					(name "MPN") "HL-AF-5060S22OC-3-S1-THL")
-				(field
-					(name "Footprint") "OWL:LED_RGB_5050-6")
-				(field
-					(name "Datasheet")
-				)
-				(field
-					(name "Description")
-				)
-			)
-			(libsource
-				(lib "OWL")
-				(part "LED_3die")
-				(description "three LED dice in one package, driven in parallel")
-			)
-			(property
-				(name "LCSC")
-				(value "C516304")
-			)
-			(property
-				(name "MPN")
-				(value "HL-AF-5060S22OC-3-S1-THL")
-			)
-			(property
-				(name "Sheetname")
-				(value "Base")
-			)
-			(property
-				(name "Sheetfile")
-				(value "base.kicad_sch")
-			)
-			(sheetpath
-				(names "/Base/")
-				(tstamps "/8f976193-3ca0-4b18-df0e-ba7338335e40/")
-			)
-			(tstamps "1c30e77e-4bcb-3a33-5e2c-9b512c081fd3")
-			(units
-				(unit
-					(name "A")
-					(pins
-						(pin
-							(num "4")
-						)
-						(pin
-							(num "5")
-						)
-						(pin
-							(num "6")
-						)
-						(pin
-							(num "1")
-						)
-						(pin
-							(num "2")
-						)
-						(pin
-							(num "3")
 						)
 					)
 				)
@@ -21522,26 +21522,26 @@
 			)
 			(node
 				(ref "D30")
-				(pin "2")
-				(pinfunction "A_2")
-				(pintype "passive")
-			)
-			(node
-				(ref "D31")
 				(pin "1")
 				(pinfunction "A_1")
 				(pintype "passive")
 			)
 			(node
-				(ref "D31")
+				(ref "D30")
 				(pin "2")
 				(pinfunction "A_2")
 				(pintype "passive")
 			)
 			(node
-				(ref "D31")
+				(ref "D30")
 				(pin "3")
 				(pinfunction "A_3")
+				(pintype "passive")
+			)
+			(node
+				(ref "D31")
+				(pin "2")
+				(pinfunction "A_2")
 				(pintype "passive")
 			)
 			(node
@@ -21570,8 +21570,20 @@
 			)
 			(node
 				(ref "D5")
+				(pin "1")
+				(pinfunction "A_1")
+				(pintype "passive")
+			)
+			(node
+				(ref "D5")
 				(pin "2")
 				(pinfunction "A_2")
+				(pintype "passive")
+			)
+			(node
+				(ref "D5")
+				(pin "3")
+				(pinfunction "A_3")
 				(pintype "passive")
 			)
 			(node
@@ -21600,20 +21612,8 @@
 			)
 			(node
 				(ref "D8")
-				(pin "1")
-				(pinfunction "A_1")
-				(pintype "passive")
-			)
-			(node
-				(ref "D8")
 				(pin "2")
 				(pinfunction "A_2")
-				(pintype "passive")
-			)
-			(node
-				(ref "D8")
-				(pin "3")
-				(pinfunction "A_3")
 				(pintype "passive")
 			)
 			(node
@@ -23013,35 +23013,6 @@
 			(name "/Base/PUMPKIN0")
 			(class "Default")
 			(node
-				(ref "D8")
-				(pin "4")
-				(pinfunction "K_4")
-				(pintype "passive")
-			)
-			(node
-				(ref "D8")
-				(pin "5")
-				(pinfunction "K_5")
-				(pintype "passive")
-			)
-			(node
-				(ref "D8")
-				(pin "6")
-				(pinfunction "K_6")
-				(pintype "passive")
-			)
-			(node
-				(ref "U3")
-				(pin "4")
-				(pinfunction "OUT3_4")
-				(pintype "power_out")
-			)
-		)
-		(net
-			(code "63")
-			(name "/Base/PUMPKIN1")
-			(class "Default")
-			(node
 				(ref "D6")
 				(pin "4")
 				(pinfunction "K_4")
@@ -23067,31 +23038,60 @@
 			)
 		)
 		(net
-			(code "64")
-			(name "/Base/PUMPKIN2")
+			(code "63")
+			(name "/Base/PUMPKIN1")
 			(class "Default")
 			(node
-				(ref "D31")
+				(ref "D5")
 				(pin "4")
 				(pinfunction "K_4")
 				(pintype "passive")
 			)
 			(node
-				(ref "D31")
+				(ref "D5")
 				(pin "5")
 				(pinfunction "K_5")
 				(pintype "passive")
 			)
 			(node
-				(ref "D31")
+				(ref "D5")
 				(pin "6")
 				(pinfunction "K_6")
 				(pintype "passive")
 			)
 			(node
 				(ref "U3")
-				(pin "32")
-				(pinfunction "OUT31_32")
+				(pin "1")
+				(pinfunction "OUT0_1")
+				(pintype "power_out")
+			)
+		)
+		(net
+			(code "64")
+			(name "/Base/PUMPKIN2")
+			(class "Default")
+			(node
+				(ref "D30")
+				(pin "4")
+				(pinfunction "K_4")
+				(pintype "passive")
+			)
+			(node
+				(ref "D30")
+				(pin "5")
+				(pinfunction "K_5")
+				(pintype "passive")
+			)
+			(node
+				(ref "D30")
+				(pin "6")
+				(pinfunction "K_6")
+				(pintype "passive")
+			)
+			(node
+				(ref "U3")
+				(pin "31")
+				(pinfunction "OUT30_31")
 				(pintype "power_out")
 			)
 		)
@@ -23327,40 +23327,6 @@
 			(name "/Base/STAR7")
 			(class "Default")
 			(node
-				(ref "D21")
-				(pin "1")
-				(pinfunction "K_1")
-				(pintype "passive")
-			)
-			(node
-				(ref "U3")
-				(pin "22")
-				(pinfunction "OUT21_22")
-				(pintype "power_out")
-			)
-		)
-		(net
-			(code "76")
-			(name "/Base/STAR8")
-			(class "Default")
-			(node
-				(ref "D20")
-				(pin "1")
-				(pinfunction "K_1")
-				(pintype "passive")
-			)
-			(node
-				(ref "U3")
-				(pin "21")
-				(pinfunction "OUT20_21")
-				(pintype "power_out")
-			)
-		)
-		(net
-			(code "77")
-			(name "/Base/STAR9")
-			(class "Default")
-			(node
 				(ref "D22")
 				(pin "1")
 				(pinfunction "K_1")
@@ -23374,8 +23340,25 @@
 			)
 		)
 		(net
-			(code "78")
-			(name "/Base/STAR10")
+			(code "76")
+			(name "/Base/STAR8")
+			(class "Default")
+			(node
+				(ref "D21")
+				(pin "1")
+				(pinfunction "K_1")
+				(pintype "passive")
+			)
+			(node
+				(ref "U3")
+				(pin "22")
+				(pinfunction "OUT21_22")
+				(pintype "power_out")
+			)
+		)
+		(net
+			(code "77")
+			(name "/Base/STAR9")
 			(class "Default")
 			(node
 				(ref "D23")
@@ -23387,6 +23370,23 @@
 				(ref "U3")
 				(pin "24")
 				(pinfunction "OUT23_24")
+				(pintype "power_out")
+			)
+		)
+		(net
+			(code "78")
+			(name "/Base/STAR10")
+			(class "Default")
+			(node
+				(ref "D24")
+				(pin "1")
+				(pinfunction "K_1")
+				(pintype "passive")
+			)
+			(node
+				(ref "U3")
+				(pin "25")
+				(pinfunction "OUT24_25")
 				(pintype "power_out")
 			)
 		)
@@ -23463,15 +23463,15 @@
 			(name "/Base/STARX3")
 			(class "Default")
 			(node
-				(ref "D24")
+				(ref "D20")
 				(pin "1")
 				(pinfunction "K_1")
 				(pintype "passive")
 			)
 			(node
 				(ref "U3")
-				(pin "25")
-				(pinfunction "OUT24_25")
+				(pin "21")
+				(pinfunction "OUT20_21")
 				(pintype "power_out")
 			)
 		)
@@ -23715,38 +23715,21 @@
 			(name "/Base/WISP0")
 			(class "Default")
 			(node
-				(ref "D5")
+				(ref "D8")
 				(pin "1")
 				(pinfunction "K_1")
 				(pintype "passive")
 			)
 			(node
 				(ref "U3")
-				(pin "1")
-				(pinfunction "OUT0_1")
+				(pin "4")
+				(pinfunction "OUT3_4")
 				(pintype "power_out")
 			)
 		)
 		(net
 			(code "98")
 			(name "/Base/WISP1")
-			(class "Default")
-			(node
-				(ref "D9")
-				(pin "1")
-				(pinfunction "K_1")
-				(pintype "passive")
-			)
-			(node
-				(ref "U3")
-				(pin "5")
-				(pinfunction "OUT4_5")
-				(pintype "power_out")
-			)
-		)
-		(net
-			(code "99")
-			(name "/Base/WISP2")
 			(class "Default")
 			(node
 				(ref "D7")
@@ -23762,8 +23745,42 @@
 			)
 		)
 		(net
+			(code "99")
+			(name "/Base/WISP2")
+			(class "Default")
+			(node
+				(ref "D9")
+				(pin "1")
+				(pinfunction "K_1")
+				(pintype "passive")
+			)
+			(node
+				(ref "U3")
+				(pin "5")
+				(pinfunction "OUT4_5")
+				(pintype "power_out")
+			)
+		)
+		(net
 			(code "100")
 			(name "/Base/WISP3")
+			(class "Default")
+			(node
+				(ref "D31")
+				(pin "1")
+				(pinfunction "K_1")
+				(pintype "passive")
+			)
+			(node
+				(ref "U3")
+				(pin "32")
+				(pinfunction "OUT31_32")
+				(pintype "power_out")
+			)
+		)
+		(net
+			(code "101")
+			(name "/Base/WISP4")
 			(class "Default")
 			(node
 				(ref "D29")
@@ -23779,8 +23796,8 @@
 			)
 		)
 		(net
-			(code "101")
-			(name "/Base/WISP4")
+			(code "102")
+			(name "/Base/WISP5")
 			(class "Default")
 			(node
 				(ref "D28")
@@ -23792,23 +23809,6 @@
 				(ref "U3")
 				(pin "29")
 				(pinfunction "OUT28_29")
-				(pintype "power_out")
-			)
-		)
-		(net
-			(code "102")
-			(name "/Base/WISP5")
-			(class "Default")
-			(node
-				(ref "D30")
-				(pin "1")
-				(pinfunction "K_1")
-				(pintype "passive")
-			)
-			(node
-				(ref "U3")
-				(pin "31")
-				(pinfunction "OUT30_31")
 				(pintype "power_out")
 			)
 		)

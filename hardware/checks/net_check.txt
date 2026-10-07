@@ -100,15 +100,15 @@ ok   J201 pin 13                              DOWN0
 ok   J201 pin 14                              LEV_A                    
 ok   J201 pin 15                              DOWN1                    
 ok   J201 pin 16                              LEV_A                    
-ok   U3 OUT0                                  WISP0                    
+ok   U3 OUT0                                  PUMPKIN1                 
 ok   U3 OUT0 colour                           yes                      
-ok   U3 OUT1                                  PUMPKIN1                 
+ok   U3 OUT1                                  PUMPKIN0                 
 ok   U3 OUT1 colour                           yes                      
-ok   U3 OUT2                                  WISP2                    
+ok   U3 OUT2                                  WISP1                    
 ok   U3 OUT2 colour                           yes                      
-ok   U3 OUT3                                  PUMPKIN0                 
+ok   U3 OUT3                                  WISP0                    
 ok   U3 OUT3 colour                           yes                      
-ok   U3 OUT4                                  WISP1                    
+ok   U3 OUT4                                  WISP2                    
 ok   U3 OUT4 colour                           yes                      
 ok   U3 OUT5                                  OWLRING0                 
 ok   U3 OUT5 colour                           yes                      
@@ -130,15 +130,15 @@ ok   U3 OUT13                                 STARX0
 ok   U3 OUT13 colour                          yes                      
 ok   U3 OUT19                                 STARX1                   
 ok   U3 OUT19 colour                          yes                      
-ok   U3 OUT20                                 STAR8                    
+ok   U3 OUT20                                 STARX3                   
 ok   U3 OUT20 colour                          yes                      
-ok   U3 OUT21                                 STAR7                    
+ok   U3 OUT21                                 STAR8                    
 ok   U3 OUT21 colour                          yes                      
-ok   U3 OUT22                                 STAR9                    
+ok   U3 OUT22                                 STAR7                    
 ok   U3 OUT22 colour                          yes                      
-ok   U3 OUT23                                 STAR10                   
+ok   U3 OUT23                                 STAR9                    
 ok   U3 OUT23 colour                          yes                      
-ok   U3 OUT24                                 STARX3                   
+ok   U3 OUT24                                 STAR10                   
 ok   U3 OUT24 colour                          yes                      
 ok   U3 OUT25                                 STAR11                   
 ok   U3 OUT25 colour                          yes                      
@@ -146,13 +146,13 @@ ok   U3 OUT26                                 CATRING2
 ok   U3 OUT26 colour                          yes                      
 ok   U3 OUT27                                 STAR6                    
 ok   U3 OUT27 colour                          yes                      
-ok   U3 OUT28                                 WISP4                    
+ok   U3 OUT28                                 WISP5                    
 ok   U3 OUT28 colour                          yes                      
-ok   U3 OUT29                                 WISP3                    
+ok   U3 OUT29                                 WISP4                    
 ok   U3 OUT29 colour                          yes                      
-ok   U3 OUT30                                 WISP5                    
+ok   U3 OUT30                                 PUMPKIN2                 
 ok   U3 OUT30 colour                          yes                      
-ok   U3 OUT31                                 PUMPKIN2                 
+ok   U3 OUT31                                 WISP3                    
 ok   U3 OUT31 colour                          yes                      
 ok   U3 OUT32                                 CATRING0                 
 ok   U3 OUT32 colour                          yes                      

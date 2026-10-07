@@ -20,6 +20,7 @@ Coils and antennas are keep-outs on every layer: no part, track or plane under a
 moon would add 300 pF and drown a hand's half picofarad).
 """
 import math
+import mech as _M
 
 # ======================================================================================
 # The base
@@ -35,7 +36,7 @@ TREE_SOCKET = (105.0, 40.0)                      # J3's centre (the tree's plane
 # its own frame, the coil at 0, the thread hole at -15.5)
 PERCH_SOCKET_Y = 32.0
 BAT_AHEAD = PERCH_SOCKET_Y                       # 32 mm in front of the tree
-THREAD_AHEAD = PERCH_SOCKET_Y + 15.5             # 47.5 mm
+THREAD_AHEAD = PERCH_SOCKET_Y - _M.THREAD_HOLE[1]  # 48.6 mm
 PEND_REST = (TREE_SOCKET[0], TREE_SOCKET[1] + THREAD_AHEAD)
 # three pendulum coils round the rest point: 18 mm out (30 mm coils: centres 31.2 mm
 # apart, just clear of each other), one in front, two behind at the sides
@@ -69,13 +70,13 @@ ANTENNA_KEEPOUT = 3.0                            # beyond the shape, on every la
 PUMPKINS = [(62.0, 118.0, 9.0), (80.0, 121.0, 7.0), (140.0, 120.0, 8.0)]   # x, y, size
 
 # the hill along the front, with the six wisps on it, left to right
-WISPS = [(48.0, 106.0), (68.0, 102.0), (84.0, 99.0), (128.0, 99.0), (146.0, 103.0), (178.0, 108.0)]
+WISPS = [(51.0, 109.0), (68.0, 102.0), (84.0, 99.0), (128.0, 99.0), (146.0, 103.0), (178.0, 108.0)]
 
 # the stars: twelve on a shallow arc across the open band between the tree and the
 # pendulum (the quantum ghost walks it, STAR0 at the left), four more scattered in the sky
 # (the moon's side and behind; behind the tree itself sit the RP2354A and its parts)
 STAR_ARC = dict(cx=107.0, cy=160.0, r=105.0, a0=245.0, a1=295.0)    # degrees, on the arc
-STARX = [(68.0, 10.0), (138.0, 30.0), (72.0, 44.0), (182.0, 72.0)]
+STARX = [(68.0, 10.0), (138.0, 30.0), (72.0, 44.0), (183.0, 60.0)]
 
 
 def star_arc():
@@ -146,15 +147,23 @@ TOKEN_R = 19.0                                           # each token: an owl or
 # ======================================================================================
 # The panel: every board, with mouse-bite tabs, on one 4-layer panel (JLCPCB standard
 # PCBA: purple mask on 4 layers needs it, and it sets a 70 x 70 mm minimum, which the
-# small boards meet only together)
+# small boards meet only together).  Inside JLCPCB's 250 x 250 mm for an assembled panel
+# (bigger panels warp through two reflows): the base, the two tokens beside it, and under
+# them the tree (turned 90 degrees, its top to the left), the perch and the bat.
 # ======================================================================================
 RAIL = 5.0                                       # the panel's frame
 GAP = 2.4                                        # routed slot between boards (mouse bites bridge it)
+_ROW2 = RAIL + GAP + BASE_H + GAP                # the top of the second row
 PANEL_OFFSETS = {                                # where each board's origin sits in the panel
     "base": (RAIL + GAP, RAIL + GAP),
-    "tree": (RAIL + GAP + BASE_W + GAP, RAIL + GAP),
-    "perch": (RAIL + GAP + BASE_W + GAP + TREE_W + GAP + PERCH_W / 2, RAIL + GAP - PERCH_FRONT),
-    "bat": (RAIL + GAP + BASE_W + GAP + TREE_W / 2, RAIL + GAP + TREE_H + GAP - BAT_HEAD_Y),
-    "owl_token": (RAIL + GAP + BASE_W + GAP + TREE_W + GAP + TOKEN_R, RAIL + GAP + (PERCH_BACK - PERCH_FRONT) + GAP + TOKEN_R),
-    "cat_token": (RAIL + GAP + BASE_W + GAP + TREE_W + GAP + TOKEN_R, RAIL + GAP + (PERCH_BACK - PERCH_FRONT) + GAP + 2 * TOKEN_R + GAP + TOKEN_R),
+    "owl_token": (RAIL + GAP + BASE_W + GAP + TOKEN_R, RAIL + GAP + TOKEN_R),
+    "cat_token": (RAIL + GAP + BASE_W + GAP + TOKEN_R, RAIL + GAP + 2 * TOKEN_R + GAP + TOKEN_R),
+    # turned 90 (counter-clockwise on the screen): the tree's (x, y) lands at
+    # (ox + y, oy - x), its top edge on the left and its foot on the right
+    "tree": (RAIL + GAP, _ROW2 + TREE_W),
+    "perch": (RAIL + GAP + TREE_H + GAP + PERCH_W / 2, _ROW2 - PERCH_FRONT),
+    "bat": (RAIL + GAP + TREE_H + GAP + PERCH_W + GAP + BAT_SPAN / 2, _ROW2 - BAT_HEAD_Y),
 }
+PANEL_ROT = {"tree": 90.0}                       # degrees, KiCad's sense; the rest 0
+PANEL_W = RAIL + GAP + BASE_W + GAP + 2 * TOKEN_R + GAP + RAIL
+PANEL_H = _ROW2 + max(TREE_W, PERCH_BACK - PERCH_FRONT, BAT_TAIL_Y - BAT_HEAD_Y) + GAP + RAIL

@@ -13,7 +13,9 @@
 #pragma once
 
 /* ---- clocks and timing ------------------------------------------------------- */
+#ifndef SYS_CLK_HZ                         /* the SDK's (platform_defs.h); this for the host tests */
 #define SYS_CLK_HZ            150000000u   /* [CHOICE] the SDK's RP2350 default */
+#endif
 #define CTRL_TICK_HZ          10000u       /* [CHOICE] core 1: ADC burst, levitation, safety */
 #define CTRL_TICK_S           (1.0f / CTRL_TICK_HZ)
 #define WATCHDOG_MS           250u         /* [CHOICE] short: a stalled core must not leave a coil on */
@@ -33,7 +35,7 @@
 #define DRV_WAKE_US           1000u        /* [DS] tWAKE <= 1 ms after nSLEEP rises */
 #define DRV_MIN_PULSE_S       300e-9f      /* [CHOICE] shorter output pulses are not reproduced
                                               (tPD 400 ns, rise/fall 150 ns, dead time 100 ns) */
-#define PEND_PWM_HZ           25000u       /* [CHOICE] pendulum and film drive: above hearing */
+#define PEND_PWM_HZ           30000u       /* [CHOICE] pendulum and film drive: above hearing */
 #define LEV_PWM_HZ            40000u       /* [CHOICE] levitation, carrier off: 4 periods per tick */
 #define LEV_CARRIER_HZ        90000u       /* [SIM] bat_power.py: the bat's eyes' tank */
 

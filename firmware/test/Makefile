@@ -30,7 +30,7 @@ SRC_test_pendulum = ../src/pendulum.c
 SRC_test_familiar = ../src/familiar.c
 SRC_test_thermal  = ../src/thermal.c
 SRC_test_film     = ../src/film.c ../src/thermal.c
-SRC_test_console  = ../src/console.c
+SRC_test_console  = ../src/console.c ../src/led_engine.c ../src/scenes.c ../src/noise.c ../src/quantum.c
 SRC_test_theremin = ../src/theremin.c ../src/voice.c
 
 all: $(TESTS:%=run_%)

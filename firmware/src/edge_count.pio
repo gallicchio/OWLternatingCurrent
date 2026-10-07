@@ -1,0 +1,25 @@
+; edge_count.pio: count the rising edges of a theremin oscillator (0.5-1 MHz).
+; X falls by one for each rising edge, and each new count is pushed, without
+; blocking: while the RX FIFO is full the pushes are dropped, so the reader empties
+; the FIFO first and takes the next push, which is fresh (theremin_hw.c).
+.program edge_count
+.wrap_target
+    wait 0 pin 0
+    wait 1 pin 0
+    jmp x-- counted
+counted:
+    mov isr, x
+    push noblock
+.wrap
+
+% c-sdk {
+static inline void edge_count_program_init(PIO pio, uint sm, uint offset, uint pin)
+{
+    pio_sm_config c = edge_count_program_get_default_config(offset);
+    sm_config_set_in_pins(&c, pin);
+    sm_config_set_fifo_join(&c, PIO_FIFO_JOIN_RX);
+    pio_sm_set_consecutive_pindirs(pio, sm, pin, 1, false);
+    pio_sm_init(pio, sm, offset, &c);
+    pio_sm_set_enabled(pio, sm, true);
+}
+%}

@@ -1,0 +1,3 @@
+# scratch for print/build.py (renders, intermediate meshes)
+build/
+__pycache__/

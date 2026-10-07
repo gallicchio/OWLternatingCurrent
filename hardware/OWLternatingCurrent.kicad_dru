@@ -1,0 +1,7 @@
+(version 1)
+# Written by gen/project.py.  Edit that, not this.
+# (no silk_clearance rule: KiCad 10 then reports every designator against Fab
+#  text and courtyards as a silkscreen overlap; its built-in silk checks stay on)
+(rule "USB pair skew"
+    (constraint skew (max 1.0mm))
+    (condition "A.NetClass == 'USB' && B.NetClass == 'USB'"))

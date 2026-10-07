@@ -91,19 +91,31 @@ def _row(n):
     return _g(PINS.GPIO_OF[n])
 
 
-# Left: the USB, the crystal, the debug port, RUN and BOOTSEL, the unused QSPI pins, the
-# UART, then the I2C bus and its interrupt, which go left to the sensors and the LED
-# driver.  Right, top to bottom in the order the blocks stand to the right of the chip:
-# the four DRV8874 bridges, the two perch bridges, then the analog inputs and the mux,
-# the audio and the theremin.  Gaps leave room for each block's parts.
-RP_LEFT_NETS = ["USB_DP", "USB_DM", None, "XIN", "XOUT", None, "SWCLK", "SWDIO", "RUN", "QSPI_SS", None,
-                "QSPI_SCLK", "QSPI_SD0", "QSPI_SD1", "QSPI_SD2", "QSPI_SD3", None, "UART_TX", "UART_RX", None,
-                "SDA", "SCL", "IMU_INT", None, "BUTTON"]
-RP_RIGHT_NETS = ["PEND1_IN1", "PEND1_IN2", "PEND2_IN1", "PEND2_IN2", "PEND3_IN1", "PEND3_IN2",
-                 "LEV_IN1", "LEV_IN2", "DRV_nSLEEP", "DRV_nFAULT", None,
-                 "FAM1_A", "FAM1_B", "FAM2_A", "FAM2_B", "FAM_EN", None,
-                 "HALL", "LEV_IPROPI", "MUX_OUT", "MUX_S0", "MUX_S1", "MUX_S2", None,
-                 "AUDIO", "THEREMIN_PITCH", "THEREMIN_VOL"]
+# Left, top to bottom: the audio out and the theremin's two oscillators in (their blocks
+# stand above-left of the chip), USB, the crystal, the debug port, RUN and BOOTSEL, the
+# unused QSPI pins, the UART, the SPELL button, then last the IMU's interrupt, the I2C bus
+# and the levitation's Hall sensor: they leave the bottom corner, run left to the sensors
+# and the LED driver, and right under the chip to the tree's socket.  Right, top to bottom
+# in the order the blocks stand to the right of the chip: the levitation bridge and the
+# three pendulum bridges (stacked, levitation on top) with their shared sleep and fault
+# lines, the levitation current, the mux, and the two perch bridges.  The order is chosen
+# so that the lines leave the chip without crossing; gaps leave room for each block.
+RP_LEFT_NETS = (["AUDIO", "THEREMIN_PITCH", "THEREMIN_VOL"] + [None] * 2
+                # GPiBridge's rows, gaps and all: its blocks were drawn and checked at these
+                # distances from the pins
+                + ["USB_DM", "USB_DP"] + [None] * 5 + ["XIN"] + [None] * 4 + ["XOUT"] + [None] * 6
+                + ["SWCLK", "SWDIO"] + [None] * 4 + ["RUN"] + [None] * 4 + ["QSPI_SS"] + [None] * 3
+                + ["QSPI_SCLK", "QSPI_SD0", "QSPI_SD1", "QSPI_SD2", "QSPI_SD3"] + [None] * 3
+                + ["UART_RX", "UART_TX"] + [None] * 3
+                + ["BUTTON"] + [None] * 3
+                + ["IMU_INT", "SCL", "SDA", "HALL"])
+# The right side's lines start low, so that the four coil bridges stacked above them are
+# reached by columns that rise without crossing.
+RP_RIGHT_NETS = ([None] * 27
+                 + ["LEV_IN1", "LEV_IN2", "PEND1_IN1", "PEND1_IN2", "PEND2_IN1", "PEND2_IN2", "PEND3_IN1",
+                    "PEND3_IN2", "DRV_nSLEEP", "DRV_nFAULT", None, "LEV_IPROPI", None,
+                    "MUX_OUT", "MUX_S0", "MUX_S1", "MUX_S2", None,
+                    "FAM1_A", "FAM1_B", "FAM2_A", "FAM2_B", "FAM_EN"])
 RP_LEFT = [_row(n) for n in RP_LEFT_NETS]
 RP_RIGHT = [_row(n) for n in RP_RIGHT_NETS]
 RP_TOP = [("46", "VREG_AVDD", PI), ("49", "VREG_VIN", PI), ("48", "VREG_LX", PO), ("50", "VREG_FB", PI),
@@ -131,19 +143,22 @@ def rp2354a():
 # outputs and the current sense out on the right, VM and the charge pump on top.
 def drv8874():
     left = [("1", "IN1", I), ("2", "IN2", I), ("3", "~{SLEEP}", I), ("4", "~{FAULT}", OC), None,
-            ("16", "PMODE", I), ("7", "IMODE", I), ("5", "VREF", I)]
+            ("16", "PMODE", I), ("5", "VREF", I), ("7", "IMODE", I)]
     right = [("8", "OUT1", O), ("10", "OUT2", O), None, None, ("6", "IPROPI", O)]
     top = [("13", "CPH", PA), ("14", "CPL", PA), ("12", "VCP", PA), ("11", "VM", PI)]
     bottom = [("9", "PGND", PI), ("15", "GND", PI), ("17", "PAD", PI)]
-    return box_symbol("DRV8874", "U", left, right, top, bottom, 17.78,
+    # the top pins in pairs 7.62 apart, so each capacitor (CPH-CPL, VCP-VM) sits flat
+    # right above its two pins
+    return box_symbol("DRV8874", "U", left, right, top, bottom, 25.4,
                       keywords="TI DRV8874 H-bridge, 37 V 6 A, PWM to 100 kHz, IPROPI current mirror (450 uA/A)",
-                      top_pitch=G * 2, bottom_x=[-G * 2, 0.0, G * 2])
+                      top_x=[-3 * G * 1.5, -G * 1.5, G * 1.5, 3 * G * 1.5], bottom_x=[-G * 2, 0.0, G * 2])
 
 
 # NS4150B (Nsiway datasheet, "pin description"): 1 CTRL (low = shutdown), 2 Bypass (1 uF
-# to ground), 3 INP, 4 INN, 5 VoN, 6 VCC, 7 GND, 8 VoP.
+# to ground), 3 INP, 4 INN, 5 VoN, 6 VCC, 7 GND, 8 VoP.  Inputs drawn INN above INP, so
+# that INN's ground network rises away from the signal line.
 def ns4150b():
-    left = [("3", "INP", I), ("4", "INN", I), None, ("1", "CTRL", I), ("2", "BYPASS", PA)]
+    left = [("4", "INN", I), ("3", "INP", I), None, ("1", "CTRL", I), ("2", "BYPASS", PA)]
     right = [("8", "VOP", O), ("5", "VON", O)]
     return box_symbol("NS4150B", "U", left, right, [("6", "VCC", PI)], [("7", "GND", PI)], 12.7,
                       keywords="Nsiway NS4150B 3 W class-D mono speaker amplifier; CTRL low = shutdown",
@@ -211,6 +226,32 @@ def led_3die():
     return _close(out), {}
 
 
+# ST LSM6DS3TR-C (LGA-14L, datasheet table 2, "Pin description"): 1 SDO/SA0, 2 SDx, 3 SCx,
+# 4 INT1, 5 VDDIO, 6 GND, 7 GND, 8 VDD, 9 INT2, 10 NC, 11 NC, 12 CS, 13 SCL, 14 SDA (the
+# numbers KiCad's own LSM6DS3 symbol uses).  Drawn with the bus and its interrupt on the
+# right, toward the RP2354A; the straps (SA0 and the aux bus to ground, CS high for I2C) on
+# the left.
+def lsm6ds3trc():
+    right = [("13", "SCL", I), ("14", "SDA", B), ("4", "INT1", O), ("9", "INT2", O)]
+    left = [("12", "CS", I), ("1", "SDO/SA0", I), ("2", "SDx", I), ("3", "SCx", I), None,
+            ("10", "NC", NC), ("11", "NC", NC)]
+    return box_symbol("LSM6DS3TR_C", "U", left, right, [("8", "VDD", PI), ("5", "VDDIO", PI)],
+                      [("6", "GND", PI), ("7", "GND", PI)], 17.78,
+                      keywords="ST LSM6DS3TR-C 6-axis IMU, I2C (SA0 low: 0x6A)", top_pitch=2 * G,
+                      bottom_x=[-G, G])
+
+
+# TI UCC27524 (SOIC-8, datasheet "Pin Functions"): 1 ENA, 2 INA, 3 GND, 4 INB, 5 OUTB, 6 VDD,
+# 7 OUTA, 8 ENB.  Drawn with both inputs on top of the left side and both enables below
+# them, so a bridge's two leg signals and its enable arrive without crossing.
+def ucc27524():
+    left = [("2", "INA", I), ("4", "INB", I), None, ("1", "ENA", I), ("8", "ENB", I)]
+    right = [("7", "OUTA", O), ("5", "OUTB", O)]
+    return box_symbol("UCC27524", "U", left, right, [("6", "VDD", PI)], [("3", "GND", PI)], 15.24,
+                      keywords="TI UCC27524 dual 5 A low-side gate driver; enables pulled up inside",
+                      top_x=[0.0], bottom_x=[0.0])
+
+
 # A PCB coil: an inductor drawn with a spiral, whose footprint is KiCad's net tie (the
 # spiral itself is tracks and vias drawn by gen/coils.py).  Pin 1 is where the spiral
 # starts (outermost turn, top layer); pin 2 where it ends.
@@ -259,13 +300,13 @@ def conn_uart():
                       "Raspberry Pi 3-pin debug connector, UART: 1 RX (into this board), 2 GND, 3 TX")
 
 
-CUSTOM = {"RP2354A": rp2354a, "DRV8874": drv8874, "NS4150B": ns4150b, "TMAG5273": tmag5273,
+CUSTOM = {"RP2354A": rp2354a, "LSM6DS3TR_C": lsm6ds3trc, "UCC27524": ucc27524, "DRV8874": drv8874, "NS4150B": ns4150b, "TMAG5273": tmag5273,
           "Q_PMOS_SSSGDDDD": q_pmos_sssgdddd, "LED_3die": led_3die, "Coil": coil,
           "Conn_SWD": conn_swd, "Conn_UART": conn_uart}
 
 # Rails, each with its own power symbol; the sub-boards have their own grounds and rails
 # (their nets must not merge with the base's: they meet only through mated connectors).
-RAILS = {"+12V": False, "+12V_IN": False, "+5V": False, "+3V3": False, "+1V1": False, "VBUS": False,
+RAILS = {"+12V": False, "+5V": False, "VSYS": False, "+3V3": False, "+1V1": False, "VBUS": False,
          "GND": True,
          "+5V_T": False, "+3V3_T": False, "GND_T": True,          # the tree
          "+3V3_P": False, "+5V_P": False, "GND_P": True}           # the perch

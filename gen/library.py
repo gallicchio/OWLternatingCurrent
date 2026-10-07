@@ -28,6 +28,7 @@ from sexp import parse, head, kids, kid, val, ser
 import symbols
 import footprints
 from parts import PARTS, LIB
+kisch.POWER_LIB = LIB          # power symbols live in our library: OWL:PWR_+5V
 
 HW = os.path.join(ROOT, "hardware")
 LIBDIR = os.path.join(HW, "lib")
@@ -46,10 +47,10 @@ STOCK_SYMBOLS = {
     "Conn_02x08_Odd_Even": "Connector_Generic:Conn_02x08_Odd_Even",
     "Conn_01x03": "Connector_Generic:Conn_01x03",
     "TestPoint": "Connector:TestPoint", "MountingHole": "Mechanical:MountingHole", "PWR_FLAG": "power:PWR_FLAG",
-    "AMS1117-3.3": "Regulator_Linear:AMS1117-3.3", "TPS54302": "Regulator_Switching:TPS54302",
+    "XC6206P332MR": "Regulator_Linear:XC6206PxxxMR", "TPS54302": "Regulator_Switching:TPS54302",
     "74HC4051": "74xx:74HC4051", "74LVC1G14": "74xGxx:74LVC1G14", "LP5036": "Driver_LED:LP5036",
-    "LSM6DS3": "Sensor_Motion:LSM6DS3", "LTR-303ALS-01": "Sensor_Optical:LTR-303ALS-01",
-    "DRV5055": "Sensor_Magnetic:DRV5055A1xDBZxQ1", "UCC27524": "Driver_FET:UCC27524D",
+    "LTR-303ALS-01": "Sensor_Optical:LTR-303ALS-01",
+    "DRV5055": "Sensor_Magnetic:DRV5055A1xDBZxQ1",
 }
 
 # Raspberry Pi's footprints (gen/rpi_minimal/rpi.pretty) -> our name, 3D model, model's KiCad library

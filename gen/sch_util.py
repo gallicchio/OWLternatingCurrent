@@ -15,6 +15,7 @@ sys.path.insert(0, os.path.join(ROOT, "tools"))
 sys.path.insert(0, HERE)
 import kisch
 from parts import PARTS, LIB
+kisch.POWER_LIB = LIB
 
 G = 2.54
 NOTE = (255, 255, 194)

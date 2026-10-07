@@ -224,15 +224,8 @@ def pin_xy(lib_id, at, pin_number, mirror=None, unit=None):
     _, pins = SYMS.get(lib_id)
     for p in pins:
         if p["num"] == str(pin_number) and (unit is None or p["unit"] in (0, unit)):
-            px, py = p["x"], p["y"]
-            if mirror == "y":
-                px = -px
-            elif mirror == "x":
-                py = -py
-            a = math.radians(-rot)
-            x = X + px * math.cos(a) + py * math.sin(a)
-            y = Y + px * math.sin(a) - py * math.cos(a)
-            return (snap(x), snap(y))
+            dx, dy = _xform(p["x"], p["y"], rot, mirror)
+            return (snap(X + dx), snap(Y + dy))
     raise KeyError("pin %s not on %s" % (pin_number, lib_id))
 
 
@@ -611,17 +604,21 @@ class Sch:
             # glyph to the right (90) or left (270) of the pin; name beyond it
             vy = y
             vx = x + (5.5 if rot == 90 else -5.5) * (1 if down else 1)
+        # a field's angle is drawn relative to the symbol's: turn the name back to horizontal
+        fang = (-rot) % 360
+        if fang >= 180:
+            fang -= 180
         self.body.append(
             '\t(symbol (lib_id %s) (at %s %s %d) (unit 1) (exclude_from_sim no) (in_bom yes) (on_board yes) (dnp no)\n'
             '\t\t(uuid %s)\n'
             '\t\t(property "Reference" "#PWR" (at %s %s 0) %s)\n'
-            '\t\t(property "Value" %s (at %s %s 0) %s)\n'
+            '\t\t(property "Value" %s (at %s %s %d) %s)\n'
             '\t\t(property "Footprint" "" (at %s %s 0) %s)\n'
             '\t\t(property "Datasheet" "" (at %s %s 0) %s)\n'
             '\t\t(property "Description" "" (at %s %s 0) %s)\n'
             '\t\t(pin "1" (uuid %s))\n'
             '\t\t(instances (project %s (path %s (reference "#PWR") (unit 1)))))'
-            % (q(lib_id), g(x), g(y), rot, q(u), g(x), g(y), _eff(hide=True), q(net), g(vx), g(vy),
+            % (q(lib_id), g(x), g(y), rot, q(u), g(x), g(y), _eff(hide=True), q(net), g(vx), g(vy), fang,
                _eff(1.27, hide=net in HIDDEN_RAIL_NAMES), g(x), g(y), _eff(hide=True), g(x), g(y), _eff(hide=True),
                g(x), g(y), _eff(hide=True), q(self._u("pwp", net, x, y)), q(self.project), q(self.inst_path)))
         w = text_w(net)
@@ -913,12 +910,16 @@ class Sch:
 
 
 def _xform(px, py, rot, mirror):
-    if mirror == "y":
-        px = -px
-    elif mirror == "x":
-        py = -py
+    """A symbol point (y up) to its offset on the sheet (y down).  KiCad rotates first and
+    mirrors after, on the sheet (checked against its ERC: a P-FET at 270 degrees, mirror
+    y); the two orders differ only for 90 and 270 degrees."""
     a = math.radians(-rot)
-    return (px * math.cos(a) + py * math.sin(a), px * math.sin(a) - py * math.cos(a))
+    x, y = px * math.cos(a) + py * math.sin(a), px * math.sin(a) - py * math.cos(a)
+    if mirror == "y":
+        x = -x
+    elif mirror == "x":
+        y = -y
+    return (x, y)
 
 
 def _body_bbox(node, unit, with_pins=True):

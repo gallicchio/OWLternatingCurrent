@@ -25,11 +25,18 @@ def render(out, width=4000):
     svgs = sorted(glob.glob(os.path.join(svgdir, "*.svg")))
     env = {k: v for k, v in os.environ.items() if k not in ("DISPLAY", "WAYLAND_DISPLAY")}
     env["DBUS_SESSION_BUS_ADDRESS"] = "/dev/null"
-    png = os.path.join(out, BI.IMAGE_PREFIX + "schematic.png")
-    subprocess.run(["inkscape", svgs[0], "--export-type=png", "--export-width=%d" % width,
-                    "--export-background=white", "--export-filename=" + png],
-                   capture_output=True, env=env, timeout=600)
-    return png
+    pngs = []
+    for svg in svgs:
+        # one PNG per sheet: OWLternatingCurrent.svg is the root, the rest are named
+        # after their sheets (OWLternatingCurrent-base.svg)
+        stem = os.path.splitext(os.path.basename(svg))[0]
+        suffix = stem[len(BI.NAME):].lstrip("-") or "root"
+        png = os.path.join(out, BI.IMAGE_PREFIX + "schematic_%s.png" % suffix)
+        subprocess.run(["inkscape", svg, "--export-type=png", "--export-width=%d" % width,
+                        "--export-background=white", "--export-filename=" + png],
+                       capture_output=True, env=env, timeout=600)
+        pngs.append(png)
+    return pngs
 
 
 if __name__ == "__main__":

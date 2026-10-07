@@ -1,0 +1,89 @@
+(kicad_sch
+	(version 20260306)
+	(generator "eeschema")
+	(generator_version "10.0")
+	(uuid "0ee13ddb-1c12-f416-8576-ee8890b4675e")
+	(paper "A3")
+	(title_block
+		(title "OWLternating Current: a cute, physics-y Halloween board")
+		(date "2026-10-07")
+		(rev "A")
+		(company "Jason Gallicchio and Claude  --  https://github.com/gallicchio/OWLternatingCurrent")
+		(comment 1 "Made by gen/schematic.py from gen/pins.py, gen/parts.py, gen/leds.py")
+		(comment 2 "Hardware CERN-OHL-P-2.0, software MIT")
+	)
+	(lib_symbols)
+	(text "OWLternating Current: a cute, physics-y Halloween board"
+		(exclude_from_sim no)
+		(at 17.78 21.59 0)
+		(effects
+			(font
+				(size 3 3)
+				(bold yes)
+			)
+			(justify left bottom)
+		)
+		(uuid "67dac0fa-14a1-070c-065c-9abc86c0618a")
+	)
+	(text "the base board: power, RP2354A, LEDs, sensors, coil drivers, theremin, audio"
+		(exclude_from_sim no)
+		(at 30.48 83.82 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "abba79d7-fb99-fcea-453e-36d47ea73569")
+	)
+	(sheet
+		(at 30.48 50.8)
+		(size 50.8 25.4)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(stroke
+			(width 0.1524)
+			(type solid)
+		)
+		(fill
+			(color 0 0 0 0)
+		)
+		(uuid "8f976193-3ca0-4b18-df0e-ba7338335e40")
+		(property "Sheetname" "Base"
+			(at 30.48 49.53 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.524 1.524)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Sheetfile" "base.kicad_sch"
+			(at 30.48 77.47 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+			)
+		)
+		(instances
+			(project "OWLternatingCurrent"
+				(path "/0ee13ddb-1c12-f416-8576-ee8890b4675e"
+					(page "2")
+				)
+			)
+		)
+	)
+	(sheet_instances
+		(path "/"
+			(page "1")
+		)
+	)
+)

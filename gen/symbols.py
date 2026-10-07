@@ -252,9 +252,9 @@ def ucc27524():
                       top_x=[0.0], bottom_x=[0.0])
 
 
-# A PCB coil: an inductor drawn with a spiral, whose footprint is KiCad's net tie (the
-# spiral itself is tracks and vias drawn by gen/coils.py).  Pin 1 is where the spiral
-# starts (outermost turn, top layer); pin 2 where it ends.
+# A PCB coil: an inductor drawn with a spiral, whose footprint (gen/coils.py) is a net
+# tie: the spiral is the footprint's own copper.  Pin 1 is where the spiral starts
+# (outermost turn, top layer); pin 2 where it ends.
 def coil():
     name = "Coil"
     out = _hdr(name, "L", name, 3.81, keywords="PCB spiral coil (copper, not a part); footprint is a net tie")

@@ -5,8 +5,8 @@ for each part (EasyEDA's, fetched into a git-ignored cache by
 mfg/footprint_check.py) is compared with these before a release, and predicts the
 rotation JLCPCB will place each part at.
 
-Coils are not footprints: the board generator draws each spiral as tracks and
-vias (gen/coils.py) and joins it to its driver through KiCad's stock net tie.
+The PCB coils are footprints too, generated rather than drawn: gen/coils.py makes each
+spiral the footprint's own copper, a net tie between its two pads.
 """
 
 MODELS = []          # 3D models drawn here: none (gen/models3d.py would add them)

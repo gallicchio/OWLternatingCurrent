@@ -12,7 +12,8 @@ Fields:
   fp       footprint in the project library
   fp_src   where gen/library.py gets the footprint: "stock:<KiCad lib>", "lcsc:<code>"
            (EasyEDA's land pattern via easyeda2kicad: JLCPCB's own drawing), "rpi"
-           (Raspberry Pi's, from GPiBridge's extraction) or "gen" (gen/footprints.py)
+           (Raspberry Pi's, from GPiBridge's extraction), "gen" (gen/footprints.py) or
+           "coil" (gen/coils.py, from COILS below)
   lcsc     LCSC/JLCPCB code, None for a part JLCPCB does not place (coils are copper)
   mpn      manufacturer part number
   value    what the schematic and silkscreen print
@@ -113,17 +114,20 @@ PARTS = {
                     ["GL0603PU01"], "phosphor purple you can see (the eye barely sees 405 nm)"),
     "LED_SIDE_ORANGE": P("LED", "LED_LiteOn_LTST-S270_SideView", "gen", "C160472", "LTST-S270KFKT", "orange side",
                          ["LTST-S270KFKT"], "side-view, so the floating bat's eyes shine forward"),
-    # --- coils: copper, not parts (gen/footprints.py draws them) ------------------------------
-    "COIL_PEND": dict(sym=LIB + ":Coil", fp=LIB + ":NetTie-2_SMD_Pad2.0mm", fp_src="stock:NetTie", lcsc=None,
-                      mpn="PCB coil", value="31uH", match=[], note="4-layer spiral, copper"),
-    "COIL_LEV": dict(sym=LIB + ":Coil", fp=LIB + ":NetTie-2_SMD_Pad2.0mm", fp_src="stock:NetTie", lcsc=None,
-                     mpn="PCB coil", value="29uH", match=[], note="4-layer spiral, copper; the Hall sensor sits in its centre"),
-    "COIL_PERCH": dict(sym=LIB + ":Coil", fp=LIB + ":NetTie-2_SMD_Pad2.0mm", fp_src="stock:NetTie", lcsc=None,
-                       mpn="PCB coil", value="28uH", match=[], note="4-layer spiral, copper"),
-    "COIL_TOKEN": dict(sym=LIB + ":Coil", fp=LIB + ":NetTie-2_SMD_Pad0.5mm", fp_src="stock:NetTie", lcsc=None,
-                       mpn="PCB coil", value="11.5uH", match=[], note="4-layer spiral, copper"),
-    "COIL_BAT": dict(sym=LIB + ":Coil", fp=LIB + ":NetTie-2_SMD_Pad0.5mm", fp_src="stock:NetTie", lcsc=None,
-                     mpn="PCB coil", value="38uH", match=[], note="4-layer fine-pitch spiral, copper"),
+    # --- coils: copper, not parts.  gen/coils.py draws each as a footprint whose own copper is
+    # the spiral (a net tie between pads 1 and 2) from COILS below, and checks that each value
+    # here is the inductance of the copper it draws (sim/physics/magnetics.py)
+    "COIL_PEND": dict(sym=LIB + ":Coil", fp=LIB + ":Coil_PEND", fp_src="coil", lcsc=None,
+                      mpn="PCB coil", value="33uH coil", match=[], note="4-layer spiral, copper"),
+    "COIL_LEV": dict(sym=LIB + ":Coil", fp=LIB + ":Coil_LEV", fp_src="coil", lcsc=None,
+                     mpn="PCB coil", value="30uH coil", match=[],
+                     note="3-layer spiral, copper; the Hall sensor sits in its centre, its lines leave on B.Cu"),
+    "COIL_PERCH": dict(sym=LIB + ":Coil", fp=LIB + ":Coil_PERCH", fp_src="coil", lcsc=None,
+                       mpn="PCB coil", value="30uH coil", match=[], note="4-layer spiral, copper"),
+    "COIL_TOKEN": dict(sym=LIB + ":Coil", fp=LIB + ":Coil_TOKEN", fp_src="coil", lcsc=None,
+                       mpn="PCB coil", value="12.5uH coil", match=[], note="4-layer spiral, copper"),
+    "COIL_BAT": dict(sym=LIB + ":Coil", fp=LIB + ":Coil_BAT", fp_src="coil", lcsc=None,
+                     mpn="PCB coil", value="37uH coil", match=[], note="4-layer fine-pitch spiral, copper"),
     # --- bare pads, holes, flags (not placed by JLCPCB) ---------------------------------------
     "ANTENNA": dict(sym=LIB + ":Antenna", fp=LIB + ":TestPoint_Pad_D1.5mm", fp_src="stock:TestPoint", lcsc=None,
                     mpn="", value="antenna", match=[], note="the pad where a gold copper shape (the moon, the ghost) joins its oscillator"),
@@ -210,8 +214,11 @@ PARTS.update({
                     "perch current sense: 0.24 A max makes 0.12 V"),
 })
 
-# The spiral of each coil (gen/coils.py), keyed like the coil parts above.  Radii and
-# pitch in mm; the physics behind each is in sim/physics/.
+# The spiral of each coil (gen/coils.py), keyed like the coil parts above, in mm.  r_out and
+# r_in are the copper's outer and inner edges; turns are per layer (gen/coils.py adds up to
+# half a turn on some layers to bring the layer changes round, about one turn per coil in
+# all), so the pitch is (r_out - r_in - width) / turns; width is the track.  The physics
+# behind each is in sim/physics/.
 COILS = {
     "COIL_PEND": dict(r_out=15.0, r_in=3.0, turns=12, width=0.6, layers=4),
     # three layers, not four: the Hall sensor sits in the hole at the centre, and its three

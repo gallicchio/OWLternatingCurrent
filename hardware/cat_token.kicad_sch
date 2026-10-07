@@ -1,0 +1,724 @@
+(kicad_sch (version 20250114) (generator "eeschema") (generator_version "9.0")
+	(uuid "959ded29-a394-da5f-558c-d75e2acf45d6")
+	(paper "A4")
+	(title_block
+		(title "OWLternating Current: cat token")
+		(date "2026-10-07")
+		(rev "A")
+		(company "Jason Gallicchio and Claude  --  https://github.com/gallicchio/OWLternatingCurrent")
+		(comment 1 "Made by gen/sch_boards.py")
+		(comment 2 "Hardware CERN-OHL-P-2.0, software MIT")
+	)
+	(lib_symbols
+		(symbol "OWL:C"
+			(pin_numbers
+				(hide yes)
+			)
+			(pin_names
+				(offset 0.254)
+			)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(property "Reference" "C"
+				(at 0.635 2.54 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(justify left)
+				)
+			)
+			(property "Value" "C"
+				(at 0.635 -2.54 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(justify left)
+				)
+			)
+			(property "Footprint" ""
+				(at 0.9652 -3.81 0)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Datasheet" ""
+				(at 0 0 0)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Description" "Unpolarized capacitor"
+				(at 0 0 0)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "ki_keywords" "cap capacitor"
+				(at 0 0 0)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "ki_fp_filters" "C_*"
+				(at 0 0 0)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(symbol "C_0_1"
+				(polyline
+					(pts
+						(xy -2.032 0.762)
+						(xy 2.032 0.762)
+					)
+					(stroke
+						(width 0.508)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy -2.032 -0.762)
+						(xy 2.032 -0.762)
+					)
+					(stroke
+						(width 0.508)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+			)
+			(symbol "C_1_1"
+				(pin passive line
+					(at 0 3.81 270)
+					(length 2.794)
+					(name ""
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 0 -3.81 90)
+					(length 2.794)
+					(name ""
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
+		(symbol "OWL:Coil"
+			(pin_names
+				(offset 0.762)
+			)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(property "Reference" "L"
+				(at 0 6.35 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Value" "Coil"
+				(at 0 -6.35 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Footprint" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Datasheet" "~"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Description" "PCB spiral coil (copper, not a part); footprint is a net tie"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(symbol "Coil_0_1"
+				(arc
+					(start -1.270 0)
+					(mid -1.905 0.635)
+					(end -2.540 0)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(arc
+					(start 0.000 0)
+					(mid -0.635 0.635)
+					(end -1.270 0)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(arc
+					(start 1.270 0)
+					(mid 0.635 0.635)
+					(end 0.000 0)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(arc
+					(start 2.540 0)
+					(mid 1.905 0.635)
+					(end 1.270 0)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy -3.0000 -1.2000)
+						(xy 3.0000 -1.2000)
+					)
+					(stroke
+						(width 0.150)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+			)
+			(symbol "Coil_1_1"
+				(pin passive line
+					(at -5.08 0.00 0)
+					(length 2.54)
+					(name "1"
+						(effects
+							(font
+								(size 1.02 1.02)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.02 1.02)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 5.08 0.00 180)
+					(length 2.54)
+					(name "2"
+						(effects
+							(font
+								(size 1.02 1.02)
+							)
+						)
+					)
+					(number "2"
+						(effects
+							(font
+								(size 1.02 1.02)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
+		(symbol "OWL:LED"
+			(pin_numbers
+				(hide yes)
+			)
+			(pin_names
+				(offset 1.016)
+				(hide yes)
+			)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(property "Reference" "D"
+				(at 0 2.54 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Value" "LED"
+				(at 0 -2.54 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Footprint" ""
+				(at 0 0 0)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Datasheet" ""
+				(at 0 0 0)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Description" "Light emitting diode"
+				(at 0 0 0)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Sim.Pins" "1=K 2=A"
+				(at 0 0 0)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "ki_keywords" "LED diode"
+				(at 0 0 0)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "ki_fp_filters" "LED* LED_SMD:* LED_THT:*"
+				(at 0 0 0)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(symbol "LED_0_1"
+				(polyline
+					(pts
+						(xy -3.048 -0.762)
+						(xy -4.572 -2.286)
+						(xy -3.81 -2.286)
+						(xy -4.572 -2.286)
+						(xy -4.572 -1.524)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy -1.778 -0.762)
+						(xy -3.302 -2.286)
+						(xy -2.54 -2.286)
+						(xy -3.302 -2.286)
+						(xy -3.302 -1.524)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy -1.27 0)
+						(xy 1.27 0)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy -1.27 -1.27)
+						(xy -1.27 1.27)
+					)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 1.27 -1.27)
+						(xy 1.27 1.27)
+						(xy -1.27 0)
+						(xy 1.27 -1.27)
+					)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+			)
+			(symbol "LED_1_1"
+				(pin passive line
+					(at -3.81 0 0)
+					(length 2.54)
+					(name "K"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 3.81 0 180)
+					(length 2.54)
+					(name "A"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
+		(symbol "OWL:R"
+			(pin_numbers
+				(hide yes)
+			)
+			(pin_names
+				(offset 0)
+			)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(property "Reference" "R"
+				(at 2.032 0 90)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Value" "R"
+				(at 0 0 90)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Footprint" ""
+				(at -1.778 0 90)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Datasheet" ""
+				(at 0 0 0)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Description" "Resistor"
+				(at 0 0 0)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "ki_keywords" "R res resistor"
+				(at 0 0 0)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "ki_fp_filters" "R_*"
+				(at 0 0 0)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(symbol "R_0_1"
+				(rectangle
+					(start -1.016 -2.54)
+					(end 1.016 2.54)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+			)
+			(symbol "R_1_1"
+				(pin passive line
+					(at 0 3.81 270)
+					(length 1.27)
+					(name ""
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 0 -3.81 90)
+					(length 1.27)
+					(name ""
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
+	)
+	(text "OWLternating Current: the cat token" (exclude_from_sim no) (at 17.7800 20.3200 0) (effects (font (size 3.50 3.50) (bold yes)) (justify left bottom)) (uuid "b9ac443b-8e64-d93e-b515-e9c3610016fa"))
+	(symbol (lib_id "OWL:Coil") (at 45.7200 88.9000 270) (unit 1) (exclude_from_sim no) (in_bom yes) (on_board yes) (dnp no)
+		(uuid "3db52207-80a6-ae26-ac4c-9a84e4199a6e")
+		(property "Reference" "L501" (at 43.1800 88.9000 90) (effects (font (size 1.00 1.00)) (justify right bottom)))
+		(property "Value" "11.5uH coil" (at 43.1800 88.9000 90) (effects (font (size 1.00 1.00)) (justify right top)))
+		(property "Footprint" "OWL:NetTie-2_SMD_Pad0.5mm" (at 45.7200 88.9000 90) (effects (font (size 1.00 1.00)) (justify left) (hide yes)))
+		(property "Datasheet" "~" (at 45.7200 88.9000 90) (effects (font (size 1.00 1.00)) (justify left) (hide yes)))
+		(property "Description" "" (at 45.7200 88.9000 90) (effects (font (size 1.00 1.00)) (justify left) (hide yes)))
+		(property "MPN" "PCB coil" (at 45.7200 88.9000 90) (effects (font (size 1.00 1.00)) (justify left) (hide yes)))
+		(pin "1" (uuid "9216e45e-f6f7-3914-c9a1-811f16a8343b"))
+		(pin "2" (uuid "f2d29bac-e9fb-86e5-84e8-d00cdd8f8c47"))
+		(instances (project "OWLternatingCurrent" (path "/0ee13ddb-1c12-f416-8576-ee8890b4675e/e8204a63-2bf5-33be-721e-2ab89b3a1191" (reference "L501") (unit 1)))))
+	(symbol (lib_id "OWL:C") (at 66.0400 88.9000 0) (unit 1) (exclude_from_sim no) (in_bom yes) (on_board yes) (dnp no)
+		(uuid "d9d96dec-fe0c-a3f6-abbd-8c7edbb07bfd")
+		(property "Reference" "C501" (at 68.5800 88.9000 0) (effects (font (size 1.00 1.00)) (justify left bottom)))
+		(property "Value" "22n C0G" (at 68.5800 88.9000 0) (effects (font (size 1.00 1.00)) (justify left top)))
+		(property "Footprint" "OWL:C_0805_2012Metric" (at 66.0400 88.9000 0) (effects (font (size 1.00 1.00)) (justify left) (hide yes)))
+		(property "Datasheet" "~" (at 66.0400 88.9000 0) (effects (font (size 1.00 1.00)) (justify left) (hide yes)))
+		(property "Description" "" (at 66.0400 88.9000 0) (effects (font (size 1.00 1.00)) (justify left) (hide yes)))
+		(property "LCSC" "C77069" (at 66.0400 88.9000 0) (effects (font (size 1.00 1.00)) (justify left) (hide yes)))
+		(property "MPN" "GRM21B5C1H223JA01L" (at 66.0400 88.9000 0) (effects (font (size 1.00 1.00)) (justify left) (hide yes)))
+		(pin "1" (uuid "8ad861e5-7b31-eb1b-edaf-f1de1598c710"))
+		(pin "2" (uuid "45d4b2fe-a579-0ac3-955d-b3584c9714b2"))
+		(instances (project "OWLternatingCurrent" (path "/0ee13ddb-1c12-f416-8576-ee8890b4675e/e8204a63-2bf5-33be-721e-2ab89b3a1191" (reference "C501") (unit 1)))))
+	(symbol (lib_id "OWL:R") (at 86.3600 82.5500 0) (unit 1) (exclude_from_sim no) (in_bom yes) (on_board yes) (dnp no)
+		(uuid "49365a22-23b0-829b-827c-c00a78f55580")
+		(property "Reference" "R501" (at 87.6300 82.5500 0) (effects (font (size 1.00 1.00)) (justify left bottom)))
+		(property "Value" "150" (at 87.6300 82.5500 0) (effects (font (size 1.00 1.00)) (justify left top)))
+		(property "Footprint" "OWL:R_0603_1608Metric" (at 86.3600 82.5500 0) (effects (font (size 1.00 1.00)) (justify left) (hide yes)))
+		(property "Datasheet" "~" (at 86.3600 82.5500 0) (effects (font (size 1.00 1.00)) (justify left) (hide yes)))
+		(property "Description" "" (at 86.3600 82.5500 0) (effects (font (size 1.00 1.00)) (justify left) (hide yes)))
+		(property "LCSC" "C22808" (at 86.3600 82.5500 0) (effects (font (size 1.00 1.00)) (justify left) (hide yes)))
+		(property "MPN" "0603WAF1500T5E" (at 86.3600 82.5500 0) (effects (font (size 1.00 1.00)) (justify left) (hide yes)))
+		(pin "1" (uuid "f32bb85c-70c0-34ed-b079-c00c69806975"))
+		(pin "2" (uuid "dccd0f64-80bd-24fd-e5cc-12859259974c"))
+		(instances (project "OWLternatingCurrent" (path "/0ee13ddb-1c12-f416-8576-ee8890b4675e/e8204a63-2bf5-33be-721e-2ab89b3a1191" (reference "R501") (unit 1)))))
+	(symbol (lib_id "OWL:LED") (at 86.3600 95.2500 90) (unit 1) (exclude_from_sim no) (in_bom yes) (on_board yes) (dnp no)
+		(uuid "89d1c8b1-8204-f7b1-bf39-0955ded25625")
+		(property "Reference" "D501" (at 88.9000 95.2500 90) (effects (font (size 1.00 1.00)) (justify right top)))
+		(property "Value" "orange" (at 88.9000 95.2500 90) (effects (font (size 1.00 1.00)) (justify right bottom)))
+		(property "Footprint" "OWL:LED_0603_1608Metric" (at 86.3600 95.2500 90) (effects (font (size 1.00 1.00)) (justify left) (hide yes)))
+		(property "Datasheet" "~" (at 86.3600 95.2500 90) (effects (font (size 1.00 1.00)) (justify left) (hide yes)))
+		(property "Description" "" (at 86.3600 95.2500 90) (effects (font (size 1.00 1.00)) (justify left) (hide yes)))
+		(property "LCSC" "C965800" (at 86.3600 95.2500 90) (effects (font (size 1.00 1.00)) (justify left) (hide yes)))
+		(property "MPN" "XL-1608UOC-06" (at 86.3600 95.2500 90) (effects (font (size 1.00 1.00)) (justify left) (hide yes)))
+		(pin "1" (uuid "4dcff2a7-a55d-fa63-dc7b-95b7ebe2b933"))
+		(pin "2" (uuid "b906cc02-f1d1-d23f-83f6-6ca39a189028"))
+		(instances (project "OWLternatingCurrent" (path "/0ee13ddb-1c12-f416-8576-ee8890b4675e/e8204a63-2bf5-33be-721e-2ab89b3a1191" (reference "D501") (unit 1)))))
+	(symbol (lib_id "OWL:R") (at 101.6000 82.5500 0) (unit 1) (exclude_from_sim no) (in_bom yes) (on_board yes) (dnp no)
+		(uuid "1e88177b-8439-0019-67e7-76e8d0ea6ddc")
+		(property "Reference" "R502" (at 102.8700 82.5500 0) (effects (font (size 1.00 1.00)) (justify left bottom)))
+		(property "Value" "150" (at 102.8700 82.5500 0) (effects (font (size 1.00 1.00)) (justify left top)))
+		(property "Footprint" "OWL:R_0603_1608Metric" (at 101.6000 82.5500 0) (effects (font (size 1.00 1.00)) (justify left) (hide yes)))
+		(property "Datasheet" "~" (at 101.6000 82.5500 0) (effects (font (size 1.00 1.00)) (justify left) (hide yes)))
+		(property "Description" "" (at 101.6000 82.5500 0) (effects (font (size 1.00 1.00)) (justify left) (hide yes)))
+		(property "LCSC" "C22808" (at 101.6000 82.5500 0) (effects (font (size 1.00 1.00)) (justify left) (hide yes)))
+		(property "MPN" "0603WAF1500T5E" (at 101.6000 82.5500 0) (effects (font (size 1.00 1.00)) (justify left) (hide yes)))
+		(pin "1" (uuid "c818ed06-95e3-6271-b064-5228a563d37b"))
+		(pin "2" (uuid "82a6a617-f0fb-9300-4596-283b2e396abe"))
+		(instances (project "OWLternatingCurrent" (path "/0ee13ddb-1c12-f416-8576-ee8890b4675e/e8204a63-2bf5-33be-721e-2ab89b3a1191" (reference "R502") (unit 1)))))
+	(symbol (lib_id "OWL:LED") (at 101.6000 95.2500 270) (unit 1) (exclude_from_sim no) (in_bom yes) (on_board yes) (dnp no)
+		(uuid "3c54640f-816b-44ea-5214-88e54b3b4fdf")
+		(property "Reference" "D502" (at 104.1400 95.2500 90) (effects (font (size 1.00 1.00)) (justify left bottom)))
+		(property "Value" "violet" (at 104.1400 95.2500 90) (effects (font (size 1.00 1.00)) (justify left top)))
+		(property "Footprint" "OWL:LED_Everlight-SMD3528_3.5x2.8mm_67-21ST" (at 101.6000 95.2500 90) (effects (font (size 1.00 1.00)) (justify left) (hide yes)))
+		(property "Datasheet" "~" (at 101.6000 95.2500 90) (effects (font (size 1.00 1.00)) (justify left) (hide yes)))
+		(property "Description" "" (at 101.6000 95.2500 90) (effects (font (size 1.00 1.00)) (justify left) (hide yes)))
+		(property "LCSC" "C516136" (at 101.6000 95.2500 90) (effects (font (size 1.00 1.00)) (justify left) (hide yes)))
+		(property "MPN" "HL-A-3528S7VC-S1-13HL" (at 101.6000 95.2500 90) (effects (font (size 1.00 1.00)) (justify left) (hide yes)))
+		(pin "1" (uuid "9d41fd50-910c-902c-c912-1da709b39d8d"))
+		(pin "2" (uuid "2e829aff-59cd-732f-907c-e88e6857423f"))
+		(instances (project "OWLternatingCurrent" (path "/0ee13ddb-1c12-f416-8576-ee8890b4675e/e8204a63-2bf5-33be-721e-2ab89b3a1191" (reference "D502") (unit 1)))))
+	(text_box "The cat familiar: the same coil, tuned higher: C501 (22 nF C0G)\nwith L501 resonates at 316 kHz, where the cat's perch drives.\nBelow about 0.2 A of perch current the other familiar stays\ncompletely dark, so each perch lights only its own token\n(sim/physics/README.md)." (exclude_from_sim no) (at 17.7800 116.8400 0) (size 57.1500 11.4300)
+		(margins 0.9525 0.9525 0.9525 0.9525) (stroke (width 0) (type default))
+		(fill (type color) (color 255 255 194 1)) (effects (font (size 1.00 1.00)) (justify left top)) (uuid "5e2b5501-991a-3ab1-e2e6-2959ef7c2deb"))
+	(wire (pts (xy 45.7200 83.8200) (xy 45.7200 76.2000)) (stroke (width 0) (type default)) (uuid "b6391fac-b9cb-3ef7-442f-2801700e5624"))
+	(wire (pts (xy 45.7200 93.9800) (xy 45.7200 101.6000)) (stroke (width 0) (type default)) (uuid "f834816b-5365-988d-ce03-4022714bbbf7"))
+	(wire (pts (xy 66.0400 85.0900) (xy 66.0400 76.2000)) (stroke (width 0) (type default)) (uuid "e6a7db49-bd2a-fbfb-cc46-5dd523f9c30b"))
+	(wire (pts (xy 66.0400 92.7100) (xy 66.0400 101.6000)) (stroke (width 0) (type default)) (uuid "d5c88cd3-19a1-5474-72f2-899c11eace6b"))
+	(wire (pts (xy 86.3600 76.2000) (xy 86.3600 78.7400)) (stroke (width 0) (type default)) (uuid "168f335e-8bfd-5afa-f1ed-ee3d42ebb07b"))
+	(wire (pts (xy 86.3600 86.3600) (xy 86.3600 91.4400)) (stroke (width 0) (type default)) (uuid "b2101fd6-3f7f-6824-7cc1-8a4af226ce84"))
+	(wire (pts (xy 86.3600 99.0600) (xy 86.3600 101.6000)) (stroke (width 0) (type default)) (uuid "8d4d9f0b-43ef-7d47-d542-d9865d178d4c"))
+	(wire (pts (xy 101.6000 76.2000) (xy 101.6000 78.7400)) (stroke (width 0) (type default)) (uuid "7761c959-72bf-f0b3-a308-06e93c5a74f2"))
+	(wire (pts (xy 101.6000 86.3600) (xy 101.6000 91.4400)) (stroke (width 0) (type default)) (uuid "0fb922e5-2c38-fb80-ba83-9ae4e359ae79"))
+	(wire (pts (xy 101.6000 99.0600) (xy 101.6000 101.6000)) (stroke (width 0) (type default)) (uuid "ea9e0371-22a9-84f1-d702-a123f411e829"))
+	(wire (pts (xy 45.7200 76.2000) (xy 66.0400 76.2000)) (stroke (width 0) (type default)) (uuid "1d03fe7c-debc-b9c5-7011-e2b0bcb5a216"))
+	(wire (pts (xy 66.0400 76.2000) (xy 86.3600 76.2000)) (stroke (width 0) (type default)) (uuid "138f6247-4d67-314a-ef08-1b079fe49061"))
+	(wire (pts (xy 86.3600 76.2000) (xy 101.6000 76.2000)) (stroke (width 0) (type default)) (uuid "78767128-7f31-155c-d3f9-c576cb040fde"))
+	(wire (pts (xy 45.7200 101.6000) (xy 66.0400 101.6000)) (stroke (width 0) (type default)) (uuid "e2e16d71-4c64-c61c-1111-150fd9856f7c"))
+	(wire (pts (xy 66.0400 101.6000) (xy 86.3600 101.6000)) (stroke (width 0) (type default)) (uuid "54596d86-8f66-3b68-2ad7-b49465b0d969"))
+	(wire (pts (xy 86.3600 101.6000) (xy 101.6000 101.6000)) (stroke (width 0) (type default)) (uuid "e4785310-7be6-2aab-d623-d123571815de"))
+	(junction (at 66.0400 76.2000) (diameter 0) (color 0 0 0 0) (uuid "644ced65-8779-dd75-e25d-fa47bb9ea59c"))
+	(junction (at 66.0400 101.6000) (diameter 0) (color 0 0 0 0) (uuid "044ca890-66f7-a9e3-1a7d-c24d5d6b9752"))
+	(junction (at 86.3600 76.2000) (diameter 0) (color 0 0 0 0) (uuid "20d0575e-cba4-428e-2c1f-e595311aa237"))
+	(junction (at 86.3600 101.6000) (diameter 0) (color 0 0 0 0) (uuid "370668f4-f695-e15d-9df8-3f492daddff4"))
+	(embedded_fonts no)
+)

@@ -49,7 +49,7 @@ for i in range(4):
     _add("BASE", 27 + i, "STARX%d" % i, "violet", "scattered sky star %d" % i)
 # OUT31-35 spare.
 
-# ---- U13, the tree's LP5036 (I2C 0x31) --------------------------------------------
+# ---- U101, the tree's LP5036 (I2C 0x32) -------------------------------------------
 # Banks 0-2: three owls' eyes, left/right (each owl's two eyes in one bank, so they
 # open together); OUT2, OUT5 and OUT8, each bank's third output, are unused.
 for k, owl in enumerate("ABC"):
@@ -58,12 +58,13 @@ for k, owl in enumerate("ABC"):
 # Banks 3-4: six violet stars on the tree's sky.
 for i in range(6):
     _add("TREE", 9 + i, "TSTAR%d" % i, "violet", "tree sky star %d" % i)
-# Bank 5: the perch's two downlights onto the floating bat (on the perch's underside,
-# reached through the tree-perch header) and one spare.
-_add("TREE", 15, "PERCH_DOWN0", "violet", "perch underside, left of the coil")
-_add("TREE", 16, "PERCH_DOWN1", "violet", "perch underside, right of the coil")
+# Bank 11: the perch's two downlights onto the floating bat (on the perch's underside,
+# reached through the tree-perch header).  The last outputs, so that their two lines
+# leave the driver below everything else and reach the header without crossing.
+_add("TREE", 33, "PERCH_DOWN0", "violet", "perch underside, left of the coil")
+_add("TREE", 34, "PERCH_DOWN1", "violet", "perch underside, right of the coil")
 # Banks 6-7: four purple wisps in the tree's branches (OUT18-21).
 for i in range(4):
     _add("TREE", 18 + i, "TWISP%d" % i, "purple", "in the tree's branches %d" % i)
 
-DRIVER_ADDR = {"BASE": 0x30, "TREE": 0x31}
+DRIVER_ADDR = {"BASE": 0x30, "TREE": 0x32}

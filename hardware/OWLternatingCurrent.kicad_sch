@@ -25,16 +25,311 @@
 		)
 		(uuid "67dac0fa-14a1-070c-065c-9abc86c0618a")
 	)
-	(text "the base board: power, RP2354A, LEDs, sensors, coil drivers, theremin, audio"
+	(text_box "the base board: power,\nRP2354A, LEDs, sensors, coil\ndrivers, theremin, audio"
 		(exclude_from_sim no)
-		(at 30.48 83.82 0)
+		(at 30.48 81.28 0)
+		(size 33.02 8.89)
+		(margins 0.9525 0.9525 0.9525 0.9525)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(fill
+			(type color)
+			(color 255 255 194 1)
+		)
 		(effects
 			(font
 				(size 1.27 1.27)
 			)
-			(justify left bottom)
+			(justify left top)
 		)
-		(uuid "abba79d7-fb99-fcea-453e-36d47ea73569")
+		(uuid "1c2480d2-0d1e-76db-9b3c-5e487f3b6fbc")
+	)
+	(text_box "the owl familiar: a tank at\n148 kHz"
+		(exclude_from_sim no)
+		(at 93.98 132.08 0)
+		(size 30.48 7.62)
+		(margins 0.9525 0.9525 0.9525 0.9525)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(fill
+			(type color)
+			(color 255 255 194 1)
+		)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left top)
+		)
+		(uuid "675ca54f-f8b0-7c43-6ed4-e37ccd703987")
+	)
+	(text_box "the bat: a coil, a capacitor,\ntwo eyes"
+		(exclude_from_sim no)
+		(at 30.48 132.08 0)
+		(size 31.75 7.62)
+		(margins 0.9525 0.9525 0.9525 0.9525)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(fill
+			(type color)
+			(color 255 255 194 1)
+		)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left top)
+		)
+		(uuid "c2f2d788-6ae5-f4fc-cc04-7f02ed4b1b85")
+	)
+	(text_box "the cat familiar: a tank at\n316 kHz"
+		(exclude_from_sim no)
+		(at 157.48 132.08 0)
+		(size 30.48 7.62)
+		(margins 0.9525 0.9525 0.9525 0.9525)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(fill
+			(type color)
+			(color 255 255 194 1)
+		)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left top)
+		)
+		(uuid "cfa67737-6409-7520-0236-77d45a545e7f")
+	)
+	(text_box "the tree: its LED driver,\nowls' eyes, stars; the coil's\nand the Hall sensor's lines"
+		(exclude_from_sim no)
+		(at 93.98 81.28 0)
+		(size 31.75 8.89)
+		(margins 0.9525 0.9525 0.9525 0.9525)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(fill
+			(type color)
+			(color 255 255 194 1)
+		)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left top)
+		)
+		(uuid "eaab4e52-dc1c-d1cc-7d57-db74bc8a505d")
+	)
+	(text_box "the perch: the levitation\ncoil, the Hall sensor, two\ndownlights"
+		(exclude_from_sim no)
+		(at 157.48 81.28 0)
+		(size 29.21 8.89)
+		(margins 0.9525 0.9525 0.9525 0.9525)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(fill
+			(type color)
+			(color 255 255 194 1)
+		)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left top)
+		)
+		(uuid "f6e781f6-8ee6-e80a-838d-c1e48c2fd4e0")
+	)
+	(sheet
+		(at 93.98 50.8)
+		(size 50.8 25.4)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(stroke
+			(width 0.1524)
+			(type solid)
+		)
+		(fill
+			(color 0 0 0 0)
+		)
+		(uuid "20a57c31-e9c8-6b22-3905-c1a308ad2923")
+		(property "Sheetname" "Tree"
+			(at 93.98 49.53 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.524 1.524)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Sheetfile" "tree.kicad_sch"
+			(at 93.98 77.47 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+			)
+		)
+		(instances
+			(project "OWLternatingCurrent"
+				(path "/0ee13ddb-1c12-f416-8576-ee8890b4675e"
+					(page "3")
+				)
+			)
+		)
+	)
+	(sheet
+		(at 30.48 101.6)
+		(size 50.8 25.4)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(stroke
+			(width 0.1524)
+			(type solid)
+		)
+		(fill
+			(color 0 0 0 0)
+		)
+		(uuid "305ded1c-2229-c555-aac8-a621a3694e24")
+		(property "Sheetname" "Bat"
+			(at 30.48 100.33 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.524 1.524)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Sheetfile" "bat.kicad_sch"
+			(at 30.48 128.27 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+			)
+		)
+		(instances
+			(project "OWLternatingCurrent"
+				(path "/0ee13ddb-1c12-f416-8576-ee8890b4675e"
+					(page "5")
+				)
+			)
+		)
+	)
+	(sheet
+		(at 157.48 50.8)
+		(size 50.8 25.4)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(stroke
+			(width 0.1524)
+			(type solid)
+		)
+		(fill
+			(color 0 0 0 0)
+		)
+		(uuid "3598fe4c-d754-7098-4d67-3157df5998b7")
+		(property "Sheetname" "Perch"
+			(at 157.48 49.53 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.524 1.524)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Sheetfile" "perch.kicad_sch"
+			(at 157.48 77.47 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+			)
+		)
+		(instances
+			(project "OWLternatingCurrent"
+				(path "/0ee13ddb-1c12-f416-8576-ee8890b4675e"
+					(page "4")
+				)
+			)
+		)
+	)
+	(sheet
+		(at 93.98 101.6)
+		(size 50.8 25.4)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(stroke
+			(width 0.1524)
+			(type solid)
+		)
+		(fill
+			(color 0 0 0 0)
+		)
+		(uuid "5b5ac49b-9d3f-5173-2b3f-db33cf2477d6")
+		(property "Sheetname" "Owl token"
+			(at 93.98 100.33 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.524 1.524)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Sheetfile" "owl_token.kicad_sch"
+			(at 93.98 128.27 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+			)
+		)
+		(instances
+			(project "OWLternatingCurrent"
+				(path "/0ee13ddb-1c12-f416-8576-ee8890b4675e"
+					(page "6")
+				)
+			)
+		)
 	)
 	(sheet
 		(at 30.48 50.8)
@@ -77,6 +372,51 @@
 			(project "OWLternatingCurrent"
 				(path "/0ee13ddb-1c12-f416-8576-ee8890b4675e"
 					(page "2")
+				)
+			)
+		)
+	)
+	(sheet
+		(at 157.48 101.6)
+		(size 50.8 25.4)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(stroke
+			(width 0.1524)
+			(type solid)
+		)
+		(fill
+			(color 0 0 0 0)
+		)
+		(uuid "e8204a63-2bf5-33be-721e-2ab89b3a1191")
+		(property "Sheetname" "Cat token"
+			(at 157.48 100.33 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.524 1.524)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Sheetfile" "cat_token.kicad_sch"
+			(at 157.48 128.27 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+			)
+		)
+		(instances
+			(project "OWLternatingCurrent"
+				(path "/0ee13ddb-1c12-f416-8576-ee8890b4675e"
+					(page "7")
 				)
 			)
 		)

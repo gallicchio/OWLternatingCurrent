@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
 """Can the perch's levitation coil light the floating bat's LEDs by induction?
 
-TX: the perch coil (the canonical 4-layer spiral, 31.5 uH), driven by its DRV8874
-(PWM <= 100 kHz), so the carrier is at 90 kHz.  RX: a fine-pitch 4-layer spiral in
-the bat PCB round its magnet (r 6-11 mm, 0.2/0.2 mm track/gap: 12 turns a layer),
-with a C0G capacitor across it (parallel resonance) and two LED pairs across that:
-orange side-view eyes and violet belly LEDs, each pair anti-parallel.
+TX: the perch's levitation coil as built (gen/parts.py COILS["COIL_LEV"]: 11 turns a layer
+on 4 layers, r 4-15 mm), driven by its DRV8874 (PWM <= 100 kHz).  RX: the bat's coil as
+built (COILS["COIL_BAT"]: 10 turns a layer, 0.2/0.2 mm, r 7-11 mm round its magnet) with a
+100 nF C0G across it (parallel resonance, 84 kHz: the carrier runs there) and the two
+orange side-view eyes, anti-parallel, through 33 R.  (Rev A's first sketch had 12 turns,
+r 6.2 mm, and a violet belly pair; the printed cap needs r 7 mm, and the belly LEDs
+starved the eyes, so both went.)
 The bat's magnet (10 x 2 mm) floats 8.5 mm below the perch's bottom copper, and the
 bat's top copper is 2 mm below that (the magnet's thickness).
 
@@ -20,8 +22,9 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 Z4 = [0.0, -0.21e-3, -1.275e-3, -1.485e-3]
 OZ4 = [1, 1, 1, 1]           # 1 oz inner copper (Jason, 2026-10-07)
 
-TX = dict(n=12, r_out=15e-3, r_in=3e-3, w=0.6e-3)
-RX = dict(n=12, r_out=11e-3, r_in=6.2e-3, w=0.2e-3)
+TX = dict(n=11, r_out=15e-3, r_in=4e-3, w=0.6e-3)
+RX = dict(n=10, r_out=11e-3, r_in=7e-3, w=0.2e-3)
+C_TANK = 100e-9
 
 
 def L_of(c):
@@ -44,8 +47,8 @@ def M_of(dz):
     return M
 
 
-f = 90e3
 L1, L2 = L_of(TX), L_of(RX)
+f = 1 / (2 * np.pi * np.sqrt(L2 * C_TANK))          # the tank's own resonance: the carrier
 R1, R2 = R_of(TX, f), R_of(RX, f)
 dz = 8.5e-3 + 2e-3
 M = M_of(dz)
@@ -56,15 +59,15 @@ print(f"perch L1 {L1*1e6:.1f} uH R1 {R1:.2f} ohm; bat coil L2 {L2*1e6:.1f} uH R2
       f"C2 {C2*1e9:.1f} nF; M {M*1e6:.2f} uH k {k:.3f} at {dz*1e3:.1f} mm")
 rows = []
 for I1 in (0.2, 0.3, 0.4, 0.5):
-    io, iv, vp = simulate(f, f, I1, M, L2, R2, cycles=300, vf_o=1.85, r_o=9 + 33, vf_v=2.85, r_v=14 + 33)
+    io, iv, vp = simulate(f, f, I1, M, L2, R2, cycles=300, vf_o=1.85, r_o=9 + 33, vf_v=1e3, r_v=1e3)
     rows.append(dict(I1=I1, orange_mA=io * 1e3, violet_mA=iv * 1e3, vpk=vp))
-    print(f"carrier {I1:.1f} A: eyes {io*1e3:5.1f} mA, belly {iv*1e3:5.1f} mA (tank {vp:.1f} V peak)")
-# carrier the bridge can make: square 12 V across L1 at 90 kHz -> triangle; fundamental amplitude
+    print(f"carrier {I1:.1f} A: eyes {io*1e3:5.1f} mA mean each (tank {vp:.1f} V peak)")
+# carrier the bridge can make: square 12 V across L1 at the carrier -> triangle; fundamental amplitude
 Ipp = 12 / (4 * f * L1)          # bipolar square, 50 %: I_pp = V T / (2 L) ... (V/L)(T/2)/2 per half
 fund = 8 / np.pi ** 2 * Ipp / 2
-print(f"a 12 V bipolar square at 90 kHz gives {Ipp:.2f} A pp, fundamental {fund:.2f} A amplitude")
+print(f"a 12 V bipolar square at {f/1e3:.0f} kHz gives {Ipp:.2f} A pp, fundamental {fund:.2f} A amplitude")
 # eddy loss in the 10 x 2 magnet: B at the magnet from the coil, per amp, on axis
-CA, CB = mg.segments(mg.multilayer_coil(12, 15e-3, 3e-3, Z4, per_turn=64))
+CA, CB = mg.segments(mg.multilayer_coil(TX["n"], TX["r_out"], TX["r_in"], Z4, per_turn=64))
 Bmag = mg.bfield(CA, CB, 1.0, np.array([[0, 0, Z4[-1] - 8.5e-3 - 1e-3]]))[0, 2]
 sigma, a, h = 7.1e5, 5e-3, 2e-3
 for I1 in (0.3, 0.5):

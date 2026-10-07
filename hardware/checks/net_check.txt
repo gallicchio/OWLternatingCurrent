@@ -1,0 +1,200 @@
+ok   U4 GPIO0 (pin 2)                         PEND1_IN1                
+ok   U4 GPIO1 (pin 3)                         PEND1_IN2                
+ok   U4 GPIO2 (pin 4)                         PEND2_IN1                
+ok   U4 GPIO3 (pin 5)                         PEND2_IN2                
+ok   U4 GPIO4 (pin 7)                         PEND3_IN1                
+ok   U4 GPIO5 (pin 8)                         PEND3_IN2                
+ok   U4 GPIO6 (pin 9)                         LEV_IN1                  
+ok   U4 GPIO7 (pin 10)                        LEV_IN2                  
+ok   U4 GPIO8 (pin 12)                        FAM1_A                   
+ok   U4 GPIO9 (pin 13)                        FAM1_B                   
+ok   U4 GPIO10 (pin 14)                       FAM2_A                   
+ok   U4 GPIO11 (pin 15)                       FAM2_B                   
+ok   U4 GPIO12 (pin 16)                       UART_TX                  
+ok   U4 GPIO13 (pin 17)                       UART_RX                  
+ok   U4 GPIO14 (pin 18)                       AUDIO                    
+ok   U4 GPIO15 (pin 19)                       IMU_INT                  
+ok   U4 GPIO16 (pin 27)                       SDA                      
+ok   U4 GPIO17 (pin 28)                       SCL                      
+ok   U4 GPIO18 (pin 29)                       THEREMIN_PITCH           
+ok   U4 GPIO19 (pin 31)                       THEREMIN_VOL             
+ok   U4 GPIO20 (pin 32)                       MUX_S0                   
+ok   U4 GPIO21 (pin 33)                       MUX_S1                   
+ok   U4 GPIO22 (pin 34)                       MUX_S2                   
+ok   U4 GPIO23 (pin 35)                       DRV_nSLEEP               
+ok   U4 GPIO24 (pin 36)                       DRV_nFAULT               
+ok   U4 GPIO25 (pin 37)                       FAM_EN                   
+ok   U4 GPIO26 (pin 40)                       HALL                     
+ok   U4 GPIO27 (pin 41)                       LEV_IPROPI               
+ok   U4 GPIO28 (pin 42)                       MUX_OUT                  
+ok   U4 GPIO29 (pin 43)                       BUTTON                   
+ok   U11 A0 (pin 13)                          PEND3_IPROPI             
+ok   U11 A1 (pin 14)                          PEND2_IPROPI             
+ok   U11 A2 (pin 15)                          PEND1_IPROPI             
+ok   U11 A3 (pin 12)                          FAM2_ISENSE              
+ok   U11 A4 (pin 1)                           FAM1_ISENSE              
+ok   U11 A5 (pin 5)                           V12_SENSE                
+ok   U11 A6 (pin 2)                           V5_SENSE                 
+ok   U11 A7 (pin 4)                           VBUS_SENSE               
+ok   J3 pin 1                                 HALL                     
+ok   J3 pin 2                                 +3V3                     
+ok   J3 pin 3                                 SDA                      
+ok   J3 pin 4                                 +5V                      
+ok   J3 pin 5                                 SCL                      
+ok   J3 pin 6                                 GND                      
+ok   J3 pin 7                                 GND                      
+ok   J3 pin 8                                 LEV_B                    
+ok   J3 pin 9                                 GND                      
+ok   J3 pin 10                                LEV_B                    
+ok   J3 pin 11                                GND                      
+ok   J3 pin 12                                GND                      
+ok   J3 pin 13                                GND                      
+ok   J3 pin 14                                LEV_A                    
+ok   J3 pin 15                                GND                      
+ok   J3 pin 16                                LEV_A                    
+ok   J101 pin 1                               HALL                     
+ok   J101 pin 2                               +3V3_T                   
+ok   J101 pin 3                               SDA                      
+ok   J101 pin 4                               +5V_T                    
+ok   J101 pin 5                               SCL                      
+ok   J101 pin 6                               GND_T                    
+ok   J101 pin 7                               GND_T                    
+ok   J101 pin 8                               LEV_B                    
+ok   J101 pin 9                               GND_T                    
+ok   J101 pin 10                              LEV_B                    
+ok   J101 pin 11                              GND_T                    
+ok   J101 pin 12                              GND_T                    
+ok   J101 pin 13                              GND_T                    
+ok   J101 pin 14                              LEV_A                    
+ok   J101 pin 15                              GND_T                    
+ok   J101 pin 16                              LEV_A                    
+ok   J102 pin 1                               HALL                     
+ok   J102 pin 2                               +3V3_T                   
+ok   J102 pin 3                               GND_T                    
+ok   J102 pin 4                               +5V_T                    
+ok   J102 pin 5                               GND_T                    
+ok   J102 pin 6                               GND_T                    
+ok   J102 pin 7                               GND_T                    
+ok   J102 pin 8                               LEV_B                    
+ok   J102 pin 9                               GND_T                    
+ok   J102 pin 10                              LEV_B                    
+ok   J102 pin 11                              GND_T                    
+ok   J102 pin 12                              GND_T                    
+ok   J102 pin 13                              DOWN0                    
+ok   J102 pin 14                              LEV_A                    
+ok   J102 pin 15                              DOWN1                    
+ok   J102 pin 16                              LEV_A                    
+ok   J201 pin 1                               HALL                     
+ok   J201 pin 2                               +3V3_P                   
+ok   J201 pin 3                               GND_P                    
+ok   J201 pin 4                               +5V_P                    
+ok   J201 pin 5                               GND_P                    
+ok   J201 pin 6                               GND_P                    
+ok   J201 pin 7                               GND_P                    
+ok   J201 pin 8                               LEV_B                    
+ok   J201 pin 9                               GND_P                    
+ok   J201 pin 10                              LEV_B                    
+ok   J201 pin 11                              GND_P                    
+ok   J201 pin 12                              GND_P                    
+ok   J201 pin 13                              DOWN0                    
+ok   J201 pin 14                              LEV_A                    
+ok   J201 pin 15                              DOWN1                    
+ok   J201 pin 16                              LEV_A                    
+ok   U3 OUT0                                  STAR0                    
+ok   U3 OUT0 colour                           yes                      
+ok   U3 OUT1                                  STAR1                    
+ok   U3 OUT1 colour                           yes                      
+ok   U3 OUT2                                  STAR2                    
+ok   U3 OUT2 colour                           yes                      
+ok   U3 OUT3                                  STAR3                    
+ok   U3 OUT3 colour                           yes                      
+ok   U3 OUT4                                  STAR4                    
+ok   U3 OUT4 colour                           yes                      
+ok   U3 OUT5                                  STAR5                    
+ok   U3 OUT5 colour                           yes                      
+ok   U3 OUT6                                  STAR6                    
+ok   U3 OUT6 colour                           yes                      
+ok   U3 OUT7                                  STAR7                    
+ok   U3 OUT7 colour                           yes                      
+ok   U3 OUT8                                  STAR8                    
+ok   U3 OUT8 colour                           yes                      
+ok   U3 OUT9                                  STAR9                    
+ok   U3 OUT9 colour                           yes                      
+ok   U3 OUT10                                 STAR10                   
+ok   U3 OUT10 colour                          yes                      
+ok   U3 OUT11                                 STAR11                   
+ok   U3 OUT11 colour                          yes                      
+ok   U3 OUT12                                 PUMPKIN0                 
+ok   U3 OUT12 colour                          yes                      
+ok   U3 OUT13                                 PUMPKIN1                 
+ok   U3 OUT13 colour                          yes                      
+ok   U3 OUT14                                 PUMPKIN2                 
+ok   U3 OUT14 colour                          yes                      
+ok   U3 OUT15                                 OWLRING0                 
+ok   U3 OUT15 colour                          yes                      
+ok   U3 OUT16                                 OWLRING1                 
+ok   U3 OUT16 colour                          yes                      
+ok   U3 OUT17                                 OWLRING2                 
+ok   U3 OUT17 colour                          yes                      
+ok   U3 OUT18                                 CATRING0                 
+ok   U3 OUT18 colour                          yes                      
+ok   U3 OUT19                                 CATRING1                 
+ok   U3 OUT19 colour                          yes                      
+ok   U3 OUT20                                 CATRING2                 
+ok   U3 OUT20 colour                          yes                      
+ok   U3 OUT21                                 WISP0                    
+ok   U3 OUT21 colour                          yes                      
+ok   U3 OUT22                                 WISP1                    
+ok   U3 OUT22 colour                          yes                      
+ok   U3 OUT23                                 WISP2                    
+ok   U3 OUT23 colour                          yes                      
+ok   U3 OUT24                                 WISP3                    
+ok   U3 OUT24 colour                          yes                      
+ok   U3 OUT25                                 WISP4                    
+ok   U3 OUT25 colour                          yes                      
+ok   U3 OUT26                                 WISP5                    
+ok   U3 OUT26 colour                          yes                      
+ok   U3 OUT27                                 STARX0                   
+ok   U3 OUT27 colour                          yes                      
+ok   U3 OUT28                                 STARX1                   
+ok   U3 OUT28 colour                          yes                      
+ok   U3 OUT29                                 STARX2                   
+ok   U3 OUT29 colour                          yes                      
+ok   U3 OUT30                                 STARX3                   
+ok   U3 OUT30 colour                          yes                      
+ok   U101 OUT0                                OWLA_L                   
+ok   U101 OUT0 colour                         yes                      
+ok   U101 OUT1                                OWLA_R                   
+ok   U101 OUT1 colour                         yes                      
+ok   U101 OUT3                                OWLB_L                   
+ok   U101 OUT3 colour                         yes                      
+ok   U101 OUT4                                OWLB_R                   
+ok   U101 OUT4 colour                         yes                      
+ok   U101 OUT6                                OWLC_L                   
+ok   U101 OUT6 colour                         yes                      
+ok   U101 OUT7                                OWLC_R                   
+ok   U101 OUT7 colour                         yes                      
+ok   U101 OUT9                                TSTAR0                   
+ok   U101 OUT9 colour                         yes                      
+ok   U101 OUT10                               TSTAR1                   
+ok   U101 OUT10 colour                        yes                      
+ok   U101 OUT11                               TSTAR2                   
+ok   U101 OUT11 colour                        yes                      
+ok   U101 OUT12                               TSTAR3                   
+ok   U101 OUT12 colour                        yes                      
+ok   U101 OUT13                               TSTAR4                   
+ok   U101 OUT13 colour                        yes                      
+ok   U101 OUT14                               TSTAR5                   
+ok   U101 OUT14 colour                        yes                      
+ok   U101 OUT18                               TWISP0                   
+ok   U101 OUT18 colour                        yes                      
+ok   U101 OUT19                               TWISP1                   
+ok   U101 OUT19 colour                        yes                      
+ok   U101 OUT20                               TWISP2                   
+ok   U101 OUT20 colour                        yes                      
+ok   U101 OUT21                               TWISP3                   
+ok   U101 OUT21 colour                        yes                      
+ok   U101 OUT33                               DOWN0                    
+ok   U101 OUT34                               DOWN1                    
+ok   U3 I2C address                           0x30                     
+ok   U101 I2C address                         0x32                     

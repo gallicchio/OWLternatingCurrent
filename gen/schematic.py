@@ -20,12 +20,18 @@ from parts import LIB
 import board_info as BI
 import sch_util as U
 import sch_base
+import sch_boards
 
 HW = os.path.join(ROOT, "hardware")
 
 # (sheet name, file, paper, module, what it is)
 SHEETS = [
-    ("Base", "base.kicad_sch", "A1", sch_base, "the base board: power, RP2354A, LEDs, sensors, coil drivers, theremin, audio"),
+    ("Base", "base.kicad_sch", "A1", sch_base.build, "the base board: power, RP2354A, LEDs, sensors, coil drivers, theremin, audio"),
+    ("Tree", "tree.kicad_sch", "A3", sch_boards.build_tree, "the tree: its LED driver, owls' eyes, stars; the coil's and the Hall sensor's lines"),
+    ("Perch", "perch.kicad_sch", "A4", sch_boards.build_perch, "the perch: the levitation coil, the Hall sensor, two downlights"),
+    ("Bat", "bat.kicad_sch", "A4", sch_boards.build_bat, "the bat: a coil, a capacitor, two eyes"),
+    ("Owl token", "owl_token.kicad_sch", "A4", sch_boards.build_owl, "the owl familiar: a tank at 148 kHz"),
+    ("Cat token", "cat_token.kicad_sch", "A4", sch_boards.build_cat, "the cat familiar: a tank at 316 kHz"),
 ]
 
 
@@ -41,14 +47,14 @@ def draw():
                                BI.LICENCE])
     root.text(17.78, 21.59, "%s: %s" % (BI.TITLE, BI.TAGLINE), size=3.0, bold=True)
     sheets = []
-    for i, (name, fn, paper, mod, what) in enumerate(SHEETS):
-        x, y = 30.48 + 60.96 * i, 50.8
+    for i, (name, fn, paper, build, what) in enumerate(SHEETS):
+        x, y = 30.48 + 63.5 * (i % 3), 50.8 + 50.8 * (i // 3)
         u, _ = root.sheet(x, y, 50.8, 25.4, name, fn, i + 2)
-        root.text(x, y + 33.02, what, size=1.27)
+        root.note(x, y + 30.48, what, cols=30)
         s = kisch.Sch(BI.NAME, fn, paper=paper, title="%s: %s" % (BI.TITLE, name.lower()), rev=BI.REV, date=BI.DATE,
-                      company=company(), comments=["Made by gen/%s.py" % mod.__name__, BI.LICENCE],
+                      company=company(), comments=["Made by gen/%s.py" % build.__module__, BI.LICENCE],
                       root=root.uuid, sheet_box_uuid=u)
-        mod.build(s)
+        build(s)
         sheets.append(s)
     return root, sheets
 

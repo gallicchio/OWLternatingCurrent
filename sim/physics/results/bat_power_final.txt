@@ -1,0 +1,9 @@
+perch L1 30.3 uH R1 2.92 ohm; bat coil L2 35.6 uH R2 7.5 ohm Q2 2.5; C2 100.0 nF; M 6.19 uH k 0.189 at 10.5 mm
+carrier 0.2 A: eyes   0.0 mA mean each (tank 1.6 V peak)
+carrier 0.3 A: eyes   1.5 mA mean each (tank 2.3 V peak)
+carrier 0.4 A: eyes   4.3 mA mean each (tank 2.9 V peak)
+carrier 0.5 A: eyes   7.4 mA mean each (tank 3.5 V peak)
+a 12 V bipolar square at 84 kHz gives 1.18 A pp, fundamental 0.48 A amplitude
+eddy loss in the bat's magnet at 0.3 A carrier: 3.1 mW (B 0.25 mT at the magnet)
+eddy loss in the bat's magnet at 0.5 A carrier: 8.6 mW (B 0.42 mT at the magnet)
+exit 0

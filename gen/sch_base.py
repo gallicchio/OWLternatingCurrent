@@ -23,26 +23,14 @@ ROOT = os.path.dirname(HERE)
 sys.path.insert(0, os.path.join(ROOT, "tools"))
 sys.path.insert(0, HERE)
 import sch_util as U
-from sch_util import G, part, hpart, vpart, gnd, flag, W, J, pwr_flag, label, note, title, box
+from sch_util import (G, part, hpart, vpart, gnd, flag, W, J, pwr_flag, label, note, title, box, nref, down,
+                      up, series, tp, line, vline, diode)
 import symbols as SYMB
 import pins as PINS
 import leds as LEDS
 
 UX, UY = 419.1, 266.7                  # the RP2354A's centre
 U4 = None
-_n = {}
-
-
-def nref(prefix):
-    """The next free reference of a kind (R, C, D, TP), in the order the sheet is drawn."""
-    _n[prefix] = _n.get(prefix, 0) + 1
-    while "%s%d" % (prefix, _n[prefix]) in U.REFS:
-        _n[prefix] += 1
-    return "%s%d" % (prefix, _n[prefix])
-
-
-def kind(key):
-    return "C" if key.startswith("C") else "L" if key.startswith("L") else "R"
 
 
 def pin(num):
@@ -56,61 +44,6 @@ def gpin(net):
 def gp(net):
     """Where the RP2354A's pin carrying `net` ends."""
     return pin(gpin(net))
-
-
-def down(key, x, y, net="GND", text="right", ref=None, drop=G, fsize=1.0):
-    """A two-pin part hanging from the node (x, y): a short drop, the part, then ground
-    (or `net`'s flag, or nothing when net is None).  Returns (reference, bottom pin)."""
-    ref = ref or nref(kind(key))
-    t, b = vpart(key, ref, x, y + drop + 3.81, fsize=fsize, text=text)
-    W((x, y), t)
-    if net:
-        gnd(*b, net=net)
-    return ref, b
-
-
-def up(key, x, y, rail, text="right", ref=None, rise=G, fsize=1.0):
-    """A two-pin part standing on the node (x, y), `rail`'s flag on top (a pull-up)."""
-    ref = ref or nref(kind(key))
-    t, b = vpart(key, ref, x, y - rise - 3.81, fsize=fsize, text=text)
-    W(b, (x, y))
-    flag(rail, *t)
-    return ref, t
-
-
-def series(key, xc, y, ref=None, above=True, fsize=1.0):
-    """A two-pin part lying on a horizontal line, its name and value stacked above it
-    (or below); returns (left, right)."""
-    ref = ref or nref(kind(key))
-    if above:
-        return hpart(key, ref, xc, y, ref_at=(xc, y - 4.3), val_at=(xc, y - 3.9), fsize=fsize, justify="center")
-    return hpart(key, ref, xc, y, ref_at=(xc, y + 3.9), val_at=(xc, y + 4.3), fsize=fsize, justify="center")
-
-
-def tp(x, y, value, ref=None):
-    """A test pad at (x, y), labelled with what it reads."""
-    ref = ref or nref("TP")
-    part("TP", ref, x, y, value=value, ref_at=(x + 1.5, y - 3.6), val_at=(x + 1.5, y - 1.9), fsize=1.0)
-    return ref
-
-
-def line(y, xs):
-    """A horizontal wire through the points xs on row y (pins, taps)."""
-    xs = sorted(set(round(x, 3) for x in xs))
-    for a, b in zip(xs, xs[1:]):
-        W((a, y), (b, y))
-
-
-def vline(x, ys):
-    ys = sorted(set(round(y, 3) for y in ys))
-    for a, b in zip(ys, ys[1:]):
-        W((x, a), (x, b))
-
-
-def diode(key, ref, xc, y):
-    """A diode lying on a horizontal line, anode on the left; returns (anode, cathode)."""
-    d = part(key, ref, xc, y, rot=180, ref_at=(xc, y - 3.0), val_at=(xc, y + 3.3), fsize=1.0)
-    return d.pin("2"), d.pin("1")
 
 
 # ======================================================================================
@@ -984,11 +917,35 @@ def bridge(u, yu, k, u11):
     W((g[0], yn), l)
     J(g[0], yn)
     down("C100N", xc, yn)
+    # x 20.6 (U18, OPA2333, zero drift): 0.5 R x 20.6 = 10.3 V per amp, 80 uA a count, so
+    # the firmware's low-duty sweep sees a token's 0.2-0.5 mA
+    xa = xc + 20.32
+    amp = part("OPA2333", "U18", xa, yn + G, unit=k, ref_at=(xa - 14.5, yn - 4.8), val_at=(xa - 14.5, yn - 4.4))
+    pp, pn, po = amp.pin("3" if k == 1 else "5"), amp.pin("2" if k == 1 else "6"), amp.pin("1" if k == 1 else "7")
+    W(r, (xc, yn), pp)
+    xo, yf, xn = po[0] + G, pn[1] + 5.08, pn[0] - G
+    l2, r2 = series("R100K", (xn + xo) / 2, yf, above=False)
+    W(po, (xo, po[1]), (xo, yf), r2)
+    W(l2, (xn, yf), (xn, pn[1]), pn)
+    J(xo, po[1])
+    down("R5K1", xn, yf, text="left")
+    J(xn, yf)
     x = X_ISENSE[k]
-    W(r, (xc, yn), (x, yn))
+    W((xo, po[1]), (x, po[1]))
     q = u11.pin("12" if k == 2 else "1")
-    W((x, yn), (x, q[1]), q)
-    label(xc + 3.0, yn, "FAM%d_ISENSE" % k)
+    W((x, po[1]), (x, q[1]), q)
+    label(xo + 3.0, po[1], "FAM%d_ISENSE" % k)
+    label(xc + 1.5, yn, "FAM%d_IAVG" % k, size=0.9)
+    if k == 1:
+        xp, yp = xa + 33.02, yn + 25.4
+        pw = part("OPA2333", "U18", xp, yp, unit=3, ref_at=(xp + 1.0, yp - 1.0), val_at=(xp + 1.0, yp + 1.0))
+        vp, vn = pw.pin("8"), pw.pin("4")
+        W(vp, (vp[0], vp[1] - G))
+        flag("+3V3", vp[0], vp[1] - G)
+        W((vp[0], vp[1] - G), (vp[0] - 7.62, vp[1] - G))
+        J(vp[0], vp[1] - G)
+        down("C100N", vp[0] - 7.62, vp[1] - G, text="left")
+        gnd(*vn)
 
 
 # ======================================================================================
@@ -1032,7 +989,7 @@ def S():
 
 
 def build(sch):
-    U.begin(sch)
+    U.begin(sch, ref_base=0)
     sch.text(17.78, 20.32, "OWLternating Current: the base board", size=3.5, bold=True)
     xt = power_in()
     xb = buck(xt + 7.62)

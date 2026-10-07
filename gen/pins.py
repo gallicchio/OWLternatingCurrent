@@ -57,8 +57,8 @@ MUX = {
     0: ("PEND3_IPROPI", "pendulum coil 3 current"),
     1: ("PEND2_IPROPI", "pendulum coil 2 current"),
     2: ("PEND1_IPROPI", "pendulum coil 1 current"),
-    3: ("FAM2_ISENSE", "cat perch bridge's supply current (filtered): rises when the cat sits on it"),
-    4: ("FAM1_ISENSE", "owl perch bridge's supply current (filtered): rises when the owl sits on it"),
+    3: ("FAM2_ISENSE", "cat perch bridge's supply current, 1 ms average, x20.6 on 0.5 R: 10.3 V/A; rises when the cat sits on it"),
+    4: ("FAM1_ISENSE", "owl perch bridge's supply current, 1 ms average, x20.6 on 0.5 R: 10.3 V/A; rises when the owl sits on it"),
     5: ("V12_SENSE", "+12V through 100 k / 22 k (12 V reads 2.16 V)"),
     6: ("V5_SENSE", "+5V through 10 k / 10 k (5 V reads 2.5 V)"),
     7: ("VBUS_SENSE", "USB VBUS through 10 k / 10 k: plugged into USB?"),
@@ -67,7 +67,7 @@ MUX = {
 # I2C0 addresses (7-bit)
 I2C = {
     "LP5036_BASE": 0x30,     # ADDR0 = ADDR1 = GND
-    "LP5036_TREE": 0x31,     # ADDR0 = VCC, ADDR1 = GND (on the tree board)
+    "LP5036_TREE": 0x32,     # ADDR1 = VCC, ADDR0 = GND (on the tree board)
     "LSM6DS3TR_C": 0x6A,     # SA0 = GND
     "LTR_303ALS": 0x29,      # fixed
     "TMAG5273A2": 0x35,      # factory address of the A2 (the B2 is 0x22): datasheet table 6-2

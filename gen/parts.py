@@ -63,6 +63,9 @@ PARTS = {
                   ["TMAG5273A2"], "3-axis Hall sensor under the pendulum's swing: where is the bat?"),
     "DRV5055": P("DRV5055", "SOT-23", "stock:Package_TO_SOT_SMD", "C266123", "DRV5055A4QDBZR", "DRV5055A4",
                  ["DRV5055A4"], "linear Hall sensor at the levitation coil's centre, +-169 mT range"),
+    "OPA2333": P("OPA2333", "SOIC-8_3.9x4.9mm_P1.27mm", "stock:Package_SO", "C38732", "OPA2333AIDR", "OPA2333",
+                 ["OPA2333"], "zero-drift dual op-amp: x20.6 on the perch bridges' 0.5 R shunts (10 uV offset: "
+                 "no dead zone at the firmware's low-duty sweep)"),
     "HC4051": P("74HC4051", "TSSOP-16_4.4x5mm_P0.65mm", "stock:Package_SO", "C5645", "74HC4051PW,118", "74HC4051",
                 ["74HC4051"], "8:1 analog mux: the slow currents and rails into one ADC pin"),
     "LVC1G14": P("74LVC1G14", "SOT-23-5", "stock:Package_TO_SOT_SMD", "C7835", "SN74LVC1G14DBVR", "74LVC1G14",

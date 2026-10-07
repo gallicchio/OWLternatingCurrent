@@ -48,7 +48,7 @@ STOCK_SYMBOLS = {
     "Conn_01x03": "Connector_Generic:Conn_01x03",
     "TestPoint": "Connector:TestPoint", "MountingHole": "Mechanical:MountingHole", "PWR_FLAG": "power:PWR_FLAG",
     "XC6206P332MR": "Regulator_Linear:XC6206PxxxMR", "TPS54302": "Regulator_Switching:TPS54302",
-    "74HC4051": "74xx:74HC4051", "74LVC1G14": "74xGxx:74LVC1G14", "LP5036": "Driver_LED:LP5036",
+    "OPA2333": "Amplifier_Operational:OPA2333xxD", "74HC4051": "74xx:74HC4051", "74LVC1G14": "74xGxx:74LVC1G14", "LP5036": "Driver_LED:LP5036",
     "LTR-303ALS-01": "Sensor_Optical:LTR-303ALS-01",
     "DRV5055": "Sensor_Magnetic:DRV5055A1xDBZxQ1",
 }

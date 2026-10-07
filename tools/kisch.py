@@ -600,10 +600,14 @@ class Sch:
         vx = x
         if rot == 180:
             vy = y - 4.2 if down else y + 3.9
-        elif rot in (90, 270):
-            # glyph to the right (90) or left (270) of the pin; name beyond it
+        vjust = None
+        if rot in (90, 270):
+            # glyph to the right (90) or left (270) of the pin; the name starts just beyond
+            # it, justified away from the pin.  KiCad mirrors the justification of a field
+            # whose angle and the symbol's add to 180, so both cases write "right".
             vy = y
-            vx = x + (5.5 if rot == 90 else -5.5) * (1 if down else 1)
+            vx = x + (1 if rot == 90 else -1) * (4.6 if down else 3.4)
+            vjust = "right"
         # a field's angle is drawn relative to the symbol's: turn the name back to horizontal
         fang = (-rot) % 360
         if fang >= 180:
@@ -619,11 +623,15 @@ class Sch:
             '\t\t(pin "1" (uuid %s))\n'
             '\t\t(instances (project %s (path %s (reference "#PWR") (unit 1)))))'
             % (q(lib_id), g(x), g(y), rot, q(u), g(x), g(y), _eff(hide=True), q(net), g(vx), g(vy), fang,
-               _eff(1.27, hide=net in HIDDEN_RAIL_NAMES), g(x), g(y), _eff(hide=True), g(x), g(y), _eff(hide=True),
+               _eff(1.27, hide=net in HIDDEN_RAIL_NAMES, justify=vjust), g(x), g(y), _eff(hide=True), g(x), g(y), _eff(hide=True),
                g(x), g(y), _eff(hide=True), q(self._u("pwp", net, x, y)), q(self.project), q(self.inst_path)))
         w = text_w(net)
         if net not in HIDDEN_RAIL_NAMES:
-            self.texts.append((vx - w / 2, vy - 0.9, vx + w / 2, vy + 0.9, net))
+            x0 = vx if rot == 90 else vx - w if rot == 270 else vx - w / 2
+            self.texts.append((x0, vy - 0.9, x0 + w, vy + 0.9, net))
+        elif rot in (90, 270):
+            self.items.append((min(x, x + (2.6 if rot == 90 else -2.6)), y - 1.27,
+                               max(x, x + (2.6 if rot == 90 else -2.6)), y + 1.27, "#gnd"))
         else:
             self.items.append((x - 1.27, y, x + 1.27, y + 2.6, "#gnd"))
         self.pinpts.append((x, y, "#PWR:" + net, "1", True))

@@ -5,7 +5,7 @@
 **Verdict: yes, and the ghost is the one to build.** A cartoon ghost works as a planar
 monopole with no extra parts. It's 17 × 20 mm of top copper on bare 1.6 mm JLCPCB FR4,
 fed from the ground-plane edge through its tail. In simulation it covers 2.400–2.484 GHz
-at **−19.4 dB worst case**, its −10 dB band runs from **2.07 GHz to beyond 3.2 GHz**,
+at **−19.5 dB worst case**, its −10 dB band runs from **2.07 GHz to beyond 3.2 GHz**,
 radiation efficiency is **98 %** and peak gain is **2.5 dBi**. Because it's so broadband,
 ±5 % artwork scaling, FR4 εr 4.2–4.6, a 2 mm PLA lid and a hand nearby leave it inside
 −10 dB with margin (§7).
@@ -20,7 +20,7 @@ NanoVNA session.
 
 |  | **ghost** (recommended) | **bat**, tail-fed, + 2-part pi | bat as a dipole + balun | TI DN007 IFA copied onto this board |
 |---|---|---|---|---|
-| worst \|S11\| in 2.400–2.484 GHz | **−19.4 dB**, no parts | −18.7 dB matched (−6 dB bare) | −17 dB (ideal balun at the body) | −8.6 dB (fails) |
+| worst \|S11\| in 2.400–2.484 GHz | **−19.5 dB**, no parts | −18.7 dB matched (−6 dB bare) | −17 dB (ideal balun at the body) | −8.6 dB (fails) |
 | −10 dB band | 2.07 → >3.2 GHz | 2.24–2.81 GHz (matched) | 2.29–2.80 GHz | 2.19–2.44 GHz |
 | radiation efficiency | 98 % | 98 % | 96 % | 94 % |
 | peak gain at 2.44 GHz | 2.5 dBi | 2.4 dBi | 5.1 dBi | 3.3 dBi |
@@ -172,13 +172,13 @@ currents cancel in the far field and add reactance at the feed.
   tab). Keep components, batteries, screws and cables at least 5 mm further away.
   Stitch the ground pour along the ground edge with vias every ≤ 3 mm.
 
-**Performance** (0.25 mm mesh; the 0.18 mm and 0.35 mm meshes agree within 0.3 dB and
-5 MHz, §7):
+**Performance** (0.25 mm mesh; the 0.18 mm and 0.35 mm meshes agree within 0.1 dB and
+1 MHz, §7):
 
 | | |
 |---|---|
 | \|S11\| minimum | −36.7 dB at 2.348 GHz |
-| worst \|S11\|, 2.400–2.484 GHz | **−19.4 dB** (VSWR 1.24) |
+| worst \|S11\|, 2.400–2.484 GHz | **−19.5 dB** (VSWR 1.24) |
 | −10 dB band | **2.07 GHz → beyond 3.2 GHz** |
 | Zin at 2.44 GHz | 58 − j1 Ω |
 | radiation efficiency (FR4 loss, PEC copper) | 98.2 % |
@@ -202,9 +202,11 @@ because in both cases the board is doing much of the radiating.
 The field map confirms the mechanism. The strongest fields run along the whole ground
 edge on either side of the feed, around the tail and up the flanks: the ground plane is
 half the antenna. The eyes, the bat's head and the wing interiors sit in quiet regions,
-which is why holes and cosmetic detail there are cheap. (The quantity mapped is |H| in the
-copper plane itself, which averages the fields just above and below the sheet. It shows
-where the current crowds, but understates it in the middle of a sheet.)
+which is why holes and cosmetic detail there are cheap. (The quantity mapped is
+tangential |H| in the copper plane. Over the ground block that equals the surface current. Over the thin
+antenna sheet it averages the fields just above and below, so it understates the
+antenna's own current, especially mid-sheet. Read it for *where* the current crowds, not
+for ground-versus-antenna magnitudes.)
 
 ## 6. If it has to be a bat
 
@@ -225,9 +227,10 @@ footprint, gives:
 | radiation efficiency / peak gain | 97.6 % / 2.35 dBi; total efficiency (× mismatch × network loss) 93 % |
 
 The match is reasonably robust. A ±0.1 pF error on the shunt capacitor leaves the band
-at −13.5 dB or better, and the sensitivity cases in §7 are evaluated with the *nominal*
-parts. The cost is that it depends on two components and their pads. Budget one NanoVNA
-session (§8) rather than trusting the simulated values to ±0.1 pF.
+at −13.5 dB or better. Every sensitivity case in §7, evaluated with the *nominal* parts,
+stays at −15.7 dB or better. The cost is that it depends on two components and their
+pads. Budget one NanoVNA session (§8) rather than trusting the simulated values to
+±0.1 pF.
 
 An even broader match exists (a 15 nH shunt inductor with a 1.0 pF series cap is matched
 from 2.19 GHz to beyond 3.2 GHz in the ideal-part calculation). It was rejected: a 15 nH
@@ -261,11 +264,31 @@ tail-fed bat. That only matters if range is marginal.
 
 **Ghost, bare (0.35 mm mesh; the differences are what count):**
 
-⟨GHOST_SENS⟩
+| variant | worst in band (dB) | −10 dB band (GHz) | f(S11 min) shift | η_rad | gain (dBi) |
+|---|---:|---:|---:|---:|---:|
+| nominal | -19.4 | 2.07–>3.2 | +0.0 % | 98.2 % | 2.54 |
+| shape −5 % | -23.2 | 2.12–>3.2 | +2.3 % | 98.2 % | 2.57 |
+| shape +5 % | -16.7 | 2.03–>3.2 | -2.2 % | 98.2 % | 2.51 |
+| FR4 εr 4.2 | -19.6 | 2.07–>3.2 | +0.1 % | 98.3 % | 2.55 |
+| FR4 εr 4.6 | -19.2 | 2.07–>3.2 | -0.1 % | 98.2 % | 2.53 |
+| 2 mm PLA lid on the copper | -16.6 | 2.01–>3.2 | -2.7 % | 97.8 % | 2.49 |
+| tissue block 15 mm over it | -15.1 | 2.13–>3.2 | -0.1 % | 56.2 % | 2.70 |
+| copper loss (35 µm Cu sheet) | -19.4 | 2.07–>3.2 | +0.0 % | 98.2 % | 2.54 |
+| mesh 0.18 mm | -19.5 | 2.07–>3.2 | +0.0 % | 98.2 % | 2.54 |
 
 **Tail-fed bat, through its nominal 0.9 pF + 4.3 nH match (0.5 mm mesh):**
 
-⟨BATPM_SENS⟩
+| variant | worst in band (dB) | −10 dB band (GHz) | f(S11 min) shift | η_rad | gain (dBi) |
+|---|---:|---:|---:|---:|---:|
+| nominal | -18.7 | 2.24–2.80 | +0.0 % | 97.7 % | 2.35 |
+| shape −5 % | -15.7 | 2.27–2.84 | +1.1 % | 97.7 % | 2.39 |
+| shape +5 % | -21.4 | 2.21–2.76 | -1.2 % | 97.6 % | 2.30 |
+| FR4 εr 4.2 | -17.9 | 2.25–2.82 | +0.4 % | 97.7 % | 2.36 |
+| FR4 εr 4.6 | -19.6 | 2.23–2.79 | -0.4 % | 97.6 % | 2.34 |
+| 2 mm PLA lid on the copper | -20.2 | 2.18–2.71 | -3.1 % | 97.0 % | 2.22 |
+| tissue block 15 mm over it | -15.9 | 2.29–2.74 | +0.3 % | 56.9 % | 2.45 |
+| copper loss (35 µm Cu sheet) | -18.8 | 2.24–2.80 | +0.0 % | 97.6 % | 2.35 |
+| mesh 0.35 mm | -18.7 | 2.24–2.81 | +0.0 % | 97.6 % | 2.35 |
 
 What the tables say:
 
@@ -274,18 +297,23 @@ What the tables say:
 * **FR4 εr 4.2 vs 4.6** moves either antenna by less than ±1 %. With no ground under the
   copper, most of the field is in air: the board is a weak load, not the resonator.
   This is the main reason a bare-FR4 tab is a good place for an antenna.
-* **A 2 mm PLA lid lying on the copper** is the biggest disturbance tested: −3 to −4 %
-  in frequency. The ghost absorbs it (−16.6 dB worst in band, minimum 2.7 % lower). The matched bat drops to −14.7 dB,
-  still inside spec. A lid with an air gap of a few millimetres would do much less.
-* **A hand** (a 20 mm tissue slab, εr 40, σ 1.5 S/m, 15 mm over the board) detunes and
-  absorbs. ⟨HAND⟩ That's the WiFi range penalty any handheld device lives with, not a
-  design flaw.
-* **Copper loss** (35 µm Cu instead of PEC) costs under 0.1 percentage point for either finalist (ghost 98.2 → 98.2 %, bat 97.7 → 97.6 %). These are wide planar
+* **A 2 mm PLA lid lying on the copper** is the biggest *detuning* tested: about −3 %
+  in frequency. The ghost absorbs it (−16.6 dB worst in band, minimum 2.7 % lower). The
+  matched bat actually improves (−20.2 dB), because its matched band sits a little high.
+  A lid with an air gap of a few millimetres would do much less.
+* **A hand** (a 20 mm tissue slab, εr 40, σ 1.5 S/m, 15 mm over the board) hardly
+  detunes either antenna. The ghost holds −15.1 dB in band and the matched bat −15.9 dB.
+  But it absorbs about 42 % of the power: radiation efficiency falls from 98 % to 56–57 %
+  (−2.4 dB). That's the range penalty any handheld radio lives with, not a design flaw.
+* **Copper loss** (35 µm Cu instead of PEC) costs under 0.1 percentage point for
+  either finalist (ghost 98.2 → 98.2 %, bat 97.7 → 97.6 %). These are wide planar
   antennas with low current density. FR4's tan δ 0.02 costs about 1–2 % (the NF2FF
   bookkeeping itself reads about 1 % low, §3a), and that loss is already in every
   efficiency figure.
-* **Mesh.** The ghost at 0.5 / 0.35 / 0.25 / 0.18 mm reads −19.1 / −19.4 / −19.4 /
-  ⟨G018⟩ dB worst-in-band. Broadband antennas converge fast; the validation dipole's
+* **Mesh.** The ghost at 0.5 / 0.35 / 0.25 / 0.18 mm reads −19.1 / −19.4 / −19.5 /
+  −19.5 dB worst-in-band, with its minimum at 2.342 / 2.348 / 2.348 / 2.349 GHz. The
+  bat's bare impedance at 0.5 / 0.35 / 0.25 mm is 95.6 / 96.2 / 94.9 + j65.7 / 66.8 /
+  64.8 Ω. Broadband antennas converge fast; the validation dipole's
   0.7 % low bias at 0.25 mm is the honest error bar on any frequency quoted here.
 
 ## 8. The pi network and the bench tuning plan
@@ -381,6 +409,8 @@ em-env python make_figs.py                       # all figures
 printf "C_ghost\nC_bat_pm\n" | em-env python analyze.py   # tables
 ```
 
-Compute used: about ⟨COMPUTE⟩ of solver time on the 16-core Ryzen 7950X. The aggregate is
-memory-bandwidth bound at roughly 140 MC/s however it's split, so wall time ≈ total
-cell-updates / 1.4 × 10⁸.
+Compute used: 58 solved cases, about 7 job-hours of solver time run 4–12 at a time, so
+roughly 2 hours of wall-clock on the 16-core Ryzen 7950X. The machine is
+memory-bandwidth bound at about 140 MC/s however the work is split, so wall time ≈ total
+cell-updates / 1.4 × 10⁸. A 0.5 mm scan case takes 2–8 minutes; a 0.25 mm production
+case takes 15–20.

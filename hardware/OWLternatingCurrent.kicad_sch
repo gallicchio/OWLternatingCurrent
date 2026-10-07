@@ -46,7 +46,7 @@
 		)
 		(uuid "1c2480d2-0d1e-76db-9b3c-5e487f3b6fbc")
 	)
-	(text_box "the owl familiar: a tank at\n148 kHz"
+	(text_box "the owl familiar: a tank at\n142 kHz"
 		(exclude_from_sim no)
 		(at 93.98 132.08 0)
 		(size 30.48 7.62)
@@ -88,7 +88,7 @@
 		)
 		(uuid "c2f2d788-6ae5-f4fc-cc04-7f02ed4b1b85")
 	)
-	(text_box "the cat familiar: a tank at\n316 kHz"
+	(text_box "the cat familiar: a tank at\n303 kHz"
 		(exclude_from_sim no)
 		(at 157.48 132.08 0)
 		(size 30.48 7.62)

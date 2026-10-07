@@ -2,7 +2,7 @@
 	(version "E")
 	(design
 		(source "../OWLternatingCurrent.kicad_sch")
-		(date "2026-10-07T14:50:04")
+		(date "2026-10-07T15:28:05")
 		(tool "Eeschema 10.0.6")
 		(textvar
 			(name "DATE") "2026-10-07")
@@ -6495,15 +6495,6 @@
 					(name "A")
 					(pins
 						(pin
-							(num "1")
-						)
-						(pin
-							(num "2")
-						)
-						(pin
-							(num "3")
-						)
-						(pin
 							(num "4")
 						)
 						(pin
@@ -6511,6 +6502,15 @@
 						)
 						(pin
 							(num "6")
+						)
+						(pin
+							(num "1")
+						)
+						(pin
+							(num "2")
+						)
+						(pin
+							(num "3")
 						)
 					)
 				)
@@ -6565,15 +6565,6 @@
 					(name "A")
 					(pins
 						(pin
-							(num "1")
-						)
-						(pin
-							(num "2")
-						)
-						(pin
-							(num "3")
-						)
-						(pin
 							(num "4")
 						)
 						(pin
@@ -6581,6 +6572,15 @@
 						)
 						(pin
 							(num "6")
+						)
+						(pin
+							(num "1")
+						)
+						(pin
+							(num "2")
+						)
+						(pin
+							(num "3")
 						)
 					)
 				)
@@ -6635,15 +6635,6 @@
 					(name "A")
 					(pins
 						(pin
-							(num "1")
-						)
-						(pin
-							(num "2")
-						)
-						(pin
-							(num "3")
-						)
-						(pin
 							(num "4")
 						)
 						(pin
@@ -6651,6 +6642,15 @@
 						)
 						(pin
 							(num "6")
+						)
+						(pin
+							(num "1")
+						)
+						(pin
+							(num "2")
+						)
+						(pin
+							(num "3")
 						)
 					)
 				)
@@ -8516,13 +8516,13 @@
 		)
 		(comp
 			(ref "L3")
-			(value "31uH coil")
-			(footprint "OWL:NetTie-2_SMD_Pad2.0mm")
+			(value "33uH coil")
+			(footprint "OWL:Coil_PEND")
 			(fields
 				(field
 					(name "MPN") "PCB coil")
 				(field
-					(name "Footprint") "OWL:NetTie-2_SMD_Pad2.0mm")
+					(name "Footprint") "OWL:Coil_PEND")
 				(field
 					(name "Datasheet")
 				)
@@ -8546,6 +8546,9 @@
 			(property
 				(name "Sheetfile")
 				(value "base.kicad_sch")
+			)
+			(property
+				(name "exclude_from_bom")
 			)
 			(sheetpath
 				(names "/Base/")
@@ -8568,13 +8571,13 @@
 		)
 		(comp
 			(ref "L4")
-			(value "31uH coil")
-			(footprint "OWL:NetTie-2_SMD_Pad2.0mm")
+			(value "33uH coil")
+			(footprint "OWL:Coil_PEND")
 			(fields
 				(field
 					(name "MPN") "PCB coil")
 				(field
-					(name "Footprint") "OWL:NetTie-2_SMD_Pad2.0mm")
+					(name "Footprint") "OWL:Coil_PEND")
 				(field
 					(name "Datasheet")
 				)
@@ -8598,6 +8601,9 @@
 			(property
 				(name "Sheetfile")
 				(value "base.kicad_sch")
+			)
+			(property
+				(name "exclude_from_bom")
 			)
 			(sheetpath
 				(names "/Base/")
@@ -8620,13 +8626,13 @@
 		)
 		(comp
 			(ref "L5")
-			(value "31uH coil")
-			(footprint "OWL:NetTie-2_SMD_Pad2.0mm")
+			(value "33uH coil")
+			(footprint "OWL:Coil_PEND")
 			(fields
 				(field
 					(name "MPN") "PCB coil")
 				(field
-					(name "Footprint") "OWL:NetTie-2_SMD_Pad2.0mm")
+					(name "Footprint") "OWL:Coil_PEND")
 				(field
 					(name "Datasheet")
 				)
@@ -8650,6 +8656,9 @@
 			(property
 				(name "Sheetfile")
 				(value "base.kicad_sch")
+			)
+			(property
+				(name "exclude_from_bom")
 			)
 			(sheetpath
 				(names "/Base/")
@@ -8672,13 +8681,13 @@
 		)
 		(comp
 			(ref "L6")
-			(value "28uH coil")
-			(footprint "OWL:NetTie-2_SMD_Pad2.0mm")
+			(value "30uH coil")
+			(footprint "OWL:Coil_PERCH")
 			(fields
 				(field
 					(name "MPN") "PCB coil")
 				(field
-					(name "Footprint") "OWL:NetTie-2_SMD_Pad2.0mm")
+					(name "Footprint") "OWL:Coil_PERCH")
 				(field
 					(name "Datasheet")
 				)
@@ -8702,6 +8711,9 @@
 			(property
 				(name "Sheetfile")
 				(value "base.kicad_sch")
+			)
+			(property
+				(name "exclude_from_bom")
 			)
 			(sheetpath
 				(names "/Base/")
@@ -8724,13 +8736,13 @@
 		)
 		(comp
 			(ref "L7")
-			(value "28uH coil")
-			(footprint "OWL:NetTie-2_SMD_Pad2.0mm")
+			(value "30uH coil")
+			(footprint "OWL:Coil_PERCH")
 			(fields
 				(field
 					(name "MPN") "PCB coil")
 				(field
-					(name "Footprint") "OWL:NetTie-2_SMD_Pad2.0mm")
+					(name "Footprint") "OWL:Coil_PERCH")
 				(field
 					(name "Datasheet")
 				)
@@ -8754,6 +8766,9 @@
 			(property
 				(name "Sheetfile")
 				(value "base.kicad_sch")
+			)
+			(property
+				(name "exclude_from_bom")
 			)
 			(sheetpath
 				(names "/Base/")
@@ -17171,13 +17186,13 @@
 		)
 		(comp
 			(ref "L201")
-			(value "29uH coil")
-			(footprint "OWL:NetTie-2_SMD_Pad2.0mm")
+			(value "30uH coil")
+			(footprint "OWL:Coil_LEV")
 			(fields
 				(field
 					(name "MPN") "PCB coil")
 				(field
-					(name "Footprint") "OWL:NetTie-2_SMD_Pad2.0mm")
+					(name "Footprint") "OWL:Coil_LEV")
 				(field
 					(name "Datasheet")
 				)
@@ -17201,6 +17216,9 @@
 			(property
 				(name "Sheetfile")
 				(value "perch.kicad_sch")
+			)
+			(property
+				(name "exclude_from_bom")
 			)
 			(sheetpath
 				(names "/Perch/")
@@ -17556,13 +17574,13 @@
 		)
 		(comp
 			(ref "L301")
-			(value "36uH coil")
-			(footprint "OWL:NetTie-2_SMD_Pad0.5mm")
+			(value "37uH coil")
+			(footprint "OWL:Coil_BAT")
 			(fields
 				(field
 					(name "MPN") "PCB coil")
 				(field
-					(name "Footprint") "OWL:NetTie-2_SMD_Pad0.5mm")
+					(name "Footprint") "OWL:Coil_BAT")
 				(field
 					(name "Datasheet")
 				)
@@ -17586,6 +17604,9 @@
 			(property
 				(name "Sheetfile")
 				(value "bat.kicad_sch")
+			)
+			(property
+				(name "exclude_from_bom")
 			)
 			(sheetpath
 				(names "/Bat/")
@@ -17938,13 +17959,13 @@
 		)
 		(comp
 			(ref "L401")
-			(value "11.5uH coil")
-			(footprint "OWL:NetTie-2_SMD_Pad0.5mm")
+			(value "12.5uH coil")
+			(footprint "OWL:Coil_TOKEN")
 			(fields
 				(field
 					(name "MPN") "PCB coil")
 				(field
-					(name "Footprint") "OWL:NetTie-2_SMD_Pad0.5mm")
+					(name "Footprint") "OWL:Coil_TOKEN")
 				(field
 					(name "Datasheet")
 				)
@@ -17968,6 +17989,9 @@
 			(property
 				(name "Sheetfile")
 				(value "owl_token.kicad_sch")
+			)
+			(property
+				(name "exclude_from_bom")
 			)
 			(sheetpath
 				(names "/Owl token/")
@@ -18320,13 +18344,13 @@
 		)
 		(comp
 			(ref "L501")
-			(value "11.5uH coil")
-			(footprint "OWL:NetTie-2_SMD_Pad0.5mm")
+			(value "12.5uH coil")
+			(footprint "OWL:Coil_TOKEN")
 			(fields
 				(field
 					(name "MPN") "PCB coil")
 				(field
-					(name "Footprint") "OWL:NetTie-2_SMD_Pad0.5mm")
+					(name "Footprint") "OWL:Coil_TOKEN")
 				(field
 					(name "Datasheet")
 				)
@@ -18350,6 +18374,9 @@
 			(property
 				(name "Sheetfile")
 				(value "cat_token.kicad_sch")
+			)
+			(property
+				(name "exclude_from_bom")
 			)
 			(sheetpath
 				(names "/Cat token/")
@@ -19376,32 +19403,32 @@
 			(pins
 				(pin
 					(num "1")
-					(name "K")
+					(name "A")
 					(type "passive")
 				)
 				(pin
 					(num "2")
-					(name "K")
+					(name "A")
 					(type "passive")
 				)
 				(pin
 					(num "3")
-					(name "K")
+					(name "A")
 					(type "passive")
 				)
 				(pin
 					(num "4")
-					(name "A")
+					(name "K")
 					(type "passive")
 				)
 				(pin
 					(num "5")
-					(name "A")
+					(name "K")
 					(type "passive")
 				)
 				(pin
 					(num "6")
-					(name "A")
+					(name "K")
 					(type "passive")
 				)
 			)
@@ -21411,56 +21438,56 @@
 			)
 			(node
 				(ref "D17")
-				(pin "4")
-				(pinfunction "A_4")
+				(pin "1")
+				(pinfunction "A_1")
 				(pintype "passive")
 			)
 			(node
 				(ref "D17")
-				(pin "5")
-				(pinfunction "A_5")
+				(pin "2")
+				(pinfunction "A_2")
 				(pintype "passive")
 			)
 			(node
 				(ref "D17")
-				(pin "6")
-				(pinfunction "A_6")
+				(pin "3")
+				(pinfunction "A_3")
 				(pintype "passive")
 			)
 			(node
 				(ref "D18")
-				(pin "4")
-				(pinfunction "A_4")
+				(pin "1")
+				(pinfunction "A_1")
 				(pintype "passive")
 			)
 			(node
 				(ref "D18")
-				(pin "5")
-				(pinfunction "A_5")
+				(pin "2")
+				(pinfunction "A_2")
 				(pintype "passive")
 			)
 			(node
 				(ref "D18")
-				(pin "6")
-				(pinfunction "A_6")
+				(pin "3")
+				(pinfunction "A_3")
 				(pintype "passive")
 			)
 			(node
 				(ref "D19")
-				(pin "4")
-				(pinfunction "A_4")
+				(pin "1")
+				(pinfunction "A_1")
 				(pintype "passive")
 			)
 			(node
 				(ref "D19")
-				(pin "5")
-				(pinfunction "A_5")
+				(pin "2")
+				(pinfunction "A_2")
 				(pintype "passive")
 			)
 			(node
 				(ref "D19")
-				(pin "6")
-				(pinfunction "A_6")
+				(pin "3")
+				(pinfunction "A_3")
 				(pintype "passive")
 			)
 			(node
@@ -22987,20 +23014,20 @@
 			(class "Default")
 			(node
 				(ref "D17")
-				(pin "1")
-				(pinfunction "K_1")
+				(pin "4")
+				(pinfunction "K_4")
 				(pintype "passive")
 			)
 			(node
 				(ref "D17")
-				(pin "2")
-				(pinfunction "K_2")
+				(pin "5")
+				(pinfunction "K_5")
 				(pintype "passive")
 			)
 			(node
 				(ref "D17")
-				(pin "3")
-				(pinfunction "K_3")
+				(pin "6")
+				(pinfunction "K_6")
 				(pintype "passive")
 			)
 			(node
@@ -23016,20 +23043,20 @@
 			(class "Default")
 			(node
 				(ref "D18")
-				(pin "1")
-				(pinfunction "K_1")
+				(pin "4")
+				(pinfunction "K_4")
 				(pintype "passive")
 			)
 			(node
 				(ref "D18")
-				(pin "2")
-				(pinfunction "K_2")
+				(pin "5")
+				(pinfunction "K_5")
 				(pintype "passive")
 			)
 			(node
 				(ref "D18")
-				(pin "3")
-				(pinfunction "K_3")
+				(pin "6")
+				(pinfunction "K_6")
 				(pintype "passive")
 			)
 			(node
@@ -23045,20 +23072,20 @@
 			(class "Default")
 			(node
 				(ref "D19")
-				(pin "1")
-				(pinfunction "K_1")
+				(pin "4")
+				(pinfunction "K_4")
 				(pintype "passive")
 			)
 			(node
 				(ref "D19")
-				(pin "2")
-				(pinfunction "K_2")
+				(pin "5")
+				(pinfunction "K_5")
 				(pintype "passive")
 			)
 			(node
 				(ref "D19")
-				(pin "3")
-				(pinfunction "K_3")
+				(pin "6")
+				(pinfunction "K_6")
 				(pintype "passive")
 			)
 			(node

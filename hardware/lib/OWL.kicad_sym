@@ -7610,62 +7610,6 @@
 						)
 					)
 				)
-				(number "4"
-					(effects
-						(font
-							(size 1.02 1.02)
-						)
-					)
-				)
-			)
-			(pin passive line
-				(at 5.08 0.00 180)
-				(length 2.54)
-				(hide yes)
-				(name "A"
-					(effects
-						(font
-							(size 1.02 1.02)
-						)
-					)
-				)
-				(number "5"
-					(effects
-						(font
-							(size 1.02 1.02)
-						)
-					)
-				)
-			)
-			(pin passive line
-				(at 5.08 0.00 180)
-				(length 2.54)
-				(hide yes)
-				(name "A"
-					(effects
-						(font
-							(size 1.02 1.02)
-						)
-					)
-				)
-				(number "6"
-					(effects
-						(font
-							(size 1.02 1.02)
-						)
-					)
-				)
-			)
-			(pin passive line
-				(at -5.08 0.00 0)
-				(length 2.54)
-				(name "K"
-					(effects
-						(font
-							(size 1.02 1.02)
-						)
-					)
-				)
 				(number "1"
 					(effects
 						(font
@@ -7675,10 +7619,10 @@
 				)
 			)
 			(pin passive line
-				(at -5.08 0.00 0)
+				(at 5.08 0.00 180)
 				(length 2.54)
 				(hide yes)
-				(name "K"
+				(name "A"
 					(effects
 						(font
 							(size 1.02 1.02)
@@ -7694,6 +7638,43 @@
 				)
 			)
 			(pin passive line
+				(at 5.08 0.00 180)
+				(length 2.54)
+				(hide yes)
+				(name "A"
+					(effects
+						(font
+							(size 1.02 1.02)
+						)
+					)
+				)
+				(number "3"
+					(effects
+						(font
+							(size 1.02 1.02)
+						)
+					)
+				)
+			)
+			(pin passive line
+				(at -5.08 0.00 0)
+				(length 2.54)
+				(name "K"
+					(effects
+						(font
+							(size 1.02 1.02)
+						)
+					)
+				)
+				(number "4"
+					(effects
+						(font
+							(size 1.02 1.02)
+						)
+					)
+				)
+			)
+			(pin passive line
 				(at -5.08 0.00 0)
 				(length 2.54)
 				(hide yes)
@@ -7704,7 +7685,26 @@
 						)
 					)
 				)
-				(number "3"
+				(number "5"
+					(effects
+						(font
+							(size 1.02 1.02)
+						)
+					)
+				)
+			)
+			(pin passive line
+				(at -5.08 0.00 0)
+				(length 2.54)
+				(hide yes)
+				(name "K"
+					(effects
+						(font
+							(size 1.02 1.02)
+						)
+					)
+				)
+				(number "6"
 					(effects
 						(font
 							(size 1.02 1.02)

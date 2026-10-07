@@ -174,7 +174,7 @@ def build_perch(sch):
     p = joint_pins(j, CONN.TREE_PERCH)
     # the levitation coil on the even side
     xl = p[8][0] + 22.86
-    L = part("COIL_LEV", "L201", xl, (p[8][1] + p[16][1]) / 2, rot=270, value="29uH coil",
+    L = part("COIL_LEV", "L201", xl, (p[8][1] + p[16][1]) / 2, rot=270,
              ref_at=(xl + 2.5, (p[8][1] + p[16][1]) / 2 - 0.4), val_at=(xl + 2.5, (p[8][1] + p[16][1]) / 2 + 0.4),
              fsize=1.0)
     la, lb = L.pin("1"), L.pin("2")
@@ -237,8 +237,8 @@ def build_perch(sch):
     pwr_flag(t[0] + 5.08, t[1])                  # 4.8 V arrives through J201
     note(17.78, 140.97,
          "The perch lies across the top of the tree (J201, a socket on its underside). "
-         "L201: the levitation coil, 11 turns on each of 4 layers round a 4 mm hole (about "
-         "29 uH, 2 ohm). The printed owl clips over it and holds the bias magnet 14 mm above; "
+         "L201: the levitation coil, about 14 turns on each of 3 layers round an 8 mm hole "
+         "(30 uH, 2.6 ohm; B.Cu stays free for the sensor's lines). The printed owl clips over it and holds the bias magnet 14 mm above; "
          "the bat floats 8.5 mm under it. U201, DRV5055A4 (7.5 mV/mT at 3.3 V, ratiometric), at the "
          "coil's centre on the underside, reads the bat's magnet; 1k and 10n at its output "
          "keep the coil's switching off the long line down the tree. D201 and D202 light "
@@ -256,7 +256,7 @@ def tank(sch, base, title_, coil_key, coil_val, cap_key, leds, text, who):
     sch.text(17.78, 20.32, "OWLternating Current: " + title_, size=3.5, bold=True)
     yt, yb = 76.2, 101.6
     xl, xc = 45.72, 66.04
-    L = part(coil_key, "L%d" % (base + 1), xl, (yt + yb) / 2, rot=270, value=coil_val,
+    L = part(coil_key, "L%d" % (base + 1), xl, (yt + yb) / 2, rot=270,
              ref_at=(xl - 2.5, (yt + yb) / 2 - 0.4), val_at=(xl - 2.5, (yt + yb) / 2 + 0.4), justify="right",
              fsize=1.0)
     W(L.pin("1"), (xl, yt)); W(L.pin("2"), (xl, yb))
@@ -282,11 +282,11 @@ def tank(sch, base, title_, coil_key, coil_val, cap_key, leds, text, who):
 
 
 def build_bat(sch):
-    return tank(sch, 300, "the bat", "COIL_BAT", "36uH coil", "C100N_C0G",
+    return tank(sch, 300, "the bat", "COIL_BAT", None, "C100N_C0G",
                 [("LED_SIDE_ORANGE", "orange", "R33", True), ("LED_SIDE_ORANGE", "orange", "R33", False)],
                 "The bat floats under the perch (or swings on its thread over the pendulum coils). "
-                "L301: 10 turns on each of 4 layers, 0.2 mm track and gap, round the magnet (r 7 to 11 "
-                "mm), 36 uH; with C301 (100 nF C0G) it resonates at 84 kHz, where the levitation "
+                "L301: about 10 turns on each of 4 layers, 0.2 mm track and 0.16 mm gap, round the "
+                "magnet (r 7 to 11 mm), 37 uH; with C301 (100 nF C0G) it resonates at 82 kHz, where the levitation "
                 "bridge adds its carrier. The two eyes (side-view orange LEDs at the head's edge) "
                 "light on alternate half-cycles: about 4 mA each at 0.4 A of carrier, 7 mA at "
                 "0.5 A (sim/physics/bat_power.py). No battery, no wires: the magnet in the printed "
@@ -294,20 +294,20 @@ def build_bat(sch):
 
 
 def build_owl(sch):
-    return tank(sch, 400, "the owl token", "COIL_TOKEN", "11.5uH coil", "C100N_C0G",
+    return tank(sch, 400, "the owl token", "COIL_TOKEN", None, "C100N_C0G",
                 [("LED_ORANGE", "orange", "R150", True), ("LED_PURPLE", "purple", "R150", False)],
-                "The owl familiar: put it on the owl's perch and it lights. L401 (7 turns on each "
-                "of 4 layers, 11.5 uH) with C401 (100 nF C0G) resonates at 148 kHz; the owl perch "
+                "The owl familiar: put it on the owl's perch and it lights. L401 (about 7 turns on "
+                "each of 4 layers, 12.5 uH) with C401 (100 nF C0G) resonates at 142 kHz; the owl perch "
                 "drives there. Orange lights first; purple joins as the drive rises (its blue-violet "
                 "photons carry about 3 eV against orange's 2.0). 150 R in each leg: the 4.8 V bridge cannot "
                 "push either LED past about 20 mA, whatever the firmware does. At the cat's "
-                "frequency (316 kHz) this tank shrinks the voltage and stays dark.", "owl")
+                "frequency (303 kHz) this tank shrinks the voltage and stays dark.", "owl")
 
 
 def build_cat(sch):
-    return tank(sch, 500, "the cat token", "COIL_TOKEN", "11.5uH coil", "C22N_C0G",
+    return tank(sch, 500, "the cat token", "COIL_TOKEN", None, "C22N_C0G",
                 [("LED_ORANGE", "orange", "R150", True), ("LED_PURPLE", "purple", "R150", False)],
                 "The cat familiar: the same coil, tuned higher: C501 (22 nF C0G) with L501 resonates "
-                "at 316 kHz, where the cat's perch drives. Below about 0.2 A of perch current the "
+                "at 303 kHz, where the cat's perch drives. Below about 0.2 A of perch current the "
                 "other familiar stays completely dark, so each perch lights only its own token "
                 "(sim/physics/README.md).", "cat")

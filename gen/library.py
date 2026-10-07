@@ -156,6 +156,25 @@ def _trim_usbc_silk(node):
     node[:] = keep
 
 
+# The MSK12C02's two locating posts: Shou Han's land pattern (KiCad's footprint) puts
+# 0.85 mm holes at (+-1.5, 0); JLCPCB's own drawing of C431540, which their placement
+# follows, puts 0.75 mm posts 0.30 mm further from the pins (mfg/footprint_check.py).  One
+# round hole takes either: 1.3 mm, centred between the two (0.15 mm), each post at most
+# 0.53 mm from its centre, 0.12 mm clear of its edge.
+MSK_HOLE = (1.3, 0.15)
+
+
+def _widen_msk_holes(node):
+    for c in node:
+        if isinstance(c, list) and head(c) == "pad" and val(c, 2) == "np_thru_hole":
+            at = kid(c, "at")
+            at[2] = ("atom", "%g" % MSK_HOLE[1])
+            for k in ("size", "drill"):
+                n = kid(c, k)
+                for i in range(1, len(n)):
+                    n[i] = ("atom", "%g" % MSK_HOLE[0])
+
+
 RPI_DESCR = "From Raspberry Pi's RP2350A Minimal design (MIT licence), so their regulator layout can be copied exactly"
 
 
@@ -195,6 +214,8 @@ def build_footprints(share, models_needed):
             if name.startswith("USB_C_Receptacle_HRO"):
                 _trim_usbc_silk(node)
                 model, lib = "USB_C_Receptacle_HRO_TYPE-C-31-M-12.wrl", None
+            if name == "SW_SPDT_Shouhan_MSK12C02":
+                _widen_msk_holes(node)
             _set_model(node, model)
             if model:
                 models_needed[model] = lib

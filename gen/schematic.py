@@ -30,8 +30,8 @@ SHEETS = [
     ("Tree", "tree.kicad_sch", "A3", sch_boards.build_tree, "the tree: its LED driver, owls' eyes, stars; the coil's and the Hall sensor's lines"),
     ("Perch", "perch.kicad_sch", "A4", sch_boards.build_perch, "the perch: the levitation coil, the Hall sensor, two downlights"),
     ("Bat", "bat.kicad_sch", "A4", sch_boards.build_bat, "the bat: a coil, a capacitor, two eyes"),
-    ("Owl token", "owl_token.kicad_sch", "A4", sch_boards.build_owl, "the owl familiar: a tank at 148 kHz"),
-    ("Cat token", "cat_token.kicad_sch", "A4", sch_boards.build_cat, "the cat familiar: a tank at 316 kHz"),
+    ("Owl token", "owl_token.kicad_sch", "A4", sch_boards.build_owl, "the owl familiar: a tank at 142 kHz"),
+    ("Cat token", "cat_token.kicad_sch", "A4", sch_boards.build_cat, "the cat familiar: a tank at 303 kHz"),
 ]
 
 

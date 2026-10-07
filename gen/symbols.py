@@ -216,10 +216,12 @@ def led_3die():
         out.append(_poly([(x + 0.9, 2.5), (x + 0.4, 2.3), (x + 0.7, 2.0), (x + 0.9, 2.5)], fill="outline"))
     out.append(')')
     out.append('(symbol "%s_1_1"' % name)
-    for k, n in enumerate(("4", "5", "6")):
+    # HL-AF-5060S22OC (datasheet p. 2, "4 -|<- 3", and JLCPCB's drawing, "+" at pins 1-3):
+    # pins 1-3 are the dice's anodes, 4-6 their cathodes
+    for k, n in enumerate(("1", "2", "3")):
         p = _pin(n, "A", 5.08, 0.0, 180, 2.54, PA)
         out.append(p if k == 0 else _hidden(p))
-    for k, n in enumerate(("1", "2", "3")):
+    for k, n in enumerate(("4", "5", "6")):
         p = _pin(n, "K", -5.08, 0.0, 0, 2.54, PA)
         out.append(p if k == 0 else _hidden(p))
     out.append(')')

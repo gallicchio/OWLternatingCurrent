@@ -3699,62 +3699,6 @@
 							)
 						)
 					)
-					(number "4"
-						(effects
-							(font
-								(size 1.02 1.02)
-							)
-						)
-					)
-				)
-				(pin passive line
-					(at 5.08 0.00 180)
-					(length 2.54)
-					(hide yes)
-					(name "A"
-						(effects
-							(font
-								(size 1.02 1.02)
-							)
-						)
-					)
-					(number "5"
-						(effects
-							(font
-								(size 1.02 1.02)
-							)
-						)
-					)
-				)
-				(pin passive line
-					(at 5.08 0.00 180)
-					(length 2.54)
-					(hide yes)
-					(name "A"
-						(effects
-							(font
-								(size 1.02 1.02)
-							)
-						)
-					)
-					(number "6"
-						(effects
-							(font
-								(size 1.02 1.02)
-							)
-						)
-					)
-				)
-				(pin passive line
-					(at -5.08 0.00 0)
-					(length 2.54)
-					(name "K"
-						(effects
-							(font
-								(size 1.02 1.02)
-							)
-						)
-					)
 					(number "1"
 						(effects
 							(font
@@ -3764,10 +3708,10 @@
 					)
 				)
 				(pin passive line
-					(at -5.08 0.00 0)
+					(at 5.08 0.00 180)
 					(length 2.54)
 					(hide yes)
-					(name "K"
+					(name "A"
 						(effects
 							(font
 								(size 1.02 1.02)
@@ -3783,6 +3727,43 @@
 					)
 				)
 				(pin passive line
+					(at 5.08 0.00 180)
+					(length 2.54)
+					(hide yes)
+					(name "A"
+						(effects
+							(font
+								(size 1.02 1.02)
+							)
+						)
+					)
+					(number "3"
+						(effects
+							(font
+								(size 1.02 1.02)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at -5.08 0.00 0)
+					(length 2.54)
+					(name "K"
+						(effects
+							(font
+								(size 1.02 1.02)
+							)
+						)
+					)
+					(number "4"
+						(effects
+							(font
+								(size 1.02 1.02)
+							)
+						)
+					)
+				)
+				(pin passive line
 					(at -5.08 0.00 0)
 					(length 2.54)
 					(hide yes)
@@ -3793,7 +3774,26 @@
 							)
 						)
 					)
-					(number "3"
+					(number "5"
+						(effects
+							(font
+								(size 1.02 1.02)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at -5.08 0.00 0)
+					(length 2.54)
+					(hide yes)
+					(name "K"
+						(effects
+							(font
+								(size 1.02 1.02)
+							)
+						)
+					)
+					(number "6"
 						(effects
 							(font
 								(size 1.02 1.02)
@@ -12991,12 +12991,12 @@
 		(property "Description" "" (at 140.9700 364.4900 0) (effects (font (size 1.00 1.00)) (justify left) (hide yes)))
 		(property "LCSC" "C516304" (at 140.9700 364.4900 0) (effects (font (size 1.00 1.00)) (justify left) (hide yes)))
 		(property "MPN" "HL-AF-5060S22OC-3-S1-THL" (at 140.9700 364.4900 0) (effects (font (size 1.00 1.00)) (justify left) (hide yes)))
-		(pin "4" (uuid "0fc5593f-668e-1b81-5567-e02068d5fa1b"))
-		(pin "5" (uuid "951fb3b4-e928-c767-07fd-0eb61d4a22ff"))
-		(pin "6" (uuid "d32594b2-2764-d968-9fba-8e3722a6031d"))
-		(pin "1" (uuid "b441c9ea-26ee-f340-32ab-49e315283746"))
-		(pin "2" (uuid "d28e220e-dba6-10c5-1789-e7f7c3db7c4f"))
-		(pin "3" (uuid "eb0e5ec9-2111-4afa-32dc-7708fe77af83"))
+		(pin "1" (uuid "92a174ca-e6d8-6439-dedc-209014db4981"))
+		(pin "2" (uuid "159072e0-a7b0-38ac-4656-b4c9195e9a9b"))
+		(pin "3" (uuid "2632aa96-3e4c-ec45-5083-8e4341bdbe5b"))
+		(pin "4" (uuid "c1c18750-8dc8-d7f0-62bc-8bdb028cf73d"))
+		(pin "5" (uuid "81f5ca5f-c2f4-3607-9848-576f1f0b06c4"))
+		(pin "6" (uuid "0b3a179e-3415-56fc-28a9-bcee55c7a81a"))
 		(instances (project "OWLternatingCurrent" (path "/0ee13ddb-1c12-f416-8576-ee8890b4675e/8f976193-3ca0-4b18-df0e-ba7338335e40" (reference "D17") (unit 1)))))
 	(symbol (lib_id "OWL:PWR_+5V") (at 135.8900 364.4900 270) (unit 1) (exclude_from_sim no) (in_bom yes) (on_board yes) (dnp no)
 		(uuid "d3ca5ea3-8a47-a773-e6b7-731564af3f29")
@@ -13017,12 +13017,12 @@
 		(property "Description" "" (at 105.4100 367.0300 0) (effects (font (size 1.00 1.00)) (justify left) (hide yes)))
 		(property "LCSC" "C516304" (at 105.4100 367.0300 0) (effects (font (size 1.00 1.00)) (justify left) (hide yes)))
 		(property "MPN" "HL-AF-5060S22OC-3-S1-THL" (at 105.4100 367.0300 0) (effects (font (size 1.00 1.00)) (justify left) (hide yes)))
-		(pin "4" (uuid "95f35aa9-88e3-a046-cab7-a11f52ac31bb"))
-		(pin "5" (uuid "2689d949-d6d9-8c8d-60fd-8680cb7426fb"))
-		(pin "6" (uuid "9e8b02dd-2cc6-6192-b4f0-50b9b946d5ac"))
-		(pin "1" (uuid "9801720c-3b52-0aab-34a8-5e66969a49f0"))
-		(pin "2" (uuid "63d4686e-3bf3-f4cc-3395-52ffc1a6f03c"))
-		(pin "3" (uuid "19a20bcc-9c36-8d0a-32df-43ab726acbc4"))
+		(pin "1" (uuid "8c0de665-6ae3-5118-822c-d6e5ef936a7f"))
+		(pin "2" (uuid "c68a2cf2-251d-6924-9983-6cbc54781ada"))
+		(pin "3" (uuid "fe189dbd-a979-fa6f-bd7c-fd5e09141834"))
+		(pin "4" (uuid "d1433e9b-f4b7-e1f0-61a3-a4f361883764"))
+		(pin "5" (uuid "260ebc7b-aed0-a867-a37c-ff876f060858"))
+		(pin "6" (uuid "39f29d49-98f4-2e55-ca61-60b7e388b1f8"))
 		(instances (project "OWLternatingCurrent" (path "/0ee13ddb-1c12-f416-8576-ee8890b4675e/8f976193-3ca0-4b18-df0e-ba7338335e40" (reference "D18") (unit 1)))))
 	(symbol (lib_id "OWL:PWR_+5V") (at 100.3300 367.0300 270) (unit 1) (exclude_from_sim no) (in_bom yes) (on_board yes) (dnp no)
 		(uuid "0eb79e45-6912-cddd-995a-fa6305ceb7c5")
@@ -13043,12 +13043,12 @@
 		(property "Description" "" (at 69.8500 369.5700 0) (effects (font (size 1.00 1.00)) (justify left) (hide yes)))
 		(property "LCSC" "C516304" (at 69.8500 369.5700 0) (effects (font (size 1.00 1.00)) (justify left) (hide yes)))
 		(property "MPN" "HL-AF-5060S22OC-3-S1-THL" (at 69.8500 369.5700 0) (effects (font (size 1.00 1.00)) (justify left) (hide yes)))
-		(pin "4" (uuid "1e6809a4-987b-a9c1-ed2f-4a6006939119"))
-		(pin "5" (uuid "92507ed1-43bf-753f-12e2-05ffdaacdbb3"))
-		(pin "6" (uuid "d8e4f411-ce77-f078-2c3d-04e402bd659e"))
-		(pin "1" (uuid "9cf81797-bbdb-5de9-0dce-8bb2ab0a20f9"))
-		(pin "2" (uuid "86312fbb-f3a4-5b90-ac11-8719e5316544"))
-		(pin "3" (uuid "90c56bd3-19cb-e565-1aef-730f260b40a2"))
+		(pin "1" (uuid "9d2f889c-6d47-e04c-acf5-ca6b920e7aa2"))
+		(pin "2" (uuid "75d2771f-426e-23c0-09de-37d2f3703212"))
+		(pin "3" (uuid "d6917a1d-6758-5478-05f9-80986089ecf3"))
+		(pin "4" (uuid "56e88462-3347-2f6e-9822-4dcb6f580d8a"))
+		(pin "5" (uuid "46dd59bb-b822-e7ea-f6cc-86c154684dab"))
+		(pin "6" (uuid "aa8115a3-609c-b9e4-8484-4401c333b1a6"))
 		(instances (project "OWLternatingCurrent" (path "/0ee13ddb-1c12-f416-8576-ee8890b4675e/8f976193-3ca0-4b18-df0e-ba7338335e40" (reference "D19") (unit 1)))))
 	(symbol (lib_id "OWL:PWR_+5V") (at 64.7700 369.5700 270) (unit 1) (exclude_from_sim no) (in_bom yes) (on_board yes) (dnp no)
 		(uuid "cec93c6d-9d6c-88d8-ad9b-6dd98cfb935e")
@@ -14117,11 +14117,11 @@
 		(property "Description" "" (at 589.2800 125.7300 0) (effects (font (size 1.27 1.27)) (hide yes)))
 		(pin "1" (uuid "0121f3f6-3f13-a381-61e3-590c1c7a801a"))
 		(instances (project "OWLternatingCurrent" (path "/0ee13ddb-1c12-f416-8576-ee8890b4675e/8f976193-3ca0-4b18-df0e-ba7338335e40" (reference "#PWR") (unit 1)))))
-	(symbol (lib_id "OWL:Coil") (at 629.9200 101.6000 270) (unit 1) (exclude_from_sim no) (in_bom yes) (on_board yes) (dnp no)
+	(symbol (lib_id "OWL:Coil") (at 629.9200 101.6000 270) (unit 1) (exclude_from_sim no) (in_bom no) (on_board yes) (dnp no)
 		(uuid "7e454050-05dd-23ff-5eea-384d38453d42")
 		(property "Reference" "L3" (at 632.4600 101.6000 90) (effects (font (size 1.00 1.00)) (justify left bottom)))
-		(property "Value" "31uH coil" (at 632.4600 101.6000 90) (effects (font (size 1.00 1.00)) (justify left top)))
-		(property "Footprint" "OWL:NetTie-2_SMD_Pad2.0mm" (at 629.9200 101.6000 90) (effects (font (size 1.00 1.00)) (justify left) (hide yes)))
+		(property "Value" "33uH coil" (at 632.4600 101.6000 90) (effects (font (size 1.00 1.00)) (justify left top)))
+		(property "Footprint" "OWL:Coil_PEND" (at 629.9200 101.6000 90) (effects (font (size 1.00 1.00)) (justify left) (hide yes)))
 		(property "Datasheet" "~" (at 629.9200 101.6000 90) (effects (font (size 1.00 1.00)) (justify left) (hide yes)))
 		(property "Description" "" (at 629.9200 101.6000 90) (effects (font (size 1.00 1.00)) (justify left) (hide yes)))
 		(property "MPN" "PCB coil" (at 629.9200 101.6000 90) (effects (font (size 1.00 1.00)) (justify left) (hide yes)))
@@ -14305,11 +14305,11 @@
 		(property "Description" "" (at 589.2800 184.1500 0) (effects (font (size 1.27 1.27)) (hide yes)))
 		(pin "1" (uuid "03455833-673a-55c1-ce05-532080472942"))
 		(instances (project "OWLternatingCurrent" (path "/0ee13ddb-1c12-f416-8576-ee8890b4675e/8f976193-3ca0-4b18-df0e-ba7338335e40" (reference "#PWR") (unit 1)))))
-	(symbol (lib_id "OWL:Coil") (at 629.9200 160.0200 270) (unit 1) (exclude_from_sim no) (in_bom yes) (on_board yes) (dnp no)
+	(symbol (lib_id "OWL:Coil") (at 629.9200 160.0200 270) (unit 1) (exclude_from_sim no) (in_bom no) (on_board yes) (dnp no)
 		(uuid "46915cb8-323c-5c9d-5b60-9d8d86b4fd33")
 		(property "Reference" "L4" (at 632.4600 160.0200 90) (effects (font (size 1.00 1.00)) (justify left bottom)))
-		(property "Value" "31uH coil" (at 632.4600 160.0200 90) (effects (font (size 1.00 1.00)) (justify left top)))
-		(property "Footprint" "OWL:NetTie-2_SMD_Pad2.0mm" (at 629.9200 160.0200 90) (effects (font (size 1.00 1.00)) (justify left) (hide yes)))
+		(property "Value" "33uH coil" (at 632.4600 160.0200 90) (effects (font (size 1.00 1.00)) (justify left top)))
+		(property "Footprint" "OWL:Coil_PEND" (at 629.9200 160.0200 90) (effects (font (size 1.00 1.00)) (justify left) (hide yes)))
 		(property "Datasheet" "~" (at 629.9200 160.0200 90) (effects (font (size 1.00 1.00)) (justify left) (hide yes)))
 		(property "Description" "" (at 629.9200 160.0200 90) (effects (font (size 1.00 1.00)) (justify left) (hide yes)))
 		(property "MPN" "PCB coil" (at 629.9200 160.0200 90) (effects (font (size 1.00 1.00)) (justify left) (hide yes)))
@@ -14493,11 +14493,11 @@
 		(property "Description" "" (at 589.2800 242.5700 0) (effects (font (size 1.27 1.27)) (hide yes)))
 		(pin "1" (uuid "04fba2f6-27c7-ba90-b398-607e7f9f75dd"))
 		(instances (project "OWLternatingCurrent" (path "/0ee13ddb-1c12-f416-8576-ee8890b4675e/8f976193-3ca0-4b18-df0e-ba7338335e40" (reference "#PWR") (unit 1)))))
-	(symbol (lib_id "OWL:Coil") (at 629.9200 218.4400 270) (unit 1) (exclude_from_sim no) (in_bom yes) (on_board yes) (dnp no)
+	(symbol (lib_id "OWL:Coil") (at 629.9200 218.4400 270) (unit 1) (exclude_from_sim no) (in_bom no) (on_board yes) (dnp no)
 		(uuid "f927d859-fcbd-9cc3-3ca1-a966eb126905")
 		(property "Reference" "L5" (at 632.4600 218.4400 90) (effects (font (size 1.00 1.00)) (justify left bottom)))
-		(property "Value" "31uH coil" (at 632.4600 218.4400 90) (effects (font (size 1.00 1.00)) (justify left top)))
-		(property "Footprint" "OWL:NetTie-2_SMD_Pad2.0mm" (at 629.9200 218.4400 90) (effects (font (size 1.00 1.00)) (justify left) (hide yes)))
+		(property "Value" "33uH coil" (at 632.4600 218.4400 90) (effects (font (size 1.00 1.00)) (justify left top)))
+		(property "Footprint" "OWL:Coil_PEND" (at 629.9200 218.4400 90) (effects (font (size 1.00 1.00)) (justify left) (hide yes)))
 		(property "Datasheet" "~" (at 629.9200 218.4400 90) (effects (font (size 1.00 1.00)) (justify left) (hide yes)))
 		(property "Description" "" (at 629.9200 218.4400 90) (effects (font (size 1.00 1.00)) (justify left) (hide yes)))
 		(property "MPN" "PCB coil" (at 629.9200 218.4400 90) (effects (font (size 1.00 1.00)) (justify left) (hide yes)))
@@ -14564,7 +14564,7 @@
 	(text_box "U8, U5-U7: DRV8874 H-bridges from 12 V.\nPMODE high: PWM mode (IN1 and IN2 drive\nthe bridge; both low: coast). IMODE to\nground: fixed off-time chopping at ITRIP\n= 3.3 V / (450 uA/A x 2.2k) = 3.3 A, so\nno coil ever carries more. IPROPI\nmirrors the low-side current, 450 uA per\namp: 2.2k makes 1 V per amp, then 1k and\n10n filter it. nSLEEP, shared, latches\nPMODE and IMODE when it rises; 4.7k\nholds the bridges asleep through a\nreset. nFAULT, shared and open-drain,\ngoes low on overcurrent, overheating or\nundervoltage." (exclude_from_sim no) (at 701.0400 58.4200 0) (size 39.3700 26.6700)
 		(margins 0.9525 0.9525 0.9525 0.9525) (stroke (width 0) (type default))
 		(fill (type color) (color 255 255 194 1)) (effects (font (size 1.00 1.00)) (justify left top)) (uuid "bb289182-6105-2d9e-8f95-a9f0c9828a97"))
-	(text_box "U8 drives the levitation coil on the\nperch (LEV_A, LEV_B: up the right edge\nto the tree's socket). L3-L5: the\npendulum coils under the bat's swing, 12\nturns on each of 4 layers, 31 uH, 2 ohm\n(copper on this board, gen/coils.py)." (exclude_from_sim no) (at 701.0400 121.9200 0) (size 36.8300 12.7000)
+	(text_box "U8 drives the levitation coil on the\nperch (LEV_A, LEV_B: up the right edge\nto the tree's socket). L3-L5: the\npendulum coils under the bat's swing,\nabout 12 turns on each of 4 layers, 33\nuH, 2.3 ohm (copper on this board,\ngen/coils.py)." (exclude_from_sim no) (at 701.0400 121.9200 0) (size 35.5600 15.2400)
 		(margins 0.9525 0.9525 0.9525 0.9525) (stroke (width 0) (type default))
 		(fill (type color) (color 255 255 194 1)) (effects (font (size 1.00 1.00)) (justify left top)) (uuid "ee8d680a-3648-14c1-6bec-acd8b0df64ef"))
 	(symbol (lib_id "OWL:74HC4051") (at 660.4000 298.4500 0) (unit 1) (exclude_from_sim no) (in_bom yes) (on_board yes) (dnp no)
@@ -14899,11 +14899,11 @@
 		(pin "1" (uuid "07ff1181-8287-9a98-e4ab-1e62bbe14e5b"))
 		(pin "2" (uuid "88e67594-a275-157a-6782-84b383129150"))
 		(instances (project "OWLternatingCurrent" (path "/0ee13ddb-1c12-f416-8576-ee8890b4675e/8f976193-3ca0-4b18-df0e-ba7338335e40" (reference "C69") (unit 1)))))
-	(symbol (lib_id "OWL:Coil") (at 594.3600 401.3200 270) (unit 1) (exclude_from_sim no) (in_bom yes) (on_board yes) (dnp no)
+	(symbol (lib_id "OWL:Coil") (at 594.3600 401.3200 270) (unit 1) (exclude_from_sim no) (in_bom no) (on_board yes) (dnp no)
 		(uuid "56a4fa50-093c-da09-7ded-bab26b6e87f3")
 		(property "Reference" "L6" (at 596.9000 401.3200 90) (effects (font (size 1.00 1.00)) (justify left bottom)))
-		(property "Value" "28uH coil" (at 596.9000 401.3200 90) (effects (font (size 1.00 1.00)) (justify left top)))
-		(property "Footprint" "OWL:NetTie-2_SMD_Pad2.0mm" (at 594.3600 401.3200 90) (effects (font (size 1.00 1.00)) (justify left) (hide yes)))
+		(property "Value" "30uH coil" (at 596.9000 401.3200 90) (effects (font (size 1.00 1.00)) (justify left top)))
+		(property "Footprint" "OWL:Coil_PERCH" (at 594.3600 401.3200 90) (effects (font (size 1.00 1.00)) (justify left) (hide yes)))
 		(property "Datasheet" "~" (at 594.3600 401.3200 90) (effects (font (size 1.00 1.00)) (justify left) (hide yes)))
 		(property "Description" "" (at 594.3600 401.3200 90) (effects (font (size 1.00 1.00)) (justify left) (hide yes)))
 		(property "MPN" "PCB coil" (at 594.3600 401.3200 90) (effects (font (size 1.00 1.00)) (justify left) (hide yes)))
@@ -15149,11 +15149,11 @@
 		(pin "1" (uuid "87ce3726-4f9b-9043-578e-d28f1289a757"))
 		(pin "2" (uuid "8d9cb3e4-63e7-97c7-df99-b2528b16a48d"))
 		(instances (project "OWLternatingCurrent" (path "/0ee13ddb-1c12-f416-8576-ee8890b4675e/8f976193-3ca0-4b18-df0e-ba7338335e40" (reference "C74") (unit 1)))))
-	(symbol (lib_id "OWL:Coil") (at 594.3600 462.2800 270) (unit 1) (exclude_from_sim no) (in_bom yes) (on_board yes) (dnp no)
+	(symbol (lib_id "OWL:Coil") (at 594.3600 462.2800 270) (unit 1) (exclude_from_sim no) (in_bom no) (on_board yes) (dnp no)
 		(uuid "61a56a78-58f4-2793-25af-84c6098b1738")
 		(property "Reference" "L7" (at 596.9000 462.2800 90) (effects (font (size 1.00 1.00)) (justify left bottom)))
-		(property "Value" "28uH coil" (at 596.9000 462.2800 90) (effects (font (size 1.00 1.00)) (justify left top)))
-		(property "Footprint" "OWL:NetTie-2_SMD_Pad2.0mm" (at 594.3600 462.2800 90) (effects (font (size 1.00 1.00)) (justify left) (hide yes)))
+		(property "Value" "30uH coil" (at 596.9000 462.2800 90) (effects (font (size 1.00 1.00)) (justify left top)))
+		(property "Footprint" "OWL:Coil_PERCH" (at 594.3600 462.2800 90) (effects (font (size 1.00 1.00)) (justify left) (hide yes)))
 		(property "Datasheet" "~" (at 594.3600 462.2800 90) (effects (font (size 1.00 1.00)) (justify left) (hide yes)))
 		(property "Description" "" (at 594.3600 462.2800 90) (effects (font (size 1.00 1.00)) (justify left) (hide yes)))
 		(property "MPN" "PCB coil" (at 594.3600 462.2800 90) (effects (font (size 1.00 1.00)) (justify left) (hide yes)))

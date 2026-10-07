@@ -595,7 +595,7 @@ def bus_left():
         tag("led:%s" % name)
         d = part(key, dref, xc, out[1], rot=180, value={"amber5050": "orange x3"}.get(colour, colour),
                  ref_at=(xc - 15.24, out[1] - 0.3), val_at=(xc - 15.24, out[1] + 0.3), justify="right", fsize=1.0)
-        k, a = d.pin("1"), d.pin("4") if key == "LED_AMBER5050" else d.pin("2")
+        k, a = (d.pin("4"), d.pin("1")) if key == "LED_AMBER5050" else (d.pin("1"), d.pin("2"))
         W(k, out)
         flag("+5V", *a, rot=270)
         label(k[0] + 1.0, out[1], name, size=0.9)
@@ -733,8 +733,8 @@ def drv_tiles():
          "or undervoltage.", cols=40)
     note(701.04, 121.92,
          "U8 drives the levitation coil on the perch (LEV_A, LEV_B: up the right edge to the "
-         "tree's socket). L3-L5: the pendulum coils under the bat's swing, 12 turns on each of "
-         "4 layers, 31 uH, 2 ohm (copper on this board, gen/coils.py).", cols=40)
+         "tree's socket). L3-L5: the pendulum coils under the bat's swing, about 12 turns on "
+         "each of 4 layers, 33 uH, 2.3 ohm (copper on this board, gen/coils.py).", cols=40)
 
 
 def tile(u, yd, k):
@@ -770,7 +770,7 @@ def tile(u, yd, k):
         label(o1[0] + 3.0, o1[1], "LEV_A"); label(o2[0] + 3.0, o2[1], "LEV_B")
     else:
         xl = o1[0] + 27.94
-        L = part("COIL_PEND", "L%d" % (2 + k), xl, yd - 7.62, rot=270, value="31uH coil",
+        L = part("COIL_PEND", "L%d" % (2 + k), xl, yd - 7.62, rot=270,
                  ref_at=(xl + 2.5, yd - 8.0), val_at=(xl + 2.5, yd - 7.2), fsize=1.0)
         W(o1, (xl - 5.08, o1[1]), (xl - 5.08, L.pin("1")[1]), L.pin("1"))
         W(o2, (xl - 10.16, o2[1]), (xl - 10.16, L.pin("2")[1]), L.pin("2"))
@@ -900,7 +900,7 @@ def bridge(u, yu, k, u11):
     tag("br%d:cblock" % k); l, r = series("C10U", oa[0] + 8.89, oa[1])
     W(oa, l)
     xl = r[0] + 5.08
-    L = part("COIL_PERCH", "L%d" % (5 + k), xl, oa[1] + 5.08, rot=270, value="28uH coil",
+    L = part("COIL_PERCH", "L%d" % (5 + k), xl, oa[1] + 5.08, rot=270,
              ref_at=(xl + 2.5, oa[1] + 4.6), val_at=(xl + 2.5, oa[1] + 5.4), fsize=1.0)
     W(r, L.pin("1"))
     xb = ob[0] + G

@@ -67,6 +67,8 @@ def part(key, ref, x, y, rot=0, unit=1, value=None, mirror=None, text="auto", fs
         kw.setdefault("justify", "right")
     elif text == "hide":
         kw["hide_ref"] = kw["hide_value"] = True
+    if p["fp"].split(":")[-1].startswith("Coil_"):
+        kw.setdefault("in_bom", False)       # copper, not a part: as its footprint says
     pl = S.sym(p["sym"], x, y, rot=rot, ref=ref, value=value, footprint=p["fp"], unit=unit, mirror=mirror,
                lcsc=p["lcsc"], fields=fields, fsize=fsize, **kw)
     REFS[ref] = key

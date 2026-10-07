@@ -127,9 +127,9 @@ def pwr_flag(x, y, rot=0):
                  in_bom=False, on_board=False, hide_ref=True, hide_value=True)
 
 
-def label(x, y, name, size=1.0):
+def label(x, y, name, size=1.0, justify="left bottom"):
     """A net name on a wire (the wire carries on: nothing disappears)."""
-    S.label(x, y, name, size=size)
+    S.label(x, y, name, size=size, justify=justify)
 
 
 def note(x, y, text, cols=44, size=1.0):

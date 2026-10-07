@@ -16,23 +16,27 @@ Constraints that shaped it (RP2350 datasheet, GPIO function table, section 9.4):
     rest at a level has an external resistor; nothing here relies on a pull-down.
 """
 
-# GPIO -> (net, direction, what it is)
-GPIO = {
-    0: ("PEND1_IN1", "out", "pendulum coil 1 bridge (DRV8874 U5) IN1; PWM0 A"),
-    1: ("PEND1_IN2", "out", "pendulum coil 1 bridge IN2; PWM0 B"),
-    2: ("PEND2_IN1", "out", "pendulum coil 2 bridge (U6) IN1; PWM1 A"),
-    3: ("PEND2_IN2", "out", "pendulum coil 2 bridge IN2; PWM1 B"),
-    4: ("PEND3_IN1", "out", "pendulum coil 3 bridge (U7) IN1; PWM2 A"),
-    5: ("PEND3_IN2", "out", "pendulum coil 3 bridge IN2; PWM2 B"),
-    6: ("LEV_IN1", "out", "levitation coil bridge (U8) IN1; PWM3 A"),
-    7: ("LEV_IN2", "out", "levitation coil bridge IN2; PWM3 B"),
-    8: ("FAM1_A", "out", "owl perch bridge, leg A (UCC27524 U9, channel A); PWM4 A"),
-    9: ("FAM1_B", "out", "owl perch bridge, leg B (U9, channel B); PWM4 B"),
-    10: ("FAM2_A", "out", "cat perch bridge, leg A (UCC27524 U10, channel A); PWM5 A"),
-    11: ("FAM2_B", "out", "cat perch bridge, leg B (U10, channel B); PWM5 B"),
+# The hand-written table, in GPIO order: GPIO -> (net, direction, what it is).  The board's
+# own order is chosen by gen/assign.py from the placement (which pin each line reaches
+# first, so that the lines leave the chip without crossing) and kept in
+# gen/assignment.json; GPIO below is that order.  The PWM slice and ADC channel in each
+# description follow the GPIO number, so they are added below, not written here.
+DEFAULT = {
+    0: ("PEND1_IN1", "out", "pendulum coil 1 bridge (DRV8874 U5) IN1"),
+    1: ("PEND1_IN2", "out", "pendulum coil 1 bridge IN2"),
+    2: ("PEND2_IN1", "out", "pendulum coil 2 bridge (U6) IN1"),
+    3: ("PEND2_IN2", "out", "pendulum coil 2 bridge IN2"),
+    4: ("PEND3_IN1", "out", "pendulum coil 3 bridge (U7) IN1"),
+    5: ("PEND3_IN2", "out", "pendulum coil 3 bridge IN2"),
+    6: ("LEV_IN1", "out", "levitation coil bridge (U8) IN1"),
+    7: ("LEV_IN2", "out", "levitation coil bridge IN2"),
+    8: ("FAM1_A", "out", "owl perch bridge, leg A (UCC27524 U9, channel A)"),
+    9: ("FAM1_B", "out", "owl perch bridge, leg B (U9, channel B)"),
+    10: ("FAM2_A", "out", "cat perch bridge, leg A (UCC27524 U10, channel A)"),
+    11: ("FAM2_B", "out", "cat perch bridge, leg B (U10, channel B)"),
     12: ("UART_TX", "out", "UART0 TX to the debug connector J5 (console, 115200)"),
     13: ("UART_RX", "in", "UART0 RX from J5"),
-    14: ("AUDIO", "out", "audio PWM to the class-D amplifier through an RC filter; PWM7 A"),
+    14: ("AUDIO", "out", "audio PWM to the class-D amplifier through an RC filter"),
     15: ("IMU_INT", "in", "LSM6DS3TR-C INT1: taps, tilt, free fall"),
     16: ("SDA", "io", "I2C0 SDA: LED drivers, IMU, light sensor, 3-axis Hall; the tree's LED driver"),
     17: ("SCL", "out", "I2C0 SCL"),
@@ -44,16 +48,18 @@ GPIO = {
     23: ("DRV_nSLEEP", "out", "all four DRV8874s: low = asleep (4.7 k pull-down keeps them asleep in reset)"),
     24: ("DRV_nFAULT", "in", "all four DRV8874s' nFAULT, wired-OR, 10 k pull-up"),
     25: ("FAM_EN", "out", "both UCC27524s' four enables (4.7 k pull-down beats their internal pull-ups: off in reset)"),
-    26: ("HALL", "adc", "ADC0: the perch's DRV5055 Hall sensor (via the tree)"),
-    27: ("LEV_IPROPI", "adc", "ADC1: levitation coil current (DRV8874 IPROPI)"),
-    28: ("MUX_OUT", "adc", "ADC2: the 74HC4051's output (slow signals, below)"),
+    26: ("HALL", "adc", "the perch's DRV5055 Hall sensor (via the tree)"),
+    27: ("LEV_IPROPI", "adc", "levitation coil current (DRV8874 IPROPI)"),
+    28: ("MUX_OUT", "adc", "the 74HC4051's output (slow signals, below)"),
     29: ("BUTTON", "in", "the SPELL button, low when pressed (internal pull-up: RP2350-E9 affects only pull-downs)"),
 }
+PWM_NETS = ("PEND1_IN1", "PEND1_IN2", "PEND2_IN1", "PEND2_IN2", "PEND3_IN1", "PEND3_IN2", "LEV_IN1",
+            "LEV_IN2", "FAM1_A", "FAM1_B", "FAM2_A", "FAM2_B", "AUDIO")
 
-# The 74HC4051's inputs (MUX channel -> net, what).  The order is the drawing's: each line
-# reaches its input without crossing another.  After switching channels, wait 10 us before
-# sampling (the dividers have no capacitor; 18 k x 10 pF settles in 2 us).
-MUX = {
+# The 74HC4051's inputs, hand-written (MUX channel -> net, what); MUX below is the board's
+# order (gen/assignment.json).  After switching channels, wait 10 us before sampling (the
+# dividers have no capacitor; 18 k x 10 pF settles in 2 us).
+MUX_DEFAULT = {
     0: ("PEND3_IPROPI", "pendulum coil 3 current"),
     1: ("PEND2_IPROPI", "pendulum coil 2 current"),
     2: ("PEND1_IPROPI", "pendulum coil 1 current"),
@@ -63,6 +69,32 @@ MUX = {
     6: ("V5_SENSE", "+5V through 10 k / 10 k (5 V reads 2.5 V)"),
     7: ("VBUS_SENSE", "USB VBUS through 10 k / 10 k: plugged into USB?"),
 }
+
+
+def _assigned():
+    import json, os
+    path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "assignment.json")
+    return json.load(open(path)) if os.path.exists(path) else {}
+
+
+def _what(net, g, what):
+    if net in PWM_NETS:
+        what += "; PWM%d %s" % ((g >> 1) & 7, "AB"[g & 1])
+    if g >= 26 and DEFAULT_DIR[net] == "adc":
+        what = "ADC%d: %s" % (g - 26, what)
+    return what
+
+
+DEFAULT_DIR = {net: d for net, d, _ in DEFAULT.values()}
+_A = _assigned()
+_GPIO_OF = _A.get("gpio") or {net: g for g, (net, _, _) in DEFAULT.items()}
+assert sorted(_GPIO_OF) == sorted(DEFAULT_DIR), "gen/assignment.json and pins.DEFAULT name different nets"
+GPIO = {}
+for _g, (_net, _d, _w) in DEFAULT.items():
+    GPIO[_GPIO_OF[_net]] = (_net, _d, _what(_net, _GPIO_OF[_net], _w))
+GPIO = dict(sorted(GPIO.items()))
+_MUX_OF = _A.get("mux") or {net: ch for ch, (net, _) in MUX_DEFAULT.items()}
+MUX = dict(sorted((_MUX_OF[net], (net, what)) for ch, (net, what) in MUX_DEFAULT.items()))
 
 # I2C0 addresses (7-bit)
 I2C = {

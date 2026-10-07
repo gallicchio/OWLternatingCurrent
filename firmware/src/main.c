@@ -232,10 +232,10 @@ static void adc_dump_json(char *buf, size_t n)
         [MUX_CH_V5_SENSE] = "v5_sense", [MUX_CH_VBUS_SENSE] = "vbus_sense",
     };
     jsonbuf j = jb_start(buf, n);
-    jb_add(&j, "{\"adc0_hall\":{\"raw\":%u,\"V\":%.4f,\"mT\":%.2f},", rt.raw_adc[ADC_CH_HALL],
-           (double)adc_volts(rt.raw_adc[ADC_CH_HALL]), (double)rt.hall_mT);
-    jb_add(&j, "\"adc1_lev_ipropi\":{\"raw\":%u,\"V\":%.4f,\"A\":%.3f},\"mux\":{", rt.raw_adc[ADC_CH_LEV_IPROPI],
-           (double)adc_volts(rt.raw_adc[ADC_CH_LEV_IPROPI]), (double)rt.i_meas[COIL_LEV]);
+    jb_add(&j, "{\"adc_hall\":{\"raw\":%u,\"V\":%.4f,\"mT\":%.2f},", rt.raw_adc[ADC_SLOT_HALL],
+           (double)adc_volts(rt.raw_adc[ADC_SLOT_HALL]), (double)rt.hall_mT);
+    jb_add(&j, "\"adc_lev_ipropi\":{\"raw\":%u,\"V\":%.4f,\"A\":%.3f},\"mux\":{", rt.raw_adc[ADC_SLOT_LEV_IPROPI],
+           (double)adc_volts(rt.raw_adc[ADC_SLOT_LEV_IPROPI]), (double)rt.i_meas[COIL_LEV]);
     for (int c = 0; c < MUX_CHANNELS; c++)
         jb_add(&j, "%s\"%s\":{\"raw\":%u,\"V\":%.4f}", c ? "," : "", MUX_NAMES[c] ? MUX_NAMES[c] : "?",
                rt.raw_mux[c], (double)adc_volts(rt.raw_mux[c]));

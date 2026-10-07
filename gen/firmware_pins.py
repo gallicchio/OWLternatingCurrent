@@ -94,6 +94,14 @@ def main():
         n = g[net]
         assert ADC_FIRST_GPIO <= n <= 29, net
         L.append("#define ADC_CH_%-12s %d   /* GPIO%d */" % (net, n - ADC_FIRST_GPIO, n))
+    # the round robin converts the enabled channels in ascending order from the one
+    # selected first, so a burst's samples come in the channels' order: each line's slot
+    chans = sorted((g[net] - ADC_FIRST_GPIO, net) for net in ("HALL", "LEV_IPROPI", "MUX_OUT"))
+    L.append("/* the round robin (from ADC_RR_FIRST, ascending): a burst's samples in this order */")
+    L.append("#define ADC_RR_MASK      0x%xu" % sum(1 << c for c, _ in chans))
+    L.append("#define ADC_RR_FIRST     %d" % chans[0][0])
+    for slot, (c, net) in enumerate(chans):
+        L.append("#define ADC_SLOT_%-10s %d   /* ADC%d */" % (net, slot, c))
     L.append("")
 
     L.append("/* ---- the 74HC4051 (S0-S2 on PIN_MUX_S0..S2) ------------------------------ */")
@@ -151,6 +159,24 @@ def main():
         f.write("\n".join(L))
     os.replace(open_tmp, OUT)
     print("wrote", os.path.relpath(OUT, ROOT))
+    board_header(g)
+
+
+BOARD_H = os.path.join(ROOT, "firmware", "boards", "owlternating.h")
+
+
+def board_header(g):
+    """The SDK's board header names the console UART's and the I2C bus's pins (stdio and
+    the SDK's defaults use them): keep them on the pins gen/pins.py gives.  The instances
+    stay UART0 and I2C0 (gen/assign.py binds them only to pins those allow)."""
+    assert (g["UART_TX"], g["UART_RX"]) in ((0, 1), (12, 13), (16, 17), (28, 29)), "UART0 cannot use these pins"
+    assert g["SDA"] % 4 == 0 and g["SCL"] == g["SDA"] + 1, "I2C0 cannot use these pins"
+    s = open(BOARD_H).read()
+    for name, pin in (("UART_TX_PIN", g["UART_TX"]), ("UART_RX_PIN", g["UART_RX"]),
+                      ("I2C_SDA_PIN", g["SDA"]), ("I2C_SCL_PIN", g["SCL"])):
+        s, n = re.subn(r"(#define PICO_DEFAULT_%s )\d+" % name, r"\g<1>%d" % pin, s)
+        assert n == 1, "no PICO_DEFAULT_%s in %s" % (name, BOARD_H)
+    open(BOARD_H, "w").write(s)
 
 
 if __name__ == "__main__":

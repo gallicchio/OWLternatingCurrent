@@ -9,13 +9,13 @@
 
 /* UART0 on GPIO12/13: the debug connector J5 (gen/pins.py) */
 #define PICO_DEFAULT_UART 0
-#define PICO_DEFAULT_UART_TX_PIN 12
-#define PICO_DEFAULT_UART_RX_PIN 13
+#define PICO_DEFAULT_UART_TX_PIN 16
+#define PICO_DEFAULT_UART_RX_PIN 17
 
 /* I2C0 on GPIO16/17: the LED drivers and the sensors */
 #define PICO_DEFAULT_I2C 0
-#define PICO_DEFAULT_I2C_SDA_PIN 16
-#define PICO_DEFAULT_I2C_SCL_PIN 17
+#define PICO_DEFAULT_I2C_SDA_PIN 20
+#define PICO_DEFAULT_I2C_SCL_PIN 21
 
 /* no LED of its own: every LED is on the LP5036s */
 

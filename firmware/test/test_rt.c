@@ -118,9 +118,9 @@ static void tick(void)
     float hall_V = HALL_VQ_FRACTION * ADC_VREF_V +
                    (float)HALL_POLARITY * (hall_bias_mT + hall_coil_mT_per_A * i_lev) * HALL_MV_PER_MT * 1e-3f;
     for (unsigned i = 0; i < stub_dma_count / 3; i++) {
-        stub_dma_dest[3 * i + 0] = code(hall_V);
-        stub_dma_dest[3 * i + 1] = code(fabsf(i_lev) * IPROPI_V_PER_A);
-        stub_dma_dest[3 * i + 2] = code(mux_volts(mux));
+        stub_dma_dest[3 * i + ADC_SLOT_HALL] = code(hall_V);
+        stub_dma_dest[3 * i + ADC_SLOT_LEV_IPROPI] = code(fabsf(i_lev) * IPROPI_V_PER_A);
+        stub_dma_dest[3 * i + ADC_SLOT_MUX_OUT] = code(mux_volts(mux));
     }
     stub_dma_busy = false;
     stub_irq_handler[DMA_IRQ_1]();

@@ -19,7 +19,7 @@ rt_shared rt;
 lev_ctrl rt_lev;
 thermal_coil rt_thermal[COIL_COUNT];
 
-#define BURST ((int)(3 * ADC_OVERSAMPLE))   /* ADC0, ADC1, ADC2, ADC_OVERSAMPLE times */
+#define BURST ((int)(3 * ADC_OVERSAMPLE))   /* the three ADC lines (ADC_SLOT_*), ADC_OVERSAMPLE times */
 static uint16_t burst[BURST];
 static int dma_ch;
 static unsigned mux_ch;                     /* the channel this burst's ADC2 samples carry */
@@ -162,7 +162,7 @@ static void tick_isr(void)
         }
     }
     adc_fifo_drain();                       /* waits for the last conversion, drops strays */
-    adc_select_input(ADC_CH_HALL);
+    adc_select_input(ADC_RR_FIRST);
     dma_channel_transfer_to_buffer_now((uint)dma_ch, burst, BURST);
     adc_run(true);
 }
@@ -229,12 +229,12 @@ static void control(void)
             avg[k] = (float)sum[k] / (float)n[k];
         rt.raw_adc[k] = (uint16_t)avg[k];
     }
-    mux_sample(mux_ch, adc_volts(avg[ADC_CH_MUX_OUT]));
+    mux_sample(mux_ch, adc_volts(avg[ADC_SLOT_MUX_OUT]));
     mux_ch = (mux_ch + 1u) % MUX_CHANNELS;
     board_mux_select(mux_ch);
-    rt.hall_mT = (float)HALL_POLARITY * (adc_volts(avg[ADC_CH_HALL]) - HALL_VQ_FRACTION * ADC_VREF_V) /
+    rt.hall_mT = (float)HALL_POLARITY * (adc_volts(avg[ADC_SLOT_HALL]) - HALL_VQ_FRACTION * ADC_VREF_V) /
                  (HALL_MV_PER_MT * 1e-3f);
-    rt.i_meas[COIL_LEV] = adc_volts(avg[ADC_CH_LEV_IPROPI]) / IPROPI_V_PER_A;
+    rt.i_meas[COIL_LEV] = adc_volts(avg[ADC_SLOT_LEV_IPROPI]) / IPROPI_V_PER_A;
 
     /* 2. faults and power */
     static uint32_t last_clear, v12_good, nf_ticks, nf_retry_at, nf_window_at;
@@ -453,8 +453,8 @@ static void core1_main(void)
 {
     flash_safe_execute_core_init();         /* settings writes pause us (only with every coil off) */
 
-    adc_set_round_robin((1u << ADC_CH_HALL) | (1u << ADC_CH_LEV_IPROPI) | (1u << ADC_CH_MUX_OUT));
-    adc_select_input(ADC_CH_HALL);
+    adc_set_round_robin(ADC_RR_MASK);
+    adc_select_input(ADC_RR_FIRST);
     adc_fifo_setup(true, true, 1, true, false);   /* FIFO, DREQ at 1, error bit, 12 bits */
     adc_set_clkdiv(0.0f);                   /* back to back: 2 us a conversion */
 

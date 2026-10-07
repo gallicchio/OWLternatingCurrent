@@ -18,13 +18,19 @@ Colours:
   purple  GL0603PU01 0603 phosphor purple (C51933300)
 """
 
-# (driver, channel) -> (name, colour, where)
-LEDS = {}
+# (driver, channel) -> (name, colour, where): the hand-written table below is DEFAULT.
+# The board's channels are chosen by gen/assign.py from the placement (each LED on the
+# output whose place round the driver matches the side its line arrives from, so the
+# lines leave the driver without crossing) and kept in gen/assignment.json; LEDS, at the
+# end of this file, is that.  The banks below are the drawing's grouping; the firmware
+# takes any mix of LEDs in a bank (led_engine.c sets each bank's brightness for its
+# brightest LED).
+DEFAULT = {}
 
 
 def _add(driver, ch, name, colour, where):
-    assert (driver, ch) not in LEDS, (driver, ch)
-    LEDS[(driver, ch)] = (name, colour, where)
+    assert (driver, ch) not in DEFAULT, (driver, ch)
+    DEFAULT[(driver, ch)] = (name, colour, where)
 
 
 # ---- U3, the base board's LP5036 (I2C 0x30) --------------------------------------
@@ -68,3 +74,20 @@ for i in range(4):
     _add("TREE", 18 + i, "TWISP%d" % i, "purple", "in the tree's branches %d" % i)
 
 DRIVER_ADDR = {"BASE": 0x30, "TREE": 0x32}
+
+
+def _assigned():
+    import json, os
+    path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "assignment.json")
+    return json.load(open(path)).get("led", {}) if os.path.exists(path) else {}
+
+
+_A = _assigned()
+LEDS = {}
+for (_d, _ch), (_name, _colour, _where) in DEFAULT.items():
+    # a driver whose LEDs the assignment does not all name keeps the hand-written order
+    _mine = {nm for (d, c), (nm, col, w) in DEFAULT.items() if d == _d}
+    _c = _A[_d][_name] if _mine <= set(_A.get(_d, {})) else _ch
+    assert (_d, _c) not in LEDS, "gen/assignment.json puts two LEDs on %s OUT%d" % (_d, _c)
+    LEDS[(_d, _c)] = (_name, _colour, _where)
+LEDS = dict(sorted(LEDS.items()))

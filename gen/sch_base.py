@@ -789,7 +789,8 @@ def tile(u, yd, k):
         W((X_LEV_IPROPI, ip[1]), (X_LEV_IPROPI, dst[1]), dst)
         label(r[0] + 6.0, ip[1], "LEV_IPROPI")
     else:
-        W(r, (xc, ip[1]), (X_PEND_IPROPI[k], ip[1]))
+        # to the mux by name: gen/assign.py chooses the input (pins.MUX)
+        W(r, (xc, ip[1]), (r[0] + 12.0, ip[1]))
         label(r[0] + 12.0, ip[1], "PEND%d_IPROPI" % k)
 
 
@@ -797,6 +798,7 @@ def tile(u, yd, k):
 # The mux and the rail dividers
 # ======================================================================================
 XM = 660.4
+MUX_PIN = {0: "13", 1: "14", 2: "15", 3: "12", 4: "1", 5: "5", 6: "2", 7: "4"}   # 74HC4051: A0..A7
 
 
 def mux():
@@ -824,25 +826,23 @@ def mux():
     for net in ("MUX_OUT", "MUX_S0", "MUX_S1", "MUX_S2"):
         p = gp(net)
         label(p[0] + 1.0, p[1], net)
-    # inputs: the pendulum currents from above, the perch currents from below, the dividers
-    for k, num in ((3, "13"), (2, "14"), (1, "15")):
-        q = u.pin(num)
-        x = X_PEND_IPROPI[k]
-        W((x, YD[k] + 1.27), (x, q[1]), q)
-    xr = u.pin("13")[0]
-    # A5 (pin 5, top row) takes the outer column and the lowest tap, A7 (pin 4) the inner
-    # column and the highest, so that none crosses another
-    taps = [("4", "VBUS", 671.83, 335.28, 664.21, "R10K", "R10K"),
-            ("2", "+5V", 674.37, 355.6, 651.51, "R10K", "R10K"),
-            ("5", "+12V", 676.91, 375.92, 638.81, "R100K", "R22K")]
-    names = {"4": "VBUS_SENSE", "2": "V5_SENSE", "5": "V12_SENSE"}
-    for num, rail, xcol, yt, xt, rtop, rbot in taps:
-        q = u.pin(num)
-        W(q, (xcol, q[1]), (xcol, yt), (xt, yt))
-        tag("div:%s:top" % names[num]); up(rtop, xt, yt, rail, text="left")
-        tag("div:%s:bot" % names[num]); down(rbot, xt, yt, text="left")
+    # inputs, by name: which signal takes which input is the board's choice (gen/assign.py,
+    # pins.MUX), so each input is a short stub with its net's name, and so is each source
+    for ch, (net, what) in sorted(PINS.MUX.items()):
+        q = u.pin(MUX_PIN[ch])
+        dx = -5.08 if q[0] < XM else 5.08
+        W(q, (q[0] + dx, q[1]))
+        label(q[0] + dx, q[1], net, size=0.9, justify="right bottom" if dx < 0 else "left bottom")
+    # the rail dividers, each tap named for the mux
+    taps = [("VBUS_SENSE", "VBUS", 335.28, 664.21, "R10K", "R10K"),
+            ("V5_SENSE", "+5V", 355.6, 651.51, "R10K", "R10K"),
+            ("V12_SENSE", "+12V", 375.92, 638.81, "R100K", "R22K")]
+    for name, rail, yt, xt, rtop, rbot in taps:
+        W((xt, yt), (xt + 7.62, yt))
+        tag("div:%s:top" % name); up(rtop, xt, yt, rail, text="left")
+        tag("div:%s:bot" % name); down(rbot, xt, yt, text="left")
         J(xt, yt)
-        label(xt + 1.0, yt, names[num])
+        label(xt + 7.62, yt, name)
     return u
 
 
@@ -934,11 +934,8 @@ def bridge(u, yu, k, u11):
     J(xo, po[1])
     tag("br%d:rgain_g" % k); down("R5K1", xn, yf, text="left")
     J(xn, yf)
-    x = X_ISENSE[k]
-    W((xo, po[1]), (x, po[1]))
-    q = u11.pin("12" if k == 2 else "1")
-    W((x, po[1]), (x, q[1]), q)
-    label(xo + 3.0, po[1], "FAM%d_ISENSE" % k)
+    W((xo, po[1]), (xo + 10.16, po[1]))
+    label(xo + 10.16, po[1], "FAM%d_ISENSE" % k)
     label(xc + 1.5, yn, "FAM%d_IAVG" % k, size=0.9)
     if k == 1:
         xp, yp = xa + 33.02, yn + 25.4

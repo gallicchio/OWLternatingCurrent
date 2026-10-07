@@ -67,7 +67,7 @@ typedef struct {
     volatile bool power_ok;                    /* 12 V present: coils may run */
     volatile bool drv_awake;
     volatile bool carrier_on;
-    volatile uint16_t raw_adc[3], raw_mux[8];  /* the last averages, ADC counts */
+    volatile uint16_t raw_adc[3], raw_mux[8];  /* the last averages, ADC counts (raw_adc by ADC_SLOT_*) */
     volatile uint32_t nfault_events;
     volatile uint32_t tick_cycles_max;         /* the longest tick's work, in clk_sys cycles */
     /* written by core 0 */

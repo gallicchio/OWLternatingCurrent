@@ -510,6 +510,7 @@ def audio_theremin():
                    value=antenna, ref_at=(xa - 11.0, ydst - 7.0), val_at=(xa - 11.0, ydst - 7.0), justify="right")
         W((xa, ydst), ant.pin("1"))
         J(xi, ydst); J(xa, ydst); J(xn, ydst)
+        label(xi + 0.6, ydst, antenna.upper(), size=0.9)      # the copper shape's net: MOON, GHOST
         label(ro[0] + 2.0, ydst, "THEREMIN_" + name)
 
     title(22.86, 220.98, "THEREMIN")

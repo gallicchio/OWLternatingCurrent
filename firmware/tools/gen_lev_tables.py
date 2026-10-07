@@ -15,7 +15,7 @@ The geometry is the one-magnet design (sim/physics/levitation_onemagnet.py, PLAN
 section 2): the bias magnet and the bat's magnet are the same 10 x 2 mm N52 disc
 (gen/mech.py MAGNET_D, MAGNET_T); the bias magnet's bottom face is OWL_LIFT above the
 perch's top copper; the bat (mass M_BAT from levitation_onemagnet.py) hangs below the
-perch coil (levitation.py's COIL, the canonical 4-layer spiral); the DRV5055 sits on
+perch coil (gen/parts.py COILS["COIL_LEV"], on levitation.py's four-layer stack-up); the DRV5055 sits on
 the coil's axis 0.6 mm below the bottom copper (ZB).  levitation_onemagnet.py runs its
 whole sweep when imported, so its two magnet definitions are repeated here (bias(),
 bat()) and checked against the result it wrote (results/levitation_onemagnet.json).
@@ -43,8 +43,15 @@ SIM = os.path.join(ROOT, "sim", "physics")
 sys.path.insert(0, SIM)
 sys.path.insert(0, os.path.join(ROOT, "gen"))
 import magnetics as mg                                   # noqa: E402
-from levitation import force_between, COIL, ZB          # noqa: E402
+from levitation import force_between, ZB, Z             # noqa: E402
 import mech                                             # noqa: E402
+import parts                                            # noqa: E402
+
+# the levitation coil as built (gen/parts.py COILS["COIL_LEV"]); the simulations used the
+# canonical 12-turn, 3-15 mm spiral, which the cross-check below reports against
+_C = parts.COILS["COIL_LEV"]
+assert _C["layers"] == len(Z), "the coil's layers and the stack-up's"
+COIL = mg.multilayer_coil(_C["turns"], _C["r_out"] * 1e-3, _C["r_in"] * 1e-3, Z, per_turn=64)
 
 G = 9.81
 BR = 1.43                       # N52, as every simulation here
@@ -126,7 +133,9 @@ def main():
         if row:
             r = row[0]
             assert abs(r["gap_mm"] - g0 * 1e3) < 0.1, (r["gap_mm"], g0 * 1e3)
-            assert abs(r["coil_mN_per_A"] - kc0 * 1e3) < 0.03 * abs(kc0 * 1e3), r
+            print("the coil as built (%d turns a layer, r %.0f-%.0f mm): %.2f mN/A at the float gap; the "
+                  "simulation's canonical coil %.2f mN/A" % (_C["turns"], _C["r_in"], _C["r_out"], kc0 * 1e3,
+                                                            r["coil_mN_per_A"]))
             assert abs(r["hall_bias_mT"] - Bbias * 1e3) < 0.03 * abs(Bbias * 1e3), r
             assert abs(r["hall_bat_mT"] - Bb0 * 1e3) < 0.03 * abs(Bb0 * 1e3), r
             assert abs(r["k_neg"] - k_neg) < 0.15 * k_neg, (r["k_neg"], k_neg)   # its was a 0.5 mm difference

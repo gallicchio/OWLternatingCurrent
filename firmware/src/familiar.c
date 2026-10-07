@@ -1,14 +1,22 @@
 /* familiar.c: find, name and light the familiar tokens on the two perches (familiar.h).
  *
- * The fit.  With a token on the perch the perch coil's impedance is
- *     Z = Z1 + (w M)^2 / Z2,   Z1 = R1 + j w L1,   Z2 = R2 + j w L2 + 1 / (j w C2)
- * and with k^2 = M^2 / (L1 L2), Q(f) = w L2 / R2 (R2 about constant, so Q grows with f)
- * and the token's resonance ft:
- *     (w M)^2 / Z2 = w k^2 L1 / (1 / Q(f) + j (1 - (ft / f)^2)).
- * The sweep measures |Y| = |I| / V; divided by the empty perch's |Y| it is |Z1| / |Z|.
- * The fit tries ft (60 values from just below the dip to 22 % above it), k^2 (6 values)
- * and Q (5 values), each with its best log offset (which absorbs ISENSE's gain), and
- * keeps the least-squares one: a few hundred candidates per call, so no call takes long.
+ * The sweep's reading.  At duty d the bridge's supply current is
+ *     I(d) = Iq + sum_n (Vn(d)^2 / 2) G(n f) / 5 V,   Vn(d) = (4 / (n pi)) 5 V sin(n pi d)
+ * with Iq the drivers' own draw (independent of d).  Two duties per frequency give
+ *     G1 = 5 V (I(dhi) - I(dlo)) / ((V1(dhi)^2 - V1(dlo)^2) / 2)
+ *        = G(f) + w3 G(3 f) + ...,   w3 = (V3(dhi)^2 - V3(dlo)^2) / (V1(dhi)^2 - V1(dlo)^2)
+ * free of Iq; with pulses this narrow w3 is ~0.97, so the 3rd harmonic counts almost
+ * as much as the fundamental.
+ *
+ * The fit.  With a token on the perch
+ *     Z = Z1 + (w M)^2 / Z2 = R1 + j w L1 + w k^2 L1 / (1 / Q(f) + j (1 - (ft / f)^2)),
+ * Q(f) = Q f / ft (the token's coil resistance about constant), and the model of the
+ * reading above the empty perch's is
+ *     m(f) = [Re 1/Z(f) - Re 1/Z1(f)] + w3 [Re 1/Z(3 f) - Re 1/Z1(3 f)].
+ * The fit tries tunings ft from 78 % to 100 % of each conductance peak's frequency
+ * (the peak is the coupled mode, ft / sqrt(1 - k^2)) and of three times it (the peak may
+ * be the 3rd harmonic's), with k^2 and Q on a grid, each with its best gain; a coarse
+ * pass, then a fine one round the best.  A few candidates per call, so no call is long.
  */
 #include "familiar.h"
 #include "config.h"
@@ -17,32 +25,56 @@
 
 #define PI_F 3.14159265f
 #define V1_MAX (4.0f / PI_F * FAM_VDRIVE_V)
-#define FIT_NF 60
-#define FIT_FSTEP 1.0035f
-static const float FIT_K2[] = {0.08f, 0.12f, 0.17f, 0.23f, 0.30f, 0.38f};
-static const float FIT_Q[] = {2.5f, 4.0f, 6.0f, 9.0f, 13.0f};
-#define FIT_NK (int)(sizeof FIT_K2 / sizeof FIT_K2[0])
-#define FIT_NQ (int)(sizeof FIT_Q / sizeof FIT_Q[0])
-#define FIT_TOTAL (FIT_NF * FIT_NK * FIT_NQ)
-#define FIT_PER_CALL 12          /* ~300 logf per call: ~0.15 ms on the M33; the fit ends in ~0.15 s */
-#define KI_DUTY_PER_AS 10.0f        /* current loop: duty per (A s) */
+#define KP_DUTY_PER_WS 6.0f          /* power loop: duty per (W s) */
+#define FIT_PER_CALL 3               /* candidates per call: ~0.15 ms on the M33 */
+static const float K2C[] = {0.10f, 0.16f, 0.22f, 0.30f, 0.40f};
+static const float QC[] = {3.0f, 5.0f, 8.0f, 12.0f};
+#define NK2 (int)(sizeof K2C / sizeof K2C[0])
+#define NQ (int)(sizeof QC / sizeof QC[0])
+#define NF_COARSE 12                 /* ft = base x (0.78 .. 1.00), 2 % steps */
+#define N_COARSE (NF_COARSE * NK2 * NQ)
+#define NF_FINE 13                   /* +-3 % in 0.5 % steps */
+#define N_FINE (NF_FINE * 3 * 3)
 
 static float clampf(float v, float lo, float hi) { return v < lo ? lo : (v > hi ? hi : v); }
 
-static float v1_of(float duty) { return V1_MAX * sinf(PI_F * clampf(duty, 0.0f, 0.5f)); }
-
-/* the duty that drives current i into admittance y (S) */
-static float duty_for(float i, float y)
+/* the n-th harmonic's amplitude at duty d, and half its square (W per S) */
+static float vn(int n, float duty)
 {
-    if (!(y > 0.0f))
+    return 4.0f / ((float)n * PI_F) * FAM_VDRIVE_V * sinf((float)n * PI_F * clampf(duty, 0.0f, 0.5f));
+}
+static float half_sq(float v) { return 0.5f * v * v; }
+
+/* the duty that delivers p_W into conductance g_S (fundamental only) */
+static float duty_for_power(float p_W, float g_S)
+{
+    if (!(p_W > 0.0f) || !(g_S > 0.0f))
         return 0.0f;
-    return asinf(clampf(i / (y * V1_MAX), 0.0f, 1.0f)) / PI_F;
+    return asinf(clampf(sqrtf(2.0f * p_W / g_S) / V1_MAX, 0.0f, 1.0f)) / PI_F;
 }
 
-static float y_empty_model(float f)
+/* the empty perch's conductance and admittance (the nominal coil) */
+static float ge_model(float f)
+{
+    float x = 2.0f * PI_F * f * FAM_L1_H;
+    return FAM_R1_OHM / (FAM_R1_OHM * FAM_R1_OHM + x * x);
+}
+static float ye_abs(float f)
 {
     float x = 2.0f * PI_F * f * FAM_L1_H;
     return 1.0f / sqrtf(FAM_R1_OHM * FAM_R1_OHM + x * x);
+}
+
+/* the perch's conductance with a token tuned to ft (coupling k2, quality q at ft) */
+static float gt_model(float f, float ft, float k2, float q)
+{
+    float w = 2.0f * PI_F * f;
+    float x = 1.0f - (ft / f) * (ft / f);
+    float iq = ft / (q * f);
+    float d = iq * iq + x * x;
+    float a = w * k2 * FAM_L1_H;
+    float re = FAM_R1_OHM + a * iq / d, im = w * FAM_L1_H - a * x / d;
+    return re / (re * re + im * im);
 }
 
 /* smooth raised-cosine 0 -> 1 over T */
@@ -67,6 +99,15 @@ const char *fam_state_name(fam_state s)
     return (unsigned)s < 7 ? n[s] : "?";
 }
 
+/* the empty perch as the sweep reads it: every harmonic counts nearly fully at these
+ * narrow pulses (weights ~0.97, 0.92, 0.85) */
+static float base_model_at(float f)
+{
+    return ge_model(f) + 0.97f * ge_model(3.0f * f) + 0.92f * ge_model(5.0f * f) + 0.85f * ge_model(7.0f * f);
+}
+
+static void model_baseline(fam_perch *p, int i) { p->base[i] = base_model_at(p->f[i]); }
+
 void fam_init(fam_perch *p, int index)
 {
     memset(p, 0, sizeof *p);
@@ -74,7 +115,8 @@ void fam_init(fam_perch *p, int index)
     p->state = FAM_ST_OFF;
     for (int i = 0; i < FAM_SWEEP_N; i++) {
         p->f[i] = FAM_F_MIN_HZ * powf(FAM_F_MAX_HZ / FAM_F_MIN_HZ, (float)i / (FAM_SWEEP_N - 1));
-        p->base[i] = y_empty_model(p->f[i]);
+        model_baseline(p, i);
+        p->w3[i] = 0.97f;
     }
     p->t_last_sweep = -1e9f;
     p->t_prev = -1.0f;
@@ -95,7 +137,7 @@ void fam_enable(fam_perch *p, bool on)
             p->t_last_sweep = -1e9f;
         }
     } else if (p->state == FAM_ST_RAMP_UP || p->state == FAM_ST_DRIVE) {
-        p->ramp_from_A = p->i_target;
+        p->ramp_from_W = p->p_target;
         p->ramp_s = FAM_RAMP_DOWN_S;
         p->state = FAM_ST_RAMP_DOWN;
         p->t_state = p->t_prev;
@@ -104,7 +146,7 @@ void fam_enable(fam_perch *p, bool on)
     }
 }
 
-/* the measured or modelled value at frequency f, from a sweep array (log-linear) */
+/* a sweep array's value at frequency f (linear in log f) */
 static float interp(const fam_perch *p, const float *arr, float f)
 {
     if (f <= p->f[0])
@@ -116,155 +158,226 @@ static float interp(const fam_perch *p, const float *arr, float f)
     if (i >= FAM_SWEEP_N - 1)
         i = FAM_SWEEP_N - 2;
     float a = u - (float)i;
-    return expf((1.0f - a) * logf(arr[i]) + a * logf(arr[i + 1]));
+    return (1.0f - a) * arr[i] + a * arr[i + 1];
 }
 
 /* ---- the fit ----------------------------------------------------------------------------- */
-static float ln_model(float f, float ft, float k2, float q)
+static float sort_median(float *v, int n)
 {
-    float w = 2.0f * PI_F * f;
-    float r1 = FAM_R1_OHM, x1 = w * FAM_L1_H;
-    float x = 1.0f - (ft / f) * (ft / f);
-    float iq = ft / (q * f);
-    float d = iq * iq + x * x;
-    float a = w * k2 * FAM_L1_H;
-    float zr_re = a * iq / d, zr_im = -a * x / d;
-    float re = r1 + zr_re, im = x1 + zr_im;
-    return 0.5f * logf((r1 * r1 + x1 * x1) / (re * re + im * im));
-}
-
-/* the sweep against the baseline: is there a token, and where does the fit start? */
-static bool fit_begin(fam_perch *p, float *contrast_out)
-{
-    float tmp[FAM_SWEEP_N], sm[FAM_SWEEP_N];
-    for (int i = 0; i < FAM_SWEEP_N; i++) {
-        float y = p->y[i] > 1e-7f ? p->y[i] : 1e-7f;
-        p->lr[i] = logf(y / p->base[i]);
-        tmp[i] = p->lr[i];
-    }
-    for (int i = 1; i < FAM_SWEEP_N; i++) {          /* the median, by insertion sort */
-        float v = tmp[i];
+    for (int i = 1; i < n; i++) {
+        float x = v[i];
         int j = i - 1;
-        while (j >= 0 && tmp[j] > v) {
-            tmp[j + 1] = tmp[j];
+        while (j >= 0 && v[j] > x) {
+            v[j + 1] = v[j];
             j--;
         }
-        tmp[j + 1] = v;
+        v[j + 1] = x;
     }
-    float med = 0.5f * (tmp[FAM_SWEEP_N / 2 - 1] + tmp[FAM_SWEEP_N / 2]);
-    for (int i = 0; i < FAM_SWEEP_N; i++)
-        p->lr[i] -= med;
+    return n & 1 ? v[n / 2] : 0.5f * (v[n / 2 - 1] + v[n / 2]);
+}
+
+/* the sweep against the empty perch: is there a peak, and where should the fit look? */
+static bool fit_begin(fam_perch *p, float *excess_out)
+{
+    float tmp[FAM_SWEEP_N];
     for (int i = 0; i < FAM_SWEEP_N; i++) {
-        int a = i > 0 ? i - 1 : i, b = i < FAM_SWEEP_N - 1 ? i + 1 : i;
-        sm[i] = 0.25f * (p->lr[a] + 2.0f * p->lr[i] + p->lr[b]);
+        p->ge1[i] = ge_model(p->f[i]);
+        p->ge3[i] = ge_model(3.0f * p->f[i]);
     }
-    int idip = 0;
-    for (int i = 1; i < FAM_SWEEP_N; i++)
-        if (sm[i] < sm[idip])
-            idip = i;
-    int ipk = idip;
-    for (int i = idip + 1; i < FAM_SWEEP_N && i <= idip + 16; i++)
-        if (sm[i] > sm[ipk])
-            ipk = i;
-    float contrast = sm[ipk] - sm[idip];
-    *contrast_out = contrast;
-    if (!(contrast > 0.34f && sm[idip] < -0.12f && ipk > idip))
+    /* the readings' noise, from what is left after a local straight line (robust) */
+    for (int i = 1; i < FAM_SWEEP_N - 1; i++)
+        tmp[i - 1] = fabsf(p->y[i] - 0.5f * (p->y[i - 1] + p->y[i + 1]));
+    float sigma = 1.4826f * sort_median(tmp, FAM_SWEEP_N - 2) / 1.2247f + 1e-7f;
+    /* a token at least doubles the conductance somewhere; take the empty perch's as up to
+     * FAM_BASE_SLACK times the baseline (ISENSE's gain, R1), and the excess must stand
+     * well out of the noise */
+    int pk[2] = {-1, -1};
+    float best = 0.0f;
+    for (int i = 0; i < FAM_SWEEP_N; i++) {
+        p->dg[i] = p->y[i] - FAM_BASE_SLACK * p->base[i];
+        float ex = p->dg[i] / sigma;
+        if (ex > best)
+            best = ex;
+    }
+    *excess_out = best;
+    for (int i = 0; i < FAM_SWEEP_N; i++) {
+        float l = i > 0 ? p->dg[i - 1] : -1e9f, r = i < FAM_SWEEP_N - 1 ? p->dg[i + 1] : -1e9f;
+        if (p->dg[i] < l || p->dg[i] < r || p->dg[i] < 6.0f * sigma)
+            continue;
+        if (pk[0] < 0 || p->dg[i] > p->dg[pk[0]]) {
+            pk[1] = pk[0];
+            pk[0] = i;
+        } else if (pk[1] < 0 || p->dg[i] > p->dg[pk[1]]) {
+            pk[1] = i;
+        }
+    }
+    if (pk[0] < 0)
         return false;
-    /* the dip's frequency, refined by a parabola through its neighbours (in log f) */
-    float fd = p->f[idip];
-    if (idip > 0 && idip < FAM_SWEEP_N - 1) {
-        float a = sm[idip - 1], b = sm[idip], c = sm[idip + 1];
-        float den = a - 2.0f * b + c;
-        if (den > 1e-6f)
-            fd *= powf(p->f[1] / p->f[0], clampf(0.5f * (a - c) / den, -0.5f, 0.5f));
+    p->n_base = 0;
+    for (int k = 0; k < 2 && pk[k] >= 0; k++) {
+        int i = pk[k];
+        float fp = p->f[i];
+        if (i > 0 && i < FAM_SWEEP_N - 1) {           /* refine by a parabola (in log f) */
+            float a = p->y[i - 1], b = p->y[i], c = p->y[i + 1];
+            float den = a - 2.0f * b + c;
+            if (den < -1e-12f)
+                fp *= powf(p->f[1] / p->f[0], clampf(0.5f * (a - c) / den, -0.5f, 0.5f));
+        }
+        p->fit_base[p->n_base++] = fp;
+        if (3.0f * 0.78f * fp <= 1.15f * FAM_F_MAX_HZ)  /* or the 3rd harmonic of a token up there */
+            p->fit_base[p->n_base++] = 3.0f * fp;
     }
-    p->f_dip = fd;
-    p->i_dip = idip;
-    p->i_peak = ipk;
-    p->fit_lo = idip > 12 ? idip - 12 : 0;
-    p->fit_hi = ipk + 4 < FAM_SWEEP_N - 1 ? ipk + 4 : FAM_SWEEP_N - 1;
+    /* the sums every candidate shares; and how the baseline compares with the model (1 for
+     * the model itself; ISENSE's gain x R1's error once learned from empty sweeps) */
+    float bm = 0.0f, mm = 0.0f;
+    p->s_bb = p->s_yb = p->s_yy = 0.0f;
+    for (int i = 0; i < FAM_SWEEP_N; i++) {
+        float mb = base_model_at(p->f[i]);
+        bm += p->base[i] * mb;
+        mm += mb * mb;
+        p->s_bb += p->base[i] * p->base[i];
+        p->s_yb += p->y[i] * p->base[i];
+        p->s_yy += p->y[i] * p->y[i];
+    }
+    p->base_scale = mm > 0.0f ? bm / mm : 1.0f;
     p->fit_i = 0;
+    p->fit_stage = 0;
     p->fit_best = 1e30f;
     return true;
 }
 
-/* a share of the candidates; true when all are done */
+/* the token's excess conductance over the empty perch, as the sweep reads it at point i */
+static float token_excess(const fam_perch *p, int i, float ft, float k2, float q)
+{
+    float f = p->f[i];
+    return (gt_model(f, ft, k2, q) - p->ge1[i]) + p->w3[i] * (gt_model(3.0f * f, ft, k2, q) - p->ge3[i]);
+}
+
+/* least squares of y = a (base + c m(ft, k2, q)), c the baseline's scale against the model.
+ * The token's excess is tied to the empty perch's scale: both are read through the same
+ * ISENSE gain, so only R1's error (R1 = FAM_R1_OHM, about +-15 %) separates them.  Left
+ * free, the excess's size trades against k^2 and the tuning comes out several per cent
+ * low (the peak, at ft / sqrt(1 - k^2), fits either way). */
+static float fit_eval(const fam_perch *p, float ft, float k2, float q, float *a_out, float *s_out)
+{
+    float s_bm = 0.0f, s_mm = 0.0f, s_ym = 0.0f;
+    for (int i = 0; i < FAM_SWEEP_N; i++) {
+        float m = token_excess(p, i, ft, k2, q);
+        s_bm += p->base[i] * m;
+        s_mm += m * m;
+        s_ym += p->y[i] * m;
+    }
+    float c = p->base_scale;
+    float s_yu = p->s_yb + c * s_ym, s_uu = p->s_bb + 2.0f * c * s_bm + c * c * s_mm;
+    if (!(s_uu > 0.0f) || s_yu <= 0.0f) {
+        *a_out = *s_out = 0.0f;
+        return p->s_yy;
+    }
+    *a_out = s_yu / s_uu;
+    *s_out = *a_out * c;
+    return p->s_yy - s_yu * s_yu / s_uu;
+}
+
+/* a share of the candidates; true when the fit is done */
 static bool fit_run(fam_perch *p)
 {
-    int end = p->fit_i + FIT_PER_CALL;
-    if (end > FIT_TOTAL)
-        end = FIT_TOTAL;
-    for (; p->fit_i < end; p->fit_i++) {
+    for (int n = 0; n < FIT_PER_CALL; n++) {
+        float ft, k2, q;
         int k = p->fit_i;
-        int iq = k % FIT_NQ;
-        k /= FIT_NQ;
-        int ik = k % FIT_NK;
-        int jf = k / FIT_NK;
-        float ft = p->f_dip * 0.98f * powf(FIT_FSTEP, (float)jf);
-        float k2 = FIT_K2[ik], q = FIT_Q[iq];
-        float d[FAM_SWEEP_N];
-        float mean = 0.0f;
-        int n = 0;
-        for (int i = p->fit_lo; i <= p->fit_hi; i++, n++) {
-            d[n] = p->lr[i] - ln_model(p->f[i], ft, k2, q);
-            mean += d[n];
+        if (p->fit_stage == 0) {
+            if (k >= p->n_base * N_COARSE) {
+                p->fit_stage = 1;
+                p->fit_i = 0;
+                p->fine_ft = p->fit_ft;
+                p->fine_k2 = p->fit_k2;
+                p->fine_q = p->fit_q;
+                continue;
+            }
+            int b = k / N_COARSE, r = k % N_COARSE;
+            int iq = r % NQ, ik = (r / NQ) % NK2, jf = r / (NQ * NK2);
+            ft = p->fit_base[b] * (0.78f + 0.02f * (float)jf);
+            k2 = K2C[ik];
+            q = QC[iq];
+        } else {
+            if (k >= N_FINE)
+                return true;
+            int iq = k % 3, ik = (k / 3) % 3, jf = k / 9;
+            static const float KM[3] = {1.0f / 1.2f, 1.0f, 1.2f}, QM[3] = {1.0f / 1.4f, 1.0f, 1.4f};
+            ft = p->fine_ft * (0.97f + 0.005f * (float)jf);
+            k2 = p->fine_k2 * KM[ik];
+            q = p->fine_q * QM[iq];
         }
-        mean /= (float)n;
-        float err = 0.0f;
-        for (int i = 0; i < n; i++)
-            err += (d[i] - mean) * (d[i] - mean);
-        if (err < p->fit_best) {
-            p->fit_best = err;
+        p->fit_i++;
+        if (ft < 0.5f * FAM_F_MIN_HZ || ft > 1.3f * FAM_F_MAX_HZ)
+            continue;
+        float a, sc;
+        float e = fit_eval(p, ft, k2, q, &a, &sc);
+        if (sc > 0.0f && e < p->fit_best) {
+            p->fit_best = e;
             p->fit_ft = ft;
             p->fit_k2 = k2;
             p->fit_q = q;
+            p->fit_a = a;
+            p->fit_scale = sc;
         }
     }
-    return p->fit_i >= FIT_TOTAL;
+    return false;
 }
 
 static fam_who classify(float ft)
 {
-    if (ft > 0.70f * FAM_OWL_HZ && ft < 1.35f * FAM_OWL_HZ)
+    if (ft > 0.70f * FAM_OWL_HZ && ft < 1.30f * FAM_OWL_HZ)
         return FAM_OWL;
-    if (ft > 0.75f * FAM_CAT_HZ && ft < 1.25f * FAM_CAT_HZ)
+    if (ft > 0.80f * FAM_CAT_HZ && ft < 1.25f * FAM_CAT_HZ)
         return FAM_CAT;
     return FAM_UNKNOWN;
 }
 
 /* ---- driving ---------------------------------------------------------------------------- */
-static void current_loop(fam_perch *p, float isense, float dt)
+static float duty_cap_at(float f)
 {
-    float ff = duty_for(p->i_target, p->y_token);
-    if (isense > FAM_I_MAX_A)
-        p->trim -= 0.02f;                       /* too much: back off at once */
-    else
-        p->trim += KI_DUTY_PER_AS * (p->i_target - isense) * dt;
-    float duty = ff + p->trim;
-    float cl = clampf(duty, 0.0f, p->duty_cap);
-    p->trim = cl - ff;                          /* no wind-up against the limits */
-    if (p->i_target <= 0.0f)
-        cl = 0.0f;
-    p->cmd.duty = cl;
+    /* what puts FAM_CAP_MARGIN x FAM_I_MAX_A into an empty perch: with a token the perch's
+     * impedance is only higher at and below the token's tuning, so this holds either way */
+    float c = asinf(clampf(FAM_CAP_MARGIN * FAM_I_MAX_A / (ye_abs(f) * V1_MAX), 0.0f, 1.0f)) / PI_F;
+    return clampf(c, 0.0f, 0.5f);
 }
 
-/* +-FAM_DITHER round f_drive at 100 Hz; the admittance's log slope from each pair */
+static void power_loop(fam_perch *p, float isense, float dt)
+{
+    float p_meas = FAM_VDRIVE_V * (isense - p->iq_drive);
+    p->p_meas_f += 0.2f * (p_meas - p->p_meas_f);
+    float g_ff = p->fit_scale * gt_model(p->f_drive, p->f_token, p->fit_k2, p->fit_q);
+    float ff = duty_for_power(p->p_target, g_ff);
+    if (p_meas > 1.6f * (p->p_target > 0.05f ? p->p_target : 0.05f))
+        p->trim -= 0.01f;                          /* far too much: back off at once */
+    else
+        p->trim += KP_DUTY_PER_WS * (p->p_target - p_meas) * dt;
+    float cap = duty_cap_at(p->f_drive);
+    float d = clampf(ff + p->trim, 0.0f, cap);
+    p->trim = d - ff;                              /* no wind-up against the limits */
+    p->cmd.duty = p->p_target > 0.0f ? d : 0.0f;
+}
+
+/* +-FAM_DITHER round f_drive at 100 Hz: the conductance's log slope from each pair, and
+ * the drive scaled so that the delivered power (and the light) does not follow the dither */
 static void dither(fam_perch *p, float t, float isense, const fam_cmd *app)
 {
-    float v1 = v1_of(app->duty);
+    float h = half_sq(vn(1, app->duty));
     if (t - p->t_step >= FAM_DITHER_HALF_S) {
         if (p->dith_side == 1 && p->dith_cnt[0] > 0 && p->dith_cnt[1] > 0) {
-            float ym = p->dith_acc[0] / p->dith_cnt[0], yp = p->dith_acc[1] / p->dith_cnt[1];
-            /* the frequencies the PWM really made (quantised: 0.44 % steps at 330 kHz) */
+            float gm = p->dith_acc[0] / p->dith_cnt[0], gp = p->dith_acc[1] / p->dith_cnt[1];
             float fm = p->dith_f[0] / p->dith_cnt[0], fp = p->dith_f[1] / p->dith_cnt[1];
-            if (ym > 0.0f && yp > 0.0f && fp > 1.001f * fm) {
-                float s = logf(yp / ym) / logf(fp / fm);
+            if (gm > 0.0f && gp > 0.0f && fp > 1.001f * fm) {
+                float s = logf(gp / gm) / logf(fp / fm);
                 if (!p->slope_ok) {
                     p->slope = s;
                     p->slope_ok = true;
                 } else {
                     p->slope += 0.05f * (s - p->slope);
                 }
+                float g = 0.5f * (gm + gp);
+                p->g_acc += 0.05f * (g - p->g_acc);       /* the conductance now, for leaving */
+                p->g_n++;
             }
             p->dith_acc[0] = p->dith_acc[1] = 0.0f;
             p->dith_f[0] = p->dith_f[1] = 0.0f;
@@ -272,28 +385,31 @@ static void dither(fam_perch *p, float t, float isense, const fam_cmd *app)
         }
         p->dith_side ^= 1;
         p->t_step = t;
-    } else if (t - p->t_step >= FAM_DITHER_HALF_S - 0.0021f && v1 > 0.0f) {
-        p->dith_acc[p->dith_side] += isense / v1;      /* the last ~2 ms of each half */
+    } else if (t - p->t_step >= FAM_DITHER_HALF_S - 0.0021f && h > 1e-4f) {
+        p->dith_acc[p->dith_side] += FAM_VDRIVE_V * (isense - p->iq_drive) / h;   /* last ~2 ms of each half */
         p->dith_f[p->dith_side] += app->freq_hz;
         p->dith_cnt[p->dith_side]++;
     }
-    p->cmd.freq_hz = p->f_drive * (p->dith_side ? 1.0f + FAM_DITHER : 1.0f - FAM_DITHER);
-    /* Hold the perch current, and so the token's light, steady through the dither: the
-     * admittance goes as f^slope here, so scale the drive by the inverse.  (At the token's
-     * resonance its tank voltage per perch amp is flat, so its LEDs do not see the dither.)
-     * The admittance is still measured: it uses the duty actually applied on each side. */
+    float sgn = p->dith_side ? 1.0f : -1.0f;
+    p->cmd.freq_hz = p->f_drive * (1.0f + sgn * FAM_DITHER);
     if (p->slope_ok && p->cmd.duty > 0.0f) {
-        float g = 1.0f + (p->dith_side ? 1.0f : -1.0f) * clampf(p->slope, -3.0f, 8.0f) * FAM_DITHER;
-        float s = sinf(PI_F * p->cmd.duty) / clampf(g, 0.5f, 1.5f);
-        p->cmd.duty = clampf(asinf(clampf(s, 0.0f, 1.0f)) / PI_F, 0.0f, p->duty_cap);
+        /* G goes as f^slope here: scale V1 by its inverse square root */
+        float g = powf(1.0f + sgn * FAM_DITHER, clampf(p->slope, -4.0f, 10.0f));
+        float s = sinf(PI_F * p->cmd.duty) / sqrtf(clampf(g, 0.5f, 2.0f));
+        p->cmd.duty = clampf(asinf(clampf(s, 0.0f, 1.0f)) / PI_F, 0.0f, duty_cap_at(p->cmd.freq_hz));
     }
 }
 
 static void start_ramp_down(fam_perch *p, float t, float seconds)
 {
-    p->ramp_from_A = p->i_target;
+    p->ramp_from_W = p->p_target;
     p->ramp_s = seconds;
     set_state(p, FAM_ST_RAMP_DOWN, t);
+}
+
+static void sweep_step_cmd(fam_perch *p)
+{
+    p->cmd = (fam_cmd){true, p->f[p->step], p->level ? FAM_SWEEP_DUTY : FAM_SWEEP_DUTY_LO};
 }
 
 void fam_step(fam_perch *p, float t, float isense, const fam_cmd *applied, fam_cmd *cmd, fam_event *ev)
@@ -305,8 +421,6 @@ void fam_step(fam_perch *p, float t, float isense, const fam_cmd *applied, fam_c
     float dt = (p->t_prev >= 0.0f && t > p->t_prev && t - p->t_prev < 0.1f) ? t - p->t_prev : 0.001f;
     p->t_prev = t;
     fam_cmd app = applied ? *applied : p->cmd;
-    float v1 = v1_of(app.duty);
-    p->i_meas_f += 0.1f * (isense - p->i_meas_f);
 
     switch (p->state) {
     case FAM_ST_OFF:
@@ -320,21 +434,43 @@ void fam_step(fam_perch *p, float t, float isense, const fam_cmd *applied, fam_c
         if (p->enabled && t - p->t_last_sweep >= FAM_SWEEP_PERIOD_S) {
             set_state(p, FAM_ST_SWEEP, t);
             p->step = 0;
+            p->level = 0;
             p->n_avg = 0;
-            p->acc = 0.0f;
+            p->acc = p->acc_v1sq = 0.0f;
+            p->v3sq_lo = 0.0f;
             p->t_step = t;
-            p->cmd = (fam_cmd){true, p->f[0], FAM_SWEEP_DUTY};
+            sweep_step_cmd(p);
         }
         break;
 
     case FAM_ST_SWEEP:
-        if (t - p->t_step >= FAM_SETTLE_S && v1 > 0.0f) {
-            p->acc += isense / v1;
+        if (t - p->t_step >= FAM_SETTLE_S) {
+            p->acc += isense;
+            p->acc_v1sq += half_sq(vn(1, app.duty));
+            p->v3sq_lo += half_sq(vn(3, app.duty)) * (p->level ? -1.0f : 1.0f);   /* lo - hi, summed */
             if (++p->n_avg >= FAM_AVG_N) {
-                p->y[p->step] = p->acc / (float)p->n_avg;
-                p->step++;
+                float I = p->acc / (float)p->n_avg, v1sq = p->acc_v1sq / (float)p->n_avg;
+                if (p->level == 0) {
+                    p->i_lo = I;
+                    p->v1sq_lo = v1sq;
+                    p->level = 1;
+                } else {
+                    float dv = v1sq - p->v1sq_lo;
+                    int i = p->step;
+                    if (dv > 1e-5f) {
+                        p->y[i] = FAM_VDRIVE_V * (I - p->i_lo) / dv;
+                        p->w3[i] = clampf(-p->v3sq_lo / (float)p->n_avg / dv, 0.0f, 1.2f);
+                        p->iq[i] = p->i_lo - p->v1sq_lo * p->y[i] / FAM_VDRIVE_V;
+                    } else {
+                        p->y[i] = 0.0f;
+                        p->iq[i] = p->i_lo;
+                    }
+                    p->v3sq_lo = 0.0f;
+                    p->level = 0;
+                    p->step++;
+                }
                 p->n_avg = 0;
-                p->acc = 0.0f;
+                p->acc = p->acc_v1sq = 0.0f;
                 p->t_step = t;
             }
         }
@@ -342,44 +478,57 @@ void fam_step(fam_perch *p, float t, float isense, const fam_cmd *applied, fam_c
             p->t_last_sweep = t;
             p->cmd.enable = false;
             p->cmd.duty = 0.0f;
-            float contrast;
-            if (fit_begin(p, &contrast)) {
+            float excess;
+            if (fit_begin(p, &excess)) {
                 set_state(p, FAM_ST_FIT, t);
             } else {
-                if (contrast < 0.15f) {                    /* clearly empty: learn what empty looks like */
+                if (excess < 3.0f) {                       /* clearly empty: learn what empty looks like */
+                    /* (the model's 1/f^2 shape, scaled to this sweep, smooths the noise) */
+                    float num = 0.0f, den = 0.0f;
                     for (int i = 0; i < FAM_SWEEP_N; i++) {
-                        float y = p->y[i] > 1e-7f ? p->y[i] : 1e-7f;
-                        p->base[i] *= expf(0.3f * logf(y / p->base[i]));
+                        num += p->y[i] * p->base[i];
+                        den += p->base[i] * p->base[i];
                     }
+                    float a = den > 0.0f ? clampf(num / den, 0.3f, 3.0f) : 1.0f;
+                    for (int i = 0; i < FAM_SWEEP_N; i++)
+                        p->base[i] += 0.3f * (a * p->base[i] - p->base[i]);
                     p->base_learned++;
                 }
                 set_state(p, FAM_ST_IDLE, t);
             }
         } else {
-            p->cmd = (fam_cmd){true, p->f[p->step], FAM_SWEEP_DUTY};
+            sweep_step_cmd(p);
         }
         break;
 
     case FAM_ST_FIT:
         p->cmd.enable = false;
+        p->cmd.duty = 0.0f;
         if (fit_run(p)) {
+            /* how much of what the baseline alone leaves unexplained the token explains */
+            float e_base = p->s_yy - p->s_yb * p->s_yb / p->s_bb;
+            p->fit_r2 = e_base > 0.0f ? 1.0f - p->fit_best / e_base : 0.0f;
+            p->gain = p->fit_a;
+            if (p->fit_r2 < 0.8f || p->fit_a < 0.2f || p->fit_a > 5.0f) {
+                set_state(p, FAM_ST_IDLE, t);              /* no resonance: not a token, not driven */
+                break;
+            }
             p->who = classify(p->fit_ft);
-            p->f_token = p->fit_ft;
-            p->f_drive = p->fit_ft;
-            p->y_token = interp(p, p->y, p->f_drive);
-            p->y_empty = interp(p, p->base, p->f_drive);
-            p->duty_cap = clampf(duty_for(1.15f * FAM_I_MAX_A, p->y_empty), 0.0f, 0.5f);
-            if (!(p->y_empty * V1_MAX > 1.15f * FAM_I_MAX_A))
-                p->duty_cap = 0.5f;                   /* an empty perch cannot reach the limit here */
+            p->f_token = p->f_drive = p->fit_ft;
+            p->iq_drive = interp(p, p->iq, p->f_drive);
             p->trim = 0.0f;
-            p->i_target = 0.0f;
+            p->p_target = 0.0f;
+            p->p_meas_f = 0.0f;
             p->slope_ok = false;
+            p->g_acc = 0.0f;
+            p->g_n = 0;
+            p->g_lit = 0.0f;
             p->dith_side = 0;
             p->dith_acc[0] = p->dith_acc[1] = 0.0f;
             p->dith_f[0] = p->dith_f[1] = 0.0f;
             p->dith_cnt[0] = p->dith_cnt[1] = 0;
             p->t_step = t;
-            p->t_low_slope = -1.0f;
+            p->t_low = -1.0f;
             ev->kind = FAM_EV_ARRIVED;
             ev->who = p->who;
             ev->freq_hz = p->f_token;
@@ -396,22 +545,26 @@ void fam_step(fam_perch *p, float t, float isense, const fam_cmd *applied, fam_c
     case FAM_ST_DRIVE:
         p->cmd.enable = true;
         if (p->state == FAM_ST_RAMP_UP) {
-            p->i_target = FAM_I_TARGET_A * ease(t - p->t_state, FAM_RAMP_S);
-            if (t - p->t_state >= FAM_RAMP_S) {
+            p->p_target = FAM_P_TARGET_W * ease(t - p->t_state, FAM_RAMP_S);
+            if (t - p->t_state >= FAM_RAMP_S)
                 set_state(p, FAM_ST_DRIVE, t);
-                p->slope0 = p->slope;
-            }
         } else {
-            p->i_target = FAM_I_TARGET_A;
+            p->p_target = FAM_P_TARGET_W;
         }
-        current_loop(p, isense, dt);
+        power_loop(p, isense, dt);
         dither(p, t, isense, &app);
         if (p->state == FAM_ST_DRIVE && p->slope_ok) {
-            /* an empty perch's admittance falls as 1/f (slope -1); a token's rises here */
-            if (p->slope < -0.3f) {
-                if (p->t_low_slope < 0.0f)
-                    p->t_low_slope = t;
-                else if (t - p->t_low_slope > 0.25f) {
+            if (p->g_lit <= 0.0f && t - p->t_state > 0.5f)
+                p->g_lit = p->g_acc;                   /* the lit token's conductance */
+            /* leaving: the slope turns negative (an empty perch's falls as ~1/f^2), or the
+             * conductance sinks most of the way back to the empty perch's */
+            float g_empty = p->fit_scale * ge_model(p->f_drive);
+            bool low = p->slope < 0.0f ||
+                       (p->g_lit > 0.0f && p->g_acc < g_empty + 0.35f * (p->g_lit - g_empty));
+            if (low) {
+                if (p->t_low < 0.0f)
+                    p->t_low = t;
+                else if (t - p->t_low > 0.25f) {
                     ev->kind = FAM_EV_LEFT;
                     ev->who = p->who;
                     ev->freq_hz = p->f_token;
@@ -420,25 +573,23 @@ void fam_step(fam_perch *p, float t, float isense, const fam_cmd *applied, fam_c
                     break;
                 }
             } else {
-                p->t_low_slope = -1.0f;
+                p->t_low = -1.0f;
             }
-            /* follow the token: hold the slope found at full drive (slowly; within 8 %) */
-            if (t - p->t_state > 1.0f && p->slope > 0.0f) {
-                if (p->t_state + 1.0f > t - dt)
-                    p->slope0 = p->slope;
-                p->f_drive *= expf(0.02f * (p->slope0 - p->slope) * dt);
-                p->f_drive = clampf(p->f_drive, 0.92f * p->f_token, 1.08f * p->f_token);
-            }
+            /* No frequency tracking: the token's tuning is its own coil and C0G capacitor and
+             * does not move; moving the token changes the coupling, which moves the
+             * conductance peak (the coupled mode) but not the tuning, where it is driven.
+             * (At the tuning the lit token's slope is at its maximum, so there is nothing to
+             * hold on to there anyway.)  A token set down again is fitted afresh. */
         }
         break;
 
     case FAM_ST_RAMP_DOWN:
-        p->i_target = p->ramp_from_A * (1.0f - ease(t - p->t_state, p->ramp_s));
-        current_loop(p, isense, dt);
+        p->p_target = p->ramp_from_W * (1.0f - ease(t - p->t_state, p->ramp_s));
+        power_loop(p, isense, dt);
         p->cmd.freq_hz = p->f_drive;
         if (t - p->t_state >= p->ramp_s) {
             p->cmd = (fam_cmd){false, p->f_drive, 0.0f};
-            p->i_target = 0.0f;
+            p->p_target = 0.0f;
             p->who = FAM_NONE;
             if (p->enabled) {
                 set_state(p, FAM_ST_IDLE, t);

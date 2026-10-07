@@ -7,7 +7,7 @@
 enum { LED_DRV_BASE = 0, LED_DRV_TREE = 1, LED_DRIVERS = 2 };
 #define LED_DRIVER_CHANNELS 36   /* LP5036: 12 banks of 3 */
 #define LED_DRIVER_BANKS    12
-static const uint8_t LED_DRIVER_ADDR[LED_DRIVERS] = {0x30, 0x31};
+static const uint8_t LED_DRIVER_ADDR[LED_DRIVERS] = {0x30, 0x32};
 
 /* colours (gen/leds.py's docstring has the parts) */
 enum { LED_COL_ORANGE = 0, LED_COL_AMBER5050 = 1, LED_COL_VIOLET = 2, LED_COL_PURPLE = 3, LED_COLOURS };
@@ -69,12 +69,12 @@ enum {
     LED_TSTAR3 = 40,
     LED_TSTAR4 = 41,
     LED_TSTAR5 = 42,
-    LED_PERCH_DOWN0 = 43,
-    LED_PERCH_DOWN1 = 44,
-    LED_TWISP0 = 45,
-    LED_TWISP1 = 46,
-    LED_TWISP2 = 47,
-    LED_TWISP3 = 48,
+    LED_TWISP0 = 43,
+    LED_TWISP1 = 44,
+    LED_TWISP2 = 45,
+    LED_TWISP3 = 46,
+    LED_PERCH_DOWN0 = 47,
+    LED_PERCH_DOWN1 = 48,
 };
 
 static const led_info LED_MAP[LED_COUNT] = {
@@ -121,18 +121,18 @@ static const led_info LED_MAP[LED_COUNT] = {
     {LED_DRV_TREE, 12, "TSTAR3", LED_COL_VIOLET, 0.00f, 0.00f, LED_BOARD_TREE},   /* tree sky star 3 */
     {LED_DRV_TREE, 13, "TSTAR4", LED_COL_VIOLET, 0.00f, 0.00f, LED_BOARD_TREE},   /* tree sky star 4 */
     {LED_DRV_TREE, 14, "TSTAR5", LED_COL_VIOLET, 0.00f, 0.00f, LED_BOARD_TREE},   /* tree sky star 5 */
-    {LED_DRV_TREE, 15, "PERCH_DOWN0", LED_COL_VIOLET, 0.00f, 0.00f, LED_BOARD_PERCH},   /* perch underside, left of the coil */
-    {LED_DRV_TREE, 16, "PERCH_DOWN1", LED_COL_VIOLET, 0.00f, 0.00f, LED_BOARD_PERCH},   /* perch underside, right of the coil */
     {LED_DRV_TREE, 18, "TWISP0", LED_COL_PURPLE, 0.00f, 0.00f, LED_BOARD_TREE},   /* in the tree's branches 0 */
     {LED_DRV_TREE, 19, "TWISP1", LED_COL_PURPLE, 0.00f, 0.00f, LED_BOARD_TREE},   /* in the tree's branches 1 */
     {LED_DRV_TREE, 20, "TWISP2", LED_COL_PURPLE, 0.00f, 0.00f, LED_BOARD_TREE},   /* in the tree's branches 2 */
     {LED_DRV_TREE, 21, "TWISP3", LED_COL_PURPLE, 0.00f, 0.00f, LED_BOARD_TREE},   /* in the tree's branches 3 */
+    {LED_DRV_TREE, 33, "PERCH_DOWN0", LED_COL_VIOLET, 0.00f, 0.00f, LED_BOARD_PERCH},   /* perch underside, left of the coil */
+    {LED_DRV_TREE, 34, "PERCH_DOWN1", LED_COL_VIOLET, 0.00f, 0.00f, LED_BOARD_PERCH},   /* perch underside, right of the coil */
 };
 
 /* each driver's outputs: the LED on OUTn, or -1 */
 static const int8_t LED_OF_CHANNEL[LED_DRIVERS][LED_DRIVER_CHANNELS] = {
     {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, -1, -1, -1, -1, -1},   /* BASE */
-    {31, 32, -1, 33, 34, -1, 35, 36, -1, 37, 38, 39, 40, 41, 42, 43, 44, -1, 45, 46, 47, 48, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},   /* TREE */
+    {31, 32, -1, 33, 34, -1, 35, 36, -1, 37, 38, 39, 40, 41, 42, -1, -1, -1, 43, 44, 45, 46, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 47, 48, -1},   /* TREE */
 };
 
 /* named groups, in order (the scenes walk these) */
@@ -152,7 +152,7 @@ static const uint8_t LED_GROUP_STARX[LED_N_STARX] = {27, 28, 29, 30};
 static const uint8_t LED_GROUP_OWLEYE[LED_N_OWLEYE] = {31, 32, 33, 34, 35, 36};
 #define LED_N_TSTAR        6
 static const uint8_t LED_GROUP_TSTAR[LED_N_TSTAR] = {37, 38, 39, 40, 41, 42};
-#define LED_N_PERCH_DOWN   2
-static const uint8_t LED_GROUP_PERCH_DOWN[LED_N_PERCH_DOWN] = {43, 44};
 #define LED_N_TWISP        4
-static const uint8_t LED_GROUP_TWISP[LED_N_TWISP] = {45, 46, 47, 48};
+static const uint8_t LED_GROUP_TWISP[LED_N_TWISP] = {43, 44, 45, 46};
+#define LED_N_PERCH_DOWN   2
+static const uint8_t LED_GROUP_PERCH_DOWN[LED_N_PERCH_DOWN] = {47, 48};

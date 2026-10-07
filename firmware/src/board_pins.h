@@ -55,8 +55,8 @@
 #define MUX_CH_PEND3_IPROPI   0   /* pendulum coil 3 current */
 #define MUX_CH_PEND2_IPROPI   1   /* pendulum coil 2 current */
 #define MUX_CH_PEND1_IPROPI   2   /* pendulum coil 1 current */
-#define MUX_CH_FAM2_ISENSE    3   /* cat perch bridge's supply current (filtered): rises when the cat sits on it */
-#define MUX_CH_FAM1_ISENSE    4   /* owl perch bridge's supply current (filtered): rises when the owl sits on it */
+#define MUX_CH_FAM2_ISENSE    3   /* cat perch bridge's supply current, 1 ms average, x20.6 on 0.5 R: 10.3 V/A; rises when the cat sits on it */
+#define MUX_CH_FAM1_ISENSE    4   /* owl perch bridge's supply current, 1 ms average, x20.6 on 0.5 R: 10.3 V/A; rises when the owl sits on it */
 #define MUX_CH_V12_SENSE      5   /* +12V through 100 k / 22 k (12 V reads 2.16 V) */
 #define MUX_CH_V5_SENSE       6   /* +5V through 10 k / 10 k (5 V reads 2.5 V) */
 #define MUX_CH_VBUS_SENSE     7   /* USB VBUS through 10 k / 10 k: plugged into USB? */
@@ -67,7 +67,7 @@
 
 /* ---- I2C0 (7-bit addresses) ------------------------------------------------- */
 #define I2C_ADDR_LP5036_BASE  0x30
-#define I2C_ADDR_LP5036_TREE  0x31
+#define I2C_ADDR_LP5036_TREE  0x32
 #define I2C_ADDR_LSM6DS3TR_C  0x6A
 #define I2C_ADDR_LTR_303ALS   0x29
 #define I2C_ADDR_TMAG5273A2   0x35

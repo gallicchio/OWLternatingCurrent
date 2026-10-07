@@ -18,7 +18,7 @@
  *   lev cal [coil|zero]             calibrate: the coil's field and polarity (bat in its
  *                                   cradle or away), or the Hall zero (bat removed)
  *   lev tune <param> <value>        a loop parameter (lev status lists them)
- *   lev eyes <0..1>                 the 90 kHz carrier that lights the bat's eyes (while it floats)
+ *   lev eyes <0..1>                 the 80 kHz carrier that lights the bat's eyes (while it floats)
  *   pend off|sustain|circle|chaos   the pendulum
  *   pend cal                        the 3-axis Hall sensor's zero (bat away)
  *   theremin on|off|cal             the theremin (cal: hands away)

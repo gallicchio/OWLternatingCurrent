@@ -50,7 +50,9 @@ enum {
 
 enum { RT_OWNER_NONE = 0, RT_OWNER_PEND, RT_OWNER_FILM, RT_OWNER_CONSOLE };
 
-#define LEV_EYES_MAX 0.8f   /* [CHOICE] the carrier's share of each period at most (0.4 each way) */
+#define LEV_EYES_MAX 0.8f   /* [CHOICE] the carrier's share of each period at most (0.4 each way).
+                              The carrier's fundamental is about (4/pi) 12 V sin(pi m) / (2 pi f L),
+                              m = eyes / 2: eyes 0.3 makes ~0.45 A, which lights the eyes (bat_power.py) */
 
 typedef struct {
     /* written by core 1 */
@@ -70,7 +72,7 @@ typedef struct {
     volatile uint32_t tick_cycles_max;         /* the longest tick's work, in clk_sys cycles */
     /* written by core 0 */
     volatile float ambient_C;                  /* the board's temperature, for the thermal models */
-    volatile float lev_eyes;                   /* 0..1: the 90 kHz carrier for the bat's eyes */
+    volatile float lev_eyes;                   /* 0..1: the 80 kHz carrier for the bat's eyes */
     volatile uint32_t clear_req;               /* incremented to clear latched faults */
 } rt_shared;
 

@@ -12,7 +12,7 @@
  * DRV8874's current mirror keeps seeing it (IPROPI works in drive and brake, not in
  * coast).  Asking for a little of both directions at once (min_alt) keeps every
  * output pulse at least DRV_MIN_PULSE_S long, so the mean voltage stays linear
- * down to zero; asking for a lot (the levitation coil's 90 kHz carrier) makes the
+ * down to zero; asking for a lot (the levitation coil's 80 kHz carrier) makes the
  * triangular ripple that lights the bat's eyes.
  *
  * UCC27524 (the familiar perches), from 5 V: each leg of the perch's full bridge

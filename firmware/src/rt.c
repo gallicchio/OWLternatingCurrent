@@ -131,12 +131,14 @@ static int resync;                          /* 1: new TOPs written, re-align on 
 
 static void align_lev_and_tick(void)
 {
+    /* the EN register's atomic clear and set aliases: one write stops both, one starts both
+     * (the tick then wraps at the coil period's start), and core 0 enabling its own slices
+     * meanwhile (perch_init) cannot be undone by a read-modify-write here */
     uint32_t both = (1u << PWM_SLICE_LEV) | (1u << PWM_SLICE_TICK);
-    uint32_t en = pwm_hw->en;
-    pwm_hw->en = en & ~both;
+    hw_clear_bits(&pwm_hw->en, both);
     pwm_set_counter(PWM_SLICE_LEV, 0);
     pwm_set_counter(PWM_SLICE_TICK, 0);
-    pwm_hw->en = en | both;                 /* together: the tick wraps at the coil period's start */
+    hw_set_bits(&pwm_hw->en, both);
 }
 
 static void tick_isr(void)
@@ -413,7 +415,7 @@ static void control(void)
         float extra = 0.0f;
         if (c == COIL_LEV && carrier_now) {
             /* the carrier's triangular ripple: about V (m T) / L peak to peak, rms / (2 sqrt 3) */
-            float ipp = rt.v12 * lev_alt / (coil_pwm_hz(COIL_LEV) * COIL_L_H);
+            float ipp = rt.v12 * lev_alt / (coil_pwm_hz(COIL_LEV) * LEV_COIL_L_H);
             extra = ipp * ipp / 12.0f;
         }
         i2[c] += i * i + extra;

@@ -17,3 +17,6 @@ void pwm_set_enabled(uint slice, bool on);
 void pwm_set_mask_enabled(uint32_t mask);
 void pwm_clear_irq(uint slice);
 void pwm_irqn_set_slice_enabled(uint irq_index, uint slice, bool on);
+/* the atomic set / clear aliases (hardware/address_mapped.h) */
+static inline void hw_set_bits(volatile uint32_t *addr, uint32_t mask) { *addr |= mask; }
+static inline void hw_clear_bits(volatile uint32_t *addr, uint32_t mask) { *addr &= ~mask; }

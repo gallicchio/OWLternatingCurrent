@@ -1,4 +1,4 @@
-/* lp5036.h: the two TI LP5036 LED drivers (base 0x30, tree 0x31; the tree may be
+/* lp5036.h: the two TI LP5036 LED drivers (base 0x30, tree 0x32; the tree may be
  * absent).  Independent (not bank) mode, linear dimming (led_engine.c does the
  * curve), the chip's 12-bit dithered PWM, 25.5 mA.  One frame is one write of the
  * engine's register image from LED0_BRIGHTNESS (0x08) to OUT35_COLOR (0x37); only

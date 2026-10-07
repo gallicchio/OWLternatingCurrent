@@ -387,10 +387,12 @@ static void do_reboot(bool bootsel)
     rt_coil_release_owner(RT_OWNER_CONSOLE);
     for (int p = 0; p < 2; p++)
         perch_set(p, false, 0.0f, 0.0f);
-    sleep_ms(30);
+    /* core 1 lets everything go at its next tick; the UART gets the last lines out.  No
+     * tud_task() here: this can run inside a TinyUSB callback (the 1200-baud habit). */
+    uint32_t t0 = time_us_32();
+    while (time_us_32() - t0 < 30000u)
+        ulog_drain();
     board_bridges_off();
-    tud_task();
-    sleep_ms(20);
     if (bootsel)
         rom_reset_usb_boot_extra(-1, 0, false);
     watchdog_reboot(0, 0, 10);
@@ -633,8 +635,10 @@ int main(void)
 {
     board_safe_init();                   /* before anything else: no coil can be driven */
 
-    /* a reset by the watchdog running out (a hang), not by watchdog_reboot() (`reboot`) */
+    /* a reset by the watchdog running out (a hang), not by watchdog_reboot() (`reboot`); and
+     * any watchdog reset at all, after which the coils may still be warm */
     bool wd = watchdog_enable_caused_reboot();
+    bool warm = watchdog_caused_reboot();
     if (wd) {
         if (++watchdog_hw->scratch[0] >= CRASHES_TO_BOOTSEL) {
             watchdog_hw->scratch[0] = 0;
@@ -687,7 +691,7 @@ int main(void)
     film_init(&film);
     theremin_init(&thr);
 
-    rt_start(!wd, &cfg.lev);             /* core 1: the tick, the ADC, the safety, the coils */
+    rt_start(!warm, &cfg.lev);           /* core 1: the tick, the ADC, the safety, the coils */
     if (wd)
         rt.faults |= RT_FAULT_WATCHDOG;
     perch_init();
@@ -704,6 +708,8 @@ int main(void)
         uint32_t now = time_us_32();
         if (now - ms_at >= 1000u) {      /* 1 kHz */
             ms_at += 1000u;
+            if (now - ms_at > 20000u)
+                ms_at = now;             /* fell far behind: catch up, do not race */
             familiars_tick();
             button_tick();
         }
@@ -726,7 +732,7 @@ int main(void)
                 theremin_tick();
                 film_tick();
             }
-            if (slot % 80u == 5u && als_read(&als))
+            if (slot % 80u == 7u && als_read(&als))   /* a slot with no IMU read: under 1.6 ms of bus */
                 sin_.lux = als.lux;
             if (slot % 2000u == 7u) {
                 leds_look_for_drivers();     /* every 5 s: the tree plugged in late? */

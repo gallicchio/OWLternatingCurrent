@@ -1,36 +1,59 @@
 /* familiar.h: the wireless familiars (PLAN.md C1): find a token on a perch, say
  * which it is, and light it.
  *
- * A token is a coil with a C0G capacitor across it (a parallel tank, the owl tuned to
- * FAM_OWL_HZ, the cat to FAM_CAT_HZ) and two LEDs.  On the perch it reflects an
- * impedance into the perch coil, so the perch current against frequency shows a
- * dispersive dip-and-peak round the token's resonance (sim/physics/familiar.py; the
- * coupling is strong, k ~ 0.47, and the token's Q low, ~5-10, so the dip sits a few
- * per cent below the tuning).  Each perch, on its own:
+ * What is measured.  FAMn_ISENSE is the perch bridge's 5 V supply current, averaged
+ * (RC-filtered).  The coil sees +5 V during leg A's pulse, -5 V during leg B's and 0
+ * while both legs are low, so the supply delivers the coil's power: I = P / 5 V, with
+ * P = sum over the odd harmonics of (Vn^2 / 2) G(n f), G = Re(Y) the perch's
+ * conductance and Vn = (4 / (n pi)) 5 V sin(n pi duty); plus the drivers' own draw
+ * (a few mA, independent of the duty).  An empty perch is almost purely inductive:
+ * G = R1 / (R1^2 + (w L1)^2), small and falling as 1/f^2.  A token (a coil with a
+ * C0G tank and two LEDs, the owl tuned to FAM_OWL_HZ, the cat to FAM_CAT_HZ) absorbs
+ * power round its resonance: G has a peak there, but strongly coupled (k ~ 0.47) the
+ * peak sits at the coupled mode, ft / sqrt(1 - k^2), 14-15 % above the token's own
+ * tuning ft, where the perch current is 1.4-2.4 times an empty perch's.
  *
+ * Each perch, on its own:
  *   IDLE      bridge off; every FAM_SWEEP_PERIOD_S a
- *   SWEEP     FAM_F_MIN_HZ..FAM_F_MAX_HZ in FAM_SWEEP_N log steps at a drive so low that a
- *             token stays dark (duty FAM_SWEEP_DUTY: 0.6 V of fundamental; the cat's tank
- *             then reaches 1.4 V at most, under its LEDs' 1.85 V), recording the
- *             admittance |I| / V at each;
- *   FIT       against the empty perch's admittance (a model, then learned from sweeps that
- *             found nothing): a dip followed by a peak means a token; a fit of the coupled-
- *             tank model gives its resonance; owl, cat or unknown by that frequency;
- *   RAMP_UP   at the token's resonance (best LED drive per amp of perch current), the
- *             perch current rises smoothly to FAM_I_TARGET_A (closed loop on ISENSE, the
- *             duty never above what would put FAM_I_MAX_A x 1.15 into an empty perch);
- *   DRIVE     holds it; the frequency is dithered +-FAM_DITHER at 100 Hz (no visible
- *             flicker) and the admittance's local slope both follows the token (keep the
- *             slope) and notices it leave (the slope of an empty perch is -1);
+ *   SWEEP     FAM_F_MIN_HZ..FAM_F_MAX_HZ in FAM_SWEEP_N log steps, each at two small
+ *             duties (FAM_SWEEP_DUTY_LO and FAM_SWEEP_DUTY, 0.2 and 0.6 V of
+ *             fundamental: a token stays dark); the difference of the two supply
+ *             currents gives the conductance with the drivers' own draw cancelled, and
+ *             the low one that draw itself;
+ *   FIT       against the empty perch (a model, then learned from sweeps that found
+ *             nothing): a conductance peak means a token; a fit of the coupled-tank model,
+ *             including the 3rd harmonic (at these narrow pulses it is as strong as the
+ *             fundamental, so the cat at 330 kHz also shows a peak at a third of its
+ *             frequency, in the owl's band), gives its tuning ft and coupling; owl, cat
+ *             or unknown by ft; a poor fit (a coin, a key: no resonance) is not driven;
+ *   RAMP_UP   at ft, the delivered power (5 V x (supply current - the drivers' draw))
+ *             rises smoothly to FAM_P_TARGET_W, closed loop; the duty never exceeds what
+ *             would put FAM_CAP_MARGIN x FAM_I_MAX_A into an EMPTY perch at that frequency.
+ *             At and below ft a token only raises the perch's impedance, so this cap holds
+ *             the perch current under FAM_I_MAX_A whether the token is there or not
+ *             (which is why it drives at ft, not at the conductance peak above it, where
+ *             the token would draw more current than the cap allows for);
+ *   DRIVE     holds it at ft (the token's own coil and C0G capacitor: it does not drift;
+ *             moving the token changes the coupling, which moves the conductance peak, not
+ *             ft); the frequency is dithered +-FAM_DITHER at 100 Hz with the drive
+ *             compensated so the delivered power (and the light) stays steady, and the
+ *             conductance's local slope (+5 to +13 at ft, about -2 on an empty perch)
+ *             notices the token leave, as does the conductance falling back toward the
+ *             empty perch's;
  *   RAMP_DOWN when it leaves or the perch is switched off.
  *
- * How the glue calls it (core 0): fam_step() every ~1 ms per perch, with the perch
- * current amplitude from FAMn_ISENSE (A, after FAM_ISENSE_V_PER_A) and what it actually
- * applied (frequency and duty after the PWM's quantisation; NULL: as commanded).  It
- * sets the bridge from the returned command: phase-correct PWM at freq_hz, leg A's
- * pulse duty centred on the period's start, leg B's (inverted) on its middle, so the
- * coil sees a 3-level wave whose fundamental is (4/pi) FAM_VDRIVE_V sin(pi duty).
- * FAM_EN is on while either perch's command is enabled.
+ * Why power, not duty: the same power gives about the same light whatever the token's
+ * placement on the perch (coupling), and it bounds the token's own heating (most of the
+ * power is lost in its coil: ~0.2 W, a few kelvin in a printed figurine).
+ *
+ * How the glue calls it (core 0): fam_step() every ~1 ms per perch, with FAMn_ISENSE as
+ * amps of 5 V supply current (after FAM_ISENSE_V_PER_A) and what it actually applied
+ * (frequency and duty after the PWM's quantisation; NULL: as commanded).  It sets the
+ * bridge from the returned command: phase-correct PWM at freq_hz, leg A's pulse centred
+ * on the period's start, leg B's (inverted) on its middle, each duty x period long.
+ * FAM_EN is on while either perch's command is enabled.  For a sweep report the glue
+ * may read state, who, f[] (Hz), y[] (measured conductance, S) and base[] (the empty
+ * perch's, S).
  * Portable C (no SDK): test/test_familiar.c runs it against a simulated perch.
  */
 #pragma once
@@ -38,17 +61,20 @@
 
 /* ---- tunables ---------------------------------------------------------------------- */
 #define FAM_SWEEP_N            48         /* [CHOICE] 3 % steps from 100 to 400 kHz */
-#define FAM_SWEEP_DUTY         0.03f      /* [CHOICE] 0.6 V fundamental: tokens stay dark */
+#define FAM_SWEEP_DUTY         0.030f     /* [CHOICE] the sweep's upper level: tokens stay dark ... */
+#define FAM_SWEEP_DUTY_LO      0.010f     /* ... and its lower one */
+#define FAM_BASE_SLACK         1.6f       /* [CHOICE] an empty perch may read up to this x the baseline */
 #define FAM_SETTLE_S           0.004f     /* [ASSUMED] ISENSE's filter settles in 4 ms (tau <= 1 ms) */
-#define FAM_AVG_N              2          /* samples averaged per sweep step, after settling */
+#define FAM_AVG_N              8          /* [CHOICE] samples averaged per level (1 ms each) */
 #define FAM_SWEEP_PERIOD_S     2.0f       /* [CHOICE] an empty perch looks this often */
-#define FAM_I_TARGET_A         (0.9f * FAM_I_MAX_A)   /* [CHOICE] 0.18 A */
+#define FAM_P_TARGET_W         0.25f      /* [CHOICE] delivered power when lit */
+#define FAM_CAP_MARGIN         0.92f      /* [CHOICE] the cap aims this far under FAM_I_MAX_A */
 #define FAM_RAMP_S             2.5f       /* [CHOICE] dark to lit: orange first, then violet */
 #define FAM_RAMP_DOWN_S        1.5f
 #define FAM_DITHER             0.01f      /* [CHOICE] +-1 % frequency dither in DRIVE ... */
 #define FAM_DITHER_HALF_S      0.005f     /* ... 5 ms each side: 100 Hz */
 #define FAM_L1_H               28.5e-6f   /* [SIM] familiar.py: the perch coil */
-#define FAM_R1_OHM             3.5f       /* [ASSUMED] perch coil + bridge, 150-330 kHz */
+#define FAM_R1_OHM             4.2f       /* [SIM] familiar.py: the perch coil's resistance, 150-330 kHz */
 
 typedef enum { FAM_NONE = 0, FAM_OWL, FAM_CAT, FAM_UNKNOWN } fam_who;
 typedef enum { FAM_ST_OFF = 0, FAM_ST_IDLE, FAM_ST_SWEEP, FAM_ST_FIT, FAM_ST_RAMP_UP, FAM_ST_DRIVE,
@@ -65,7 +91,7 @@ typedef struct {
     int kind;             /* FAM_EV_* */
     int perch;
     fam_who who;
-    float freq_hz;        /* the token's resonance */
+    float freq_hz;        /* the token's tuning */
 } fam_event;
 
 typedef struct {
@@ -75,34 +101,46 @@ typedef struct {
     float t_state;               /* when the state began */
     float t_last_sweep;
     fam_cmd cmd;
-    /* sweep */
-    float f[FAM_SWEEP_N];
-    float y[FAM_SWEEP_N];        /* measured admittance, S */
-    float base[FAM_SWEEP_N];     /* the empty perch's admittance, S */
+    /* sweep: two levels per frequency */
+    float f[FAM_SWEEP_N];        /* Hz */
+    float y[FAM_SWEEP_N];        /* measured conductance, S (gain of ISENSE included) */
+    float base[FAM_SWEEP_N];     /* the empty perch's, S */
+    float iq[FAM_SWEEP_N];       /* the drivers' own draw at each frequency, A */
+    float w3[FAM_SWEEP_N];       /* the 3rd harmonic's weight in each conductance reading */
     int base_learned;            /* sweeps that found nothing and taught the baseline */
-    int step, n_avg;
-    float acc;
+    int step, level, n_avg;
+    float acc, acc_v1sq, i_lo, v1sq_lo, v3sq_lo;
     float t_step;
-    /* fit (run a few candidates per call) */
-    float lr[FAM_SWEEP_N];       /* log admittance ratio, normalised */
-    int i_dip, i_peak, fit_i, fit_lo, fit_hi;
-    float fit_best, fit_ft, fit_k2, fit_q, f_dip;
+    /* fit (a few candidates per call) */
+    float dg[FAM_SWEEP_N];       /* conductance above the empty perch's */
+    float ge1[FAM_SWEEP_N], ge3[FAM_SWEEP_N];  /* the empty perch's model at f and 3 f */
+    float gain;                  /* the fitted empty-perch scale (ISENSE's gain x R1's error) */
+    float s_bb, s_yb, s_yy;      /* sums the fit's candidates share */
+    float fit_a;                 /* the fitted scale (ISENSE's gain) */
+    float base_scale;            /* the baseline against the model */
+    int n_base;                  /* fit bases (peak frequencies, and 3 x them) */
+    float fit_base[4];
+    int fit_i, fit_stage;
+    float fit_best, fit_ft, fit_k2, fit_q, fit_scale, fit_r2;
+    float fine_ft, fine_k2, fine_q;
     /* the token */
     fam_who who;
     float f_token, f_drive;
-    float y_token;               /* its admittance at f_drive in the sweep */
-    float y_empty;               /* an empty perch's there */
     float duty_cap, trim;
-    float i_target, i_meas_f;
-    float ramp_from_A;
+    float p_target, p_meas_f;
+    float iq_drive;              /* the drivers' draw at the drive frequency */
+    float g_lit;                 /* the token's conductance once lit (for noticing it leave) */
+    float g_acc;
+    int g_n;
+    float ramp_from_W;
     float ramp_s;
     /* dither in DRIVE */
-    int dith_side, dith_n;
+    int dith_side;
     float dith_acc[2], dith_f[2];
     int dith_cnt[2];
-    float slope, slope0;
+    float slope;
     bool slope_ok;
-    float t_low_slope;
+    float t_low;
     float t_prev;
 } fam_perch;
 

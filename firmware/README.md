@@ -32,11 +32,12 @@ picotool load -x build/owlternating.uf2 -f   # or copy the .uf2 onto the RP2350 
 |---|---|---|
 | `src/board_pins.h` | `../gen/firmware_pins.py` | `../gen/pins.py`: every GPIO, each bridge's PWM slice (checked: IN1 = channel A), the ADC channels, the multiplexer's channels and the sense dividers' ratios, the I2C addresses, the board's pull resistors |
 | `src/led_map.h` | `../gen/firmware_leds.py` | `../gen/leds.py`: all 49 LEDs (driver, channel, name, colour, board, position), each group in order, each driver's channel → LED table. Positions come from `../hardware/checks/led_positions.json` once the placement writes it; until then they are 0 and `LED_UNPLACED` says so |
-| `src/lev_table.h`, `test/lev_plant.h` | `tools/gen_lev_tables.py` | `../sim/physics/` (the one-magnet levitation geometry, `../gen/mech.py`'s `OWL_LIFT`): the bias magnet's force, the coil's force per amp, the bat's field at the Hall sensor, all against the gap |
+| `src/lev_table.h`, `test/lev_plant.h` | `tools/gen_lev_tables.py` | `../sim/physics/` (the one-magnet levitation geometry, `../gen/mech.py`'s `OWL_LIFT`) with the levitation coil as built (`../gen/parts.py` `COILS["COIL_LEV"]`: 11 turns a layer, r 4-15 mm): the bias magnet's force, the coil's force per amp, the bat's field at the Hall sensor, all against the gap. Half a minute; it cross-checks the magnets against the simulation's result |
 
 Run `python3 ../gen/firmware_pins.py && python3 ../gen/firmware_leds.py` after any change
-to `gen/pins.py` or `gen/leds.py`. The C uses only the generated names, so when the
-multiplexer's order changed (2026-10-07) nothing else needed editing.
+to `gen/pins.py` or `gen/leds.py`. The C uses only the generated names. When the
+multiplexer's order, the tree driver's address (now 0x32) and the downlights' channels
+changed on 2026-10-07, nothing else needed editing.
 
 ## Architecture
 
@@ -99,8 +100,8 @@ realtime loops run on core 1; the scenes and the console run on core 0.
 
 1. **The tick slice's wrap.** PWM slice 6 drives no pin. It runs in phase-locked step with
    the levitation coil's slice: both are started together through the PWM block's EN
-   register, and the tick's period is exactly 4 of the coil's 40 kHz periods (9 of its
-   90 kHz ones with the carrier on). The wrap's interrupt starts the ADC burst, so every
+   register, and the tick's period is exactly 4 of the coil's 40 kHz periods (8 of its
+   80 kHz ones with the carrier on). The wrap's interrupt starts the ADC burst, so every
    burst begins at the same point of the coil's PWM period: the centre of the forward
    pulse.
 2. **The burst.** The ADC free-runs in round robin over ADC0 (Hall), ADC1 (the levitation
@@ -126,7 +127,7 @@ coil sees a mean of (f_fwd − f_rev) × 12 V. This scheme has three properties:
 - **Linear down to zero:** a little of both directions keeps every output pulse at least
   300 ns long, so the mean stays linear.
 
-The levitation coil's 90 kHz carrier for the bat's eyes is the same scheme with a lot of
+The levitation coil's 80 kHz carrier for the bat's eyes is the same scheme with a lot of
 both directions (`lev eyes`). It only runs while the bat floats, and it always gives way
 to the loop when the loop needs the voltage.
 
@@ -236,6 +237,63 @@ Crank-Nicolson, which is unitary and unconditionally stable, factorised once (Th
 O(N) per step. One step a frame; |ψ|² in each star's cell is its brightness. The packet's
 mean energy (0.46) is below the wall's top (0.50), and about a third of it tunnels.
 
+## The coils' features
+
+- **Levitation (`lev_ctrl.c`, core 1, 10 kHz).**
+  - A port of `sim/physics/levitation_loop.py` to the one-magnet design.
+  - PID on the gap, with gains scheduled from the tables: a 10 Hz loop, the derivative
+    low-passed at 50 Hz.
+  - The Hall reading (8× oversampled, taken in step with the PWM) minus the coil's own
+    field, from the current mirror above 0.4 A and the command below.
+  - The slow zero-power loop walks the set-point to where the mean current is zero.
+  - **States:** off, CAL, wait, hold, lost, inhibit and fault.
+    - CAL: ±0.3 A pulses measure the coil's field at the sensor and its polarity, on the
+      first `lev on`; `lev cal zero` measures the Hall zero.
+    - Wait: the catch engages when the bat is within ±5 mm of the float gap and steady.
+      The set-point starts where the bat is and walks to the float gap.
+    - Hold: the bat floats. It is released within 2 ms if the gap leaves ±5 mm, if the
+      Hall sees no bat, if the current is pinned, or if the 1 s mean current is too high.
+    - Fault: an open coil, thermal, or repeated trips.
+  - The 80 kHz carrier for the bat's eyes runs only while it floats: `lev eyes 0.3` makes
+    about 0.45 A of carrier.
+- **The pendulum (`pendulum.c`, core 0, 400 Hz).**
+  - The TMAG5273's three axes are inverted through the bat's dipole field: position,
+    then a Kalman filter per axis that learns the swing's frequency.
+  - **SUSTAIN** pumps one axis and damps the other.
+  - **CIRCLE** makes a force rotating through the three coils, 120° apart, along the
+    bat's motion.
+  - **CHAOS** pumps a swing, then lets the three coils attract it: "which pumpkin will it
+    choose".
+  - Pulses of up to 0.3 A, renewed every 2.5 ms; the coils sit 18 mm from the rest point.
+    There a coil at 0.5 A holds the bat 11 mm out, a real capture; at 25 mm it would not.
+- **The familiars (`familiar.c`, core 0, 1 kHz).**
+  - Every 2 s an idle perch sweeps 100-400 kHz in 48 steps.
+  - Each step is read at two duties so small that a token stays dark (0.010 and 0.030).
+    Their difference cancels the drivers' own draw, giving the perch's conductance:
+    FAMn_ISENSE is the bridge's 4.8 V supply current, at 10.3 V/A.
+  - A token shows a resonance peak (the coupled mode, ~15 % above its tuning). A fit of the
+    coupled-tank model, third harmonic included, gives the token's own tuning f_t: owl
+    105-195 kHz, cat 264-412 kHz, else unknown.
+  - The perch is driven at f_t, never at the peak: there a token only raises the perch's
+    impedance, so the empty-perch duty cap (0.92 × 0.2 A into an empty perch) bounds the
+    current with or without a token.
+  - The delivered power ramps to 0.25 W.
+  - A ±1 % dither at 100 Hz, compensated so the light stays steady, notices the token
+    leaving within 0.5 s.
+- **Film mode (`film.c`).** For magnetic viewing film laid over the pendulum coils: steps of
+  DC current, alone and in pairs, sometimes opposed (1 → 1+2 → 2 → 2+3 → 3 ...).
+  - Each step is at most 1 A, on for at most 1.9 s with 0.4 s ramps, then 2.5 s of rest.
+  - Each step is planned against the thermal model, which shortens or skips it rather than
+    pass 44 °C.
+- **The theremin (`theremin.c`, `voice.c`, `theremin_hw.c`).**
+  - PIO counts each oscillator's edges; core 0 reads the counts every 10 ms.
+  - Calibrated at start with hands away, it then follows slow drift while nobody plays.
+  - The hand's nearness is the fractional frequency drop over its span (3 % assumed).
+    Pitch maps exponentially to 200-1000 Hz; volume is gated above the noise.
+  - The voice is a sine with a little 2nd and 3rd harmonic, a slow vibrato that deepens
+    after the onset, a glide, and a soft attack and release. It runs at 36.6 kHz into a
+    146 kHz PWM by DMA, at 0.12 of full scale by default, never above 0.25.
+
 ## The console
 
 USB serial "OWLternating console" (any baud; 1200 baud means BOOTSEL), and the UART at
@@ -253,7 +311,7 @@ the same lines.
 | `lev on\|off\|status` | the levitation loop; `status` gives its full telemetry and every tunable |
 | `lev cal [coil\|zero]` | `coil`: measures the coil's field and polarity at the sensor (bat in its cradle or away; it also runs by itself on the first `lev on`). `zero`: the Hall zero (bat removed) |
 | `lev tune <param> <value>` | a loop parameter (`bw_hz`, `dfilt_hz`, `ki_div`, `zp_rate`, `g0_mm`, `mass_g`, `i_max`, `catch_mm`, `loss_mm`, `ramp_mm_s`, ...; range-checked) |
-| `lev eyes <0..1>` | the 90 kHz carrier that lights the bat's eyes (while it floats) |
+| `lev eyes <0..1>` | the 80 kHz carrier that lights the bat's eyes (while it floats); 0.3 makes about 0.45 A |
 | `pend <off\|sustain\|circle\|chaos>` | the pendulum's mode |
 | `pend cal` | the TMAG5273's zero (bat away) |
 | `theremin <on\|off\|cal>` | the theremin (`cal`: hands away for a second) |
@@ -287,14 +345,14 @@ exactly as for the board.
 |---|---|---|
 | `test_leds` | Every scene alone, and every scene under a storm of random events (taps, tilts, familiars on and off, theremin jumps, the room lights, 12 V unplugged and back, console overrides). Plus 30 minutes of the automatic sequence. Every LED, every frame: the lightness shown moves at most 1/60 a frame. The registers' real duty moves at most that plus two of its own steps. No LED passes its ceiling. Banks valid | largest per-frame change in any scene 0.0167 = the limit; the scenes alone need the limiter on <0.01 % of LED-frames; dither average within 0.15 of a step, slowest pattern 40 Hz |
 | `test_quantum` | Crank-Nicolson keeps the norm (no renormalisation); stable at 20× the step; the group velocity; tunnelling vs the textbook barrier | norm drift 9×10⁻⁵ over the 14 s show (3×10⁻⁸ a step, float rounding); v 0.837 vs sin k₀ 0.841; 34 % tunnels (E 0.46 < V 0.50) |
-| `test_lev` | The controller against the plant from `sim/physics` (bias force, coil force/A, Hall field vs gap). Sensor: DRV5055A4 at 7.5 mV/mT, 12-bit ADC with noise, VQ errors; the mirror's offset; a coil 9 % off. Catches, settles, rejects a tap, releases, calibrates | catches from −3, −2, +2, +3 mm: peaks 0.60, 0.49, 0.85, 1.41 A with the soft catch (2.6-2.8 A as a step, as the sim does); settled mean current < 1 mA (limit 10 mA), 34 mA rms, 1 µm jitter; release 2.1 ms after the gap leaves ±5 mm; CAL finds the coil within 0.2 %, either polarity, either sensor orientation |
-| `test_pendulum` | The estimator against an independent 3-D pendulum; SUSTAIN, CIRCLE, CHAOS | position error 0.04 mm rms; sustain 24.2 mm (target 25); circle 24.3 ± 0.3 mm; chaos: 14 choices in 4 min over all three coils; peak 0.30 A |
-| `test_familiar` | Sweep, identify and drive on a simulated perch | (see the familiar section below) |
+| `test_lev` | The controller against the plant from `sim/physics` with the as-built coil (bias force, coil force/A, Hall field vs gap). Sensor: DRV5055A4 at 7.5 mV/mT, 12-bit ADC with noise, VQ errors; the mirror's offset; a coil 9 % off. Catches, settles, rejects a tap, releases, calibrates | catches from −3, −2, +2, +3 mm: peaks 0.64, 0.51, 0.88, 1.42 A with the soft catch (2.1-2.8 A as a step, as the sim does); settled mean current < 0.6 mA (limit 10 mA), 35 mA rms, 1 µm jitter; release 2.0-2.1 ms after the gap leaves ±5 mm; CAL finds the coil within 0.3 %, either polarity, either sensor orientation |
+| `test_pendulum` | The estimator against an independent 3-D pendulum; SUSTAIN, CIRCLE, CHAOS, with the coils at 18 mm | position error 0.04 mm rms; sustain 24.5 mm (target 25); circle 17.7 ± 0.9 mm (target 18); chaos: 20 choices in 4 min over all three coils; peak 0.30 A |
+| `test_familiar` | Sweep, identify and drive on a simulated perch. The plant reports the bridge's supply current: four harmonics, the drivers' draw, gain error, noise, the 1 ms filter. The last cases go through the 12-bit ADC at 2, 10 and the board's 10.3 V/A | owl named at 150.5 kHz, cat at 331.7 kHz (within ±5 % across gap, gain, R1 ±15 % and noise variations); empty perch and a coin: nothing; a 240 kHz token "unknown"; perch current ≤ 185 mA; the sweep keeps tanks ≤ 1.6 V (dark); lift-off noticed in 0.45 s. At the schematic's first 0.5 V/A (no amplifier) nothing was found, which led to the ×20.6 amplifier |
 | `test_thermal` | Steady state; derating under a hard pulse train; the resistance thermometer against a mis-modelled coil | exact steady state; hottest 42.5 °C; mis-modelled coil 50.0 °C → 43.2 °C with the thermometer |
 | `test_film` | Ten minutes of film mode with the thermal model | 136 steps, hottest coil 41.4 °C (42.4 °C if it cools worse than modelled), ≤ 1.000 A, ≤ 1.91 s on |
 | `test_console` | Every command, malformed input, the coil limits, the volume cap, JSON well-formedness (quotes escaped) | 61 replies, all well-formed |
 | `test_theremin` | Calibration, drift tracking, the exponential pitch map, the volume gate, a dead oscillator; the voice's pitch, ceiling, clickless onset and release | 200 → 1000 Hz; 440 Hz asked, 442 Hz measured with vibrato; peak under the ceiling |
-| `test_rt` | Core 1 with the SDK modelled (`test/stubs/`), driven like the hardware: the safe pin state, the PWM's meaning against the DRV8874's truth table, no coil without 12 V, deadlines, owner limits, brown-out, nFAULT (retry, latch, clear), shorted and open coils, ten minutes of 1 A asked for, the levitation CAL through the glue | PWM within 1 count; current 1.4 ms after a request; brown-out off in 0.4 ms; nFAULT off in 1.0 ms; 1 A for 10 min derated to 0.45 A at 42.7 °C (plant 43.3 °C); CAL 3.706 mT/A (plant 3.69) |
+| `test_rt` | Core 1 with the SDK modelled (`test/stubs/`), driven like the hardware: the safe pin state, the PWM's meaning against the DRV8874's truth table, no coil without 12 V, deadlines, owner limits, brown-out, nFAULT (retry, latch, clear), shorted and open coils, ten minutes of 1 A asked for, the levitation CAL through the glue | PWM within 1 count; current 1.4 ms after a request; brown-out off in 0.4 ms; nFAULT off in 1.0 ms; 1 A for 10 min derated to 0.45 A at 42.7 °C (plant 43.3 °C); CAL 3.18 mT/A (plant 3.11) |
 
 ## What is untested on hardware
 
@@ -310,7 +368,7 @@ Specific things to check on the bench, in this order (`status` and `adc dump` sh
 all):
 1. **USB power alone:**
    - `status`: VBUS ≈ 5 V, V12 ≈ 0, `coils_powered` false;
-   - `i2c scan` finds 0x30 (and 0x31 with the tree), 0x6A, 0x29, 0x35;
+   - `i2c scan` finds 0x30 (and 0x32 with the tree), 0x6A, 0x29, 0x35;
    - the LEDs are dim.
 2. **12 V:** V12 reads 12 V (the divider). `led all 0.3`, then `led all off`. Check
    `scene night`.
@@ -330,47 +388,45 @@ all):
 
 ## Open questions for the board designer
 
-Each is a `#define` marked `[ASSUMED]`; the firmware adapts by changing one line.
+**Settled with the designer on 2026-10-07:**
+- PMODE tied high (PWM mode).
+- IMODE grounded: fixed off-time chopping, nFAULT on overcurrent only.
+- R_IPROPI 2.2 kΩ with VREF 3.3 V: 0.99 V/A, ITRIP 3.3 A.
+- FAMn_ISENSE at 10.3 V/A (0.5 Ω, 10 k / 100 n, ×20.6 OPA2333): asked for after
+  `test_familiar` showed that 0.5 V/A could not see a token.
+- The "+5 V" rail is 4.8 V.
+- The tree driver at 0x32; the downlights on OUT33/34.
+- The pendulum coils 18 mm from the rest point.
+- The bat's carrier at 80 kHz (tank 84 kHz, Q 2.5: 97 %).
+- The LED positions JSON format.
 
-1. **DRV8874 PMODE tied high (PWM mode).** The drive scheme depends on IN1/IN2 = 1/1 being
-   brake. **IMODE:** fixed off-time with automatic retry is assumed (nFAULT only on
-   overcurrent); with cycle-by-cycle chopping, nFAULT also pulses during current regulation,
-   which the firmware would treat as a fault after 1 ms.
-2. **R_IPROPI = 2.2 kΩ and VREF = 3.3 V** (`R_IPROPI_OHM`): 0.99 V/A, ITRIP ≈ 3.3 A, and
-   the IPROPI clamp protects the ADC.
-3. **The ADC's reference** is the 3.3 V rail, and the DRV5055A4 is powered from the same
-   3.3 V (its VQ = VCC/2 is ratiometric). Which way the DRV5055 faces (`HALL_POLARITY`) is
-   detected automatically, but say if the marked side does not face the bat.
-4. **FAMn_ISENSE**, now the perch bridge's filtered 5 V supply current:
-   - its scale (`FAM_ISENSE_V_PER_A`, assumed 1 V/A);
-   - its filter's time constant (≤ 1 ms assumed: the sweep waits 4 ms a step);
-   - any offset.
-5. **LP5036.** EN tied high? Their VCC on USB power alone? `ADDR` as in `pins.py` (0x30,
-   0x31).
-6. **The LED duty model.** The colour × bank-brightness product, assumed truncated to
-   12 bits (C × B / 16); a bench measurement settles it.
-7. **The IMU's orientation** on the board (`IMU_AXIS_*`; the wisps roll along board x).
-8. **Pendulum geometry.**
-   - Assumed values: thread length 15 cm; the TMAG5273's depth under the bat at rest
-     12 mm; coil centres 25 mm from the rest point, coil 1 at 90°; the TMAG5273's sensing
-     point 0.6 mm over the top copper.
-   - The pendulum test found that at 25 mm the coils hold only 0.63 mN/A at the rest point,
-     too weak to capture the bat in CHAOS mode. Coils ~15 mm from the rest point, or a
-     lower bat, would make "which pumpkin" a real capture.
-9. **Levitation.** The bat is 3.6 g. The cradle must hold the bat 2-3 mm below the float
-   gap: 10.5-11.5 mm under the perch's bottom copper. The DRV5055 sits on the coil axis,
-   0.6 mm below the bottom copper.
-10. **The coils:** 2.2 Ω with 1 oz inner copper (`COIL_R20_OHM`; the resistance
-    thermometer calibrates it). The thermal constants (0.3 / 2.5 J/K, 3 / 40 K/W) need an
-    IR-thermometer check.
-11. **A temperature sensor beside the coils** (PLAN.md §7). The firmware uses the IMU's
-    die temperature (else the TMAG5273's) as the coils' ambient. Is either near them?
-12. **The light sensor's placement.** It must not see the board's own LEDs, or dusk and
-    dawn will chase each other. The thresholds are 3 and 30 lux, with 20 s of hysteresis.
-13. **Theremin.** The oscillators' frequency (0.5-1 MHz assumed) and the drop with a hand
+**Still open.** Each is a `#define` marked `[ASSUMED]`; changing one line adapts the firmware.
+
+1. **The ADC's reference** is the 3.3 V rail, and the DRV5055A4 is powered from the same
+   3.3 V (its VQ = VCC/2 is ratiometric). Which way it faces (`HALL_POLARITY`) is detected
+   automatically.
+2. **LP5036.** EN tied high? Their VCC on USB power alone?
+3. **The LED duty model.** The colour × bank-brightness product, assumed truncated to
+   12 bits (C × B / 16); a photodiode on the bench settles it.
+4. **The IMU's orientation** on the board (`IMU_AXIS_*`; the wisps roll along board x).
+5. **Pendulum.** The thread's length (15 cm); the TMAG5273's depth under the bat at rest
+   (12 mm); its sensing point 0.6 mm over the top copper; coil 1's direction (90°).
+6. **Levitation.** The bat's mass (3.6 g). The cradle must hold the bat 2-3 mm below the
+   float gap, 10.5-11.5 mm under the perch's bottom copper. The DRV5055 sits on the coil
+   axis, 0.6 mm below the bottom copper.
+7. **The coils.** 2.2 Ω with 1 oz inner copper (`COIL_R20_OHM`; the resistance
+   thermometer calibrates it). The thermal constants (0.3 / 2.5 J/K, 3 / 40 K/W) want an
+   IR-thermometer check on the bench. The perch coil's resistance (`FAM_R1_OHM`, 4.2 Ω with
+   the drivers) must be right to ±15 % for the familiars' reported tuning to stay within
+   ±5 %; the owl/cat names are robust either way.
+8. **A temperature sensor beside the coils** (PLAN.md §7). The firmware uses the IMU's die
+   temperature (else the TMAG5273's) as the coils' ambient. Is either near them?
+9. **The light sensor's placement.** It must not see the board's own LEDs, or dusk and
+   dawn will chase each other. The thresholds are 3 and 30 lux, with 20 s of hysteresis.
+10. **Theremin.** The oscillators' frequency (0.5-1 MHz assumed) and the drop with a hand
     at the antenna (3 % assumed: `THEREMIN_*_SPAN`). Which end of the star arc is the moon
     (`SCENE_MOON_STAR` = 11, the right)?
-14. **USB VID:PID:** 1209:0001 is a test PID; a public release needs its own.
+11. **USB VID:PID:** 1209:0001 is a test PID; a public release needs its own.
 
 ## Not yet
 

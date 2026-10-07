@@ -29,6 +29,7 @@
 #include "coils.h"
 #include "config.h"
 #include "lev_ctrl.h"
+#include "lev_table.h"
 #include "rt.h"
 #include "sdk_stub.h"
 #include "hardware/irq.h"
@@ -55,7 +56,7 @@ static float v12 = 0.0f, v5 = 0.0f, vbus = 5.0f;
 static float coil_r[COIL_COUNT] = {2.2f, 2.2f, 2.2f, 2.2f};   /* the real coils at 25 C */
 static float coil_t[COIL_COUNT] = {25.0f, 25.0f, 25.0f, 25.0f}; /* their temperature: one node, 2.8 J/K, 43 K/W */
 static float hall_bias_mT = 6.36f;                             /* the owl's magnet at the sensor */
-static float hall_coil_mT_per_A = 3.69f;                       /* the coil at the sensor, per forward amp */
+static float hall_coil_mT_per_A = LEV_BCOIL_MT_PER_A;           /* the coil at the sensor, per forward amp */
 static long ticks;
 
 /* the fractions of a PWM period the bridge spends in each state, from the registers */

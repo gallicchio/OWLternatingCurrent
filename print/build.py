@@ -4,8 +4,9 @@
   1. out/params.scad, out/shapes.scad   - numbers (gen/mech.py + design.py) and shapes
   2. OpenSCAD -> the parts' meshes        - owl, cap, foot, and the two breakaway stand-ins
   3. out/owl.stl, out/bat_cap.stl, out/foot.stl   - print-ready, one part each
-     out/plate.3mf, out/plate.stl                - the whole plate, ready to slice
-     out/reference/*_frame.stl                    - the bare parts in their boards' frames
+     out/plate_bambu.3mf                          - the plate as a Bambu Studio project, pause set
+     out/plate.3mf, out/plate.stl                - the whole plate for any slicer (add the pause)
+     out/assembled/*_frame.stl                    - the bare parts in their boards' frames
   4. out/*.png                            - renders, sections, the pause layer
   5. check.py                             - re-measures the meshes against mech.py
   6. README.md's numbers block            - from the same numbers
@@ -29,7 +30,7 @@ import mech as M            # noqa: E402
 import meshtools as mt      # noqa: E402
 
 OUT = os.path.join(HERE, "out")
-REF = os.path.join(OUT, "reference")
+REF = os.path.join(OUT, "assembled")
 BUILD = os.path.join(HERE, "build")
 SCAD = os.path.join(HERE, "owlternating.scad")
 OPENSCAD = shutil.which("openscad") or "/usr/bin/openscad"
@@ -164,15 +165,24 @@ def compose():
     mt.write_stl(os.path.join(OUT, "foot.stl"), foot, "foot (print four)")
 
     import numpy as np
-    objects = [("owl (on its breakaway slab)", owl_print, D.PLATE["owl"] + (0.0,)),
-               ("bat cap (on its breakaway pedestal)", cap_print, D.PLATE["bat_cap"] + (0.0,))]
+    cx, cy = D.PLATE_CENTRE
+    at = lambda k: (D.PLATE[k][0] + cx, D.PLATE[k][1] + cy, 0.0)
+    objects = [("owl (on its breakaway slab)", owl_print, at("owl")),
+               ("bat cap (on its breakaway pedestal)", cap_print, at("bat_cap"))]
     for i in range(1, 5):
-        objects.append(("foot %d" % i, foot, D.PLATE["foot%d" % i] + (0.0,)))
+        objects.append(("foot %d" % i, foot, at("foot%d" % i)))
     mt.write_3mf(os.path.join(OUT, "plate.3mf"), objects,
                  title="OWLternating Current - print plate (PLA, 0.2 mm layers, no supports, "
                        "pause before layer %d at %.2f mm)" % (D.PAUSE_LAYER, D.PAUSE_LAYER_TOP),
                  designer="Jason Gallicchio and Claude")
-    plate = np.concatenate([mt.translate(t, off) for _, t, off in objects])
+    settings = open(os.path.join(HERE, "bambu", "project_settings.config")).read()
+    mt.write_bambu_3mf(os.path.join(OUT, "plate_bambu.3mf"), objects, settings,
+                       title="OWLternating Current - print plate (pause preset before layer %d)" % D.PAUSE_LAYER,
+                       designer="Jason Gallicchio and Claude",
+                       pauses=[(D.PAUSE_LAYER_TOP, D.PAUSE_GCODE)],
+                       note="Bambu Studio project: X1 Carbon 0.4 / 0.20 mm Standard / Bambu PLA Basic; pick "
+                            "your own printer, the pause stays.  See print/README.md.")
+    plate = np.concatenate([mt.translate(t, (o[0] - cx, o[1] - cy, 0)) for _, t, o in objects])
     mt.write_stl(os.path.join(OUT, "plate.stl"), plate, "whole plate")
     # render helpers (not committed)
     feet = np.concatenate([mt.translate(foot, D.PLATE["foot%d" % i] + (0.0,)) for i in range(1, 5)])
@@ -186,41 +196,67 @@ def compose():
 
 
 # ------------------------------------------------------------------ 4. pictures
-VIEWS = [  # (file, PART, camera eye+centre, size)
-    ("build/v_owl_front.png", "view_owl", (0, -105, 15, 0, 0, 13.5), (900, 900)),
-    ("build/v_owl_q.png", "view_owl", (-55, -80, 40, 0, 0, 12), (900, 900)),
-    ("build/v_owl_back.png", "view_owl", (60, 75, 30, 0, 0, 12), (900, 900)),
-    ("build/v_owl_below.png", "view_owl", (-45, -55, -45, 0, 0, 8), (900, 900)),
-    ("build/v_cap_q.png", "view_cap", (-32, -42, 30, 0, -0.5, 1), (900, 900)),
-    ("build/v_cap_front.png", "view_cap", (0, -48, 9, 0, 0, 1.5), (900, 900)),
-    ("build/v_cap_below.png", "view_cap", (-28, -32, -26, 0, 0, 0), (900, 900)),
-    ("build/v_foot_q.png", "view_foot", (-24, -30, 26, 0, 0, 4), (900, 900)),
-    ("build/v_foot_low.png", "view_foot", (-28, -34, 4, 0, 0, 4.5), (900, 900)),
-    ("build/v_plate.png", "view_plate", (-60, -175, 150, 0, -2, 8), (1600, 1200)),
-    ("build/v_plate_paused.png", "view_plate_paused", (-40, -140, 135, 0, 0, 8), (1600, 1200)),
-    ("build/v_assembly.png", "view_assembly", (-70, -95, 45, 0, 4, 2), (1400, 1200)),
-    ("build/v_owl_on_perch.png", "view_owl_on_perch", (-55, -85, 40, 0, 4, 8), (1100, 1000)),
-    ("build/v_cap_on_bat.png", "view_cap_on_bat", (-40, -60, 45, 0, 0, 0), (1100, 1000)),
+VIEWS = [  # (file, PART, camera eye+centre, size, fit to view)
+    ("build/v_owl_front.png", "view_owl", (0, -105, 15, 0, 0, 13.5), (900, 900), True),
+    ("build/v_owl_q.png", "view_owl", (-55, -80, 40, 0, 0, 12), (900, 900), True),
+    ("build/v_owl_back.png", "view_owl", (60, 75, 30, 0, 0, 12), (900, 900), True),
+    ("build/v_owl_below.png", "view_owl", (-45, -55, -45, 0, 0, 8), (900, 900), True),
+    ("build/v_cap_q.png", "view_cap", (-32, -42, 30, 0, -0.5, 1), (900, 900), True),
+    ("build/v_cap_front.png", "view_cap", (0, -48, 9, 0, 0, 1.5), (900, 900), True),
+    ("build/v_cap_below.png", "view_cap", (-28, -32, -26, 0, 0, 0), (900, 900), True),
+    ("build/v_foot_q.png", "view_foot", (-24, -30, 26, 0, 0, 4), (900, 900), True),
+    ("build/v_foot_low.png", "view_foot", (-28, -34, 4, 0, 0, 4.5), (900, 900), True),
+    ("build/v_plate.png", "view_plate", (-55, -190, 150, 0, -4, 6), (1600, 1200), False),
+    ("build/v_plate_paused.png", "view_plate_paused", (-45, -165, 140, 0, -2, 6), (1600, 1200), False),
+    ("build/v_levitation.png", "view_levitation", (-75, -110, 40, 0, 0, 2), (1200, 1300), True),
+    ("build/v_owl_on_perch.png", "view_owl_on_perch", (-60, -95, 55, 0, 6, 6), (1200, 1300), True),
+    ("build/v_cap_on_bat.png", "view_cap_on_bat", (-45, -70, 55, 0, 0, 0), (1200, 1300), True),
 ]
+CUTS = [("build/owl_cut.stl", "owl_cut"), ("build/cap_cut.stl", "cap_cut"),
+        ("build/paused_owl.stl", "paused_owl"), ("build/paused_cap.stl", "paused_cap")]
 
 
 def render_views(parallel):
+    openscad_jobs([(os.path.join(HERE, f), part, []) for f, part in CUTS], parallel)
     jobs = []
-    for f, part, cam, size in VIEWS:
+    for f, part, cam, size, fit in VIEWS:
         jobs.append((os.path.join(HERE, f), part,
                      ["--imgsize=%d,%d" % size, "--camera=" + ",".join("%g" % c for c in cam),
-                      "--projection=p", "--colorscheme=Tomorrow"]))
+                      "--projection=p", "--colorscheme=Tomorrow"] + (["--viewall"] if fit else [])))
     openscad_jobs(jobs, parallel)
 
 
-def montage(out, files, labels=None, title=None, cols=None):
+def trim(im, margin=40):
+    """Crop a render to its content (anything unlike the corner's background)."""
+    import numpy as np
+    a = np.asarray(im.convert("RGB")).astype(int)
+    bg = a[0, 0]
+    mask = np.abs(a - bg).sum(axis=2) > 24
+    if not mask.any():
+        return im
+    ys, xs = np.nonzero(mask)
+    box = (max(xs.min() - margin, 0), max(ys.min() - margin, 0),
+           min(xs.max() + margin, im.width), min(ys.max() + margin, im.height))
+    return im.crop(box)
+
+
+def montage(out, files, labels=None, title=None, cols=None, height=700, crop=True):
+    """Trim each render to its content, scale to a common height, and lay them out."""
     from PIL import Image, ImageDraw, ImageFont
-    ims = [Image.open(os.path.join(HERE, f)).convert("RGB") for f in files]
+    ims = []
+    for f in files:
+        im = Image.open(os.path.join(HERE, f)).convert("RGB")
+        im = trim(im) if crop else im
+        ims.append(im.resize((max(1, round(im.width * height / im.height)), height), Image.LANCZOS))
+    import textwrap
     cols = cols or len(ims)
     rows = (len(ims) + cols - 1) // cols
-    w, h = max(i.width for i in ims), max(i.height for i in ims)
+    colw = [max(ims[k].width for k in range(c, len(ims), cols)) for c in range(cols)]
+    if labels:   # wrap each label to its column (about 13 px a character at 24 pt)
+        labels = [textwrap.fill(l, max(12, colw[k % cols] // 14)) for k, l in enumerate(labels)]
+    label_h = 14 + 30 * max(l.count("\n") + 1 for l in labels) if labels else 0
     top = 60 if title else 0
-    sheet = Image.new("RGB", (cols * w, rows * h + top), (247, 247, 247))
+    sheet = Image.new("RGB", (sum(colw), rows * (height + label_h) + top), (247, 247, 247))
     try:
         font = ImageFont.truetype("DejaVuSans.ttf", 30)
         small = ImageFont.truetype("DejaVuSans.ttf", 24)
@@ -230,10 +266,12 @@ def montage(out, files, labels=None, title=None, cols=None):
     if title:
         d.text((20, 14), title, fill=(40, 40, 40), font=font)
     for k, im in enumerate(ims):
-        x, y = (k % cols) * w, (k // cols) * h + top
-        sheet.paste(im, (x, y))
+        c, r = k % cols, k // cols
+        x0 = sum(colw[:c])
+        y0 = top + r * (height + label_h)
         if labels:
-            d.text((x + 18, y + 12), labels[k], fill=(60, 60, 60), font=small)
+            d.multiline_text((x0 + 18, y0 + 8), labels[k], fill=(60, 60, 60), font=small, spacing=6)
+        sheet.paste(im, (x0 + (colw[c] - im.width) // 2, y0 + label_h))
     sheet.save(out)
 
 
@@ -278,13 +316,15 @@ def sections(meshes):
     ax.add_patch(Rectangle((-xn, -M.PCB_T), 2 * xn, M.PCB_T, fc=C["board"], ec="none"))
     ax.add_patch(Rectangle((-M.MAGNET_D / 2, D.OWL_FLOOR), M.MAGNET_D, M.MAGNET_T, fc=C["mag"], ec="#555"))
     ax.text(0, D.OWL_FLOOR + 1.0, "magnet %g x %g" % (M.MAGNET_D, M.MAGNET_T), ha="center", va="center", fontsize=8)
-    ax.text(-8, -0.8, "perch, %.1f mm (notch bottoms %.0f mm apart)" % (M.PCB_T, 2 * xn), color="white",
+    ax.text(-6, -0.8, "perch %.1f mm, notch bottoms %.0f mm apart" % (M.PCB_T, 2 * xn), color="white",
             fontsize=8, ha="center", va="center")
     dim(ax, (7.5, 0), (7.5, D.OWL_FLOOR), "%.2f\n(%.2f above\ntop copper)" % (D.OWL_FLOOR, D.OWL_LIFT_DESIGNED),
         off=(2.6, 0))
-    dim(ax, (D.OWL_LIP_TIP, D.OWL_Z_CATCH - 0.9), (xn, D.OWL_Z_CATCH - 0.9), "", off=(0, 0))
-    ax.text(xn - 0.4, D.OWL_Z_CATCH - 1.8, "hook %.1f\nunder" % M.OWL_HOOK, fontsize=8, ha="center", color="#203060")
-    dim(ax, (xn + 2.6, D.OWL_Z_CATCH), (xn + 2.6, 0), "%.1f slot\n(board %.1f)" % (D.OWL_SLOT, M.PCB_T), off=(2.4, 0))
+    ax.annotate("hook reaches %.1f\nunder the perch" % M.OWL_HOOK, xy=(D.OWL_LIP_TIP + 0.3, D.OWL_Z_CATCH - 0.2),
+                xytext=(5.5, -4.2), fontsize=8, color="#203060", arrowprops=dict(arrowstyle="->", lw=0.7))
+    dim(ax, (xn + 3.2, D.OWL_Z_CATCH), (xn + 3.2, 0), "", off=(0, 0))
+    ax.text(xn + 3.7, D.OWL_Z_CATCH / 2, "%.1f slot\n(board %.1f)" % (D.OWL_SLOT, M.PCB_T), fontsize=8,
+            color="#203060", va="center")
     ax.annotate("wing-arm flexes\n%.1f mm out to snap on\n(%.1f %% strain)" % (D.owl_arm_snap()["deflection"],
                 100 * D.owl_arm_snap()["strain"]), xy=(D.OWL_ARM_IN + 0.5, 4.5), xytext=(21, 9),
                 fontsize=8, arrowprops=dict(arrowstyle="->", lw=0.7))
@@ -294,7 +334,7 @@ def sections(meshes):
     ax.annotate("hollow base: only a rim\nsits on the coil", xy=(-6, 2.5), xytext=(-29, 8), fontsize=8,
                 arrowprops=dict(arrowstyle="->", lw=0.7))
     ax.set_title("Owl on the perch, cut through the notches (y = 0)", fontsize=11)
-    ax.set_xlim(-30, 30); ax.set_ylim(-5, 32); ax.set_aspect("equal"); ax.grid(alpha=0.25)
+    ax.set_xlim(-30, 30); ax.set_ylim(-5.5, 32); ax.set_aspect("equal"); ax.grid(alpha=0.25)
     ax.set_xlabel("x (mm)"); ax.set_ylabel("z above the perch's top surface (mm)")
 
     # --- the foot in the base board, cut at y = 0 (across the slot)
@@ -359,7 +399,11 @@ def pause_picture(meshes):
     ys = np.arange(-45, 40, 0.1)
     g = mt.raster(mt.plane_segments(plate, 2, z), xs, ys)
     g2 = mt.raster(mt.plane_segments(plate, 2, z + D.LAYER), xs, ys)
+    foot = np.zeros_like(g)
+    for zz in (0.1, 1.1, 2.9, 5.0, 8.0, 12.0, 15.0):          # the plate's footprint, for context
+        foot |= mt.raster(mt.plane_segments(plate, 2, zz), xs, ys)
     img = np.ones(g.shape + (3,))
+    img[foot] = (0.86, 0.86, 0.88)
     img[g] = (0.82, 0.54, 0.24)
     img[g & ~g2] = (0.95, 0.80, 0.55)
     fig, ax = plt.subplots(figsize=(11, 7))
@@ -372,8 +416,10 @@ def pause_picture(meshes):
                  "pockets open.\nDrop one magnet in each pocket, same face up (see README), then resume."
                  % (D.PAUSE_LAYER, D.PAUSE_LAYER_TOP, D.PAUSE_LAYER - 1, D.PAUSE_Z), fontsize=10)
     ax.set_xlabel("bed x (mm, from the plate's centre)"); ax.set_ylabel("bed y (mm)")
-    ax.text(D.PLATE["owl"][0], D.PLATE["owl"][1] - 17, "owl", ha="center", fontsize=10)
-    ax.text(D.PLATE["bat_cap"][0], D.PLATE["bat_cap"][1] - 21, "bat cap\n(on its pedestal)", ha="center", fontsize=10)
+    ax.text(D.PLATE["owl"][0], D.PLATE["owl"][1] - 20, "owl", ha="center", fontsize=10)
+    ax.text(D.PLATE["bat_cap"][0], D.PLATE["bat_cap"][1] - 22, "bat cap\n(on its pedestal)", ha="center", fontsize=10)
+    ax.text(0, D.PLATE["foot1"][1] - 9, "feet (finished long before the pause; grey: lower parts)", ha="center",
+            fontsize=9, color="#555")
     fig.savefig(os.path.join(OUT, "pause_layer.png"), dpi=110, bbox_inches="tight")
     plt.close(fig)
 
@@ -396,9 +442,10 @@ def pictures(parallel, meshes):
              "at the pause (%.2f mm): both pockets open" % D.PAUSE_Z], cols=2,
             title="One plate, PLA, no supports, one pause before layer %d (%.2f mm)" % (D.PAUSE_LAYER, D.PAUSE_LAYER_TOP))
     montage(os.path.join(OUT, "assembly.png"),
-            ["build/v_assembly.png", "build/v_owl_on_perch.png", "build/v_cap_on_bat.png"],
-            ["levitation stack: owl on the perch, bat floating %.1f mm below" % bat_z_floating()[1],
-             "owl snapped into the perch's notches", "cap hooked under the bat's head and tail"], cols=3,
+            ["build/v_levitation.png", "build/v_owl_on_perch.png", "build/v_cap_on_bat.png"],
+            ["cut away: both magnets red (north) up; the bat floats %.1f mm under the perch"
+             % bat_z_floating()[1], "the owl's wings hook into the perch's notches",
+             "the cap hooks under the bat's head and tail"], cols=3,
             title="Assembly check (boards drawn from gen/mech.py; the bat's outline is schematic)")
     sections(meshes)
     pause_picture(meshes)

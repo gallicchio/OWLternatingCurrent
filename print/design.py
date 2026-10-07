@@ -159,6 +159,13 @@ FOOT_CORE_R = 3.6
 
 # --- the plate (bed coordinates of each part's print-frame origin) --------------------
 BED = (180.0, 180.0)      # the smallest Bambu bed (A1 mini); the plate fits well inside
+# plate_bambu.3mf's pause: lift the hot nozzle clear of the pockets, then wait.  On resume
+# Bambu Studio's next move spirals back down at the same spot and travels on at the next
+# layer's height, clear of everything (nothing on the plate is taller than PAUSE_Z yet).
+PAUSE_GCODE = ["; OWLternating Current: magnets in now (print/README.md)",
+               "G91", "G1 Z15 F900", "G90", "M400 U1"]
+PLATE_CENTRE = (128.0, 128.0)   # where plate.3mf puts the plate: the middle of a 256 mm bed
+                                # (X1, P1, A1), and still inside an A1 mini's 180 mm bed
 PLATE = {
     "owl": (-26.0, 10.0),
     "bat_cap": (30.0, 10.0),
@@ -351,25 +358,33 @@ def cap_ears():
 
 def bat_outline():
     """A schematic bat board for the fit views (the real outline is the board
-    generator's): a round body over the receive coil with straight head and tail
-    edges where the cap hooks, ears, and scalloped wings to BAT_SPAN."""
+    generator's): a round body over the receive coil, straight head and tail edges
+    where the cap hooks, ears, and wings to BAT_SPAN with a scalloped trailing edge."""
     from shapely.geometry import Point, Polygon, box
     from shapely.ops import unary_union
     h, t = M.BAT_HEAD_Y, M.BAT_TAIL_Y
+    half = M.BAT_SPAN / 2
+
+    def qbez(p0, c, p1, n=12):
+        return [((1 - u) ** 2 * p0[0] + 2 * (1 - u) * u * c[0] + u * u * p1[0],
+                 (1 - u) ** 2 * p0[1] + 2 * (1 - u) * u * c[1] + u * u * p1[1])
+                for u in (i / n for i in range(n + 1))]
+
     body = Point(0, 0).buffer(M.RX_R_OUT + 1.5, 64).intersection(box(-30, h, 30, t))
     flat = box(-(M.CAP_ARM_W / 2 + 1.5), h, M.CAP_ARM_W / 2 + 1.5, t)
     parts = [body, flat]
-    half = M.BAT_SPAN / 2
     for s in (-1, 1):
-        parts.append(Polygon([(s * 3.4, h + 1.2), (s * 6.8, h - 2.6), (s * 8.6, h + 4.0)]))
-        tips = [(half, -6.0), (0.80 * half, 3.0), (0.56 * half, 7.0), (0.36 * half, 8.5)]
-        pts = [(s * 9.0, -6.5), (s * 0.62 * half, -10.5), (s * half, -6.0)]
-        for (x0, y0), (x1, y1) in zip(tips, tips[1:]):
-            mx, my = (x0 + x1) / 2, (y0 + y1) / 2
-            pts += [(s * (mx - 1.2), my - 2.0), (s * x1, y1)]
-        pts.append((s * 8.0, 6.0))
-        parts.append(Polygon(pts).buffer(0))
-    shape = unary_union(parts).buffer(0.3).buffer(-0.3)
+        parts.append(Polygon([(s * 3.8, h + 1.5), (s * 6.6, h - 2.4), (s * 8.6, h + 4.6)]))
+        root_f, wrist, tip = (9.5, -6.0), (0.64 * half, -10.5), (half, -5.0)
+        fingers = [tip, (0.82 * half, 4.0), (0.60 * half, 7.5), (0.40 * half, 8.5)]
+        pts = qbez(root_f, (12.5, -11.0), wrist) + qbez(wrist, (0.86 * half, -11.0), tip)[1:]
+        for a, b in zip(fingers, fingers[1:]):
+            mid = ((a[0] + b[0]) / 2, (a[1] + b[1]) / 2)
+            c = (mid[0] + 0.45 * (wrist[0] - mid[0]), mid[1] + 0.45 * (wrist[1] - mid[1]))
+            pts += qbez(a, c, b)[1:]
+        pts.append((8.0, 6.5))
+        parts.append(Polygon([(s * x, y) for x, y in pts]).buffer(0))
+    shape = unary_union(parts).buffer(0.4).buffer(-0.4)
     return [tuple(p) for p in shape.exterior.coords[:-1]]
 
 

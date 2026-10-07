@@ -238,39 +238,72 @@ module bat() {
         difference() { circle(r = M_RX_R_OUT, $fn = 96); circle(r = M_RX_R_IN, $fn = 48); }
 }
 
-module magnet() color("#b8bcc8") cylinder(d = M_MAGNET_D, h = M_MAGNET_T, $fn = 64);
+// a magnet drawn in two colours, north (red) up: in the views both point the same way
+module magnet(cut = false)
+    for (h = [[0, "#3a6fd8"], [M_MAGNET_T / 2, "#d83a3a"]])
+        color(h[1]) translate([0, 0, h[0]]) linear_extrude(M_MAGNET_T / 2)
+            difference() { circle(d = M_MAGNET_D, $fn = 64); if (cut) quarter_2d(); }
+
+module quarter_2d() translate([-60, -60]) square(60);       // the quarter toward the viewer
 
 // ================================================================= views (import the built meshes)
 C_OWL = "#d08a3c"; C_CAP = "#8a5cc8"; C_FOOT = "#f08a24"; C_SCRAP = "#c8c8c8";
 
+module perch_cut() {
+    color("#4b2a6b") translate([0, 0, -M_PCB_T]) linear_extrude(M_PCB_T)
+        difference() { perch_2d(); quarter_2d(); }
+    color("#c87533") translate([0, 0, -0.04]) linear_extrude(0.05) difference() {
+        circle(r = M_COIL_R_OUT, $fn = 96); circle(r = M_COIL_R_IN, $fn = 48); quarter_2d(); }
+}
+
+module bat_cut() {
+    color("#2e1a47") translate([0, 0, -M_PCB_T]) linear_extrude(M_PCB_T)
+        difference() { polygon(BAT_OUTLINE_2D); quarter_2d(); }
+    color("#c87533") translate([0, 0, -0.04]) linear_extrude(0.05) difference() {
+        circle(r = M_RX_R_OUT, $fn = 96); circle(r = M_RX_R_IN, $fn = 48); quarter_2d(); }
+}
+
+module view_levitation() {     // quarter cut away: the owl's magnet over the bat's, same way up
+    perch_cut();
+    translate([0, 0, OWL_FLOOR]) magnet(true);
+    color(C_OWL) import("build/owl_cut.stl", convexity = 10);
+    translate([0, 0, BAT_Z_FLOATING]) {
+        bat_cut();
+        translate([0, 0, CAP_FLOOR_T + POCKET_DEPTH - M_MAGNET_T]) magnet(true);
+        color(C_CAP) import("build/cap_cut.stl", convexity = 10);
+    }
+}
+
 module view_assembly() {
     perch();
-    translate([0, 0, OWL_FLOOR]) magnet();
-    color(C_OWL) import("out/reference/owl_in_perch_frame.stl");
+    color(C_OWL) import("out/assembled/owl_in_perch_frame.stl", convexity = 10);
     translate([0, 0, BAT_Z_FLOATING]) {
         bat();
-        translate([0, 0, CAP_FLOOR_T + POCKET_DEPTH - M_MAGNET_T]) magnet();
-        color(C_CAP) import("out/reference/bat_cap_in_bat_frame.stl");
+        color(C_CAP) import("out/assembled/bat_cap_in_bat_frame.stl", convexity = 10);
     }
 }
 
 module view_plate() {
     color("#30343a") translate([0, 0, -0.6]) linear_extrude(0.6)
         offset(r = 4, $fn = 24) offset(delta = -4) square(BED, center = true);
-    color(C_OWL) import("build/plate_owl.stl");
-    color(C_CAP) import("build/plate_cap.stl");
-    color(C_FOOT) import("build/plate_feet.stl");
-    color(C_SCRAP) import("build/plate_standins.stl");
+    color(C_OWL) import("build/plate_owl.stl", convexity = 10);
+    color(C_CAP) import("build/plate_cap.stl", convexity = 10);
+    color(C_FOOT) import("build/plate_feet.stl", convexity = 10);
+    color(C_SCRAP) import("build/plate_standins.stl", convexity = 10);
 }
 
 module view_plate_paused() {   // the plate at the pause: everything cut at the pause height
-    intersection() {
-        view_plate();
-        translate([-200, -200, -1]) cube([400, 400, PAUSE_Z + 1]);
-    }
-    for (p = [PLATE_OWL, PLATE_BAT_CAP])
-        translate([p[0], p[1], POCKET_FLOOR_Z]) magnet();
+    color("#30343a") translate([0, 0, -0.6]) linear_extrude(0.6)
+        offset(r = 4, $fn = 24) offset(delta = -4) square(BED, center = true);
+    color(C_OWL) import("build/paused_owl.stl", convexity = 10);
+    color(C_CAP) import("build/paused_cap.stl", convexity = 10);
+    color(C_FOOT) import("build/plate_feet.stl", convexity = 10);
+    color(C_SCRAP) import("build/plate_standins.stl", convexity = 10);
+    for (p = [PLATE_OWL, PLATE_BAT_CAP]) translate([p[0], p[1], POCKET_FLOOR_Z]) magnet();
 }
+
+module cut_below(z) intersection() { children(); translate([-200, -200, -1]) cube([400, 400, z + 1]); }
+module cut_quarter() difference() { children(); translate([-60, -60, -60]) cube([60, 60, 120]); }
 
 // ================================================================= what to make
 if (PART == "owl") owl();
@@ -282,19 +315,24 @@ else if (PART == "cap_print") cap_print();
 else if (PART == "foot") foot();
 else if (PART == "perch") perch();
 else if (PART == "bat") bat();
+// meshes for the pictures (CGAL cuts, so the cut faces keep the part's colour)
+else if (PART == "owl_cut") cut_quarter() owl();
+else if (PART == "cap_cut") cut_quarter() cap();
+else if (PART == "paused_owl") translate([PLATE_OWL[0], PLATE_OWL[1], 0]) cut_below(PAUSE_Z - 0.01) translate([0, 0, OWL_Z0]) owl();
+else if (PART == "paused_cap") translate([PLATE_BAT_CAP[0], PLATE_BAT_CAP[1], 0]) cut_below(PAUSE_Z - 0.01) translate([0, 0, CAP_Z0]) cap();
+// the views
+else if (PART == "view_levitation") view_levitation();
 else if (PART == "view_assembly") view_assembly();
 else if (PART == "view_plate") view_plate();
 else if (PART == "view_plate_paused") view_plate_paused();
-else if (PART == "view_owl") color(C_OWL) import("out/reference/owl_in_perch_frame.stl");
-else if (PART == "view_cap") {
-    color(C_CAP) import("out/reference/bat_cap_in_bat_frame.stl");
-}
-else if (PART == "view_foot") color(C_FOOT) import("out/foot.stl");
+else if (PART == "view_owl") color(C_OWL) import("out/assembled/owl_in_perch_frame.stl", convexity = 10);
+else if (PART == "view_cap") color(C_CAP) import("out/assembled/bat_cap_in_bat_frame.stl", convexity = 10);
+else if (PART == "view_foot") color(C_FOOT) import("build/foot.stl", convexity = 10);
 else if (PART == "view_owl_on_perch") {
     perch();
-    color(C_OWL) import("out/reference/owl_in_perch_frame.stl");
+    color(C_OWL) import("out/assembled/owl_in_perch_frame.stl", convexity = 10);
 }
 else if (PART == "view_cap_on_bat") {
     bat();
-    color(C_CAP) import("out/reference/bat_cap_in_bat_frame.stl");
+    color(C_CAP) import("out/assembled/bat_cap_in_bat_frame.stl", convexity = 10);
 }

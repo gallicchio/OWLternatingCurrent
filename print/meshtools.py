@@ -259,3 +259,91 @@ def solid_intervals(tris, origin, direction):
     """[(enter, exit), ...] along a ray that starts outside the mesh."""
     h = ray_hits(tris, origin, direction)
     return [(h[i], h[i + 1]) for i in range(0, len(h) - 1, 2)]
+
+
+# ------------------------------------------------------------------ Bambu Studio project
+BAMBU_APP = "BambuStudio-02.08.02.61"     # the version this layout was verified with
+
+
+def write_bambu_3mf(path, objects, settings, title="", designer="", pauses=(), note=""):
+    """A Bambu Studio project: the objects (as write_3mf), Bambu's project settings
+    (`settings`, the JSON text of Metadata/project_settings.config: Bambu Studio needs a
+    full set), and custom G-code run before each layer listed in `pauses` as
+    (layer top z, [G-code lines]).  Layout as Bambu Studio 2.8 writes it: per-object
+    meshes in 3D/Objects, a production-extension 3dmodel.model placing them,
+    Metadata/model_settings.config naming them, Metadata/custom_gcode_per_layer.xml
+    (type 4 = custom G-code)."""
+    ns = ('xmlns="http://schemas.microsoft.com/3dmanufacturing/core/2015/02" '
+          'xmlns:BambuStudio="http://schemas.bambulab.com/package/2021" '
+          'xmlns:p="http://schemas.microsoft.com/3dmanufacturing/production/2015/06" requiredextensions="p"')
+    uid = lambda a, b: "%08x-%04x-4c03-9d28-80fed5dfa1dc" % (a, b)
+    files = {}
+    rels = []
+    top = ['<?xml version="1.0" encoding="UTF-8"?>', '<model unit="millimeter" xml:lang="en-US" %s>' % ns,
+           ' <metadata name="Application">%s</metadata>' % BAMBU_APP,
+           ' <metadata name="BambuStudio:3mfVersion">1</metadata>',
+           ' <metadata name="Title">%s</metadata>' % escape(title),
+           ' <metadata name="Designer">%s</metadata>' % escape(designer),
+           ' <metadata name="Description">%s</metadata>' % escape(note),
+           " <resources>"]
+    cfg = ['<?xml version="1.0" encoding="UTF-8"?>', "<config>"]
+    items = []
+    for k, (name, tris, (tx, ty, tz)) in enumerate(objects, 1):
+        mesh_id, obj_id = 2 * k - 1, 2 * k
+        verts, faces = weld(tris)
+        m = ['<?xml version="1.0" encoding="UTF-8"?>', '<model unit="millimeter" xml:lang="en-US" %s>' % ns,
+             ' <metadata name="BambuStudio:3mfVersion">1</metadata>', " <resources>",
+             '  <object id="%d" p:UUID="%s" type="model">' % (mesh_id, uid(k << 16, 0)), "   <mesh>", "    <vertices>"]
+        m.extend('     <vertex x="%.5f" y="%.5f" z="%.5f"/>' % tuple(v) for v in verts)
+        m.append("    </vertices>\n    <triangles>")
+        m.extend('     <triangle v1="%d" v2="%d" v3="%d"/>' % tuple(f) for f in faces)
+        m.append("    </triangles>\n   </mesh>\n  </object>\n </resources>\n <build/>\n</model>\n")
+        fn = "3D/Objects/object_%d.model" % k
+        files[fn] = "\n".join(m)
+        rels.append(' <Relationship Target="/%s" Id="rel-%d" '
+                    'Type="http://schemas.microsoft.com/3dmanufacturing/2013/01/3dmodel"/>' % (fn, k))
+        top.append('  <object id="%d" p:UUID="%s" type="model">\n   <components>\n'
+                   '    <component p:path="/%s" objectid="%d" p:UUID="%s" transform="1 0 0 0 1 0 0 0 1 0 0 0"/>\n'
+                   '   </components>\n  </object>' % (obj_id, uid(k, 0), fn, mesh_id, uid(k << 16, 1)))
+        items.append('  <item objectid="%d" p:UUID="%s" transform="1 0 0 0 1 0 0 0 1 %.4f %.4f %.4f" printable="1"/>'
+                     % (obj_id, uid(k, 2), tx, ty, tz))
+        cfg += ['  <object id="%d">' % obj_id,
+                '    <metadata key="name" value="%s"/>' % escape(name, {'"': "&quot;"}),
+                '    <metadata key="extruder" value="1"/>',
+                '    <part id="%d" subtype="normal_part">' % mesh_id,
+                '      <metadata key="name" value="%s"/>' % escape(name, {'"': "&quot;"}),
+                '      <metadata key="matrix" value="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1"/>',
+                "    </part>", "  </object>"]
+    top.append(" </resources>")
+    top.append(' <build p:UUID="%s">' % uid(0xb0, 3))
+    top += items
+    top.append(" </build>\n</model>\n")
+    cfg += ["  <plate>", '    <metadata key="plater_id" value="1"/>', '    <metadata key="plater_name" value=""/>',
+            '    <metadata key="locked" value="false"/>', "  </plate>", "  <assemble>", "  </assemble>",
+            "</config>\n"]
+    gc = ['<?xml version="1.0" encoding="utf-8"?>', "<custom_gcodes_per_layer>", "<plate>", '<plate_info id="1"/>']
+    for z, lines in pauses:
+        g = "&#10;".join(escape(ln, {'"': "&quot;"}) for ln in lines)
+        gc.append('<layer top_z="%g" type="4" extruder="1" color="" extra="%s" gcode="%s"/>' % (z, g, g))
+    gc += ['<mode value="SingleExtruder"/>', "</plate>", "</custom_gcodes_per_layer>\n"]
+    files["3D/3dmodel.model"] = "\n".join(top)
+    files["3D/_rels/3dmodel.model.rels"] = ('<?xml version="1.0" encoding="UTF-8"?>\n<Relationships '
+                                            'xmlns="http://schemas.openxmlformats.org/package/2006/relationships">\n'
+                                            + "\n".join(rels) + "\n</Relationships>\n")
+    files["Metadata/model_settings.config"] = "\n".join(cfg)
+    files["Metadata/custom_gcode_per_layer.xml"] = "\n".join(gc)
+    files["Metadata/project_settings.config"] = settings
+    files["_rels/.rels"] = ('<?xml version="1.0" encoding="UTF-8"?>\n<Relationships '
+                            'xmlns="http://schemas.openxmlformats.org/package/2006/relationships">\n'
+                            ' <Relationship Target="/3D/3dmodel.model" Id="rel-1" '
+                            'Type="http://schemas.microsoft.com/3dmanufacturing/2013/01/3dmodel"/>\n</Relationships>\n')
+    files["[Content_Types].xml"] = ('<?xml version="1.0" encoding="UTF-8"?>\n<Types '
+                                    'xmlns="http://schemas.openxmlformats.org/package/2006/content-types">\n'
+                                    ' <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>\n'
+                                    ' <Default Extension="model" ContentType="application/vnd.ms-package.3dmanufacturing-3dmodel+xml"/>\n'
+                                    ' <Default Extension="xml" ContentType="application/xml"/>\n'
+                                    ' <Default Extension="config" ContentType="application/xml"/>\n</Types>\n')
+    order = ["[Content_Types].xml", "_rels/.rels", "3D/3dmodel.model", "3D/_rels/3dmodel.model.rels"]
+    with zipfile.ZipFile(path, "w", zipfile.ZIP_DEFLATED) as z:
+        for n in order + sorted(k for k in files if k not in order):
+            z.writestr(n, files[n])

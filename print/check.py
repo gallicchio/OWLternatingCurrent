@@ -325,6 +325,9 @@ def check_plate(C, owl_info, cap_info):
     lo, hi = mt.bbox(allp)
     C.within("plate: footprint x", hi[0] - lo[0], None, D.BED[0] - 20)
     C.within("plate: footprint y", hi[1] - lo[1], None, D.BED[1] - 20)
+    for bed in (180.0, 256.0):
+        C.add("plate.3mf: inside a %g mm bed as placed" % bed, "x %.0f..%.0f, y %.0f..%.0f" % (lo[0], hi[0], lo[1], hi[1]),
+              lo[0] >= 5 and lo[1] >= 5 and hi[0] <= bed - 5 and hi[1] <= bed - 5, "5 mm margins", "")
     for name, t in objs:
         C.near("plate: %s on the bed" % name, mt.bbox(t)[0][2], 0.0, EPS)
     tops, centres = [], []
@@ -352,6 +355,34 @@ def check_plate(C, owl_info, cap_info):
     return {}
 
 
+def check_bambu(C):
+    """out/plate_bambu.3mf: a Bambu Studio project carrying the same plate as plate.3mf,
+    a 0.2 mm layer setup, and the custom pause before the first layer over the pockets."""
+    import json
+    import re
+    import zipfile
+    p = os.path.join(OUT, "plate_bambu.3mf")
+    z = zipfile.ZipFile(p)
+    names = z.namelist()
+    need = ["3D/3dmodel.model", "Metadata/model_settings.config", "Metadata/project_settings.config",
+            "Metadata/custom_gcode_per_layer.xml"]
+    C.add("plate_bambu.3mf: a Bambu Studio project", "%d files" % len(names), all(n in names for n in need),
+          "model, settings, pause", "")
+    cfg = json.loads(z.read("Metadata/project_settings.config"))
+    C.near("plate_bambu.3mf: layer height", float(cfg["layer_height"]), D.LAYER, 1e-6)
+    C.near("plate_bambu.3mf: first layer height", float(cfg["initial_layer_print_height"]), D.LAYER, 1e-6)
+    C.add("plate_bambu.3mf: supports off", cfg.get("enable_support"), cfg.get("enable_support") in ("0", 0), "0", "")
+    xml = z.read("Metadata/custom_gcode_per_layer.xml").decode()
+    tops = [float(t) for t in re.findall(r'top_z="([-\d.]+)"', xml)]
+    pause = getattr(check_bambu, "pause_top", None)
+    C.add("plate_bambu.3mf: one custom G-code, a pause (M400 U1)", len(tops),
+          len(tops) == 1 and "M400 U1" in xml, "1", "", "%d")
+    if tops and pause is not None:
+        C.near("plate_bambu.3mf: pause runs before the first layer over the magnets", tops[0], pause + D.LAYER, 1e-6)
+    model = z.read("3D/3dmodel.model").decode()
+    C.add("plate_bambu.3mf: six objects placed", model.count("<item "), model.count("<item ") == 6, "6", "", "%d")
+
+
 def run(verbose=True):
     C = Checks()
     owl_t = mt.read_stl(os.path.join(OUT, "owl.stl"))
@@ -361,6 +392,8 @@ def run(verbose=True):
     cap = check_cap(C, cap_t)
     foot = check_foot(C, foot_t)
     plate = check_plate(C, owl, cap)
+    check_bambu.pause_top = plate.get("pause_z")
+    check_bambu(C)
     oh = []
     for t, name, mag in ((owl_t, "owl", [(0.0, 0.0, owl["pocket_top"])]),
                          (cap_t, "bat cap", [(0.0, 0.0, cap["pocket_top"])]),

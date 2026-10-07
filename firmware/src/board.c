@@ -33,7 +33,9 @@ void board_safe_init(void)
     gpio_pull_up(PIN_DRV_nFAULT);       /* belt and braces: pull-ups are not hit by E9 */
     gpio_init(PIN_BUTTON);
     gpio_set_dir(PIN_BUTTON, GPIO_IN);
-    gpio_pull_up(PIN_BUTTON);
+    for (unsigned pin = 0; pin < 32; pin++)
+        if (MCU_PULL_UP_MASK & (1u << pin))
+            gpio_pull_up(pin);          /* gen/pins.py: "internal pull-up" (the SPELL button) */
     gpio_init(PIN_IMU_INT);
     gpio_set_dir(PIN_IMU_INT, GPIO_IN);
     gpio_disable_pulls(PIN_IMU_INT);

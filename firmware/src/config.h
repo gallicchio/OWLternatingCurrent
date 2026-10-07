@@ -71,7 +71,8 @@
 
 /* ---- the familiar perches (UCC27524 full bridges from 5 V) ---------------------------- */
 #define FAM_VDRIVE_V          5.0f         /* [SIM] familiar_resistors.py: 5 V caps the current */
-#define FAM_ISENSE_V_PER_A    1.0f         /* [ASSUMED] rectified, filtered perch current amplitude */
+#define FAM_ISENSE_V_PER_A    1.0f         /* [ASSUMED] FAMn_ISENSE: the perch bridge's 5 V supply
+                                              current, filtered: volts per amp */
 #define FAM_I_MAX_A           0.2f         /* [SIM] familiar.py: 0.1-0.2 A; the other token stays dark */
 #define FAM_F_MIN_HZ          100000.0f    /* [CHOICE] sweep range */
 #define FAM_F_MAX_HZ          400000.0f

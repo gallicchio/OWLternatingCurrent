@@ -127,7 +127,15 @@ float perch_set(int perch, bool on, float freq_hz, float duty)
     unsigned s = FSLICE[perch];
     if (!on || !(freq_hz > 0.0f)) {
         uint16_t t = (uint16_t)pwm_hw->slice[s].top;
-        pwm_set_both_levels(s, 0, (uint16_t)(t + 1u));
+        pwm_set_both_levels(s, 0, (uint16_t)(t + 1u));       /* both legs low ... */
+        if (fon[perch]) {                                   /* ... and the pins plain and low */
+            gpio_put(FPIN_A[perch], 0);
+            gpio_put(FPIN_B[perch], 0);
+            gpio_set_function(FPIN_A[perch], GPIO_FUNC_SIO);
+            gpio_set_function(FPIN_B[perch], GPIO_FUNC_SIO);
+            gpio_set_dir(FPIN_A[perch], GPIO_OUT);
+            gpio_set_dir(FPIN_B[perch], GPIO_OUT);
+        }
         fon[perch] = false;
         fduty[perch] = 0.0f;
         if (!fon[0] && !fon[1])
@@ -144,6 +152,8 @@ float perch_set(int perch, bool on, float freq_hz, float duty)
     if (duty > 0.5f)
         duty = 0.5f;
     uint32_t cc = (uint32_t)lroundf(duty * (float)P);
+    if (cc > P / 2u)
+        cc = P / 2u;                                          /* the legs never high together */
     pwm_set_wrap(s, (uint16_t)(P - 1u));
     pwm_set_both_levels(s, (uint16_t)cc, (uint16_t)(P - cc));
     if (!fon[perch]) {

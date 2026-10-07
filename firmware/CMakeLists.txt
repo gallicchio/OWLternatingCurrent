@@ -61,6 +61,8 @@ target_compile_definitions(owlternating PRIVATE
     PICO_STDIO_USB_RESET_RESET_TO_FLASH_DELAY_MS=100
     PICO_STDIO_USB_ENABLE_RESET_VIA_BAUD_RATE=0
     PICO_STDIO_UART_SUPPORT_CHARS_AVAILABLE_CALLBACK=0
+    PICO_STACK_SIZE=0x1000          # core 0: 4 kB (SCRATCH_Y)
+    PICO_CORE1_STACK_SIZE=0x1000    # core 1: 4 kB (SCRATCH_X), its 10 kHz interrupts run on it
 )
 target_compile_options(owlternating PRIVATE -Wall -Wextra -Wno-unused-parameter -Wdouble-promotion)
 target_link_libraries(owlternating

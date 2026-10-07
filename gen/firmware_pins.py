@@ -118,17 +118,24 @@ def main():
         L.append("#define I2C_ADDR_%-12s 0x%02X" % (name, addr))
     L.append("")
 
-    # the board's own resistors
-    up, down = [], []
+    # the board's own resistors ("4.7 k pull-down") and the pins that need the pad's
+    # own pull-up ("internal pull-up"); RP2350-E9 rules out relying on a pad pull-down
+    up, down, internal_up = [], [], []
     for n in sorted(PINS.GPIO):
         net, _, what = PINS.GPIO[n]
-        if re.search(r"pull-up", what):
+        if re.search(r"[\d.]+\s*k\s+pull-up", what):
             up.append(net)
-        if re.search(r"pull-down", what) and "RP2350-E9" not in what:
+        if re.search(r"[\d.]+\s*k\s+pull-down", what):
             down.append(net)
-    L += ["/* ---- what the board's own 10 k resistors hold while the RP2354A is in reset ---- */",
+        # the RP2354A pad's own ("internal pull-up"), not another chip's ("their internal pull-ups")
+        if re.search(r"(?<!their )internal pull-up(?!s)", what):
+            internal_up.append(net)
+        assert not re.search(r"internal pull-down", what), "%s relies on a pad pull-down (RP2350-E9)" % net
+    L += ["/* ---- what the board's own resistors hold while the RP2354A is in reset ---- */",
           "#define BOARD_PULL_UP_MASK    (%s)" % (" | ".join("(1u << PIN_%s)" % n for n in up) or "0u"),
           "#define BOARD_PULL_DOWN_MASK  (%s)" % (" | ".join("(1u << PIN_%s)" % n for n in down) or "0u"),
+          "/* the pins that rely on the pad's own pull-up (pull-ups are not hit by RP2350-E9) */",
+          "#define MCU_PULL_UP_MASK      (%s)" % (" | ".join("(1u << PIN_%s)" % n for n in internal_up) or "0u"),
           ""]
     assert "DRV_nSLEEP" in down and "FAM_EN" in down, "the bridges' enables must be pulled off in reset"
 

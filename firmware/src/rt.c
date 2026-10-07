@@ -296,7 +296,10 @@ static void control(void)
         .iprop_A = rt.i_meas[COIL_LEV],
         .v12_V = rt.v12,
         .coil_R_ohm = thermal_r_ohm(&rt_thermal[COIL_LEV]),
-        .coil_allowed = allowed && drv == DRV_AWAKE,
+        /* allowed, not "awake": the bridges wake within 1.2 ms of the loop wanting them, and
+         * nothing the loop asks for in that time matters (WAIT drives nothing; a CAL starts
+         * with tens of ms of measuring with the coil off) */
+        .coil_allowed = allowed,
         .thermal_trip = thermal_derate(&rt_thermal[COIL_LEV]) <= 0.0f,
     };
     lev_output lo;
@@ -350,10 +353,15 @@ static void control(void)
         break;
     }
 
-    /* 5. the PWM */
+    /* 5. the PWM.  The levitation coil always switches both ways a little (every output
+     * pulse at least DRV_MIN_PULSE_S: the mean stays linear down to zero); with the
+     * carrier, a lot, but never so much that the loop's mean voltage cannot be made:
+     * the carrier yields to the control for as long as the control needs it. */
     float lev_alt = DRV_MIN_PULSE_S * coil_pwm_hz(COIL_LEV);
-    if (carrier_now)
-        lev_alt = fmaxf(lev_alt, 0.5f * clampf_(rt.lev_eyes, 0.0f, 1.0f));
+    if (carrier_now) {
+        float room = 0.5f * (1.0f - fabsf(u[COIL_LEV])) - 0.02f;
+        lev_alt = fmaxf(lev_alt, fminf(0.5f * clampf_(rt.lev_eyes, 0.0f, LEV_EYES_MAX), room));
+    }
     for (int c = 0; c < COIL_COUNT; c++) {
         bool on = drv == DRV_AWAKE && want[c];
         if (drv == DRV_AWAKE) {
@@ -474,7 +482,7 @@ static void core1_main(void)
         __wfi();
 }
 
-void rt_start(bool cold_boot)
+void rt_start(bool cold_boot, const lev_cal_data *cal)
 {
     memset(&rt, 0, sizeof rt);
     rt.ambient_C = AMBIENT_DEFAULT_C;
@@ -486,6 +494,8 @@ void rt_start(bool cold_boot)
             thermal_assume_cold(&rt_thermal[c]);
     }
     lev_init(&rt_lev);
+    if (cal && (cal->coil_valid || cal->zero_valid))
+        lev_set_cal(&rt_lev, cal);          /* before core 1 runs the loop */
     coils_init();
     multicore_launch_core1(core1_main);
 }

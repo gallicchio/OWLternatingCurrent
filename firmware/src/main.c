@@ -26,6 +26,7 @@
 #include <string.h>
 #include "pico/bootrom.h"
 #include "pico/stdlib.h"
+#include "hardware/uart.h"
 #include "hardware/watchdog.h"
 #include "tusb.h"
 
@@ -74,21 +75,58 @@ static uint64_t t0_us;
 
 static float now_s(void) { return (float)((time_us_64() - t0_us) * 1e-6); }
 
-/* ---- the console's lines out: the UART always, USB when a terminal is open ---------- */
+/* ---- the console's lines out: the UART always, USB when a terminal is open ----------
+ * The UART (115200 baud, 11.5 bytes a millisecond) would hold the loop for 130 ms on a
+ * long reply if written directly, so lines queue in a ring and drain between slots; a
+ * line that does not fit whole is dropped and counted. */
+#define ULOG_SIZE 8192u
+static char ulog[ULOG_SIZE];
+static uint32_t ulog_head, ulog_tail, ulog_dropped;
+
+static void ulog_line(const char *s)
+{
+    size_t n = strlen(s);
+    uint32_t used = (ulog_head - ulog_tail) % ULOG_SIZE;
+    if (n + 2u >= ULOG_SIZE - used) {
+        ulog_dropped++;
+        return;
+    }
+    for (size_t i = 0; i < n; i++)
+        ulog[ulog_head++ % ULOG_SIZE] = s[i];
+    ulog[ulog_head++ % ULOG_SIZE] = '\r';
+    ulog[ulog_head++ % ULOG_SIZE] = '\n';
+    ulog_head %= ULOG_SIZE;
+}
+
+static void ulog_drain(void)
+{
+    while (ulog_tail != ulog_head && uart_is_writable(uart0)) {
+        uart_putc_raw(uart0, ulog[ulog_tail]);
+        ulog_tail = (ulog_tail + 1u) % ULOG_SIZE;
+    }
+}
+
+static uint32_t usb_dropped;
+
 static void out_line(const char *s)
 {
-    printf("%s\n", s);
+    ulog_line(s);
     if (tud_cdc_connected()) {
-        tud_cdc_write_str(s);
-        tud_cdc_write_str("\r\n");
-        tud_cdc_write_flush();
+        uint32_t n = (uint32_t)strlen(s);
+        if (tud_cdc_write_available() >= n + 2u) {   /* whole lines or nothing: never half a JSON object */
+            tud_cdc_write(s, n);
+            tud_cdc_write_str("\r\n");
+            tud_cdc_write_flush();
+        } else {
+            usb_dropped++;
+        }
     }
 }
 
 static void event(const char *fmt, ...) __attribute__((format(printf, 1, 2)));
 static void event(const char *fmt, ...)
 {
-    char buf[CONSOLE_REPLY_MAX];
+    static char buf[CONSOLE_REPLY_MAX];      /* core 0's main loop only */
     va_list ap;
     va_start(ap, fmt);
     vsnprintf(buf, sizeof buf, fmt, ap);
@@ -180,8 +218,9 @@ static void status_json(char *buf, size_t n)
     jb_add(&j, "\"rt\":{\"ticks\":%lu,\"overruns\":%lu,\"adc_errors\":%lu,\"tick_us_max\":%lu},",
            (unsigned long)rt.ticks, (unsigned long)rt.overruns, (unsigned long)rt.adc_errors,
            (unsigned long)rt.tick_cycles_max);
-    jb_add(&j, "\"leds\":{\"frames\":%lu,\"errors\":[%lu,%lu]}}", (unsigned long)leds.frames,
-           (unsigned long)drv[0].errors, (unsigned long)drv[1].errors);
+    jb_add(&j, "\"leds\":{\"frames\":%lu,\"errors\":[%lu,%lu]},\"lines_dropped\":{\"uart\":%lu,\"usb\":%lu}}",
+           (unsigned long)leds.frames, (unsigned long)drv[0].errors, (unsigned long)drv[1].errors,
+           (unsigned long)ulog_dropped, (unsigned long)usb_dropped);
 }
 
 static void adc_dump_json(char *buf, size_t n)
@@ -256,8 +295,8 @@ static const char *a_lev(int op, const char *param, float v)
 {
     switch (op) {
     case LEV_OP_ON:
-        lev_enable(&rt_lev, true);
-        return rt.power_ok ? NULL : NULL;   /* without 12 V it waits (INHIBIT) */
+        lev_enable(&rt_lev, true);          /* without 12 V it waits (INHIBIT) */
+        return NULL;
     case LEV_OP_OFF:
         lev_enable(&rt_lev, false);
         return NULL;
@@ -491,7 +530,7 @@ static void familiars_tick(void)
         if (sweep_watch[p] == 1 && perch[p].state == FAM_ST_SWEEP)
             sweep_watch[p] = 2;
         if (sweep_watch[p] == 2 && before == FAM_ST_SWEEP && perch[p].state != FAM_ST_SWEEP) {
-            char buf[CONSOLE_REPLY_MAX];
+            static char buf[CONSOLE_REPLY_MAX];
             jsonbuf j = jb_start(buf, sizeof buf);
             jb_add(&j, "{\"event\":\"sweep\",\"perch\":\"fam%d\",\"f_kHz\":[", p + 1);
             for (int k = 0; k < FAM_SWEEP_N; k++)
@@ -594,7 +633,8 @@ int main(void)
 {
     board_safe_init();                   /* before anything else: no coil can be driven */
 
-    bool wd = watchdog_caused_reboot();
+    /* a reset by the watchdog running out (a hang), not by watchdog_reboot() (`reboot`) */
+    bool wd = watchdog_enable_caused_reboot();
     if (wd) {
         if (++watchdog_hw->scratch[0] >= CRASHES_TO_BOOTSEL) {
             watchdog_hw->scratch[0] = 0;
@@ -615,7 +655,7 @@ int main(void)
     familiars_on = cfg.familiars_on;
 
     i2c_bus_init();
-    char scan[512];
+    static char scan[512];
     i2c_scan_json(scan, sizeof scan);
     event("{\"event\":\"i2c_scan\",\"found\":%s}", scan);
     led_engine_init(&leds);
@@ -635,7 +675,7 @@ int main(void)
     scenes_init(&show, (uint32_t)time_us_32() ^ 0x0717u);
     memset(&sin_, 0, sizeof sin_);
     sin_.gravity[2] = -1.0f;
-    sin_.lux = -1.0f;
+    sin_.lux = als.present ? SCENE_LUX_PENDING : -1.0f;
     sin_.pendulum_choice = -1;
     pend_params pp;
     pend_default_params(&pp);
@@ -647,9 +687,7 @@ int main(void)
     film_init(&film);
     theremin_init(&thr);
 
-    rt_start(!wd);                       /* core 1: the tick, the ADC, the safety, the coils */
-    if (cfg.lev.coil_valid || cfg.lev.zero_valid)
-        lev_set_cal(&rt_lev, &cfg.lev);
+    rt_start(!wd, &cfg.lev);             /* core 1: the tick, the ADC, the safety, the coils */
     if (wd)
         rt.faults |= RT_FAULT_WATCHDOG;
     perch_init();
@@ -661,6 +699,7 @@ int main(void)
     uint64_t started = time_us_64();
     for (;;) {
         tud_task();
+        ulog_drain();
         console_input();
         uint32_t now = time_us_32();
         if (now - ms_at >= 1000u) {      /* 1 kHz */
@@ -689,8 +728,15 @@ int main(void)
             }
             if (slot % 80u == 5u && als_read(&als))
                 sin_.lux = als.lux;
-            if (slot % 2000u == 7u)
+            if (slot % 2000u == 7u) {
                 leds_look_for_drivers();     /* every 5 s: the tree plugged in late? */
+                if (!als.present && als_init(&als))
+                    sin_.lux = SCENE_LUX_PENDING;
+                if (!imu.present)
+                    imu_init(&imu);
+                if (!tmag.present)
+                    tmag_init(&tmag);
+            }
             if (!imu.present && tmag.present)
                 rt.ambient_C = tmag.temp_C;
             watch_changes();

@@ -131,7 +131,7 @@ bool tmag_init(tmag_state *s)
     const uint8_t a = I2C_ADDR_TMAG5273A2;
     if (!i2c_read_reg(a, TMAG_DEVICE_ID, id, 3) || id[1] != 0x49 || id[2] != 0x54)
         return false;
-    bool ok = i2c_write_reg8(a, TMAG_DEVICE_CONFIG_1, 0x02 << 2) &&   /* 4x averaging (3.1 kSPS, 3 axes) */
+    bool ok = i2c_write_reg8(a, TMAG_DEVICE_CONFIG_1, 0x03 << 2) &&   /* 8x averaging (1.6 kSPS, 3 axes) */
               i2c_write_reg8(a, TMAG_SENSOR_CONFIG_1, 0x7 << 4) &&    /* X, Y, Z */
               i2c_write_reg8(a, TMAG_SENSOR_CONFIG_2, 0x00) &&        /* +-133 mT */
               i2c_write_reg8(a, TMAG_T_CONFIG, 0x01) &&               /* temperature too */

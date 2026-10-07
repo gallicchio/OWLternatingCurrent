@@ -55,13 +55,15 @@ typedef enum {
 #define SCENE_MOON_STAR    11          /* [ASSUMED] the arc's star nearest the moon (theremin) */
 
 enum { FAMILIAR_NONE = 0, FAMILIAR_OWL = 1, FAMILIAR_CAT = 2, FAMILIAR_UNKNOWN = 3 };
+#define SCENE_LUX_PENDING (-2.0f)
 
 typedef struct {
     float dt_s;                    /* this frame's length (1 / LED_FPS) */
     float gravity[3];              /* "down" in the board's frame, in g: x right, y toward the
                                       sky, z out of the board's face; flat on a table: (0,0,-1) */
     bool tap, double_tap, button;  /* events since the last frame */
-    float lux;                     /* ambient light, or < 0 without the sensor */
+    float lux;                     /* ambient light; -1 without the sensor (always night);
+                                      SCENE_LUX_PENDING while its first reading is awaited */
     uint8_t familiar[2];           /* per perch (owl's, cat's): FAMILIAR_* */
     bool theremin_active;          /* theremin on and a hand near */
     float pitch01, volume01;       /* the theremin's hand, 0..1 */
@@ -89,7 +91,7 @@ typedef struct {
     scene_id resume;               /* where the quantum ghost / theremin return to */
 
     /* the light sensor's verdict, with hysteresis */
-    bool dark;
+    bool dark, lux_seen;
     float lux_dark_for, lux_light_for;
     float next_firefly;            /* night -> firefly, when */
 

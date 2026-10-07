@@ -376,6 +376,12 @@ void scenes_init(scenes *s, uint32_t seed)
 static void sequence(scenes *s, const scene_inputs *in)
 {
     float dt = in->dt_s;
+    if (in->lux <= SCENE_LUX_PENDING)
+        return;                                          /* the light sensor has not spoken yet */
+    if (in->lux >= 0.0f && !s->lux_seen) {               /* its first word counts at once */
+        s->lux_seen = true;
+        s->dark = in->lux < 0.5f * (ALS_DARK_LUX + ALS_LIGHT_LUX);
+    }
     if (in->lux >= 0.0f) {
         s->lux_dark_for = in->lux < ALS_DARK_LUX ? s->lux_dark_for + dt : 0.0f;
         s->lux_light_for = in->lux > ALS_LIGHT_LUX ? s->lux_light_for + dt : 0.0f;

@@ -50,6 +50,8 @@ enum {
 
 enum { RT_OWNER_NONE = 0, RT_OWNER_PEND, RT_OWNER_FILM, RT_OWNER_CONSOLE };
 
+#define LEV_EYES_MAX 0.8f   /* [CHOICE] the carrier's share of each period at most (0.4 each way) */
+
 typedef struct {
     /* written by core 1 */
     volatile uint32_t ticks, overruns, adc_errors;
@@ -77,8 +79,9 @@ extern lev_ctrl rt_lev;                        /* core 0: lev_enable, lev_reques
                                                   lev_get_telemetry */
 extern thermal_coil rt_thermal[COIL_COUNT];    /* core 0 reads */
 
-void rt_start(bool cold_boot);                 /* core 0, once: launches core 1; cold_boot: a power-on
-                                                  (the coils are at room temperature) */
+/* core 0, once: launches core 1.  cold_boot: a power-on (the coils are at room
+ * temperature); cal: the levitation's saved calibration, or NULL */
+void rt_start(bool cold_boot, const lev_cal_data *cal);
 /* core 0: a mean current (A, + = forward) for ms milliseconds; false if refused */
 bool rt_coil_request(int coil, float amps, uint32_t ms, int owner);
 void rt_coil_release_owner(int owner);         /* every coil this owner holds: off now */

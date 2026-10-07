@@ -6,8 +6,8 @@
  * pull-downs on nSLEEP and FAM_EN already hold them so in reset; this makes it
  * true in software before the first line that could drive a coil.
  *
- * RP2350-E9: no input here relies on the pad's pull-down.  nFAULT and the SPELL
- * button have the board's 10 k pull-ups (pull-ups work); the IMU's interrupt and the
+ * RP2350-E9: no input here relies on the pad's pull-down.  nFAULT has the board's
+ * 10 k pull-up, the SPELL button the pad's own (pull-ups work); the IMU's interrupt and the
  * theremin oscillators are driven push-pull; the ADC pins have their digital input
  * buffers off (adc_gpio_init).
  */

@@ -11,10 +11,10 @@
 #define PIN_PEND3_IN2         5   /* out: pendulum coil 3 bridge IN2; PWM2 B */
 #define PIN_LEV_IN1           6   /* out: levitation coil bridge (U8) IN1; PWM3 A */
 #define PIN_LEV_IN2           7   /* out: levitation coil bridge IN2; PWM3 B */
-#define PIN_FAM1_A            8   /* out: owl perch bridge, leg A (UCC27524 U9); PWM4 A */
-#define PIN_FAM1_B            9   /* out: owl perch bridge, leg B (U10); PWM4 B */
-#define PIN_FAM2_A           10   /* out: cat perch bridge, leg A (U11); PWM5 A */
-#define PIN_FAM2_B           11   /* out: cat perch bridge, leg B (U12); PWM5 B */
+#define PIN_FAM1_A            8   /* out: owl perch bridge, leg A (UCC27524 U9, channel A); PWM4 A */
+#define PIN_FAM1_B            9   /* out: owl perch bridge, leg B (U9, channel B); PWM4 B */
+#define PIN_FAM2_A           10   /* out: cat perch bridge, leg A (UCC27524 U10, channel A); PWM5 A */
+#define PIN_FAM2_B           11   /* out: cat perch bridge, leg B (U10, channel B); PWM5 B */
 #define PIN_UART_TX          12   /* out: UART0 TX to the debug connector J5 (console, 115200) */
 #define PIN_UART_RX          13   /* in: UART0 RX from J5 */
 #define PIN_AUDIO            14   /* out: audio PWM to the class-D amplifier through an RC filter; PWM7 A */
@@ -26,13 +26,13 @@
 #define PIN_MUX_S0           20   /* out: 74HC4051 select bit 0 */
 #define PIN_MUX_S1           21   /* out: 74HC4051 select bit 1 */
 #define PIN_MUX_S2           22   /* out: 74HC4051 select bit 2 */
-#define PIN_DRV_nSLEEP       23   /* out: all four DRV8874s: low = asleep (10 k pull-down keeps them asleep in reset) */
+#define PIN_DRV_nSLEEP       23   /* out: all four DRV8874s: low = asleep (4.7 k pull-down keeps them asleep in reset) */
 #define PIN_DRV_nFAULT       24   /* in: all four DRV8874s' nFAULT, wired-OR, 10 k pull-up */
-#define PIN_FAM_EN           25   /* out: the four UCC27524s' enables (10 k pull-down: off in reset) */
+#define PIN_FAM_EN           25   /* out: both UCC27524s' four enables (4.7 k pull-down beats their internal pull-ups: off in reset) */
 #define PIN_HALL             26   /* adc: ADC0: the perch's DRV5055 Hall sensor (via the tree) */
 #define PIN_LEV_IPROPI       27   /* adc: ADC1: levitation coil current (DRV8874 IPROPI) */
 #define PIN_MUX_OUT          28   /* adc: ADC2: the 74HC4051's output (slow signals, below) */
-#define PIN_BUTTON           29   /* in: the SPELL button (10 k pull-up, low when pressed) */
+#define PIN_BUTTON           29   /* in: the SPELL button, low when pressed (internal pull-up: RP2350-E9 affects only pull-downs) */
 
 /* ---- the coil bridges: one PWM slice each, IN1/leg A = channel A -------------- */
 #define PWM_SLICE_PEND1  0   /* GPIO0 (IN1) = A, GPIO1 (IN2) = B */
@@ -52,11 +52,11 @@
 /* ---- the 74HC4051 (S0-S2 on PIN_MUX_S0..S2) ------------------------------ */
 #define MUX_SEL_SHIFT    20
 #define MUX_SEL_MASK     (7u << MUX_SEL_SHIFT)
-#define MUX_CH_PEND1_IPROPI   0   /* pendulum coil 1 current */
+#define MUX_CH_PEND3_IPROPI   0   /* pendulum coil 3 current */
 #define MUX_CH_PEND2_IPROPI   1   /* pendulum coil 2 current */
-#define MUX_CH_PEND3_IPROPI   2   /* pendulum coil 3 current */
-#define MUX_CH_FAM1_ISENSE    3   /* owl perch current (rectified, filtered) */
-#define MUX_CH_FAM2_ISENSE    4   /* cat perch current (rectified, filtered) */
+#define MUX_CH_PEND1_IPROPI   2   /* pendulum coil 1 current */
+#define MUX_CH_FAM2_ISENSE    3   /* cat perch bridge's supply current (filtered): rises when the cat sits on it */
+#define MUX_CH_FAM1_ISENSE    4   /* owl perch bridge's supply current (filtered): rises when the owl sits on it */
 #define MUX_CH_V12_SENSE      5   /* +12V through 100 k / 22 k (12 V reads 2.16 V) */
 #define MUX_CH_V5_SENSE       6   /* +5V through 10 k / 10 k (5 V reads 2.5 V) */
 #define MUX_CH_VBUS_SENSE     7   /* USB VBUS through 10 k / 10 k: plugged into USB? */
@@ -72,9 +72,11 @@
 #define I2C_ADDR_LTR_303ALS   0x29
 #define I2C_ADDR_TMAG5273A2   0x35
 
-/* ---- what the board's own 10 k resistors hold while the RP2354A is in reset ---- */
-#define BOARD_PULL_UP_MASK    ((1u << PIN_DRV_nFAULT) | (1u << PIN_BUTTON))
+/* ---- what the board's own resistors hold while the RP2354A is in reset ---- */
+#define BOARD_PULL_UP_MASK    ((1u << PIN_DRV_nFAULT))
 #define BOARD_PULL_DOWN_MASK  ((1u << PIN_DRV_nSLEEP) | (1u << PIN_FAM_EN))
+/* the pins that rely on the pad's own pull-up (pull-ups are not hit by RP2350-E9) */
+#define MCU_PULL_UP_MASK      ((1u << PIN_BUTTON))
 
 /* every pin that drives a coil bridge: low = off (DRV8874 coast, UCC27524 output low) */
 #define BRIDGE_PIN_MASK  ((1u << PIN_PEND1_IN1) | \

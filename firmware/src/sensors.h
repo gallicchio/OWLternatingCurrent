@@ -6,7 +6,7 @@
  *   LTR-303ALS (0x29)   ambient light: gain 48x (0.02-1300 lux), 100 ms integration,
  *                       every 200 ms
  *   TMAG5273A2 (0x35)   3-axis Hall under the pendulum: X, Y, Z at +-133 mT and its
- *                       temperature, continuous conversion, 4x averaging
+ *                       temperature, continuous conversion, 8x averaging (pendulum.h's noise)
  *
  * [ASSUMED] the IMU's axes are the board's (x right, y toward the sky, z out of the
  * face); IMU_AXIS_* below fix it once the placement is known.

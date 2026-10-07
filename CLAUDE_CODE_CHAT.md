@@ -531,3 +531,26 @@ review document that I'll ask other LLMs to look at.
 ## Response 2 2026-10-07 12:13 - (in progress) Claude Opus 5.5 Max
 
 *(being written; progress is logged below as the work goes)*
+
+### Progress log
+
+- **12:13** Prompt recorded. Committing as I go from now on (you: "Commit as you go").
+- **12:20** Two lessons into `CLAUDE_PCB.md` §1: minimise the steps beyond the JLCPCB
+  upload, and commit as you go in a repository that is mine alone.
+- **12:35** New parts: a real 23 mm speaker with PCB pins (GSPK2307P, 5k in stock), the
+  NS4150B amplifier, the MSK12C02 sound switch, 2 × 8 right-angle headers and sockets
+  for the plug-together tree, orange side-view LEDs for the bat's eyes.
+- **12:50** One magnet size for everything: the bias magnet is the bat's own 10 × 2 mm
+  disc, 14 mm above the perch, and the 3.6 g bat floats 8.5 mm below
+  (`sim/physics/levitation_onemagnet.py`). The bat's eyes are lit by a 90 kHz carrier
+  in the levitation coil: ~9 mA each (`bat_power.py`). The familiar tokens, lying flat
+  on their perches, get 15-23 mA through 150 Ω at the 5 V drive's hard cap.
+- **13:05** Datasheet checks that changed the design:
+  - the UCC27524's continuous output limit is 0.3 A, so each perch leg gets a whole
+    chip, channels in parallel;
+  - the TMAG5273A2 answers at 0x35, not 0x22.
+- **13:15** The antenna study finished (for rev B): a ghost-shaped monopole needs no
+  matching parts.
+- **13:20** Interfaces fixed and committed: `gen/pins.py` (all 30 GPIOs within the 8
+  PWM slices), `gen/mech.py`, `gen/leds.py` (49 LEDs). Two agents started: the 3D
+  prints (`print/`) and the firmware (`firmware/`).

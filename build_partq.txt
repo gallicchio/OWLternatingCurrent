@@ -1,0 +1,202 @@
+--- SMT standoff M3  (2026-10-07T12:15:14-07:00)
+--- SMD spacer M2.5  (2026-10-07T12:15:15-07:00)
+--- SMTSO  (2026-10-07T12:15:16-07:00)
+--- 9774030151  (2026-10-07T12:15:18-07:00)
+--- speaker SMD 8ohm  (2026-10-07T12:15:19-07:00)
+--- SMD speaker  (2026-10-07T12:15:20-07:00)
+--- micro speaker 1511  (2026-10-07T12:15:21-07:00)
+  C3031417   DMZ1511E                         2849 expand -55℃~+150℃ 1 N-channel 1.5V 100mA 12.8pF 150V 25Ω@0V 3.3pF 3nC@10V~0V 5.4pF 500mW SOT-23 MOSFETs ROHS
+--- NS4150B  (2026-10-07T12:15:23-07:00)
+  C189961    NS4150B                        144386 expand -40℃~+85℃ -80dB 0.1% 1 Pair Differential Inputs 1-Channel 3V~5.25V 3Wx1@4Ω 4mA 88%、90% Automatic mute/no-noise
+--- PAM8302  (2026-10-07T12:15:24-07:00)
+  C113367    PAM8302AASCR                    13759 expand -40℃~+85℃ 0.3% 1-Channel 2.5Wx1@4Ω 2V~5.5V 4mA 50dB 80dB 85% Class D Filterless architecture MSOP-8 Audio Ampl
+--- HT6872  (2026-10-07T12:15:25-07:00)
+  C93112     HT6872                          38589 expand -40℃~+85℃ -72dB 0.08% 1-Channel 2.5V~6.5V 2.64mA、3.26mA、4.04mA 3.85Wx1@4Ω 82%、85% 87dB Automatic mute/no-noise
+  C46955888  HT6872SPNR                       1915 expand -40℃~+85℃ -70dB 0.08% 1-Channel 2.5V~6.5V 2.65mA 80%、90% 91dB Automatic mute/no-noise switch、Enable/shutdown f
+--- LTK8002D  (2026-10-07T12:15:26-07:00)
+--- slide switch SMD SPDT  (2026-10-07T12:15:28-07:00)
+  C49023767  MST-12D18G4 SPDT Slide Switc    35495 expand -25℃~+70℃ 10 thousand cycles 100mA 12V 200gf 2mm 3.5mm 7.5mm 9.1mm Beryllium bronze Black Rectangular Columnar
+  C49023765  MST-12D18G2 SMD Slide Switch     9705 expand -25℃~+70℃ 10 thousand cycles 100mA 12V 200gf 2mm 3.5mm 5.5mm 9.1mm Beryllium bronze Black Rectangular Columnar
+  C49023766  MST-12D18G3 Surface Mount Sl     1311 expand -25℃~+70℃ 10 thousand cycles 100mA 12V 200gf 2mm 3.5mm 6.5mm 9.1mm Beryllium bronze Black Rectangular Columnar
+  C91271     DSDT08LSGET                       900 expand 2.54mm 24V 25mA 8 Black SPDT Slide, Rocked SMD,P=2.54mm DIP Switches ROHS
+  C92658     K3-1280S-F1                       815 expand -25℃~+80℃ 10000 times 3.5mm 3.7mm 300mA 6V 9.1mm Black Gull Wing Rectangular Columnar SPDT Surface Mount, Righ
+  C92660     K3-1235S-F1                      1788 expand -25℃~+80℃ 10000 times 3.5mm 3.5mm 300mA 6V 9mm Black Gull Wing Rectangular Columnar SPDT Surface Mount,Vertica
+  C97433     SSSS810701                       5210 expand -40℃~+85℃ 10,000 cycles 300mA 4.1mm 5V Rectangular Columnar SMD(SMT) Tab SPDT Surface Mount, Right Angle SMD S
+  C109335    SSSS811101                      41009 expand -40℃~+85℃ 10,000 cycles 300mA 4.1mm 5V Rectangular Columnar SMD(SMT) Tab SPDT Surface Mount, Right Angle SMD S
+--- MSK-12C02  (2026-10-07T12:15:29-07:00)
+  C431540    MSK12C02                       190738 expand -20℃~+70℃ 1.4mm 10000 times 12V 2.8mm 50mA 8mm SMD(SMT) Tab SPDT Surface Mount, Right Angle SMD,8x2.8mm Slide 
+  C431541    MSK12C02-HB                     89925 expand -25℃~+70℃ 1.4mm 10,000 cycles 12V 2.8mm 50mA 8mm Black Rectangular Columnar SMD(SMT) Tab SPDT Surface Mount, R
+  C2681568   MSK12C02-SZ                     30901 expand -20℃~+70℃ 1.4mm 10000 times 12V 2.8mm 50mA 8mm SMD(SMT) Tab SPDT Surface Mount, Right Angle SMD,8x2.8mm Slide 
+--- SK12D07  (2026-10-07T12:15:30-07:00)
+  C393937    SK12D07VG4                     106268 expand -25℃~+70℃ 5,000 cycles 500mA 50V 8.8mm PC Pin Rectangular Columnar Right Angle SPDT 插件 Slide Switches ROHS
+  C431547    SK12D07VG3                      59041 expand -10℃~+50℃ 4.4mm 4.7mm 5,000 cycles 500mA 50V 8.7mm PC Pin SPDT 插件,8.7x4.4mm Slide Switches ROHS
+  C431548    SK12D07VG5                      63282 expand -10℃~+50℃ 4.4mm 4.7mm 5,000 cycles 500mA 50V 8.7mm PC Pin SPDT 插件,8.7x4.4mm Slide Switches ROHS
+  C480338    SK12D07L2B                       2061 expand -40℃~+85℃ 10000 times 300mA 4.5mm 4.7mm 50V 8.6mm Black PC Pin Rectangular Columnar SPDT 插件,8.6x4.5mm Slide Sw
+  C480339    SK12D07L3B                       4797 expand -40℃~+85℃ 10000 times 300mA 4.5mm 4.7mm 50V 8.6mm Black PC Pin Rectangular Columnar SPDT 插件,8.6x4.5mm Slide Sw
+  C480340    SK12D07L4B                       2822 expand -20℃~+80℃ 10000 times 300mA 4.5mm 4.7mm 50V 8.6mm Black PC Pin Rectangular Columnar SPDT 插件,8.6x4.5mm Slide Sw
+--- side view LED orange  (2026-10-07T12:15:32-07:00)
+--- side LED 1204 orange  (2026-10-07T12:15:33-07:00)
+--- right angle LED orange 0603  (2026-10-07T12:15:34-07:00)
+  C49234144  HX-3x5-CA-1.6N right angle       3632 expand 1.6N 100,000 Cycles 12V 3.3mm 3.45mm 4.45mm 50mA No Round Button SMD(SMT) Tab SPST Surface Mount, Right Angle 
+  C47647     PH-2PSurface Mount，Right Ang     8546 expand -25℃~+85℃ 1 1x2P 2 250V 2A 2P 2mm Brass PA PH Surface Mount, Right Angle Tin UL94V-0 maize-yellow SMD,P=2mm,卧贴
+  C50137     PH-4PSurface Mount，Right Ang     5713 expand -25℃~+85℃ 1 1x4P 250V 2A 2mm 4 4P Brass PA PH Surface Mount, Right Angle Tin maize-yellow SMD,P=2mm,卧贴 Wire To
+--- 2.54mm right angle pin header 2x8  (2026-10-07T12:15:36-07:00)
+--- 2.54mm female header 2x8 straight  (2026-10-07T12:15:37-07:00)
+--- AMS1117-3.3  (2026-10-07T12:15:38-07:00)
+  C6186      AMS1117-3.3                   1050084 base   -40℃~+125℃ 0.003%Vout 1 1.1V@(800mA) 15V 1A 3.3V 5mA 72dB@(120Hz) Fixed Over Current Protection、Short Circuit 
+  C347222    AMS1117-3.3                    907731 expand -40℃~+125℃ 0.003%Vout 1 1.3V@(1A) 12V 1A 3.3V 5mA 60dB@(120Hz) Fixed Over Current Protection Positive SOT-223 
+  C347256    AMS1117-3.3S                   359172 expand -40℃~+125℃ 0.003%Vout 1 1.3V@(1A) 18V 1A 3.3V 5mA 60dB@(120Hz) Fixed Over Current Protection Positive SOT-89 V
+  C351784    AMS1117-3.3                     12344 expand -20℃~+125℃@(Ta) 1 1.4V@(1A) 10V 12mA 1A 3.3V Fixed Positive SOT-223-3 Voltage Regulators - Linear, Low Drop Ou
+  C369933    AMS1117-3.3                     30059 expand 1 1.3V@(800mA) 18V 1A 3.3V 8mA Fixed Over Temperature Protection Positive SOT-223-4 Voltage Regulators - Linea
+  C880752    AMS1117-3.3                     56822 expand -40℃~+125℃@(Tj) 0.003%Vout 1 1.3V@(800mA) 18V 3.3V 3mA 70dB@(120Hz) 800mA Fixed Over Temperature Protection Po
+  C917183    AMS1117-3.3                     60704 expand -20℃~+125℃@(Tj) 0.003%Vout 1 1.3V@(800mA) 15V 1A 2mA 3.3V 75dB@(120Hz) Fixed Over Current Protection、Thermal s
+  C2688239   AMS1117-3.3V                     3710 expand -40℃~+125℃@(Tj) 0.003%Vout 1 1.4V@(1A) 12V 1A 3.3V 5mA 70dB@(120Hz) Fixed Over Temperature Protection、Thermal 
+--- 74HC4051  (2026-10-07T12:15:40-07:00)
+  C5645      74HC4051PW,118                  20088 expand -40℃~+125℃ 1 12ns 29ns 2V~10V 31ns 5pF 70Ω 8:1 Level shifting TSSOP-16 Analog Switches, Multiplexers ROHS
+  C9386      74HC4051D,653                   19804 expand -40℃~+125℃ 1 29ns 2V~10V 31ns 5ns 80Ω 8:1 SOIC-16 Analog Switches, Multiplexers ROHS
+  C16870     MC74HC4051ADR2G                  1423 expand -55℃~+125℃ -6V~0V、2V~6V 240Ω 35pF 59ns 8 8:1 95MHz SOIC-16 Analog Switches, Multiplexers ROHS
+  C128429    74HC4051BQ,115                  48983 expand -40℃~+125℃ 15ns 2V~10V 5pF 73ns 80Ω 86ns 8:1 DHVQFN-16-EP(2.5x3.5) Analog Switches, Multiplexers ROHS
+  C132065    CD74HC4051M96                    8306 expand -55℃~+125℃ 19ns 23ns 2V~6V 4ns 70Ω 8:1 SOIC-16 Analog Switches, Multiplexers ROHS
+  C179325    74HC4051PW-Q100,11               1184 expand -40℃~+125℃ 12ns 29ns 2V~10V 31ns 80Ω 8:1 TSSOP-16 Analog Switches, Multiplexers ROHS
+--- CD4051  (2026-10-07T12:15:41-07:00)
+  C5200      CD4051BE                         1646 expand -55℃~+125℃ 125Ω 20MHz 3V~20V 450ns 8 8:1 PDIP-16 Analog Switches, Multiplexers ROHS
+  C21379     CD4051BM96                     130394 expand -55℃~+125℃ 1 125Ω 20MHz 30pF 3V~20V 60ns 8:1 SOIC-16-150mil Analog Switches, Multiplexers ROHS
+  C54587     CD4051BPWR                      41759 expand -55℃~+125℃ 1 125Ω 20MHz 30ns 30pF 3V~20V 8:1 TSSOP-16 Analog Switches, Multiplexers ROHS
+  C87646     CD4051BNSR                       3025 expand -55℃~+125℃ 125Ω 20MHz 30ns 30pF 3V~20V 8:1 SOIC-16-208mil Analog Switches, Multiplexers ROHS
+  C507163    CD4051BM/TR                    134702 expand -40℃~+85℃ 0.2pF 3V~15V 60Ω 7ns 8 8:1 Glitch-free switching SOP-16 Analog Switches, Multiplexers ROHS
+  C507164    CD4051BE                          672 expand -40℃~+85℃ 0.2pF 1 3V~15V 50ns 60Ω 8:1 Bidirectional analog channel、Glitch-free switching DIP-16 Analog Switche
+  C555142    CD4051BQPWRQ1                    9752 expand -45℃~+125℃ 30ns@5V,50pF 3V~20V 5uA 8/1 CD4000 Dual Supply Level shifting、Break-before-make function TSSOP-16 S
+  C3007951   CD4051BMT/TR                     9738 expand -40℃~+85℃ 0.2pF 3V~15V 60Ω 7ns 8 8:1 Glitch-free switching TSSOP-16 Analog Switches, Multiplexers ROHS
+--- AW9523B  (2026-10-07T12:15:42-07:00)
+  C148077    AW9523BTQR                      76798 expand -40℃~+85℃ 100nA 16 2.4V~5.5V 20mA 4 400kHz 60mV I2C Interrupt Output Push-Pull、Open-drain Reset function、Casca
+--- BM03B-SRSS-TB  (2026-10-07T12:15:44-07:00)
+  C160389    BM03B-SRSS-TB(LF)(SN)           32191 expand -25℃~+85℃ 1 1A 1mm 1x3P 3 3.6mm 3P 4.25mm 50V 5mm Auxiliary Solder Pin Copper alloy PA SH Surface Mount,Vertic
+  C495538    BM03B-SRSS-TBT(LF)(SN)          47873 expand -25℃~+85℃ 1 1A 1mm 1x3P 3 3.6mm 3P 4.25mm 50V 5mm Auxiliary Solder Pin Copper alloy PA SH Surface Mount,Vertic
+--- TS-1088-AR02016  (2026-10-07T12:15:45-07:00)
+  C720477    TS-1088-AR02016                763194 base   -30℃~+80℃ 1.6N 100,000 cycles 12V 2mm 3.9mm 3mm 50mA Black Round Button SMD(SMT) Tab SPST Surface Mount,Vertic
+--- NTC 10K 0603  (2026-10-07T12:15:47-07:00)
+  C15401     0603WAJ0103T5E                 563372 expand -55℃~+155℃ 100mW 10kΩ 75V Thick Film Resistor ±100ppm/℃ ±5% 0603 Chip Resistor - Surface Mount ROHS
+--- Speakers
+  C391022    40M01-4T-H50-L36                    312 expand [Audio Products / Vibration Motors] -20℃~+50℃ 10% 40mm 4Ω 500mW 550Hz 5mm 85dB Electromagnetic Lead - Speakers ROHS
+--- speaker 8Ω
+--- Speaker 0.5W
+--- Buzzers Speakers SMD
+  C94598     MLT-5020                          37055 expand [Audio Products / Vibration Motors] -20℃~+70℃ 100mA 2.5mm 2V~4V 3V 4kHz 5.2mm 5.2mm 75dB Electromagnetic Passive (Externally Driven) SMD
+  C94599     MLT-8530                          74718 expand [Audio Products / Vibration Motors] -20℃~+70℃ 2.5V~4.5V 2.7kHz 3.3mm 3.6V 8.5mm 8.5mm 80dB 95mA Electromagnetic Passive (Externally Driv
+  C95297     MLT-5030                           6789 expand [Audio Products / Vibration Motors] -20℃~+70℃ 100mA 2V~4V 3.4mm 3V 4kHz 5.2mm 5.2mm 80dB Electromagnetic Passive (Externally Driven) SMD
+  C95298     MLT-8540H                         44370 expand [Audio Products / Vibration Motors] -20℃~+70℃ 100mA 2.5V~4.5V 2.7kHz 3.6V 4.3mm 8.5mm 8.5mm 85dB Electromagnetic Passive (Externally Dri
+  C95299     MLT-7525                          62657 expand [Audio Products / Vibration Motors] -20℃~+70℃ 2.5V~4.5V 2.7kHz 2.8mm 3.6V 7.5mm 7.5mm 80dB 95mA Electromagnetic Passive (Externally Driv
+  C95300     MLT-8540                           4817 expand [Audio Products / Vibration Motors] -20℃~+70℃ 2.5V~4.5V 2.7kHz 3.6V 4mm 8.7mm 8.7mm 80dB 95mA Electromagnetic Passive (Externally Driven
+  C96127     MLT-9650                          44594 expand [Audio Products / Vibration Motors] -20℃~+70℃ 2.7kHz 30mA 3V~7V 5.5mm 5V 85dB 9.6mm 9.6mm Active Buzzer (Built-in Driving Circuit) Elect
+  C113159    PKLCS1212E4001-R1                  8143 expand [Audio Products / Vibration Motors] -20℃~+70℃ 12mm 12mm 3mm 4kHz 84dB Passive (Externally Driven) Piezoelectric ±12.5V SMD,12x12mm Buzze
+  C184513    PKLCS1212E2000-R1                  1778 expand [Audio Products / Vibration Motors] -20℃~+70℃ 12mm 12mm 2kHz 3mm 76dB Passive (Externally Driven) Piezoelectric ±12.5V SMD,12x12mm Buzze
+--- Standoffs
+  C64321     M3 m3*11mm                         3102 expand [Hardware Fasteners] - Female-Female Hex Standoff
+  C66568     M3*8MM                             1241 expand [Hardware Fasteners] - Female-Female Hex Standoff
+  C192879    M2*3+3                            10104 expand [Hardware Fasteners] - Male-Female Round Standoff ROHS
+  C193465    M2*10+3                             320 expand [Hardware Fasteners] - Male-Female Round Standoff
+  C193469    M2*5+3                             1427 expand [Hardware Fasteners] - Male-Female Round Standoff
+  C551325    M3*5                               3890 expand [Hardware Fasteners] 0.5mm 3mm 4.7mm 5mm Hex Hollow Isolation Lead-free brass M3X5 National standard Natural color Stud -
+  C551326    M3*6                               1787 expand [Hardware Fasteners] 0.5mm 3mm 4.7mm 6mm Hex Hollow Isolation Lead-free brass M3X6 National standard Natural color Stud -
+  C551328    M3*8                               1536 expand [Hardware Fasteners] 0.5mm 3mm 4.7mm 8mm Hex Hollow Isolation Lead-free brass M3X8 National standard Natural color Stud -
+  C551331    M3*11                              4730 expand [Hardware Fasteners] - Female-Female Hex Standoff ROHS
+--- SMT Nut
+--- spacer SMD
+--- PCB Standoff
+--- LED side
+  C41419561  YLED0602GSIDE                       926 expand [Optoelectronics] -40℃~+85℃ 100mW 120° 1mm x 0.75mm square LED 2.5V~3.1V 20mA 430mcd 525nm 534nm Discrete Diode Emeral
+  C46635136  YLED0602WSIDE                      1968 expand [Optoelectronics] -40℃~+85℃ 100mW 120° 145mcd 2.5V~3V 2mA Discrete Diode White Yellow Lens 0603 LED Indication - Discr
+  C49446795  YLED0602BSIDE                      2744 expand [Optoelectronics] -40℃~+85℃ 120° 1mm x 0.75mm square LED 2.6V~3.1V 34mcd~100mcd 460nm~475nm 465nm 70mW Blue Discrete D
+  C49446796  YLED0602RSIDE                      2618 expand [Optoelectronics] -40℃~+85℃ 1.8V~2.4V 120° 1mm x 0.75mm square LED 20mA 48mW 48mcd~120mcd 615nm~630nm 635nm Discrete D
+  C74270     27-21SYGC/S530-E3/TR8              4071 expand [Optoelectronics] -40℃~+85℃ 130° 20mA 28mcd 2V 573nm 575nm 60mW Discrete Diode Side View Mount Water Clear Yellow Gree
+  C115449    LTST-S110KSKT                      5160 expand [Optoelectronics] -55℃~+85℃ 130° 2.1V 20mA 587nm 588nm 75mW 80mcd Discrete Diode Side View Mount Water Clear Yellow SM
+  C125113    LTST-S270KGKT                     16438 expand [Optoelectronics] -30℃~+85℃ 130° 20mA 2V 571nm 574nm 71mcd 75mW Discrete Diode Side View Mount Water Clear Yellow Gree
+  C125114    LTST-S270KRKT                      6926 expand [Optoelectronics] -30℃~+85℃ 130° 20mA 2V 54mcd 631nm 639nm 75mW Discrete Diode Red Side View Mount Water Clear SMD,1.6
+  C125115    LTST-S270TBKT                     28159 expand [Optoelectronics] -20℃~+80℃ 130° 180mcd 2.8V~3.8V 20mA 465nm~475nm 468nm 76mW Blue Discrete Diode Side View Mount Wate
+  C125116    LTST-S326KGJRKT                   29455 expand [Optoelectronics] -30℃~+85℃ 130° 20mA 2V、2V 35mcd、45mcd 571nm、631nm 574nm、639nm 75mW Common Anode Red, Yellow Green Si
+  C133119    LTST-S270KSKT                      3883 expand [Optoelectronics] -30℃~+85℃ 130° 20mA 2V 587nm 588nm 75mW 80mcd Discrete Diode Side View Mount Water Clear Yellow SMD,
+  C160468    LTST-S220KSKT                      5777 expand [Optoelectronics] -30℃~+85℃ 130° 20mA 2V 54mcd 589nm 591nm 75mW Discrete Diode Side View Mount Water Clear Yellow SMD,
+--- side-looking LED
+--- SMD LED Side View
+  C74270     27-21SYGC/S530-E3/TR8              4071 expand [Optoelectronics] -40℃~+85℃ 130° 20mA 28mcd 2V 573nm 575nm 60mW Discrete Diode Side View Mount Water Clear Yellow Gree
+  C115449    LTST-S110KSKT                      5160 expand [Optoelectronics] -55℃~+85℃ 130° 2.1V 20mA 587nm 588nm 75mW 80mcd Discrete Diode Side View Mount Water Clear Yellow SM
+  C125113    LTST-S270KGKT                     16438 expand [Optoelectronics] -30℃~+85℃ 130° 20mA 2V 571nm 574nm 71mcd 75mW Discrete Diode Side View Mount Water Clear Yellow Gree
+  C125114    LTST-S270KRKT                      6926 expand [Optoelectronics] -30℃~+85℃ 130° 20mA 2V 54mcd 631nm 639nm 75mW Discrete Diode Red Side View Mount Water Clear SMD,1.6
+  C125115    LTST-S270TBKT                     28159 expand [Optoelectronics] -20℃~+80℃ 130° 180mcd 2.8V~3.8V 20mA 465nm~475nm 468nm 76mW Blue Discrete Diode Side View Mount Wate
+  C125116    LTST-S326KGJRKT                   29455 expand [Optoelectronics] -30℃~+85℃ 130° 20mA 2V、2V 35mcd、45mcd 571nm、631nm 574nm、639nm 75mW Common Anode Red, Yellow Green Si
+  C133119    LTST-S270KSKT                      3883 expand [Optoelectronics] -30℃~+85℃ 130° 20mA 2V 587nm 588nm 75mW 80mcd Discrete Diode Side View Mount Water Clear Yellow SMD,
+  C160468    LTST-S220KSKT                      5777 expand [Optoelectronics] -30℃~+85℃ 130° 20mA 2V 54mcd 589nm 591nm 75mW Discrete Diode Side View Mount Water Clear Yellow SMD,
+  C160469    LTST-S220KGKT                     41332 expand [Optoelectronics] -30℃~+85℃ 130° 20mA 2V 35mcd 568nm 574nm 75mW Discrete Diode Side View Mount Water Clear Yellow Gree
+  C160470    LTST-S220TGKT                     17055 expand [Optoelectronics] -20℃~+80℃ 130° 20mA 260.5mcd 3.2V 525nm 530nm 76mW Discrete Diode Green Side View Mount Water Clear 
+  C160471    LTST-S220TBKT                      8800 expand [Optoelectronics] -20℃~+80℃ 104mcd 130° 20mA 3.3V 465nm~475nm 468nm 76mW Blue Discrete Diode Side View Mount Water Cle
+  C160472    LTST-S270KFKT                      5962 expand [Optoelectronics] -30℃~+85℃ 130° 20mA 2V 605nm 611nm 75mW 90mcd Discrete Diode Orange Side View Mount Water Clear SMD,
+--- 0603 side
+  C41419561  YLED0602GSIDE                       926 expand [Optoelectronics] -40℃~+85℃ 100mW 120° 1mm x 0.75mm square LED 2.5V~3.1V 20mA 430mcd 525nm 534nm Discrete Diode Emeral
+  C46635136  YLED0602WSIDE                      1968 expand [Optoelectronics] -40℃~+85℃ 100mW 120° 145mcd 2.5V~3V 2mA Discrete Diode White Yellow Lens 0603 LED Indication - Discr
+  C273616    TJ-S1706SW6TGLC2G-A5              42550 expand [Optoelectronics] -40℃~+80℃ 108mW 120° 2.8V~3.4V 20mA 520nm~530nm 525nm 600mcd Discrete Diode Emerald Green Side View 
+  C273617    TJ-S1706SW6TGLC6B-A5              12979 expand [Optoelectronics] -40℃~+80℃ 108mW 120mcd 120° 2.8V~3.4V 20mA 460nm~475nm 465nm Blue Discrete Diode Side View Mount Wat
+  C273618    TJ-S1706SW6TGLCCW-A5              16134 expand [Optoelectronics] -40℃~+80℃ 10000K~15000K 120° 2.8V~3.6V 20mA 400mcd~700mcd Discrete Diode Side View Mount White Yello
+  C19171204  A-SP1922BS1B1C-C01-3D              1806 expand [Optoelectronics] -40℃~+85℃ 1.6V~2.2V、2.6V~3.1V 130° 22.5mcd~57mcd 40mW、60mW 465nm~475nm、598nm~608nm 468nm、611nm 5mA D
+  C19171206  A-SP192SY3C-C01-3C                 2104 expand [Optoelectronics] -40℃~+85℃ 1.7V~2.2V 120° 18mcd~45mcd 582.5nm~594.5nm 591nm 5mA 60mW Discrete Diode Side View Mount W
+  C19171362  A-SP1922BR6GHC-C01-3C             16055 expand [Optoelectronics] -40℃~+85℃ 1.6V~2.2V、2.5V~3V 1.6mm side-view lamp head 130° 18mcd~45mcd、112mcd~285mcd 518nm、632nm 520
+  C11099     FFCCable 40P Spacing0.5mm Long      760 expand [Connectors] 0.3mm 0.5mm 30cm 40P Same Side P=0.5mm FFC Cable (Flexible Flat Cable) ROHS
+  C11101     FFCCable 12P Spacing0.5mm Long      925 expand [Connectors] 0.3mm 0.5mm 12P 25cm Same Side P=0.5mm FFC Cable (Flexible Flat Cable) ROHS
+--- PZ254R-2-8P
+--- PZ254-2-08-W
+  C5149358   PZ254-2-08-WS                       744 expand [Connectors] -40℃~+105℃ 16P 2 2.54mm 2.54mm 2.5mm 2x8P 3A 6mm Black Square pin Surface Mount, Right Angle SMD,P=2
+  C2894988   PZ254-2-08-W-8.5                   2443 expand [Connectors] -40℃~+105℃ 16P 2 2.54mm 2.54mm 2.5mm 2x8P 3A 6mm Black Right Angle Square pin Push-Pull,P=2.54mm Pin
+--- Pin Headers 2x8 2.54 right angle
+--- Female Headers 2x8 2.54
+--- PM254-2-08
+  C2897409   PM254-2-08-Z-8.5                  23440 expand [Connectors] -40℃~+105℃ 16P 2 2.54mm 2.54mm 2x8P 3A 8.5mm Copper alloy Square Hole Through Hole Top Plugin,P=2.54
+  C2897428   PM254-2-08-W-8.5                   5874 expand [Connectors] -40℃~+105℃ 16P 2 2.54mm 2.54mm 2x8P 3A 8.5mm Copper alloy Right Angle Side Square Hole Push-Pull,P=2
+  C3975153   PM254-2-08-S-8.5                  13052 expand [Connectors] -40℃~+105℃ 16P 2 2.54mm 2.54mm 2x8P 3A 8.5mm Copper alloy Square Hole Surface Mount,Vertical Top SMD
+--- 2.54-2*8P
+  C68234     2.54-2*8PPin                      40196 expand [Connectors] -55℃~+105℃ 16P 2 2.54mm 2.54mm 2.54mm 2x8P 3A 3mm 5.9mm Black Brass Gold Pin Header Through Hole 插件,
+  C779499    2.54-2*8PPin                       2585 expand [Connectors] -55℃~+105℃ 16P 2 2.54mm 2.54mm 2.54mm 2x8P 3A 3mm 6mm Black Brass Gold Pin Header Through Hole 插件,P=
+  C2906130   NJ-2.54-2*8PW                       541 expand [Connectors] -40℃~+105℃ 2 2.54mm 2.54mm 2x8P 3A 8 Brass Gold IDC Header Right Angle Push-Pull,P=2.54mm IDC Connec
+  C3311562   CMS-15118C-SP                        0 expand [Audio Products / Vibration Motors] 11mm 15mm 3mm 400Hz~10kHz 500Hz 800mW 8Ω Electromagnetic - Speakers ROHS
+  C3311715   CMS-15118D-SP                        0 expand [Audio Products / Vibration Motors] 11mm 15mm 3mm 425Hz~10kHz 500Hz 700mW 8Ω Electromagnetic - Speakers ROHS
+  C5578656   CMS-15118E-SP                        0 expand [Audio Products / Vibration Motors] 11mm 15mm 2.5mm 440Hz~10kHz 550Hz 800mW 8Ω Electromagnetic - Speakers ROHS
+  C3310934   CMS-15118D-L100                      0 expand [Audio Products / Vibration Motors] 11mm 15mm 3mm 425Hz~10kHz 500Hz 700mW 8Ω Electromagnetic - Speakers ROHS
+  C19386230  CMS-15118-25-SP                      0 expand [Audio Products / Vibration Motors] - Speakers ROHS
+  C19566095  AS01508MR-R                          0 expand [Audio Products / Vibration Motors] - Speakers ROHS
+  C3311370   AS01508MR-6-R                        0 expand [Audio Products / Vibration Motors] -30℃~+70℃ 1.2W 1.8W 15mm 4.4mm 5% 8Ω 900Hz 900Hz~20kHz Electromagnetic - Speakers ROHS
+  C3311686   AS01508AO-3-R                        0 expand [Audio Products / Vibration Motors] 11mm 15mm 3mm 500Hz 500Hz~14kHz 700mW 8Ω Electromagnetic - Speakers ROHS
+  C19394475  AS01508MR-3-R                        0 expand [Audio Products / Vibration Motors] - Speakers ROHS
+  C3310713   AS01508AO-WP-R                       0 expand [Audio Products / Vibration Motors] 11mm 15mm 3.2mm 500Hz 500Hz~14kHz 700mW 8Ω Electromagnetic - Speakers ROHS
+  C19547274  AS01508AO-SC-R                       0 expand [Audio Products / Vibration Motors] - Speakers ROHS
+  C3310643   AS01508AO-3-SC-R                     0 expand [Audio Products / Vibration Motors] 11mm 15mm 3.3mm 500Hz 500Hz~14kHz 700mW 8Ω Electromagnetic - Speakers ROHS
+  C3311938   AS01508MO-SC11-R                     0 expand [Audio Products / Vibration Motors] -20℃~+60℃ 11mm 15mm 3.9mm 600Hz 600Hz~20kHz 700mW 8Ω Electromagnetic - Speakers ROHS
+  C19567491  AS01508AO-LW25-R                     0 expand [Audio Products / Vibration Motors] - Speakers ROHS
+  C3311489   AS01508AO-SC-WP-R                    0 expand [Audio Products / Vibration Motors] 11mm 15mm 3.3mm 500Hz 500Hz~14kHz 700mW 8Ω Electromagnetic - Speakers ROHS
+  C3310591   AS01508MS-SC15-WP-R                  0 expand [Audio Products / Vibration Motors] 11mm 15mm 2.5mm 550Hz 550Hz~20kHz 700mW 8Ω Electromagnetic - Speakers ROHS
+  C3310808   AS01508MS-SP11-WP-R                  0 expand [Audio Products / Vibration Motors] 11mm 15mm 3.5mm 600Hz 600Hz~20kHz 700mW 8Ω Electromagnetic - Speakers ROHS
+  C3311084   AS01508MR-6-LW100-R                  0 expand [Audio Products / Vibration Motors] -30℃~+70℃ 1.2W 15mm 4.4mm 8Ω 900Hz 900Hz~20kHz Electromagnetic - Speakers ROHS
+  C3311357   AS01508MS-SP15-WP-R                  0 expand [Audio Products / Vibration Motors] 11mm 15mm 2.5mm 500Hz 500Hz~20kHz 700mW 8Ω Electromagnetic - Speakers ROHS
+  C3311599   AS01508MS-SC11-WP-R                  0 expand [Audio Products / Vibration Motors] -20℃~+70℃ 11mm 15mm 1W 3.5mm 600Hz 600Hz~20kHz 700mW 8Ω Electromagnetic - Speakers ROHS
+  C3311736   AS01508MO-SP11-LW25-R                0 expand [Audio Products / Vibration Motors] -20℃~+60℃ 11mm 15mm 3.9mm 600Hz 600Hz~20kHz 700mW 8Ω Electromagnetic - Speakers ROHS
+  C530531    GSPK2307P-8R1W                    5014 expand [Audio Products / Vibration Motors] -40℃~+85℃ 1.7kHz 23mm 5% 500mW 6.8mm 88dB 8Ω Electromagnetic - Speakers ROHS
+  C530532    GSPK2308P-8R0.5W                  1020 expand [Audio Products / Vibration Motors] -40℃~+85℃ 1.8kHz 23mm 250mW 5% 85dB 8mm 8Ω Electromagnetic - Speakers ROHS
+  C530534    GSPK1003PN-8R0.2W-L100             101 expand [Audio Products / Vibration Motors] -40℃~+85℃ 10mm 200Hz~5000Hz 200mW 3.1mm 5% 650Hz 8Ω 90dB Electromagnetic Lead - Speakers ROHS
+  C530535    GSPK1335PN-8R0.7W-L100               9 expand [Audio Products / Vibration Motors] -40℃~+85℃ 13mm 200Hz~5000Hz 5% 650Hz 700mW 8Ω 90dB Electromagnetic - Speakers ROHS
+  C530536    GSPK13045PN-8R0.8W-L100            108 expand [Audio Products / Vibration Motors] -40℃~+85℃ 13mm 200Hz~5000Hz 4.5mm 5% 650Hz 800mW 8Ω 90dB Electromagnetic - Speakers ROHS
+  C530537    GSPK1504PN-8R0.7W-L100              39 expand [Audio Products / Vibration Motors] -40℃~+85℃ 15mm 200Hz~5000Hz 3Ω 5% 700Hz 700mW 89dB Electromagnetic - Speakers ROHS
+  C530538    GSPK151103TN-8R0.2W                368 expand [Audio Products / Vibration Motors] -40℃~+85℃ 11mm 15mm 200mW 3mm 5% 700Hz 88dB 8Ω Electromagnetic - Speakers ROHS
+  C530539    GSPK151035PN-8R0.5W-L35-1.25T     1100 expand [Audio Products / Vibration Motors] -40℃~+85℃ 10mm 15mm 200Hz~5kHz 3.5mm 3Ω 5% 500mW 650Hz 90dB Electromagnetic - Speakers ROHS
+  C530541    GSPK2003TN-8R0.5W                  325 expand [Audio Products / Vibration Motors] -40℃~+85℃ 1kHz 200Hz~5000Hz 20mm 3.5mm 3Ω 5% 500mW 86dB Electromagnetic - Speakers ROHS
+  C530543    GSPK2004PN-8R0.5W-L100              69 expand [Audio Products / Vibration Motors] - Speakers ROHS
+  C530544    GSPK2004PN-8R1W-L100               582 expand [Audio Products / Vibration Motors] -40℃~+85℃ 1W 1kHz 200Hz~5000Hz 20mm 3.8mm 5% 8Ω 90dB Electromagnetic - Speakers ROHS
+  C530545    GSPK2014035PN-8R0.5W-L100         1882 expand [Audio Products / Vibration Motors] -40℃~+85℃ 14mm 200Hz~5kHz 20mm 3.5mm 3Ω 5% 500mW 650Hz 88dB Electromagnetic - Speakers ROHS
+  C530547    GSPK2014035PN-8R1W-L100            474 expand [Audio Products / Vibration Motors] -40℃~+85℃ 14mm 1W 200Hz~5000Hz 20mm 3Ω 5% 650Hz 95dB Electromagnetic - Speakers ROHS
+  C530548    GSPK241505PN-8R0.8W-L100            14 expand [Audio Products / Vibration Motors] -40℃~+85℃ 115dB 15mm 24mm 5% 5mm 800Hz 800mW 8Ω Electromagnetic - Speakers ROHS
+  C530550    GSPK2805TN-8R0.5W                  708 expand [Audio Products / Vibration Motors] -40℃~+85℃ 200Hz~5kHz 28mm 5% 500mW 650Hz 8Ω 93dB Electromagnetic - Speakers ROHS
+  C530554    GSPK3005TN-8R1W                    168 expand [Audio Products / Vibration Motors] -40℃~+85℃ 110dB 1W 200Hz~5000Hz 30mm 5% 650Hz 8Ω Electromagnetic - Speakers ROHS
+  C530555    GSPK3020035PN-8R0.8W-L100          905 expand [Audio Products / Vibration Motors] -40℃~+85℃ 20mm 3.5mm 30mm 5% 630Hz 800mW 8Ω 93dB Electromagnetic - Speakers ROHS
+  C530556    GSPK3020035PN-8R1.0W-L100          503 expand [Audio Products / Vibration Motors] -40℃~+85℃ 1W 20mm 3.5mm 30mm 5% 630Hz 8Ω 96dB Electromagnetic - Speakers ROHS
+  C530557    GSPK3020035PN-8R1.2W-L100          121 expand [Audio Products / Vibration Motors] - Speakers ROHS
+  C530563    GSPK4055TN-8R1W                    970 expand [Audio Products / Vibration Motors] -40℃~+85℃ 120dB 1W 40mm 5% 5.5mm 800Hz 8Ω Electromagnetic - Speakers ROHS
+  C530564    GSPK4505TN-8R0.5W                    9 expand [Audio Products / Vibration Motors] -40℃~+85℃ 110dB 45mm 5% 500mW 5mm 800Hz 8Ω Electromagnetic - Speakers ROHS
+  C530566    GSPK4505TN-8R2W                    568 expand [Audio Products / Vibration Motors] -40℃~+85℃ 118dB 2W 45mm 5% 5mm 800Hz 8Ω Electromagnetic - Speakers ROHS
+  C530568    GSPK3070PN-8R2W-L100               925 expand [Audio Products / Vibration Motors] -40℃~+75℃ 2W 31mm 450Hz 5% 69.9mm 8.6mm 86dB 8Ω Electromagnetic Lead - Speakers ROHS
+  C3311646   AST-03008MR-R                        0 expand [Audio Products / Vibration Motors] 1.4kHz 12.5mm 150mW 29.85mm 500Hz~20kHz 8Ω Electromagnetic - Speakers ROHS

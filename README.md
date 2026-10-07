@@ -1,4 +1,4 @@
-# halloween1 (working name; "Hocus Flux" proposed)
+# OWLternating Current
 
 *By Jason Gallicchio and Claude. A cute, physics-y Halloween board for a six-year-old
 witch: owls, bats and a little witch on her broom across a gold moon, in orange and

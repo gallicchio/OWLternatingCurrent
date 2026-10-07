@@ -157,7 +157,11 @@ currents cancel in the far field and add reactance at the feed.
   right of centre (the tail "swish").
 * **Feed.** The tail point lands on a **2.4 mm wide feed** whose end is **0.5 mm from
   the ground-pour edge**. That 0.5 mm is the port gap. In KiCad, the RF trace from the pi
-  network crosses the pour edge and widens to 2.4 mm under the tail.
+  network crosses the pour edge and widens to 2.4 mm under the tail. Up to the pour edge
+  the line is ordinary 50 Ω. On the JLC04161H-7628 4-layer stack that's a microstrip
+  over L2 (about 0.35 mm wide). On 2-layer 1.6 mm it's a via-fenced coplanar waveguide
+  (about 1 mm wide with 0.15–0.2 mm gaps). Take the exact width from JLCPCB's impedance
+  calculator.
 * **Arms.** Two 4.4 × 2.4 mm elliptical stubs at mid-height, making it 17.4 mm wide
   overall.
 * **Face.** The eyes (1.8 × 2.9 mm) and the mouth (2.4 × 1.7 mm) are holes in the
@@ -178,7 +182,7 @@ currents cancel in the far field and add reactance at the feed.
 | −10 dB band | **2.07 GHz → beyond 3.2 GHz** |
 | Zin at 2.44 GHz | 58 − j1 Ω |
 | radiation efficiency (FR4 loss, PEC copper) | 98.2 % |
-| copper loss on top of that | ⟨GHOST_CU⟩ |
+| copper loss on top of that | < 0.1 % (98.2 % with PEC, 98.2 % with 35 µm copper) |
 | peak gain at 2.44 GHz | 2.5 dBi |
 | total efficiency at band edges (η_rad × mismatch) | 98.1 % / 97.6 % / 97.1 % at 2.40 / 2.44 / 2.48 GHz (≤ 0.13 dB) |
 
@@ -271,12 +275,12 @@ What the tables say:
   copper, most of the field is in air: the board is a weak load, not the resonator.
   This is the main reason a bare-FR4 tab is a good place for an antenna.
 * **A 2 mm PLA lid lying on the copper** is the biggest disturbance tested: −3 to −4 %
-  in frequency. The ghost absorbs it (⟨GHOST_PLA⟩). The matched bat drops to −14.7 dB,
+  in frequency. The ghost absorbs it (−16.6 dB worst in band, minimum 2.7 % lower). The matched bat drops to −14.7 dB,
   still inside spec. A lid with an air gap of a few millimetres would do much less.
 * **A hand** (a 20 mm tissue slab, εr 40, σ 1.5 S/m, 15 mm over the board) detunes and
   absorbs. ⟨HAND⟩ That's the WiFi range penalty any handheld device lives with, not a
   design flaw.
-* **Copper loss** (35 µm Cu instead of PEC) costs ⟨CULOSS⟩. These are wide planar
+* **Copper loss** (35 µm Cu instead of PEC) costs under 0.1 percentage point for either finalist (ghost 98.2 → 98.2 %, bat 97.7 → 97.6 %). These are wide planar
   antennas with low current density. FR4's tan δ 0.02 costs about 1–2 % (the NF2FF
   bookkeeping itself reads about 1 % low, §3a), and that loss is already in every
   efficiency figure.
@@ -337,7 +341,8 @@ With a NanoVNA (V2 or H4: 2.4 GHz is well inside its range):
   position; the first NanoVNA pass absorbs that.
 * **Mesh/solver error.** About 0.7 % low in frequency at 0.25 mm (§3a), and 1.8 % low
   against TI's measurement (§3b). Both are small next to the ghost's bandwidth and inside
-  the matched bat's.
+  the matched bat's. No second full-wave solver (EMerge) was run; the method-of-moments
+  dipole and TI's measured board play that role.
 
 ## 10. Will it work first time?
 

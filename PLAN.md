@@ -122,62 +122,68 @@ gap that takes 0.8 A and 2.3 W; at 8 mm, 1.5 A and 7 W.
 
 E2 is not for a child's room; E4 strobes, which this board does not do.
 
-## 2. Recommendation for rev A (to be confirmed by Jason)
+## 2. Rev A: what is being built (Jason's choices, Prompt 2, 2026-10-07)
 
-**One base board and three small ones, all assembled by JLCPCB:**
+**Name: OWLternating Current.** Jason's daughter wants to be an owl for Halloween. The
+capital OWL reads at a glance, and keeps the pun whole where a hyphen would break it.
+Repository: `github.com/gallicchio/OWLternatingCurrent`.
 
-1. **The base board** (about 170 × 120 mm, 4 layers, purple mask, white silk, ENIG):
-   - **Art:** a gold moon with the little witch and her cat flying across it, owls
-     on a branch, bats, stars, friendly pumpkins (concept:
-     `docs/images/concept_v1.png`).
-   - **Light (A1, A2, B7):** orange (about 605-610 nm) and violet (about 405 nm)
-     LEDs on 36-channel constant-current drivers with 12-bit-or-better PWM at tens
-     of kHz. The scenes are below.
-   - **Senses (B1, B2):** an accelerometer and an ambient-light sensor.
-   - **A coil array (C1, C2):** two familiar perches (5 V gate-driver bridges) and
-     three pendulum coils (12 V DRV8874 H-bridges with current sense), the planes
-     cleared under every coil, and a 3-axis Hall sensor under the pendulum's swing.
-   - **A perch port (C3):** one more H-bridge and the Hall sensor's lines, to a JST
-     connector for the perch board.
-   - **The rest:** an RP2354A, USB-C for firmware and a console, 12 V input with
-     protection.
-2. **The perch board** (about 30 mm, 4 layers): the levitation coil, a Hall sensor,
-   and a pocket for the bias magnet. It hangs from a 3D-printed tree.
-   - Its bridge on the base board is a DRV8874 in independent half-bridge mode
-     (≥ 3.5 A peaks for catching the bat, current sensing, PWM to 100 kHz).
-   - The coil's L/R is only 9.4 µs, so ordinary PWM would leave amperes of ripple.
-     The firmware uses 3-level PWM, whose ripple vanishes near the zero mean current
-     where the bat floats, and adds a deliberate carrier only to light the bat's
-     eyes.
-   - **Fallback:** two violet LEDs on the perch's underside shine down on the bat, so a
-     bat printed in glow PLA glows even if its own eyes are never lit by induction.
-3. **The bat** (about 45 mm wingspan, 2 layers, purple): its receive coil and tuning
-   capacitor, violet LED eyes, and a printed body that holds its magnet. It levitates
-   under the perch, or swings on a thread over the pendulum coils if levitation needs
-   more tuning than Halloween allows.
-4. **Familiar coins** (about 25 mm): coil, capacitor and orange and violet LEDs,
-   inside printed owl and cat figurines (glow PLA). Each kind is tuned to its own
-   frequency. Simulated with real LED thresholds (`sim/physics/familiar.py`):
-   - a parallel-resonant tank, owl at 150 kHz and cat at 330 kHz;
-   - 0.1-0.2 A in the perch coil fades a familiar from dark through orange to orange
-     and violet;
-   - below 0.2 A the other familiar stays completely dark;
-   - the perch bridges must switch at up to about 330 kHz;
-   - each LED gets 68 Ω, and the perch bridges run from 5 V, so the coil's own
-     reactance caps the drive where no firmware can overdrive a familiar.
+**Features:**
+- **C1, wireless familiars:** an owl and a cat, as flat PCB tokens that light on their
+  perches.
+- **C2, the pendulum bat.**
+- **C3, the levitating bat.**
+- **B5, the theremin,** with a physical sound switch.
+- **Film mode** for her magnetic viewing film: firmware only.
+- **The light show:** A1, A2, B7, with B1 and B2.
 
-**Why this set:**
-- The two things most likely to delight a six-year-old (things that light up with
-  nothing attached, and a bat that flies or floats by itself) are also the two with
-  the deepest physics.
-- C1 and C2 are about 90 % first-time. C3 is the stretch (about 65 %: the closed-loop
-  simulation holds the bat on milliwatts and catches it from ±3 mm), and it fails safe
-  into C2 with the same bat.
+**Guiding rule (Prompt 2):** minimise what Jason must do beyond uploading the JLCPCB
+order.
+- Everything electronic is made and assembled by JLCPCB, as one panel with break-away
+  boards.
+- The tree and perch **plug together**; there is no wiring and no soldering.
+- **One kind of magnet**, one print plate, no glue.
 
-**Deferred to rev B** unless Jason wants them now:
-- D1, the bat antenna and WiFi: the simulation result is in `sim/antenna/`.
-- B3, owl eyes that follow you.
-- B4, the echolocating bat.
+### What Jason does after the JLCPCB order (the whole list)
+
+1. Buy two things: a 12 V, 5 A barrel-jack adapter, and one pack of 10 × 2 mm N52
+   disc magnets (`ORDER_LIST.md`).
+2. Print one plate in PLA, with two pauses: the bat's cap and the perch owl, each of
+   which takes one magnet at its pause, plus four feet. "Take the top two magnets off
+   the stack without turning them over, one into each pocket" sets the polarity.
+3. When the boards arrive, snap off the break-away boards.
+4. Assemble:
+   - snap the four feet into the base;
+   - plug the tree into the base, and the perch onto the tree;
+   - snap the owl onto the perch, and the cap onto the bat.
+5. Plug in the 12 V adapter.
+
+Steps 1 and 2 can happen while the boards are in the post. Step 4 needs both 2 and 3.
+
+### The boards (one 4-layer panel: purple mask, ENIG, 1 oz outer and inner copper)
+
+| board | size | what is on it |
+|---|---|---|
+| **Base** | ~170 × 120 mm | MCU, power, LED driver #1, sensors, 4 DRV8874 coil bridges, 4 UCC27524 perch drivers, theremin oscillators, audio, the art (gold moon with the witch, pumpkins, stars), two familiar perches, three pendulum coils, the tree socket |
+| **Tree** | ~75 × 110 mm, tree-shaped | stands in the base's 2 × 8 socket (right-angle header and two tabs); LED driver #2; owls with orange LED eyes; carries the perch coil's current and the Hall signal to the perch |
+| **Perch** | ~28 × 55 mm | plugs onto the tree's top header (socket on its underside); the levitation coil; a DRV5055 Hall sensor at the coil's centre on the underside; two violet LEDs shining down on the bat; holes for the owl (bias magnet) |
+| **Bat** | ~48 × 26 mm, bat-shaped | its 4-layer receive coil round the magnet; a C0G tuning capacitor; two orange side-view LED eyes looking forward; three holes for the cap that holds its magnet |
+| **Owl token, cat token** | ~38 mm | coil, C0G tank capacitor, an orange and a violet LED, 150 Ω each; the owl tuned to 150 kHz, the cat to 330 kHz |
+
+### The physics, as designed (`sim/physics/`)
+
+- **Levitation with one magnet size** (`levitation_onemagnet.py`):
+  - the bias magnet (10 × 2 mm, in the owl, 14 mm above the perch's top copper) holds
+    the 3.6 g bat 8.5 mm below the perch;
+  - vertically it needs control (k_neg 4.8 N/m against the coil's 21 mN/A); sideways it
+    is stable (+2.5 N/m);
+  - the Hall sensor sees ~40 mT, 8.7 mT per mm of gap.
+- **The bat's eyes** (`bat_power.py`): the perch's DRV8874 adds a 90 kHz carrier
+  (0.43 A from 12 V); the bat's 44-turn coil and a 70 nF C0G tank light two side-view
+  orange LEDs at ~9 mA each. Eddy heating of the bat's magnet is 4-10 mW.
+- **The familiar tokens:** lying flat on the perch (k 0.74), at the 5 V drive's hard
+  cap, they reach 15-23 mA through 150 Ω. Below 0.2 A the other token stays dark.
+- **The pendulum:** 0.1-0.3 A pulses; a TMAG5273 under the swing times them.
 
 ### Coil drivers (from the datasheets, 2026-10-07)
 

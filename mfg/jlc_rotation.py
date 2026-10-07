@@ -160,6 +160,35 @@ JLC_ROTATION_BY_PART = {
                               "reverse it"),
     "C2297": (0, "read", "green LED, D2: as D1"),
     "C84256": (0, "read", "red LED, D3: cathode mark and pad 1 on the left in both drawings"),
+
+    # OWLternating Current (2026-10-07): PREDICTED by the polarity mark in JLCPCB's own
+    # drawing (the EasyEDA footprint record's png, read by eye), for the two-pad parts a
+    # fit by pin number cannot judge, and for the through-hole headers, whose hole
+    # pattern is the same turned round.  JLCPCB marks a diode's cathode "-" (C2296 above,
+    # read right in GPiBridge's preview, is the calibration: "-" on the left, correction
+    # 0).  KiCad's LED and diode footprints put the cathode at pad 1, on the left at 0;
+    # its polarized capacitors put "+" at pad 1, on the left.
+    "C965800": (0, "predicted", "XL-1608UOC-06 orange 0603 LED: JLCPCB's '-' (their pad 2) on the left at 0, "
+                                "where our pad 1, the cathode, is"),
+    "C51933300": (0, "predicted", "GL0603PU01 purple 0603 LED: '-' on the left, as C965800"),
+    "C516136": (0, "predicted", "HL-A-3528S7VC violet 3528 LED: '-' (their pad 1), the cathode bar and the "
+                                "corner mark on the left at 0, where our pad 1 is"),
+    "C160472": (0, "predicted", "LTST-S270KFKT side-view LED: '-' (their pad 1) on the left and the lens "
+                                "toward -y at 0, as our footprint (pad 1 cathode, light toward -y) and the "
+                                "datasheet's top view (cathode left when the lens faces up)"),
+    "C173431": (0, "predicted", "BZT52C10 SOD-123: '-' and the cathode bar on the left"),
+    "C8598": (0, "predicted", "B5819W SOD-123: '-' and the cathode bar on the left (ECP5 read the same mark)"),
+    "C19077569": (0, "predicted", "SMBJ15A SMB: '-' and the cathode bar on the left"),
+    "C46550472": (0, "predicted", "470 uF polymer capacitor: '+' and the bevelled corners on the left, where our "
+                                  "pad 1 (+) is"),
+    "C530531": (0, "predicted", "GSPK2307P speaker: '+' at their pad 1 on the left, as ours (either way sounds "
+                                "the same)"),
+    "C2894988": (90, "predicted", "PZ254-2-08-W right-angle 2x8 header: JLCPCB draws the body and the bent pins "
+                                  "toward +y at 0; our footprint's go toward +x, a quarter turn counter-clockwise. "
+                                  "The hole pattern is the same turned half round, so only the drawing says which "
+                                  "way the pins point: in the preview they must point off the board's edge"),
+    "C2897409": (90, "predicted", "PM254-2-08-Z vertical 2x8 socket: JLCPCB draws its rows along x, ours along y; "
+                                  "either quarter turn fits the holes and the part is the same turned half round"),
 }
 
 # BOTTOM-SIDE PLACEMENTS ARE MIRRORED: rot -> 180 - rot, and it is CONFIRMED.
@@ -203,7 +232,10 @@ ROTATION_NA = ("R_0402_1005Metric", "R_0201_0603Metric", "C_0402_1005Metric",
                "SW-SMD_L3.9-W3.0-P4.45",
                # GPiBridge's: two-terminal parts, Raspberry Pi's 0402 footprints, and the BOOT button
                # (two pads, the same either way round)
-               "R_0402_RPi", "C_0402_RPi", "C_0402_RPi_wide", "SW_SPST_TS-1088-xR020")
+               "R_0402_RPi", "C_0402_RPi", "C_0402_RPi_wide", "SW_SPST_TS-1088-xR020",
+               # OWLternating Current's: the shunts, the PTC fuse and the buck's molded inductor
+               # have two pads and no polarity
+               "R_1206_3216Metric", "Fuse_2920_7451Metric", "L_Changjiang_FXL0630")
 
 def correction(footprint, code=None):
     """(degrees, confidence, why) for one part: per part first, then per footprint."""
@@ -212,23 +244,30 @@ def correction(footprint, code=None):
     return JLC_ROTATION.get(footprint, (0, "none", ""))
 
 
-def cpl_rotation(native_deg, side, footprint, code=None):
+def cpl_rotation(native_deg, side, footprint, code=None, predicted=None):
     """The number that goes in JLCPCB's CPL for one placement.
 
-    `native_deg` is KiCad's own footprint orientation, `side` is "top" or
-    "bottom", `footprint` is the footprint's short name, `code` its LCSC code.
+    `native_deg` is KiCad's own footprint orientation (as KiCad's own flip
+    stores it for the bottom side: pads mirrored top-to-bottom), `side` is
+    "top" or "bottom", `footprint` is the footprint's short name, `code` its
+    LCSC code.  `predicted` is the correction read off JLCPCB's own drawing of
+    the part (mfg/make_release.py, from footprint_check.py's fit); it is used
+    only where nobody has read the part in a preview.
     """
     rot = float(native_deg) % 360.0
     if BOTTOM_FLIP and side == "bottom":
         rot = (180.0 - rot) % 360.0
-    rot = (rot + correction(footprint, code)[0]) % 360.0
+    corr, conf, _ = correction(footprint, code)
+    if conf == "none" and predicted is not None:
+        corr = predicted
+    rot = (rot + corr) % 360.0
     return round(rot, 4)
 
 
 def checked(footprint, code=None):
     """Has anybody looked at this part in a placement preview?"""
     if code in JLC_ROTATION_BY_PART:
-        return JLC_ROTATION_BY_PART[code][1] != "predicted"
+        return JLC_ROTATION_BY_PART[code][1] not in ("predicted", "none")
     return footprint in JLC_ROTATION or footprint in ROTATION_NA
 
 

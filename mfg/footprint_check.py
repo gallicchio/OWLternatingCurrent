@@ -163,45 +163,176 @@ def _isnum(s):
         return False
 
 
+def top_forms(text):
+    """The board file's top-level items as (head, text) pairs, without parsing it
+    all.  KiCad writes every top-level item on a line of its own that starts with
+    one tab and "(", and a quoted string never holds a raw newline, so splitting
+    there is exact.  A panel's filled zones are most of the file and nothing here
+    needs their outlines, so they are never parsed."""
+    chunks = text.split("\n\t(")
+    out = []
+    for i, c in enumerate(chunks[1:], 1):
+        if i == len(chunks) - 1:                  # the last one carries the file's own ")"
+            c = c.rstrip()
+            if c.endswith(")"):
+                c = c[:-1]
+        m = re.match(r"[A-Za-z_]+", c)
+        out.append((m.group(0) if m else "", "(" + c))
+    return out
+
+
+_BOARDS = {}
+
+
+def read_board_full(path):
+    """Everything the release needs from a .kicad_pcb, cached by path and mtime.
+
+    Returns a dict:
+      fps      footprints: ref, value, short, lib, at (x, y, angle as stored),
+               layer, attrs (the (attr ...) words), dnp, props {name: value},
+               pads (number, type, shape, x, y, rot, w, h, drill, layers;
+               x and y local to the footprint, as the file stores them)
+      drills   (x, y, d) of every plated or unplated drill, vias included
+      vias     (x, y, size, drill)
+      aux      the drill/place file origin (aux_axis_origin), or None
+      edges    point lists of every Edge.Cuts shape, in board millimetres
+      texts    (text, layer, x, y) of the board's free texts
+      copper   the copper layers' names, thickness, the number of filled zone
+               polygons, and the widths of the tracks (Counter)
+    """
+    key = (os.path.abspath(path), os.path.getmtime(path))
+    if key in _BOARDS:
+        return _BOARDS[key]
+    with open(path, encoding="utf-8") as f:
+        text = f.read()
+    B = dict(fps=[], drills=[], vias=[], aux=None, edges=[], texts=[], copper=[], thickness=None,
+             filled=text.count("(filled_polygon"), widths=collections.Counter())
+    for head, chunk in top_forms(text):
+        if head in ("segment", "arc"):
+            m = re.search(r"\(width ([\d.]+)\)", chunk)
+            if m:
+                B["widths"][float(m.group(1))] += 1
+            continue
+        if head not in ("footprint", "via", "setup", "general", "layers", "gr_line", "gr_rect", "gr_arc",
+                        "gr_circle", "gr_poly", "gr_text"):
+            continue
+        node = sexp(chunk)[0]
+        if head == "footprint":
+            B["fps"].append(_footprint(node, B))
+        elif head == "via":
+            vat = nums(kid(node, "at"), 2)
+            d = kid(node, "drill")
+            s = kid(node, "size")
+            dd = nums(d, 1)[0] if d else 0.0
+            B["vias"].append((vat[0], vat[1], nums(s, 1)[0] if s else 0.0, dd))
+            B["drills"].append((vat[0], vat[1], dd))
+        elif head == "setup":
+            a = kid(node, "aux_axis_origin")
+            if a:
+                B["aux"] = tuple(nums(a, 2))
+        elif head == "general":
+            t = kid(node, "thickness")
+            B["thickness"] = nums(t, 1)[0] if t else None
+        elif head == "layers":
+            B["copper"] = [c[1] for c in node[1:] if isinstance(c, list) and len(c) > 2
+                           and str(c[1]).endswith(".Cu")]
+        elif head == "gr_text":
+            lay = kid(node, "layer")
+            at = nums(kid(node, "at"), 2) if kid(node, "at") else [0.0, 0.0]
+            B["texts"].append((node[1], lay[1] if lay else "", at[0], at[1]))
+        else:
+            lay = kid(node, "layer")
+            if lay and lay[1] == "Edge.Cuts":
+                B["edges"].append(_shape_points(node, None, None))
+    _BOARDS[key] = B
+    return B
+
+
+def _footprint(fp, B):
+    lib = fp[1]
+    at = nums(kid(fp, "at"), 3)
+    layer = kid(fp, "layer")[1]
+    props = {}
+    for pr in kids(fp, "property"):
+        if len(pr) > 2:
+            props[pr[1]] = pr[2]
+    attr = kid(fp, "attr")
+    attrs = [str(a) for a in attr[1:] if not isinstance(a, list)] if attr else []
+    dnp = "dnp" in attrs or any(len(d) > 1 and d[1] == "yes" for d in kids(fp, "dnp"))
+    pads = []
+    for p in kids(fp, "pad"):
+        number, ptype, shape = p[1], p[2], p[3]
+        pat = nums(kid(p, "at"), 3)
+        size = nums(kid(p, "size"), 2)
+        dr = kid(p, "drill")
+        layers = kid(p, "layers")
+        drill = 0.0
+        if dr:
+            v = [float(x) for x in dr[1:] if _isnum(x)]
+            drill = min(v) if v else 0.0           # an oval drill: its narrow way
+        mm = kid(p, "solder_mask_margin")
+        pads.append(dict(number=number, type=ptype, shape=shape, x=pat[0], y=pat[1], rot=pat[2],
+                         w=size[0], h=size[1], drill=drill, mask=nums(mm, 1)[0] if mm else None,
+                         layers=[str(s) for s in (layers[1:] if layers else [])]))
+        if dr:
+            bx, by = to_board(pat[0], pat[1], at, layer)
+            B["drills"].append((bx, by, drill))
+    for g in fp:
+        if isinstance(g, list) and g and g[0] in ("fp_line", "fp_rect", "fp_arc", "fp_circle", "fp_poly"):
+            lay = kid(g, "layer")
+            if lay and lay[1] == "Edge.Cuts":
+                B["edges"].append(_shape_points(g, at, layer))
+    return dict(ref=props.get("Reference", ""), value=props.get("Value", ""), short=lib.split(":")[-1], lib=lib,
+                at=at, layer=layer, attrs=attrs, dnp=dnp, props=props, pads=pads)
+
+
+def _shape_points(g, at, layer):
+    """Points along one outline shape (line, rect, arc, circle, polygon), in board mm."""
+    def P(tag):
+        n = kid(g, tag)
+        return tuple(nums(n, 2)) if n else None
+    head = g[0]
+    pts = []
+    if head.endswith("line"):
+        pts = [P("start"), P("end")]
+    elif head.endswith("rect"):
+        (x0, y0), (x1, y1) = P("start"), P("end")
+        pts = [(x0, y0), (x1, y0), (x1, y1), (x0, y1)]
+    elif head.endswith("circle"):
+        (cx, cy), (ex, ey) = P("center"), P("end")
+        r = math.hypot(ex - cx, ey - cy)
+        pts = [(cx + r * math.cos(math.radians(a)), cy + r * math.sin(math.radians(a))) for a in range(0, 360)]
+    elif head.endswith("arc"):
+        (x0, y0), (xm, ym), (x1, y1) = P("start"), P("mid"), P("end")
+        pts = _arc(x0, y0, xm, ym, x1, y1)
+    elif head.endswith("poly"):
+        pl = kid(g, "pts")
+        pts = [tuple(nums(xy, 2)) for xy in kids(pl, "xy")] if pl else []
+    if at is not None:
+        pts = [to_board(x, y, at, layer) for x, y in pts]
+    return pts
+
+
+def _arc(x0, y0, xm, ym, x1, y1, n=360):
+    """Points along the arc from (x0, y0) through (xm, ym) to (x1, y1)."""
+    ax, ay, bx, by, cx, cy = x0, y0, xm, ym, x1, y1
+    d = 2 * (ax * (by - cy) + bx * (cy - ay) + cx * (ay - by))
+    if abs(d) < 1e-12:
+        return [(x0, y0), (x1, y1)]
+    ux = ((ax * ax + ay * ay) * (by - cy) + (bx * bx + by * by) * (cy - ay) + (cx * cx + cy * cy) * (ay - by)) / d
+    uy = ((ax * ax + ay * ay) * (cx - bx) + (bx * bx + by * by) * (ax - cx) + (cx * cx + cy * cy) * (bx - ax)) / d
+    r = math.hypot(ax - ux, ay - uy)
+    a0, am, a1 = (math.atan2(y - uy, x - ux) for x, y in ((x0, y0), (xm, ym), (x1, y1)))
+    sweep = (a1 - a0) % (2 * math.pi)
+    if (am - a0) % (2 * math.pi) > sweep:             # the mid point says it goes the other way
+        sweep -= 2 * math.pi
+    return [(ux + r * math.cos(a0 + sweep * i / n), uy + r * math.sin(a0 + sweep * i / n)) for i in range(n + 1)]
+
+
 def read_board(path):
     """Footprint placements with their pads, plus every drill on the board."""
-    with open(path, encoding="utf-8") as f:
-        tree = sexp(f.read())[0]
-
-    fps, drills = [], []
-    for fp in kids(tree, "footprint"):
-        lib = fp[1]
-        short = lib.split(":")[-1]
-        at = nums(kid(fp, "at"), 3)
-        layer = kid(fp, "layer")[1]
-        ref = ""
-        for pr in kids(fp, "property"):
-            if len(pr) > 2 and pr[1] == "Reference":
-                ref = pr[2]
-        pads = []
-        for p in kids(fp, "pad"):
-            number, ptype, shape = p[1], p[2], p[3]
-            pat = nums(kid(p, "at"), 3)
-            size = nums(kid(p, "size"), 2)
-            dr = kid(p, "drill")
-            layers = kid(p, "layers")
-            pads.append(dict(number=number, type=ptype, shape=shape,
-                             x=pat[0], y=pat[1], rot=pat[2],
-                             w=size[0], h=size[1],
-                             drill=(nums(dr, 1)[0] if dr else 0.0),
-                             layers=[str(s) for s in (layers[1:] if layers
-                                                      else [])]))
-            if dr:
-                bx, by = to_board(pat[0], pat[1], at, layer)
-                drills.append((bx, by, nums(dr, 1)[0]))
-        fps.append(dict(ref=ref, short=short, lib=lib, at=at, layer=layer,
-                        pads=pads))
-
-    for v in kids(tree, "via"):
-        vat = nums(kid(v, "at"), 2)
-        d = kid(v, "drill")
-        drills.append((vat[0], vat[1], nums(d, 1)[0] if d else 0.0))
-    return fps, drills
+    B = read_board_full(path)
+    return B["fps"], B["drills"]
 
 
 def to_board(lx, ly, at, layer):
@@ -449,6 +580,8 @@ def check(code, insts, board_drills, refresh=False, verbose=False):
         fit = dict(deg=0, worst=0.0, at="", n=0, dx=0.0, dy=0.0, how="")
     deg, dx, dy = fit["deg"], fit["dx"], fit["dy"]
     FITS[(code, mirror)] = dict(fit)
+    # and by footprint too: one code can sit on two footprints drawn differently
+    FITS[(code, mirror, insts[0]["short"])] = dict(fit)
 
     # ---- HOLE: the part wants a hole and the board has no drill -----------
     wants = ([dict(h, what="%.2f mm hole" % h["d"]) for h in lp["holes"]]
@@ -528,19 +661,26 @@ def check(code, insts, board_drills, refresh=False, verbose=False):
     return out, lp, ts
 
 
-def report(bom, refresh=False, verbose=False):
+def report(bom, refresh=False, verbose=False, pcb=None, bom_label=None):
     """The whole check, as (hard_failure_count, lines).
 
-    build_release.py calls this and writes the lines into the release beside
+    make_release.py calls this and writes the lines into the release beside
     PLACEMENT_CHECKS.txt, so that what was checked ships with what was sent.
+    `pcb` is the board file (default: the project's); `bom_label` what to call the
+    BOM in the report (the release's own name for a BOM still being staged).
     """
-    fps, drills = read_board(PCB)
+    pcb = pcb or PCB
+    fps, drills = read_board(pcb)
     by_ref = {f["ref"]: f for f in fps}
+
+    def rel(p):
+        r = os.path.relpath(p, os.path.dirname(HERE))
+        return r if not r.startswith("..") else os.path.basename(p)     # never a machine's own path
     L = ["FOOTPRINT vs ORDERED PART -- does the part fit the copper?",
          "=========================================================",
          "",
-         "board  %s" % os.path.relpath(PCB, HERE),
-         "BOM    %s" % os.path.relpath(bom, HERE),
+         "board  %s" % rel(pcb),
+         "BOM    %s" % (bom_label or rel(bom)),
          "run    %s" % datetime.datetime.now().astimezone()
          .isoformat(timespec="seconds"),
          "%d footprint(s) placed, %d drill(s) on the board"
@@ -620,7 +760,7 @@ def default_bom():
     renamed, running this with no arguments still checks what went out.
     """
     def bom(d):
-        p = os.path.join(HERE, d, BI.NAME + "_bom.csv")
+        p = os.path.join(HERE, d, "BOM_JLCPCB.csv")
         return p if os.path.exists(p) else None
 
     return bom(os.path.basename(BI.RELEASE)) or next(

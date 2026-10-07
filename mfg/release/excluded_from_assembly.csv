@@ -1,0 +1,22 @@
+Designator,Value,Footprint,Why JLCPCB does not place it
+AE1,moon,TestPoint_Pad_D1.5mm,"ANTENNA: the pad where a gold copper shape (the moon, the ghost) joins its oscillator"
+AE2,ghost,TestPoint_Pad_D1.5mm,"ANTENNA: the pad where a gold copper shape (the moon, the ghost) joins its oscillator"
+H1,foot,MountingHole_3.2mm_M3,FOOTHOLE: a printed foot snaps in here
+H2,foot,MountingHole_3.2mm_M3,FOOTHOLE: a printed foot snaps in here
+H3,foot,MountingHole_3.2mm_M3,FOOTHOLE: a printed foot snaps in here
+H4,foot,MountingHole_3.2mm_M3,FOOTHOLE: a printed foot snaps in here
+L3,31uH coil,NetTie-2_SMD_Pad2.0mm,"COIL_PEND: 4-layer spiral, copper"
+L4,31uH coil,NetTie-2_SMD_Pad2.0mm,"COIL_PEND: 4-layer spiral, copper"
+L5,31uH coil,NetTie-2_SMD_Pad2.0mm,"COIL_PEND: 4-layer spiral, copper"
+L6,28uH coil,NetTie-2_SMD_Pad2.0mm,"COIL_PERCH: 4-layer spiral, copper"
+L7,28uH coil,NetTie-2_SMD_Pad2.0mm,"COIL_PERCH: 4-layer spiral, copper"
+L201,29uH coil,NetTie-2_SMD_Pad2.0mm,"COIL_LEV: 4-layer spiral, copper; the Hall sensor sits in its centre"
+L301,36uH coil,NetTie-2_SMD_Pad0.5mm,"COIL_TOKEN: 4-layer spiral, copper"
+L401,11.5uH coil,NetTie-2_SMD_Pad0.5mm,"COIL_TOKEN: 4-layer spiral, copper"
+L501,11.5uH coil,NetTie-2_SMD_Pad0.5mm,"COIL_TOKEN: 4-layer spiral, copper"
+TP1,+12V,TestPoint_Pad_D1.5mm,TP: bare pad
+TP2,+4.8V,TestPoint_Pad_D1.5mm,TP: bare pad
+TP3,+3V3,TestPoint_Pad_D1.0mm,"TP1MM: bare pad (the RP2354A's corner, GPiBridge's size)"
+TP4,VSYS,TestPoint_Pad_D1.0mm,"TP1MM: bare pad (the RP2354A's corner, GPiBridge's size)"
+TP5,+1V1,TestPoint_Pad_D1.0mm,"TP1MM: bare pad (the RP2354A's corner, GPiBridge's size)"
+TP6,VBUS,TestPoint_Pad_D1.0mm,"TP1MM: bare pad (the RP2354A's corner, GPiBridge's size)"

@@ -152,14 +152,16 @@ def build_meshes(parallel):
 def compose():
     owl = mt.read_stl(os.path.join(REF, "owl_in_perch_frame.stl"))
     cap = mt.read_stl(os.path.join(REF, "bat_cap_in_bat_frame.stl"))
+    mt.write_stl(os.path.join(REF, "owl_in_perch_frame.stl"), owl, "owl, perch frame")       # fixed order
+    mt.write_stl(os.path.join(REF, "bat_cap_in_bat_frame.stl"), cap, "bat cap, bat frame")
     slab = mt.read_stl(os.path.join(BUILD, "owl_standin.stl"))
     ped = mt.read_stl(os.path.join(BUILD, "cap_pedestal.stl"))
     foot = mt.read_stl(os.path.join(BUILD, "foot.stl"))
     owl_p = mt.translate(owl, (0, 0, D.OWL_Z0))
     cap_p = mt.translate(cap, (0, 0, D.CAP_Z0))
-    parts = {"owl": (owl_p, slab), "bat_cap": (cap_p, ped)}
-    owl_print = __import__("numpy").concatenate([owl_p, slab])
-    cap_print = __import__("numpy").concatenate([cap_p, ped])
+    import numpy as np
+    owl_print = np.concatenate([owl_p, slab])
+    cap_print = np.concatenate([cap_p, ped])
     mt.write_stl(os.path.join(OUT, "owl.stl"), owl_print, "owl on its breakaway slab")
     mt.write_stl(os.path.join(OUT, "bat_cap.stl"), cap_print, "bat cap on its breakaway pedestal")
     mt.write_stl(os.path.join(OUT, "foot.stl"), foot, "foot (print four)")

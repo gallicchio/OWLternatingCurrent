@@ -421,8 +421,7 @@ def run(verbose=True):
         "cap preload  %.1f / %.1f N per hook (arm stress %.0f / %.0f MPa) when the board is 0.1 / 0.2 mm"
         " thicker than the slot" % (hk["tail"]["preload"][0.1]["force_N"], hk["tail"]["preload"][0.2]["force_N"],
                                     hk["tail"]["preload"][0.1]["stress_MPa"], hk["tail"]["preload"][0.2]["stress_MPa"]),
-        "cap mass  %.2f g of PLA (solid; %.2f g/cm3); owl %.1f g, foot %.1f g (solid)"
-        % (cap["mass_g"], D.PLA_DENSITY, owl["mass_g"], foot["mass_g"]),
+        "cap mass  %.2f g of PLA (it prints solid; %.2f g/cm3)" % (cap["mass_g"], D.PLA_DENSITY),
         "owl  %.1f mm tall above the perch; bat floats %.1f mm below the perch (sim/physics)"
         % (owl["height"], D.float_gap(owl["lift"]) or float("nan")),
         "overhangs  no floating islands; farthest unsupported spot %s"

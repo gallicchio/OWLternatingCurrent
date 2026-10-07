@@ -19,7 +19,7 @@ One plate, PLA, no supports, no glue, **one pause** for both magnets.
 
 - About 13 g of PLA, any colour.
 - Two 10 × 2 mm N52 disc magnets from the pack on the order list, and a felt-tip pen.
-- Two small squares of masking tape, only if your nozzle is magnetic (see "Before you print").
+- A little masking tape, only if your nozzle is magnetic (see "Before you print").
 
 ## Files (`out/`)
 
@@ -41,7 +41,7 @@ One plate, PLA, no supports, no glue, **one pause** for both magnets.
 
 ## Before you print: is your nozzle magnetic?
 
-Touch a magnet to the cold nozzle. A hardened-steel nozzle (stock on the X1C, X1E and H2D) grabs it; brass and most stainless ones don't. A magnetic nozzle passing 0.4 mm over a magnet can lift it out of its seat, so on those printers you'll tape the magnets down at the pause (step 5 below).
+Touch a magnet to the cold nozzle. A hardened-steel nozzle (stock on the X1C, X1E and H2D) grabs it; brass and the stainless ones on the P1S and A1 don't. A magnetic nozzle pulls a 10 × 2 mm magnet up with several times its weight from anywhere within a few millimetres, so as the first layer goes over it the magnet would jump up and rattle in its pocket. On those printers you tape the magnets down at the pause (step 5 below).
 
 ## The pause, step by step
 
@@ -57,15 +57,21 @@ Orca Slicer should open `plate_bambu.3mf` the same way, but I haven't tested it:
 
 1. Open `out/plate.3mf` (drag it in, or *File → Import*), choose printer, PLA and "0.20mm Standard", and *Slice plate*.
 2. In the preview, drag the top handle of the vertical layer slider to **layer 97, 19.40 mm**: the first layer that bridges over the two round pockets. (At layer 96, 19.20 mm, both pockets are open: the picture below.)
-3. **Right-click the "+"** beside the handle and choose **Add Pause**. Print.
-4. This pause leaves the hot nozzle just above the print. If it stops over a pocket, keep your fingers clear and slide the magnet in beside it. `plate_bambu.3mf`'s pause lifts the nozzle first.
+3. **Right-click the "+"** beside the handle and choose **Add Custom G-code**. Paste these four lines, which lift the nozzle 15 mm and then pause (the same pause `plate_bambu.3mf` carries), and print:
+   ```
+   G91
+   G1 Z15 F900
+   G90
+   M400 U1
+   ```
+   *Add Pause* also works, but it leaves the hot nozzle resting on the print where the layer ended. If that's over a pocket, the magnet won't go in.
 
 **PrusaSlicer:**
 
 1. Open `out/plate.3mf`, choose your printer, PLA and a 0.20 mm print profile (supports: none), and *Slice now*.
 2. Drag the vertical slider to **19.40 mm** (layer 97).
 3. **Right-click** the orange "+" and choose **Add pause print (M601)**. A plain left-click adds a colour change (M600), which you don't want. Export or print.
-4. On a Prusa, M601 parks the head and beeps.
+4. On a Prusa, M601 parks the head and beeps. Other firmware has its own pause command (Klipper: `PAUSE`); use that instead.
 
 **Any other slicer:** pause **after the layer that ends at 19.20 mm, before the layer that ends at 19.40 mm** (layer 97, counting the first layer as 1).
 
@@ -77,7 +83,7 @@ Orca Slicer should open `plate_bambu.3mf` the same way, but I haven't tested it:
 2. Drop one magnet, **dot up**, into the bat cap's pocket. That's the round hole on top of the small purple part on its tall grey pedestal.
 3. Drop the other, **dot up**, into the owl's pocket: the round hole in the middle of the half-printed owl.
 4. Check that both lie flat, both dots up.
-5. *(Magnetic nozzle only.)* Press a small square of masking tape over each magnet onto the plastic round its pocket. The next layers print over it.
+5. *(Magnetic nozzle only.)* Stick a **narrow strip** of masking tape (about 3 mm wide, 12-13 mm long) across each magnet, its two ends pressed onto the plastic rim round the pocket. It holds the magnet down while the nozzle passes over, and the next layers seal it in. Keep it narrow: the cap's rim is only 1 mm wide, and its roof must still bond to most of it.
 6. Resume from the printer's screen. The next layer closes over both magnets for good.
 
 **Why "same face up" gets the polarity right.** Magnets stuck together in a stack all point the same way. Take the top two off the stack without flipping them and put each in its pocket with the same face up, and they point the same way. The owl and the cap both print the way they are used (owl standing, cap dome up). So on the board the owl's magnet and the bat's magnet point the same way, and **the bat is pulled up toward the owl**. In the cut-away below, both magnets are red side up. If a bat is ever pushed *away* from the owl, one magnet went in upside down; reprint that part.
@@ -112,7 +118,7 @@ owl hooks  0.8 mm under the perch, slot 2.0 for a 1.6 board
 cap hooks  0.8 under the head (y -13) and tail (y 12), slot 1.60
 snap strains  owl wing-arm 1.0 %, cap arm 1.5 %, foot prong 1.6 %  (PLA: keep < 2 %)
 cap preload  1.3 / 2.7 N per hook (arm stress 14 / 28 MPa) when the board is 0.1 / 0.2 mm thicker than the slot
-cap mass  0.50 g of PLA (solid; 1.24 g/cm3); owl 13.8 g, foot 0.5 g (solid)
+cap mass  0.50 g of PLA (it prints solid; 1.24 g/cm3)
 owl  30.1 mm tall above the perch; bat floats 8.5 mm below the perch (sim/physics)
 overhangs  no floating islands; farthest unsupported spot owl 0.9 mm, bat cap 3.4 mm, foot 0.4 mm
 ```
@@ -135,6 +141,7 @@ Both magnets are sealed inside printed plastic: no glue, no open pocket (`PLAN.m
 - **Perch:** the wings' inner corners are chamfered 0.6 mm, so router fillets up to r 0.5 in the notches' inside corners are fine. The lips reach 0.8 mm under the board inside the 2 mm keep-out. On top, the owl covers |x| ≤ 15.5, y −11.6 … +10 (toes in front); nothing on the top side there except the coil. The thread hole at (0, −15.5) is clear.
 - **Bat:** the head and tail edges must be straight across |x| ≤ 3 mm, where the lips hook. The cap's drops hang 0.1-2.3 mm outside those edges and 2.6 mm below the bat's top. On top, keep clear of the cap's dome (r ≤ 6.6 mm) and of the strips |x| ≤ 2.5 mm under its arms. The arms are 1.6 mm up, so parts under 1.4 mm tall may sit beneath them. The magnet's top face ends up 2.6 mm above the bat's top surface (0.4 floor + 2.2 pocket, and the magnet's pull holds it against the roof when floating), not the 2.0 mm `sim/physics/bat_power.py` assumes.
 - **Base:** each foot's top is 11 mm across: keep 5.5 mm round each foot hole clear on the bottom side.
+- **Cap location (optional):** the cap's drops fix it front to back (0.1 mm clearance to the edges), but sideways it is held only by friction along the head and tail edges, with about 1 N of preload. To pin it sideways too, notch the head and tail edges 5.4 mm wide and 0.5 mm deep at x = 0, and make `BAT_HEAD_Y` and `BAT_TAIL_Y` in `mech.py` the notch bottoms; `build.py` then remakes the cap with its 5 mm drops sitting in the notches.
 
 ## How it's made
 

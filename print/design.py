@@ -225,17 +225,6 @@ def owl_side_x(y, z):
     return a * (1 - u ** n) ** (1 / n)
 
 
-def sphere_dirs(k=42):
-    """Roughly uniform unit vectors (Fibonacci sphere)."""
-    out = []
-    g = math.pi * (3 - math.sqrt(5))
-    for i in range(k):
-        z = 1 - 2 * (i + 0.5) / k
-        r = math.sqrt(1 - z * z)
-        out.append((r * math.cos(g * i), r * math.sin(g * i), z))
-    return out
-
-
 def hull_polyhedron(points):
     """Convex hull -> (points, faces) with OpenSCAD's winding (clockwise seen from outside)."""
     import numpy as np

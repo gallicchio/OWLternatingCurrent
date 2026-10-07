@@ -24,8 +24,21 @@ def read_stl(path):
     return rec["v"].reshape(-1, 3, 3).astype(float)
 
 
+def canonical(tris):
+    """The same triangles in a fixed order (OpenSCAD's CGAL emits them in a run-dependent
+    order): each starts at its smallest vertex (winding kept), then all are sorted."""
+    t = np.asarray(tris, np.float32)
+    if not len(t):
+        return t
+    first = np.array([min(range(3), key=lambda i: tuple(tri[i])) for tri in t])
+    idx = (np.arange(3)[None, :] + first[:, None]) % 3
+    t = np.take_along_axis(t, idx[:, :, None].repeat(3, axis=2), axis=1)
+    flat = t.reshape(len(t), 9)
+    return t[np.lexsort(flat.T[::-1])]
+
+
 def write_stl(path, tris, name="mesh"):
-    tris = np.asarray(tris, np.float32)
+    tris = canonical(tris)
     n = np.cross(tris[:, 1] - tris[:, 0], tris[:, 2] - tris[:, 0])
     ln = np.linalg.norm(n, axis=1, keepdims=True)
     n = n / np.where(ln == 0, 1, ln)
@@ -55,7 +68,7 @@ def volume(tris):
 def weld(tris):
     """Indexed form (vertices, faces), merging only bit-identical float32 vertices
     (OpenSCAD writes float32 STLs; rounding would collapse its sliver triangles)."""
-    p = np.asarray(tris, np.float32).reshape(-1, 3)
+    p = canonical(tris).reshape(-1, 3)
     verts, inv = np.unique(p, axis=0, return_inverse=True)
     return verts.astype(float), inv.reshape(-1, 3)
 
@@ -90,6 +103,16 @@ def is_closed(tris):
 
 
 # ------------------------------------------------------------------ 3MF
+ZIP_DATE = (2026, 10, 7, 12, 0, 0)        # fixed, so rebuilding doesn't churn the binaries
+
+
+def _zput(z, name, data):
+    info = zipfile.ZipInfo(name, date_time=ZIP_DATE)
+    info.compress_type = zipfile.ZIP_DEFLATED
+    info.external_attr = 0o644 << 16
+    z.writestr(info, data)
+
+
 def write_3mf(path, objects, title="", designer="", extra_files=None):
     """objects: list of (name, tris_in_local_frame, (tx, ty, tz)).  One <object> each,
     placed by its build item, so slicers list the parts by name."""
@@ -124,11 +147,11 @@ def write_3mf(path, objects, title="", designer="", extra_files=None):
             'Type="http://schemas.microsoft.com/3dmanufacturing/2013/01/3dmodel"/>'
             '</Relationships>\n')
     with zipfile.ZipFile(path, "w", zipfile.ZIP_DEFLATED) as z:
-        z.writestr("[Content_Types].xml", ct)
-        z.writestr("_rels/.rels", rels)
-        z.writestr("3D/3dmodel.model", "\n".join(out))
+        _zput(z, "[Content_Types].xml", ct)
+        _zput(z, "_rels/.rels", rels)
+        _zput(z, "3D/3dmodel.model", "\n".join(out))
         for name, text in (extra_files or {}).items():
-            z.writestr(name, text)
+            _zput(z, name, text)
 
 
 def read_3mf(path):
@@ -346,4 +369,4 @@ def write_bambu_3mf(path, objects, settings, title="", designer="", pauses=(), n
     order = ["[Content_Types].xml", "_rels/.rels", "3D/3dmodel.model", "3D/_rels/3dmodel.model.rels"]
     with zipfile.ZipFile(path, "w", zipfile.ZIP_DEFLATED) as z:
         for n in order + sorted(k for k in files if k not in order):
-            z.writestr(n, files[n])
+            _zput(z, n, files[n])

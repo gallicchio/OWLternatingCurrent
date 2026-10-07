@@ -1,0 +1,8 @@
+# Build products and the fetched SDK (also in the repository's own .gitignore).
+build/
+external/
+# The host tests' binaries and outputs (make -C test).
+test/test_*
+!test/test_*.c
+!test/test_*.h
+test/out/

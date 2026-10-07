@@ -115,12 +115,12 @@ magnet bottom above the perch's top copper  14.05 mm  (OWL_LIFT 14.0; on the 0.2
 both pockets  10.35 mm across, 2.2 deep  (magnet 10 x 2)
 ONE pause: before layer 97 (19.40 mm); pockets open at 19.20 mm
 owl hooks  0.8 mm under the perch, slot 2.0 for a 1.6 board
-cap hooks  0.8 under the head (y -13) and tail (y 12), slot 1.60
-snap strains  owl wing-arm 1.0 %, cap arm 1.5 %, foot prong 1.6 %  (PLA: keep < 2 %)
-cap preload  1.3 / 2.7 N per hook (arm stress 14 / 28 MPa) when the board is 0.1 / 0.2 mm thicker than the slot
-cap mass  0.50 g of PLA (it prints solid; 1.24 g/cm3)
+cap hooks  0.8 under the head (y -12.5) and tail (y 11.5), slot 1.60
+snap strains  owl wing-arm 1.0 %, cap arm 1.6 %, foot prong 1.6 %  (PLA: keep < 2 %)
+cap preload  1.8 / 3.5 N per hook (arm stress 17 / 33 MPa) when the board is 0.1 / 0.2 mm thicker than the slot
+cap mass  0.49 g of PLA (it prints solid; 1.24 g/cm3)
 owl  30.1 mm tall above the perch; bat floats 8.5 mm below the perch (sim/physics)
-overhangs  no floating islands; farthest unsupported spot owl 0.9 mm, bat cap 3.4 mm, foot 0.4 mm
+overhangs  no floating islands; farthest unsupported spot owl 0.9 mm, bat cap 3.2 mm, foot 0.4 mm
 ```
 <!-- numbers: end -->
 

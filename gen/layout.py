@@ -42,7 +42,8 @@ PEND_REST = (TREE_SOCKET[0], TREE_SOCKET[1] + THREAD_AHEAD)
 PEND_R = 18.0
 PEND_COILS = {"L3": 90.0, "L4": 210.0, "L5": 330.0}          # degrees, 90 = toward the viewer
 COIL_R = 15.0                                    # every base coil (gen/parts.py COILS r_out)
-COIL_KEEPOUT = 1.0                               # beyond r_out, on every layer
+COIL_KEEPOUT = 0.3                               # beyond r_out, on every layer (courtyard r_out + 0.25):
+                                                 # the TMAG5273 between the pendulum coils needs the room
 
 
 def pend_coil(ref):
@@ -70,10 +71,11 @@ PUMPKINS = [(62.0, 118.0, 9.0), (80.0, 121.0, 7.0), (140.0, 120.0, 8.0)]   # x, 
 # the hill along the front, with the six wisps on it, left to right
 WISPS = [(48.0, 106.0), (68.0, 102.0), (84.0, 99.0), (128.0, 99.0), (146.0, 103.0), (178.0, 108.0)]
 
-# the sky: twelve stars on an arc (the quantum ghost's walk, STAR0 at the left), four more
-# scattered
-STAR_ARC = dict(cx=118.0, cy=86.0, r=78.0, a0=205.0, a1=330.0)       # degrees, on the arc
-STARX = [(68.0, 12.0), (182.0, 14.0), (75.0, 60.0), (150.0, 54.0)]
+# the stars: twelve on a shallow arc across the open band between the tree and the
+# pendulum (the quantum ghost walks it, STAR0 at the left), four more scattered in the sky
+# (the moon's side and behind; behind the tree itself sit the RP2354A and its parts)
+STAR_ARC = dict(cx=107.0, cy=160.0, r=105.0, a0=245.0, a1=295.0)    # degrees, on the arc
+STARX = [(68.0, 10.0), (128.0, 10.0), (72.0, 44.0), (182.0, 62.0)]
 
 
 def star_arc():
@@ -85,9 +87,11 @@ def star_arc():
     return pts
 
 
-# what the child touches and the plugs: on top
-JACK = (8.0, 10.0)                               # J1: plug from the left edge
-USB = (30.0, 4.0)                                # J2: plug from the back edge
+# what the child touches and the plugs: on top.  The RP2354A's corner of the board (its
+# USB and debug plugs) is behind the tree, where the tree hides it from the front.
+MCU = (105.0, 15.0)                              # U4, on top, behind the tree
+JACK = (150.0, 10.15)                            # J1: plug from the back edge
+USB = (95.0, 2.45)                               # J2: plug from the back edge (GPiBridge's USB layout)
 SPEAKER = (176.0, 36.0)                          # LS1, 23 mm
 SOUND_SWITCH = (183.0, 118.0)                    # SW3, its lever at the right edge
 SPELL_BUTTON = (168.0, 121.0)                    # SW2
@@ -132,7 +136,11 @@ PERCH_W, PERCH_FRONT, PERCH_BACK = 34.0, -18.0, 38.0     # the coil's centre is 
 # ======================================================================================
 # The bat and the two tokens
 # ======================================================================================
-BAT_SPAN, BAT_HEAD_Y, BAT_TAIL_Y = 48.0, -13.0, 12.0     # the magnet's axis is (0, 0)
+import mech as _M
+BAT_SPAN = _M.BAT_SPAN                                   # the magnet's axis is (0, 0)
+BAT_HEAD_Y = _M.BAT_HEAD_Y - _M.BAT_NOTCH_D              # the head edge (-13.0)
+BAT_TAIL_Y = _M.BAT_TAIL_Y + _M.BAT_NOTCH_D              # the tail edge (+12.0)
+BAT_NOTCH_W, BAT_NOTCH_D = _M.BAT_NOTCH_W, _M.BAT_NOTCH_D   # notches at x = 0 in both edges
 TOKEN_R = 19.0                                           # each token: an owl or a cat, 38 mm
 
 # ======================================================================================

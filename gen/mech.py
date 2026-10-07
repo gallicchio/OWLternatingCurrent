@@ -43,8 +43,14 @@ THREAD_HOLE_D = 1.2
 # --- the bat (horizontal while it floats; its head points toward the viewer, -y) --
 # Origin: the magnet's axis.  Its receive coil (4 layers, fine pitch) surrounds it.
 BAT_SPAN = 48.0          # wingtip to wingtip (x)
-BAT_HEAD_Y = -13.0       # front edge of the head (toward the viewer)
-BAT_TAIL_Y = 12.0        # back edge of the body
+# The head and tail edges carry a notch at x = 0, BAT_NOTCH_W wide and BAT_NOTCH_D deep,
+# where the cap's drops sit: it pins the cap sideways (print/README.md, designer notes).
+# BAT_HEAD_Y and BAT_TAIL_Y are the notch bottoms, where the cap hooks; the board's
+# edges are BAT_NOTCH_D beyond them.
+BAT_NOTCH_W = 5.4
+BAT_NOTCH_D = 0.5
+BAT_HEAD_Y = -12.5       # the head notch's bottom (the head edge is at -13.0, toward the viewer)
+BAT_TAIL_Y = 11.5        # the tail notch's bottom (the tail edge is at +12.0)
 RX_R_OUT = 11.0
 RX_R_IN = 7.0
 # The cap: a dome over the magnet whose two arms reach the head and tail edges and

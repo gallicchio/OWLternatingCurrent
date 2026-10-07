@@ -200,7 +200,9 @@ PARTS.update({
 # pitch in mm; the physics behind each is in sim/physics/.
 COILS = {
     "COIL_PEND": dict(r_out=15.0, r_in=3.0, turns=12, width=0.6, layers=4),
-    "COIL_LEV": dict(r_out=15.0, r_in=4.0, turns=11, width=0.6, layers=4),
+    # three layers, not four: the Hall sensor sits in the hole at the centre, and its three
+    # lines (and the coil's own inner end) leave on B.Cu, which a fourth spiral would close
+    "COIL_LEV": dict(r_out=15.0, r_in=4.0, turns=14, width=0.5, layers=3),
     "COIL_PERCH": dict(r_out=15.0, r_in=5.0, turns=10, width=0.6, layers=4),
     "COIL_TOKEN": dict(r_out=11.5, r_in=4.5, turns=7, width=0.6, layers=4),
     "COIL_BAT": dict(r_out=11.0, r_in=7.0, turns=10, width=0.2, layers=4),

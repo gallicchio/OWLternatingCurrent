@@ -1,0 +1,192 @@
+[
+ {
+  "f": 150000.0,
+  "R_series": 0,
+  "0.1A": {
+   "orange_mA": 11.8,
+   "violet_mA": 0.0,
+   "vpk": 2.64
+  },
+  "0.2A": {
+   "orange_mA": 34.7,
+   "violet_mA": 7.8,
+   "vpk": 3.63
+  },
+  "0.4A": {
+   "orange_mA": 77.7,
+   "violet_mA": 33.4,
+   "vpk": 5.14
+  }
+ },
+ {
+  "f": 150000.0,
+  "R_series": 22,
+  "0.1A": {
+   "orange_mA": 7.1,
+   "violet_mA": 0.4,
+   "vpk": 3.05
+  },
+  "0.2A": {
+   "orange_mA": 21.3,
+   "violet_mA": 9.8,
+   "vpk": 4.68
+  },
+  "0.4A": {
+   "orange_mA": 50.5,
+   "violet_mA": 33.3,
+   "vpk": 7.7
+  }
+ },
+ {
+  "f": 150000.0,
+  "R_series": 47,
+  "0.1A": {
+   "orange_mA": 4.8,
+   "violet_mA": 0.6,
+   "vpk": 3.23
+  },
+  "0.2A": {
+   "orange_mA": 15.4,
+   "violet_mA": 8.6,
+   "vpk": 5.34
+  },
+  "0.4A": {
+   "orange_mA": 37.5,
+   "violet_mA": 27.8,
+   "vpk": 9.37
+  }
+ },
+ {
+  "f": 150000.0,
+  "R_series": 68,
+  "0.1A": {
+   "orange_mA": 3.8,
+   "violet_mA": 0.7,
+   "vpk": 3.32
+  },
+  "0.2A": {
+   "orange_mA": 12.6,
+   "violet_mA": 7.5,
+   "vpk": 5.69
+  },
+  "0.4A": {
+   "orange_mA": 31.0,
+   "violet_mA": 24.1,
+   "vpk": 10.27
+  }
+ },
+ {
+  "f": 150000.0,
+  "R_series": 100,
+  "0.1A": {
+   "orange_mA": 2.9,
+   "violet_mA": 0.6,
+   "vpk": 3.41
+  },
+  "0.2A": {
+   "orange_mA": 9.9,
+   "violet_mA": 6.3,
+   "vpk": 6.04
+  },
+  "0.4A": {
+   "orange_mA": 24.6,
+   "violet_mA": 19.8,
+   "vpk": 11.19
+  }
+ },
+ {
+  "f": 330000.0,
+  "R_series": 0,
+  "0.1A": {
+   "orange_mA": 26.8,
+   "violet_mA": 6.4,
+   "vpk": 3.53
+  },
+  "0.2A": {
+   "orange_mA": 52.6,
+   "violet_mA": 21.4,
+   "vpk": 4.49
+  },
+  "0.4A": {
+   "orange_mA": 104.8,
+   "violet_mA": 54.6,
+   "vpk": 6.23
+  }
+ },
+ {
+  "f": 330000.0,
+  "R_series": 22,
+  "0.1A": {
+   "orange_mA": 21.0,
+   "violet_mA": 9.8,
+   "vpk": 4.68
+  },
+  "0.2A": {
+   "orange_mA": 42.5,
+   "violet_mA": 27.0,
+   "vpk": 6.93
+  },
+  "0.4A": {
+   "orange_mA": 86.1,
+   "violet_mA": 63.7,
+   "vpk": 11.31
+  }
+ },
+ {
+  "f": 330000.0,
+  "R_series": 47,
+  "0.1A": {
+   "orange_mA": 17.9,
+   "violet_mA": 10.7,
+   "vpk": 5.81
+  },
+  "0.2A": {
+   "orange_mA": 37.2,
+   "violet_mA": 27.7,
+   "vpk": 9.33
+  },
+  "0.4A": {
+   "orange_mA": 76.2,
+   "violet_mA": 63.1,
+   "vpk": 16.3
+  }
+ },
+ {
+  "f": 330000.0,
+  "R_series": 68,
+  "0.1A": {
+   "orange_mA": 16.2,
+   "violet_mA": 10.7,
+   "vpk": 6.61
+  },
+  "0.2A": {
+   "orange_mA": 34.2,
+   "violet_mA": 27.0,
+   "vpk": 11.06
+  },
+  "0.4A": {
+   "orange_mA": 70.4,
+   "violet_mA": 60.7,
+   "vpk": 19.9
+  }
+ },
+ {
+  "f": 330000.0,
+  "R_series": 100,
+  "0.1A": {
+   "orange_mA": 14.4,
+   "violet_mA": 10.3,
+   "vpk": 7.64
+  },
+  "0.2A": {
+   "orange_mA": 30.6,
+   "violet_mA": 25.5,
+   "vpk": 13.29
+  },
+  "0.4A": {
+   "orange_mA": 63.3,
+   "violet_mA": 56.5,
+   "vpk": 24.56
+  }
+ }
+]

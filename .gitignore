@@ -1,0 +1,47 @@
+# Copyrighted reference material, fetched or dropped in locally and never committed:
+# Hans Rosenberg's checklist (references/), vendor datasheets (datasheets/), and any
+# vendor drawings or 3D models we are not licensed to republish (reference/).
+references/
+datasheets/
+reference/
+
+# Scratch space for the build.  Everything else the build makes (hardware/, mfg/release/,
+# docs/images/, 3D-print STLs) is committed, so the design can be reviewed and ordered
+# without building it.
+build/
+
+# Art previews (python3 art/preview.py regenerates them).
+art/out/
+
+# Simulation scratch (openEMS / EMerge write large field dumps; the scripts and the
+# small result summaries they write beside themselves are committed).
+sim/**/out/
+sim/**/*.h5
+sim/**/tmp*/
+
+# KiCad writes these while a project is open.
+*.kicad_prl
+fp-info-cache
+*-backups/
+~*.lck
+*.lck
+.history/
+
+# JLCPCB's parts data and EasyEDA's land patterns, cached by the tools: theirs, not
+# ours to publish, and fetched again when stale.
+tools/jlc_cache.json
+mfg/jlc_footprint_cache.json
+
+# Firmware build products and fetched SDKs.
+firmware/build/
+firmware/.deps/
+firmware/external/
+
+# Python.
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Questions and answers between Jason and Claude, while working.
+QUESTIONS.md
+ANSWERS.md

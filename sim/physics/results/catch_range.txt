@@ -1,0 +1,15 @@
+equilibrium gap 8.38 mm; negative stiffness 6.4 N/m; coil -21.8 mN/A
+B_bat at sensor vs gap (mT): 4:-122.5 6:-67.7 8:-38.7 10:-23.5 12:-15.1 14:-10.1
+released -3 mm from equilibrium: held=True, peak 2.36 A
+equilibrium gap 8.38 mm; negative stiffness 6.4 N/m; coil -21.8 mN/A
+B_bat at sensor vs gap (mT): 4:-122.5 6:-67.7 8:-38.7 10:-23.5 12:-15.1 14:-10.1
+released -2 mm from equilibrium: held=True, peak 1.58 A
+equilibrium gap 8.38 mm; negative stiffness 6.4 N/m; coil -21.8 mN/A
+B_bat at sensor vs gap (mT): 4:-122.5 6:-67.7 8:-38.7 10:-23.5 12:-15.1 14:-10.1
+released +2 mm from equilibrium: held=True, peak 1.60 A
+equilibrium gap 8.38 mm; negative stiffness 6.4 N/m; coil -21.8 mN/A
+B_bat at sensor vs gap (mT): 4:-122.5 6:-67.7 8:-38.7 10:-23.5 12:-15.1 14:-10.1
+released +3 mm from equilibrium: held=True, peak 2.40 A
+equilibrium gap 8.38 mm; negative stiffness 6.4 N/m; coil -21.8 mN/A
+B_bat at sensor vs gap (mT): 4:-122.5 6:-67.7 8:-38.7 10:-23.5 12:-15.1 14:-10.1
+released +4 mm from equilibrium: held=True, peak 3.23 A

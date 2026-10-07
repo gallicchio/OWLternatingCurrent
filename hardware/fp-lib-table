@@ -1,0 +1,4 @@
+(fp_lib_table
+	(version 7)
+	(lib (name "OWL") (type "KiCad") (uri "${KIPRJMOD}/lib/OWL.pretty") (options "") (descr "Every footprint OWLternating Current uses"))
+)

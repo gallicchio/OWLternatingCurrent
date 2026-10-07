@@ -1,0 +1,104 @@
+(footprint "Speaker_GSPK2307P_D23mm_P10mm"
+	(version 20260206)
+	(generator "pcbnew")
+	(generator_version "10.0")
+	(layer "F.Cu")
+	(descr "G-SPK GSPK2307P-8R1W 23 mm 8 ohm 1 W speaker, PCB pins 10 mm apart")
+	(tags "speaker")
+	(property "Reference" "REF**"
+		(at 0 -3 0)
+		(layer "F.SilkS")
+		(uuid "d57bf9d7-1ded-4262-8822-07a692ca5379")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Value" "Speaker_GSPK2307P_D23mm_P10mm"
+		(at 0 3 0)
+		(layer "F.Fab")
+		(uuid "353c5f8e-779c-40e8-96b5-43eb56f82e46")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Datasheet" ""
+		(at 0 0 0)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "0d8b9695-eae4-46f7-abf1-cecd911cb49c")
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Description" ""
+		(at 0 0 0)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "a2aa6898-7b7a-4c80-83fa-f6bd30fb61a4")
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(attr through_hole)
+	(duplicate_pad_numbers_are_jumpers no)
+	(fp_circle
+		(center 0 0)
+		(end 11.6 0)
+		(stroke
+			(width 0.15)
+			(type solid)
+		)
+		(fill no)
+		(layer "F.SilkS")
+		(uuid "247e8dc6-87ff-4e63-bfd8-dc7f0bfe3998")
+	)
+	(fp_circle
+		(center 0 0)
+		(end 11.85 0)
+		(stroke
+			(width 0.05)
+			(type solid)
+		)
+		(fill no)
+		(layer "F.CrtYd")
+		(uuid "7b2d11d2-a43f-4ede-bdf8-4a989dfaac58")
+	)
+	(fp_circle
+		(center 0 0)
+		(end 11.5 0)
+		(stroke
+			(width 0.1)
+			(type solid)
+		)
+		(fill no)
+		(layer "F.Fab")
+		(uuid "39f81d7f-b074-481b-8b1d-ab4d62eaafc8")
+	)
+	(pad "1" thru_hole rect
+		(at -5 0)
+		(size 2.5 2.5)
+		(drill 1.1)
+		(layers "*.Cu" "*.Mask")
+		(remove_unused_layers no)
+		(uuid "a383cf71-b72a-4c40-90d6-72145f095e09")
+	)
+	(pad "2" thru_hole circle
+		(at 5 0)
+		(size 2.5 2.5)
+		(drill 1.1)
+		(layers "*.Cu" "*.Mask")
+		(remove_unused_layers no)
+		(uuid "22962ba7-cadd-40ea-a518-f56d89b0fcd5")
+	)
+	(embedded_fonts no)
+)

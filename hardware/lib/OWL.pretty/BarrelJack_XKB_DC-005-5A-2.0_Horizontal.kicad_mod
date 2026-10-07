@@ -1,0 +1,142 @@
+(footprint "BarrelJack_XKB_DC-005-5A-2.0_Horizontal"
+	(version 20260206)
+	(generator "pcbnew")
+	(generator_version "10.0")
+	(layer "F.Cu")
+	(descr "XKB DC-005-5A-2.0 5.5x2.1 mm barrel jack, 5 A; pin 1 centre (+), 2 sleeve, 3 switch; plug enters from -x")
+	(tags "barrel jack DC-005")
+	(property "Reference" "REF**"
+		(at 0 -3 0)
+		(layer "F.SilkS")
+		(uuid "9232615a-9e76-447d-8f87-b408dd903e26")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Value" "BarrelJack_XKB_DC-005-5A-2.0_Horizontal"
+		(at 0 3 0)
+		(layer "F.Fab")
+		(uuid "9366979d-2747-47eb-b5ed-b0cbe0c63992")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Datasheet" ""
+		(at 0 0 0)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "881348a7-91e3-4c38-88f8-232aee9ad62b")
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Description" ""
+		(at 0 0 0)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "67c436df-fab9-41c5-82a9-176561749812")
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(attr through_hole)
+	(duplicate_pad_numbers_are_jumpers no)
+	(fp_line
+		(start -10.65 -4.5)
+		(end 3.75 -4.5)
+		(stroke
+			(width 0.15)
+			(type solid)
+		)
+		(layer "F.SilkS")
+		(uuid "a28ce847-a5ff-42c7-8d81-1728c3b1cdc2")
+	)
+	(fp_line
+		(start -10.65 4.5)
+		(end 3.75 4.5)
+		(stroke
+			(width 0.15)
+			(type solid)
+		)
+		(layer "F.SilkS")
+		(uuid "594ac03d-4cc4-4a96-89eb-c357ba6e29b2")
+	)
+	(fp_line
+		(start 3.75 -4.5)
+		(end 3.75 4.5)
+		(stroke
+			(width 0.15)
+			(type solid)
+		)
+		(layer "F.SilkS")
+		(uuid "1d3b5ccc-0896-453e-9d41-6e10ab36daaf")
+	)
+	(fp_rect
+		(start -10.9 -5)
+		(end 4.25 5)
+		(stroke
+			(width 0.05)
+			(type solid)
+		)
+		(fill no)
+		(layer "F.CrtYd")
+		(uuid "da4d9445-7760-413c-9682-1c3ed353974a")
+	)
+	(fp_rect
+		(start -10.65 -4.5)
+		(end 3.75 4.5)
+		(stroke
+			(width 0.1)
+			(type solid)
+		)
+		(fill no)
+		(layer "F.Fab")
+		(uuid "f52b972e-f1e1-4d90-8f6b-50efcbd30087")
+	)
+	(pad "1" thru_hole oval
+		(at 2.95 -2.35)
+		(size 1.9 4.4)
+		(drill oval 1 3.5)
+		(layers "*.Cu" "*.Mask")
+		(remove_unused_layers no)
+		(uuid "4ef79376-754f-4ddf-ba7d-8b0246dcd222")
+	)
+	(pad "2" thru_hole oval
+		(at -2.95 -2.35)
+		(size 1.9 4.4)
+		(drill oval 1 3.5)
+		(layers "*.Cu" "*.Mask")
+		(remove_unused_layers no)
+		(uuid "3898987e-6085-4344-8578-4e367a7cd053")
+	)
+	(pad "3" thru_hole oval
+		(at 0 2.35)
+		(size 4.4 1.9)
+		(drill oval 3.5 1)
+		(layers "*.Cu" "*.Mask")
+		(remove_unused_layers no)
+		(uuid "e6db1412-9901-4f28-ade2-0428d3025c5c")
+	)
+	(embedded_fonts no)
+	(model "${KIPRJMOD}/lib/OWL.3dshapes/BarrelJack_Horizontal.step"
+		(offset
+			(xyz 0 0 0)
+		)
+		(scale
+			(xyz 1 1 1)
+		)
+		(rotate
+			(xyz 0 0 0)
+		)
+	)
+)

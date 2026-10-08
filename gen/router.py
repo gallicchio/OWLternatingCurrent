@@ -23,6 +23,7 @@ CLEAR = 0.16                                   # rules ask 0.15; the grid rounds
 # half widths: fine 0.127 mm, thin 0.15, mid 0.2, wide 0.4, power 1.0, heavy 2.0, via 0.45 mm pad
 CLASSES = {"fine": 0.0635, "thin": 0.075, "mid": 0.1, "wide": 0.2, "power": 0.5, "heavy": 1.0, "via": 0.225}
 CLS = ["fine", "thin", "mid", "wide", "power", "heavy", "via"]
+REGION = 40000                                 # a walled-in search smaller than this keeps its cells
 VIA_COST = 40.0                                # about 4 mm of track
 TURN_COST = 2.0
 # per layer, the cost multiplier of (horizontal, vertical) steps: F.Cu free,
@@ -198,7 +199,7 @@ class Grid:
               via_cost=VIA_COST, layer_cost=None):
         """starts, goals: sets of (L, k).  Returns [(L, k), ...] or None.
         layer_cost: {L: multiplier} on a layer's step costs (default 1)."""
-        nx = self.nx
+        nx, n = self.nx, self.n
         if bbox is None:
             i0, j0, i1, j1 = 0, 0, nx - 1, self.ny - 1
         else:
@@ -206,80 +207,132 @@ class Grid:
         grid = [self.g[(L, cls)] for L in range(NL)]
         vg = [self.g[(L, "via")] for L in range(NL)]
         keep = self.keep
+        novia = self.novia
         use = list(layers) if layers is not None else list(range(NL))
-        goal = set(goals)
-        gpts = list({(k % nx, k // nx) for (_, k) in goal})
-        if len(gpts) > 60:
-            gpts = gpts[::max(1, len(gpts) // 60)]
+        # a search's states are L * n + k in flat arrays kept between searches: a state's
+        # cost is valid only where its stamp is this search's number, so nothing is cleared
+        if getattr(self, "_best", None) is None:
+            self._best = array("d", bytes(8 * NL * n))
+            self._stamp = array("i", bytes(4 * NL * n))
+            self._par = array("i", bytes(4 * NL * n))
+            self._gen = 0
+        self._gen += 1
+        gen, best, stamp, par = self._gen, self._best, self._stamp, self._par
+        goal = {L * n + k for (L, k) in goals}
+        # the heuristic: the octile distance to the nearest of at most 24 representatives
+        # of the goal (one a millimetre square), less what a representative may lie beyond
+        # the goal's nearest cell, so it never overestimates by much
+        reps = {}
+        for (_, k) in goals:
+            i, j = k % nx, k // nx
+            reps.setdefault((i // 10, j // 10), (i, j))
+        gpts = list(reps.values())
+        if len(gpts) > 24:
+            gpts = gpts[::max(1, len(gpts) // 24)]
+        slack = 14 if len(reps) > 1 or len(goals) > 1 else 0
 
         def h(i, j):
-            return min(max(abs(gi - i), abs(gj - j)) + 0.414 * min(abs(gi - i), abs(gj - j)) for gi, gj in gpts) * 0.98
+            m = 1e18
+            for gi, gj in gpts:
+                a, b = abs(gi - i), abs(gj - j)
+                v = (a + 0.414 * b) if a > b else (b + 0.414 * a)
+                if v < m:
+                    m = v
+            m -= slack
+            return m * 0.98 if m > 0 else 0.0
 
-        pq, best, par = [], {}, {}
-        for s in starts:
-            if s in goal:
-                return [s]
-            if s[0] not in use:
+        pq = []
+        push, pop = heapq.heappush, heapq.heappop
+        for (L, k) in starts:
+            st = L * n + k
+            if st in goal:
+                return [(L, k)]
+            if L not in use:
                 continue
-            best[s] = 0.0
-            heapq.heappush(pq, (h(s[1] % nx, s[1] // nx), 0.0, s[0], s[1], -1))
+            best[st], stamp[st], par[st] = 0.0, gen, -1
+            push(pq, (h(k % nx, k // nx), 0.0, st, -1))
         NB = [(1, 0, 1.0, 0), (-1, 0, 1.0, 0), (0, 1, 1.0, 1), (0, -1, 1.0, 1),
               (1, 1, 1.414, 2), (1, -1, 1.414, 3), (-1, 1, 1.414, 3), (-1, -1, 1.414, 2)]
-        pops, found = 0, None
+        NB = [(di, dj, c, nd, dj * nx + di) for di, dj, c, nd in NB]
+        cost = {}
+        for L in range(NL):
+            ph, pv = DIR_PENALTY[L]
+            lc = layer_cost.get(L, 1.0) if layer_cost else 1.0
+            cost[L] = (ph * lc, pv * lc, (ph + pv) * lc / 2.0)
+        # a box where one layer costs less (`cheap`: layer, i0, j0, i1, j1, factor): the
+        # top round the RP2354A, hidden behind the tree, where lines spread out before a via
+        cheap = getattr(self, "cheap", None)
+        if cheap:
+            cL, ci0, cj0, ci1, cj1, cf = cheap
+            cheap_cost = (cost[cL][0] * cf, cost[cL][1] * cf, cost[cL][2] * cf)
+        pops, found = 0, -1
+        seen = self.last_region = []          # where a search that walls in went (rip-up)
         while pq:
-            f, gc, L, k, d = heapq.heappop(pq)
-            if best.get((L, k), 1e18) < gc - 1e-9:
+            f, gc, st, d = pop(pq)
+            if best[st] < gc - 1e-9:
                 continue
             pops += 1
+            if pops < REGION:
+                seen.append(st)
             if pops > max_pop:
                 self.last_why = "search budget (%d steps)" % max_pop
                 break
-            if (L, k) in goal:
-                found = (L, k)
+            if st in goal:
+                found = st
                 break
+            L = st // n
+            k = st - L * n
             i, j = k % nx, k // nx
-            ph, pv = DIR_PENALTY[L]
-            if layer_cost:
-                lc = layer_cost.get(L, 1.0)
-                ph, pv = ph * lc, pv * lc
+            ph, pv, pd = cost[L]
+            if cheap and L == cL and ci0 <= i <= ci1 and cj0 <= j <= cj1:
+                ph, pv, pd = cheap_cost
             gl, kl = grid[L], keep[L]
-            for di, dj, c, nd in NB:
+            base = L * n
+            for di, dj, c, nd, dk in NB:
                 ii, jj = i + di, j + dj
                 if ii < i0 or jj < j0 or ii > i1 or jj > j1:
                     continue
-                kk = jj * nx + ii
-                if (gl[kk] or kl[kk]) and (L, kk) not in goal:
+                kk = k + dk
+                s2 = base + kk
+                # (no exception for the goal's own cells: a track wider than a pin may
+                # not end on it, or it would overlap the pins beside it; wide lines land on
+                # stubs and are widened afterwards, gen/routing.py fatten())
+                if gl[kk] or kl[kk]:
                     continue
                 if di and dj:
-                    if gl[j * nx + ii] or gl[jj * nx + i]:
+                    if gl[k + di] or gl[k + dj * nx]:
                         continue
-                    cc = c * (ph + pv) / 2.0
+                    cc = c * pd
                 else:
-                    cc = c * (ph if di else pv)
+                    cc = ph if di else pv
                 if d >= 0 and d != nd:
                     cc += TURN_COST
                 ng = gc + cc
-                if ng < best.get((L, kk), 1e18):
-                    best[(L, kk)] = ng
-                    par[(L, kk)] = (L, k)
-                    heapq.heappush(pq, (ng + h(ii, jj), ng, L, kk, nd))
-            if allow_via and not self.novia[k] and all(not vg[LL][k] for LL in range(NL)):
+                if stamp[s2] != gen or ng < best[s2]:
+                    best[s2], stamp[s2], par[s2] = ng, gen, st
+                    push(pq, (ng + h(ii, jj), ng, s2, nd))
+            if allow_via and not novia[k] and not vg[0][k] and not vg[1][k] and not vg[2][k]:
+                hv = None
                 for LL in use:
                     if LL == L:
                         continue
+                    s2 = LL * n + k
                     ng = gc + via_cost
-                    if ng < best.get((LL, k), 1e18):
-                        best[(LL, k)] = ng
-                        par[(LL, k)] = (L, k)
-                        heapq.heappush(pq, (ng + h(i, j), ng, LL, k, -1))
-        if found is None:
+                    if stamp[s2] != gen or ng < best[s2]:
+                        best[s2], stamp[s2], par[s2] = ng, gen, st
+                        if hv is None:
+                            hv = h(i, j)
+                        push(pq, (ng + hv, ng, s2, -1))
+        if found < 0:
             if pops <= max_pop:
                 self.last_why = "walled in (%d steps)" % pops
+            if pops >= REGION:
+                self.last_region = []
             return None
         path, cur = [], found
-        while cur is not None:
-            path.append(cur)
-            cur = par.get(cur)
+        while cur >= 0:
+            path.append((cur // n, cur % n))
+            cur = par[cur]
         path.reverse()
         return path
 

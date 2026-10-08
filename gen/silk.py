@@ -72,6 +72,7 @@ class Silk:
         self.grid = {pcbnew.F_SilkS: Grid(), pcbnew.B_SilkS: Grid()}
         self.placed = 0
         self.to_fab = 0
+        self.why = {}
 
     def box(self, bb, grow=0.0):
         x0, y0 = self.B(pcbnew.VECTOR2I(bb.GetX(), bb.GetY()))
@@ -135,9 +136,17 @@ class Silk:
     def references(self):
         bodies = {}
         for fp in self.fps:
+            # only the parts underneath, where the labels go (not the coils: a label inside
+            # a coil's circle is not "nearer" to the coil)
+            if fp.GetLayer() != pcbnew.B_Cu or str(fp.GetFPID().GetLibItemName()).startswith("Coil_"):
+                continue
             bb = None
             for pad in fp.Pads():
-                bb = pad.GetBoundingBox() if bb is None else (bb.Merge(pad.GetBoundingBox()) or bb)
+                # (Merge in place: its return value is a view of a temporary)
+                if bb is None:
+                    bb = pad.GetBoundingBox()
+                else:
+                    bb.Merge(pad.GetBoundingBox())
             for it in fp.GraphicalItems():
                 if it.GetLayer() in (pcbnew.F_Fab, pcbnew.B_Fab) and it.GetClass() == "PCB_SHAPE" and bb is not None:
                     bb.Merge(it.GetBoundingBox())
@@ -171,7 +180,16 @@ class Silk:
                                 "L": (x0 - gap - hw, cy), "R": (x1 + gap + hw, cy)}[side]
                         t.SetPosition(self._P(x, y, fp))
                         r = self.box(t.GetEffectiveTextShape().BBox())
-                        if not self.inside(r) or self.grid[layer].hit(r) or not _nearest_is(ref, r, bodies):
+                        if not self.inside(r):
+                            self.why["outside the board"] = self.why.get("outside the board", 0) + 1
+                            continue
+                        h = self.grid[layer].hit(r)
+                        if h:
+                            key = h.split(" ")[-1] if " " in h else h
+                            self.why[key] = self.why.get(key, 0) + 1
+                            continue
+                        if not _nearest_is(ref, r, bodies):
+                            self.why["nearer another part"] = self.why.get("nearer another part", 0) + 1
                             continue
                         self.grid[layer].add((r[0] - GAP, r[1] - GAP, r[2] + GAP, r[3] + GAP, "%s ref" % ref))
                         done = True

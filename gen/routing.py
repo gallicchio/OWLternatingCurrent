@@ -14,6 +14,7 @@ layers: 0 = F.Cu, 1 = In1.Cu, 2 = B.Cu; In2.Cu is the ground plane.  (GPiBridge'
 routing.py, with one Router per board of the panel: its pads, its outline, its planes.)
 """
 import math
+from array import array
 import pcbnew
 import router as R
 
@@ -28,12 +29,15 @@ class Item:
     """cells: {layer: grid cells its copper covers}, for joining items;
     inner: where a routed track may end on it (a pad's cells far enough
     inside that a track ending there crosses the pad's edge at full width;
-    any cell of a track, via or zone)."""
-    __slots__ = ("net", "cells", "stamp", "plane", "what", "inner")
+    any cell of a track, via or zone); obj, seg: a track's pcbnew object and
+    (layer, start, end, width), for widening it afterwards."""
+    __slots__ = ("net", "cells", "stamp", "plane", "what", "inner", "obj", "seg", "routed")
 
     def __init__(self, net, cells, stamp, plane, what, inner=None):
         self.net, self.cells, self.stamp, self.plane, self.what = net, cells, stamp, plane, what
         self.inner = inner if inner is not None else cells
+        self.obj = self.seg = None
+        self.routed = False                       # laid by the router (rip-up may take it back)
 
 
 class Router:
@@ -51,6 +55,7 @@ class Router:
             if str(name):
                 self.nets[str(name)] = ni
         self.failed = []
+        self.region = {}                          # net -> (class, cells) of a walled-in search
         self.n_tracks = self.n_vias = 0
 
     # ---- items ----------------------------------------------------------------
@@ -166,8 +171,67 @@ class Router:
         self.board.Add(t)
         self.n_tracks += 1
         if stamp:
-            self._item(net, ("seg", a[0], a[1], b[0], b[1], width / 2), [L], what="track")
+            it = self._item(net, ("seg", a[0], a[1], b[0], b[1], width / 2), [L], what="track")
+            it.obj, it.seg = t, (L, a, b, width)
         return t
+
+    # ---- widening, after routing ------------------------------------------------
+    def fatten(self, net, widths, split=1.5):
+        """Widen the net's tracks toward `widths` (the widest first) wherever the copper
+        round them leaves room: the router laid them at a width every pin they reach can
+        take, and a power line is wide only where it can be.  Long tracks are first cut
+        `split` from each end, so the part beside a fine pin stays narrow and the rest
+        widens.  Returns (tracks widened, tracks in all)."""
+        ids = [i for i in self.by_net.get(net, []) if self.items[i].what == "track" and self.items[i].seg]
+        for i in ids:
+            L, a, b, w = self.items[i].seg
+            routed = self.items[i].routed
+            n = math.hypot(b[0] - a[0], b[1] - a[1])
+            if n <= 2 * split + 0.5:
+                continue
+            ux, uy = (b[0] - a[0]) / n, (b[1] - a[1]) / n
+            p1 = (a[0] + ux * split, a[1] + uy * split)
+            p2 = (b[0] - ux * split, b[1] - uy * split)
+            self._kill(i)
+            for q0, q1 in ((a, p1), (p1, p2), (p2, b)):
+                self.track(net, L, q0, q1, w)
+                self.items[-1].routed = routed
+        self.lift(net)
+        done = total = 0
+        try:
+            for i in list(self.by_net.get(net, [])):
+                it = self.items[i]
+                if it.what != "track" or not it.seg:
+                    continue
+                total += 1
+                L, a, b, w = it.seg
+                for wn in widths:
+                    if wn <= w + 1e-6:
+                        break
+                    cls = R.width_class(wn)
+                    cells = self.g.shape_cells(("seg", a[0], a[1], b[0], b[1], 0.0), 0.0)
+                    g, kl = self.g.g[(L, cls)], self.g.keep[L]
+                    if any(g[k] or kl[k] for k in cells):
+                        continue
+                    it.obj.SetWidth(pcbnew.FromMM(wn))
+                    it.seg = (L, a, b, wn)
+                    it.stamp = self.g.obstacle(("seg", a[0], a[1], b[0], b[1], wn / 2), [L], R.CLEAR)
+                    done += 1
+                    break
+        finally:
+            self.drop(net)
+        return done, total
+
+    def _kill(self, i):
+        """Take a track or via out of the board and of the router (its item stays, empty)."""
+        it = self.items[i]
+        self.g.sub(it.stamp)
+        it.stamp = {}
+        it.cells = {}
+        it.inner = {}
+        it.what = "dead"
+        self.board.Remove(it.obj)
+        it.seg = None
 
     def polyline(self, net, L, pts, width):
         for a, b in zip(pts, pts[1:]):
@@ -186,8 +250,12 @@ class Router:
         v.SetNet(self.nets[net])
         self.board.Add(v)
         self.n_vias += 1
-        self._item(net, ("disc", x, y, size[0] / 2), [0, 1, 2], plane=True, what="via")
+        it = self._item(net, ("disc", x, y, size[0] / 2), [0, 1, 2], plane=True, what="via")
+        it.obj, it.seg = v, ("via", x, y, size[1])
         self._novia(x, y, size[1] / 2 + VIA[1] / 2 + 0.25)
+        if getattr(self, "_vcount", None) is not None:
+            for k in self.g._disc(x, y, size[1] / 2 + VIA[1] / 2 + 0.25):
+                self._vcount[k] += 1
         return v
 
     def zone(self, net, layer, pts, priority=0, clearance=0.15, min_width=0.15, connect="thermal",
@@ -250,7 +318,7 @@ class Router:
 
     # ---- connectivity ---------------------------------------------------------
     def groups(self, net):
-        ids = self.by_net.get(net, [])
+        ids = [i for i in self.by_net.get(net, []) if self.items[i].what != "dead"]
         parent = {i: i for i in ids}
 
         def find(a):
@@ -344,6 +412,8 @@ class Router:
             finally:
                 self.drop(net)
             if path is None:
+                if self.g.last_region:
+                    self.region[net] = (cls, self.g.last_region)
                 what = ",".join(sorted(self.items[i].what for i in src if self.items[i].what not in ("track", "via")))
                 self.failed.append((net, "from %s: %s" % (what or "a track", getattr(self.g, "last_why", "?"))))
                 stuck.update(src)
@@ -357,10 +427,78 @@ class Router:
 
     def lay(self, net, path, width):
         segs, vias = R.simplify(path, self.g.nx)
+        n0 = len(self.items)
         for (L, x0, y0, x1, y1) in segs:
             self.track(net, L, (x0, y0), (x1, y1), width)
         for (x, y) in vias:
             self.via(net, x, y)
+        for it in self.items[n0:]:
+            it.routed = True
+
+    # ---- rip-up -------------------------------------------------------------------
+    def freeze_vias(self):
+        """From here on a via the router lays can be taken back out: remember where vias
+        may not go before it (the planned copper), and count the router's own."""
+        self._nbase = bytes(self.g.novia)
+        self._vcount = array("H", bytes(2 * len(self.g.novia)))
+
+    def routed_copper(self, net):
+        """The router's tracks and vias of `net`, to put back exactly (restore())."""
+        return [it.seg for i in self.by_net.get(net, []) for it in [self.items[i]] if it.routed and it.seg]
+
+    def rip(self, net):
+        """Take every track and via the router laid for `net` back out."""
+        for i in self.by_net.get(net, []):
+            it = self.items[i]
+            if not it.routed or it.what == "dead":
+                continue
+            if it.what == "via":
+                _, x, y, d = it.seg
+                for k in self.g._disc(x, y, d / 2 + VIA[1] / 2 + 0.25):
+                    if self._vcount[k]:               # (a via from before freeze_vias() stays marked)
+                        self._vcount[k] -= 1
+                        if not self._vcount[k]:
+                            self.g.novia[k] = self._nbase[k]
+            self._kill(i)
+
+    def restore(self, net, copper):
+        for seg in copper:
+            if seg[0] == "via":
+                self.via(net, seg[1], seg[2])
+            else:
+                L, a, b, w = seg
+                self.track(net, L, a, b, w)
+            self.items[-1].routed = True
+
+    def walls(self, net, cls, region, planned=False):
+        """The nets whose router-laid copper bounds `region` (a walled-in search's cells,
+        router.last_region): the ones to rip up so `net` can get out."""
+        n = self.g.nx * self.g.ny
+        nx = self.g.nx
+        edge = {}
+        for st in region:
+            L, k = divmod(st, n)
+            g, kl = self.g.g[(L, cls)], self.g.keep[L]
+            for dk in (1, -1, nx, -nx, nx + 1, nx - 1, -nx + 1, -nx - 1):
+                kk = k + dk
+                if 0 <= kk < n and (g[kk] or kl[kk]):
+                    edge.setdefault(L, set()).add(kk)
+        out = []
+        for other, ids in self.by_net.items():
+            if other == net:
+                continue
+            for i in ids:
+                it = self.items[i]
+                if (it.routed or planned) and it.what != "dead" and any(
+                        edge.get(L) and not edge[L].isdisjoint(ks)
+                        for (L, c), ks in it.stamp.items() if c == cls):
+                    out.append(other if not planned else "%s:%s%s" % (other, it.what, "" if it.routed else "(planned)"))
+                    if not planned:
+                        break
+        if planned:
+            kept = sum(1 for L, ks in edge.items() for k in ks if self.g.keep[L][k])
+            out.append("keep:%d cells; layers %s" % (kept, sorted(edge)))
+        return out
 
     def fanout(self, net, pad_items=None, reach=1.6, width=0.25, skip=()):
         """A via beside every SMD pad of `net` that does not already reach

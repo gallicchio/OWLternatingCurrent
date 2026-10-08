@@ -75,14 +75,20 @@ gp(16.15, 17.4, 90, "usb:r_dp")           # their R2
 gp(17.2, 17.4, 270, "decap:54")           # their C19, QSPI_IOVDD
 gp(18.25, 17.4, 270, "decap:53")          # their C20, USB_OTP_VDD
 gp(11.4, 4.4, 180, "decap:30")            # their C16
-gp(9.9, 10.3, 180, "decap:38")            # their C17
-gp(9.9, 11.35, 180, "decap:39")           # their C12
-gp(9.9, 12.4, 180, "decap:44")            # their C21
+gp(9.9, 10.15, 180, "decap:38")            # their C17
+# their C12 sat in front of pins 40-43, which GPiBridge left unused; here they are the
+# ADC inputs: DVDD pin 39's capacitor goes underneath, under the chip's north edge, a short
+# bottom-layer line from Raspberry Pi's 1.1 V via; their C21 moves 0.15 mm toward the
+# corner, so GPIO26-29 leave through one 1.6 mm gap in the capacitor row
+b.put("decap:39", L.MCU[0] - 1.6, L.MCU[1] - 2.3, 0, "B")
+gp(9.9, 12.55, 180, "decap:44")           # their C21
 gp(9.9, 13.45, 180, "decap:45")           # their C18
-gp(19.6, 13.28, 270, "decap:1")           # their C13
-gp(20.65, 13.28, 270, "decap:11")         # their C14
-gp(21.7, 13.28, 270, "decap:20")          # their C15
-gp(22.75, 13.28, 270, "decap:6")          # their C10
+# (this column 0.35 mm further from the chip than GPiBridge's, out of GPIO0's way;
+# gen/routes.py steps pin 1's line across to it)
+gp(19.6, 13.63, 270, "decap:1")           # their C13
+gp(20.65, 13.63, 270, "decap:11")         # their C14
+gp(21.7, 13.63, 270, "decap:20")          # their C15
+gp(22.75, 13.63, 270, "decap:6")          # their C10
 gp(18.6, 2.35, 90, "decap:23")            # their C11
 gp(22.3, 10.8, 0, "tp:1v1")               # their TP3
 gp(14.95, 2.2, 90, "Y1")

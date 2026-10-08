@@ -381,7 +381,10 @@ def copper(board, outl, args):
     import time
     import routes as RS
     out = {}
+    only = args[args.index("--only") + 1].split(",") if "--only" in args else list(PL.BOARDS)
     for name in PL.BOARDS:
+        if name not in only:
+            continue
         t = time.time()
         seed("copper:" + name)
         R = router(board, name, outl[name])
@@ -395,8 +398,29 @@ def copper(board, outl, args):
                  (": " + ", ".join("%s(%d)" % kv for kv in sorted(left.items())))[:400] if left else ""))
         for net, why in R.failed[:30]:
             print("   UNROUTED %s: %s" % (net, why))
+        if "--stamps" in args:
+            stamps(R, name)
         out[name] = R
     return out
+
+
+def stamps(R, name, r=4.0, most=16):
+    """The router's view round each net left in pieces (gen/routing.py stamp()), for
+    tools/stamps.py to draw: build/stamps_<board>.json."""
+    import routing as RT
+    out = list(getattr(R, "live", []))
+    for net in sorted(n for n in R.by_net if not n.startswith("<") and R.unrouted(n))[:most]:
+        for g in sorted(R.groups(net), key=len)[:2]:
+            it = next((R.items[i] for i in g if any(R.items[i].cells.values())), None)
+            if it is None:
+                continue
+            k = next(iter(next(c for c in it.cells.values() if c)))
+            x, y = R.g.pos(k)
+            st = RT.stamp(R, net, 0.2, max(0, x - r), max(0, y - r), x + r, y + r)
+            st.update(board=name, at=[x + R.x0, y + R.y0], what=sorted(set(R.items[i].what for i in g))[:6])
+            out.append(st)
+    os.makedirs(os.path.join(ROOT, "build"), exist_ok=True)
+    json.dump(out, open(os.path.join(ROOT, "build", "stamps_%s.json" % name), "w"))
 
 
 def pours_only(board, routers):
@@ -418,6 +442,20 @@ def fill(board):
     print("pours: %d zones, %d filled" % (len(zs), n))
 
 
+def led_positions():
+    """Every LED's place on its own board (the placement: KiCad coordinates, millimetres),
+    for the firmware's light show (gen/firmware_leds.py reads it into led_map.h)."""
+    out = {}
+    for role, ref in PL.ROLES.items():
+        if role.startswith("led:"):
+            name = PL.board_of(ref)
+            x, y, rot, side = PL.BOARDS[name].place[ref]
+            out[role[4:]] = {"x_mm": x, "y_mm": y, "board": name}
+    path = os.path.join(HW, "checks", "led_positions.json")
+    json.dump(out, open(path, "w"), indent=1, sort_keys=True)
+    return len(out)
+
+
 # ---------------------------------------------------------------------------
 def main():
     args = [a for a in sys.argv[1:] if a != "--inside"]
@@ -427,6 +465,7 @@ def main():
     setup(board)
     outl, art = outlines()
     fps, netinfo = place_parts(board, comps, nets)
+    led_positions()
     if art:
         seed("art")
         n_art = draw_art(board, art, netinfo)
@@ -434,7 +473,8 @@ def main():
     routers = None
     if "--place" not in args:
         routers = copper(board, outl, args)
-        pours_only(board, routers)
+        if "--nopour" not in args:
+            pours_only(board, routers)
     import silk as SK
     seed("silk")
     n_ref = n_fab = 0
@@ -443,6 +483,8 @@ def main():
         S = SK.apply(board, name, set(PL.BOARDS[name].place), F.B, inset(outl[name][0], SK.EDGE), art, F)
         n_ref += S.placed
         n_fab += S.to_fab
+        if S.why:
+            print("   silk %s: labels refused for %s" % (name, ", ".join("%s %d" % kv for kv in sorted(S.why.items(), key=lambda kv: -kv[1])[:6])))
     print("silk: %d designators printed underneath, %d on the fab layer only" % (n_ref, n_fab))
     for name in PL.BOARDS:
         n = turn(board, name)
@@ -456,7 +498,7 @@ def main():
     for n in PL.BOARDS:
         if per.get(n, 0) < 2:
             print("   PANEL: %s has %d tab(s)" % (n, per.get(n, 0)))
-    if routers:
+    if routers and "--nopour" not in args:
         fill(board)
     board.Save(PCB)
     import project

@@ -219,22 +219,29 @@ def rpi_local(R, pads):
     u1 = lambda num: p("U1", num)
     (x, y), (cx, cy) = u1("38"), p("C17", "1")
     line("C17", "1", [(x, y), (cx + (cy - y), y), (cx, cy)])
-    (x, y), (cx, cy) = u1("39"), p("C12", "1")
-    xm = cx + 0.57
-    line("C12", "1", [(x, y), (xm, y), (xm, cy - (xm - cx - 0.27)), (cx + 0.27, cy), (cx, cy)], 0.15)
+    # (GPiBridge ran pin 39's line to C12 across the front of pins 40-43, which it left
+    # unused; here they are the ADC inputs, so the router joins C12 after they escape)
     line("C21", "1", [p("C21", "1"), u1("44")])
     (x, y), (cx, cy) = u1("45"), p("C18", "1")
     line("C18", "1", [(x, y), (cx + (cy - y), y), (cx, cy)])
     (x, y), (cx, cy) = u1("30"), p("C16", "1")
     line("C16", "1", [(x, y), (x, cy + (x - cx)), (cx, cy)])
     (x, y) = u1("1")
-    xe = p("C15", "1")[0]
-    line("C13", "1", [(x, y), (xe, y)], 0.25)
+    # pin 1's 3.3 V line: straight out of the pin, a step across to the capacitors' column
+    # (0.35 mm further out than GPiBridge's, clear of GPIO0's way out), down it through
+    # C13, C14 and C15 (in our frame: their T)
+    mx, my = fr.T((x, y))
+    out = 1.0 if fr.T(p("C13", "1"))[1] > my else -1.0
+    colx = fr.T(p("C13", "1"))[0]
+    yend = fr.T(p("C15", "1"))[1]
+    y1 = my + out * 0.6
+    R.polyline(N("C13", "1"), 0, [(mx, my), (mx, y1), (colx, y1 + out * abs(mx - colx)), (colx, yend)], 0.25)
     yg = p("C13", "2")[1]
     line("C13", "2", [(p("C13", "2")[0], yg), (p("C10", "2")[0], yg)], 0.25)
     for a, b in (("C13", "C14"), ("C14", "C15")):
+        # (GPiBridge's 3.3 V vias here went to its bottom 3.3 V pour; this board routes
+        # 3.3 V, and they would stand in GPIO0's way)
         xv = (p(a, "1")[0] + p(b, "1")[0]) / 2
-        X.via("+3V3", xv, y)
         X.via("GND", xv, yg)
     # DVDD pin 6's capacitor: from Raspberry Pi's via inside the ring, along their In2
     # (our In1, inside the ground island) to a via beside the +1V1 test point
@@ -366,6 +373,184 @@ def coils(R):
     return out
 
 
+def exposed_pad(R, ref):
+    """A chip's exposed pad (its largest SMD pad) as (pad, net, x0, y0, x1, y1), router mm."""
+    fp = next(f for f in R.board.GetFootprints() if f.GetReference() == ref)
+    best = None
+    for p in fp.Pads():
+        if p.GetAttribute() != pcbnew.PAD_ATTRIB_SMD:
+            continue
+        bb = p.GetBoundingBox()
+        a = bb.GetWidth() * bb.GetHeight()
+        if best is None or a > best[0]:
+            best = (a, p)
+    p = best[1]
+    bb = p.GetBoundingBox()
+    x0, y0 = R.B(pcbnew.VECTOR2I(bb.GetX(), bb.GetY()))
+    x1, y1 = R.B(pcbnew.VECTOR2I(bb.GetRight(), bb.GetBottom()))
+    return p, p.GetNetname(), min(x0, x1), min(y0, y1), max(x0, x1), max(y0, y1)
+
+
+def ep_vias(R, ref, nx=2, ny=3, inset=0.55):
+    """Vias inside a QFN's exposed pad, to the ground plane (its footprint has none)."""
+    p, net, x0, y0, x1, y1 = exposed_pad(R, ref)
+    if (x1 - x0) < (y1 - y0):
+        cols, rows = nx, ny
+    else:
+        cols, rows = ny, nx
+    for i in range(cols):
+        for j in range(rows):
+            x = x0 + inset + (x1 - x0 - 2 * inset) * (i / (cols - 1) if cols > 1 else 0.5)
+            y = y0 + inset + (y1 - y0 - 2 * inset) * (j / (rows - 1) if rows > 1 else 0.5)
+            R.via(net, x, y)
+
+
+def ep_ties(R, ref, width=0.25):
+    """Each pin on the exposed pad's net straight into the pad: along the pin, past the
+    row's inner end, then to the pad's centre, so the pin needs no via of its own in the
+    ring where the other pins escape."""
+    fp = next(f for f in R.board.GetFootprints() if f.GetReference() == ref)
+    ep, net, x0, y0, x1, y1 = exposed_pad(R, ref)
+    cx, cy = (x0 + x1) / 2, (y0 + y1) / 2
+    for p in fp.Pads():
+        if p is ep or p.GetNetname() != net or p.GetAttribute() != pcbnew.PAD_ATTRIB_SMD:
+            continue
+        bb = p.GetBoundingBox()
+        px0, py0 = R.B(pcbnew.VECTOR2I(bb.GetX(), bb.GetY()))
+        px1, py1 = R.B(pcbnew.VECTOR2I(bb.GetRight(), bb.GetBottom()))
+        px0, px1, py0, py1 = min(px0, px1), max(px0, px1), min(py0, py1), max(py0, py1)
+        x, y = (px0 + px1) / 2, (py0 + py1) / 2
+        if px0 < cx < px1 and py0 < cy < py1:
+            continue
+        if (py1 - py0) > (px1 - px0):           # a vertical pin: in along y
+            yi = (py1 + 0.35) if cy > y else (py0 - 0.35)
+            pts = [(x, y), (x, yi), (cx, cy)]
+        else:
+            xi = (px1 + 0.35) if cx > x else (px0 - 0.35)
+            pts = [(x, y), (xi, y), (cx, cy)]
+        R.polyline(net, 2 if fp.GetLayer() == pcbnew.B_Cu else 0, pts, width)
+
+
+SKIP_FAN = ("USB_D", "XIN", "XOUT", "QSPI", "VREG", "Net-(U4-", "Net-(C27")
+
+
+def _seg_free(R, L, g, a, b):
+    kl = R.g.keep[L]
+    return not any(g[k] or kl[k] for k in R.g.shape_cells(("seg", a[0], a[1], b[0], b[1], 0.0), 0.0))
+
+
+def _via_free(R, x, y):
+    if not (0 <= x < R.g.w and 0 <= y < R.g.h):
+        return False
+    k = R.g.k(x, y)
+    return not (R.g.novia[k] or R.g.outside[k]) and all(not R.g.g[(L, "via")][k] for L in range(RR.NL))
+
+
+def fan(R, ref, width=0.15, dmin=0.9, dmax=4.5):
+    """A planned fan-out for a fine-pitch chip: each signal pin a short straight stub,
+    then a straight line out to a via of its own.  Per side the pins go from the middle
+    outward, each via outward of the one before, so the lines spread like a fan and none
+    crosses another or passes in front of a pin still to come; each via is the cheapest
+    spot (nearest, least sideways) whose via and lines the router's grid allows.  The
+    router then starts each net from its via, with every layer to choose from.  (Left to
+    the router, the first nets hugged the chip and walled the later pins in; and lines
+    straight out at the pins' 0.4 mm pitch leave no room for a via between them.)
+    Returns how many pins it fanned out, and prints those it could not."""
+    fp = next(f for f in R.board.GetFootprints() if f.GetReference() == ref)
+    L_ = 2 if fp.GetLayer() == pcbnew.B_Cu else 0
+    g = R.g.g[(L_, RR.width_class(width))]
+    xs = [xy for (r, num), xy in R.pads.xy.items() if r == ref]
+    cx, cy = sum(p[0] for p in xs) / len(xs), sum(p[1] for p in xs) / len(xs)
+    sides = {}
+    for p in fp.Pads():
+        net = p.GetNetname()
+        if not net or net in POWER or any(k in net for k in SKIP_FAN) or p.GetAttribute() != pcbnew.PAD_ATTRIB_SMD:
+            continue
+        bb = p.GetBoundingBox()
+        x0, y0 = R.B(pcbnew.VECTOR2I(bb.GetX(), bb.GetY()))
+        x1, y1 = R.B(pcbnew.VECTOR2I(bb.GetRight(), bb.GetBottom()))
+        x0, x1, y0, y1 = min(x0, x1), max(x0, x1), min(y0, y1), max(y0, y1)
+        if (x1 - x0) > 2.0 or (y1 - y0) > 2.0:
+            continue                                  # the exposed pad
+        px, py = (x0 + x1) / 2, (y0 + y1) / 2
+        dx, dy = px - cx, py - cy
+        if abs(dx) > abs(dy):
+            u, tip = ((1.0 if dx > 0 else -1.0), 0.0), (x1 - x0) / 2
+        else:
+            u, tip = (0.0, (1.0 if dy > 0 else -1.0)), (y1 - y0) / 2
+        t = (-u[1], u[0])                             # along the side
+        sides.setdefault(u, []).append(((px - cx) * t[0] + (py - cy) * t[1], (px, py), tip, net, p.GetNumber()))
+    def place(u, s0, xy, tip, net, sign, prev):
+        """The pin's stub, line and via at the cheapest legal spot outward (`sign`) of
+        `prev` along the side (None: anywhere); returns the via's place along the side,
+        or why there is none."""
+        t = (-u[1], u[0])
+        px, py = xy
+        at = lambda h, o: (px + u[0] * h + t[0] * o, py + u[1] * h + t[1] * o)
+        a = tip + 0.25
+        cands = []
+        for i in range(int(round(dmin * 10)), int(round(dmax * 10)) + 1):
+            for j in range(-30, 31):
+                o = j * 0.1
+                if abs(o) > 0.7 * (tip + i * 0.1 - a) + 1e-6:
+                    continue                          # steeper than 35 degrees shuts the next pin in
+                if prev is not None and (sign * j < -2 or sign * (s0 + o) <= sign * prev + 0.05):
+                    continue
+                cands.append((i * 0.1 + 0.6 * abs(o) + (0.4 * abs(o) if sign * j < 0 else 0), tip + i * 0.1, o))
+        cands.sort()
+        R.lift(net)
+        try:
+            if not _seg_free(R, L_, g, at(tip, 0), at(a, 0)):
+                return "its stub is shut"
+            pick = next(((h, o) for _, h, o in cands
+                         if _via_free(R, *at(h, o)) and _seg_free(R, L_, g, at(a, 0), at(h, o))), None)
+        finally:
+            R.drop(net)
+        if pick is None:
+            return "no spot"
+        h, o = pick
+        R.polyline(net, L_, [(px, py), at(a, 0), at(h, o)], width)
+        R.via(net, *at(h, o))
+        return s0 + o
+
+    done, missed = 0, []
+    for u, pins in sorted(sides.items()):
+        pins.sort()
+        mid = len(pins) // 2
+        for seq, sign in ((pins[mid:], 1.0), (pins[:mid][::-1], -1.0)):
+            prev = -sign * 1e9
+            for s0, xy, tip, net, num in seq:
+                r = place(u, s0, xy, tip, net, sign, prev)
+                if isinstance(r, str):
+                    missed.append((u, s0, xy, tip, net, sign, "%s.%s" % (ref, num), r))
+                else:
+                    prev = r
+                    done += 1
+    # a pin the fan left out: its line anywhere the copper so far allows
+    for u, s0, xy, tip, net, sign, who, why in missed:
+        r = place(u, s0, xy, tip, net, sign, None)
+        if isinstance(r, str):
+            print("   %s: no fan-out for %s (%s, then %s)" % (R.name, who, why, r))
+        else:
+            done += 1
+    return done
+
+
+def fanout_band(R, ref, band=1.2):
+    """No new via within `band` of a fine-pitch chip's pins: escapes spread out on the
+    chip's own layer first.  (Without it each line dived to the cheaper layer at its pin's
+    tip, and 0.45 mm vias at a 0.4 mm pitch walled the pins beside it in.)"""
+    xs = [xy for (r, num), xy in R.pads.xy.items() if r == ref]
+    x0, x1 = min(p[0] for p in xs) - band, max(p[0] for p in xs) + band
+    y0, y1 = min(p[1] for p in xs) - band, max(p[1] for p in xs) + band
+    i0, j0 = R.g.cell(x0, y0)
+    i1, j1 = R.g.cell(x1, y1)
+    nx = R.g.nx
+    for j in range(max(0, j0), min(R.g.ny - 1, j1) + 1):
+        a, b = j * nx + max(0, i0), j * nx + min(nx - 1, i1) + 1
+        R.g.novia[a:b] = b"\x01" * (b - a)
+
+
 def coil_stubs(R, pads, ref, spread=1.3, width=0.8):
     """From each of a coil's two terminals, a short line out and apart (the last
     millimetre into a terminal may be 0.8 mm wide at most), ending where the bridge's
@@ -414,30 +599,144 @@ def span(R, net):
     return (max(xs) - min(xs)) + (max(ys) - min(ys))
 
 
+def live_stamp(R, net, r=3.0, most=24):
+    """The router's view round a net's smallest piece the moment the net fails (later
+    nets cover over what walled it in): R.live, for gen/board.py --stamps."""
+    import routing as RT
+    live = R.__dict__.setdefault("live", [])
+    if len(live) >= most:
+        return
+    g = min(R.groups(net), key=len)
+    it = next((R.items[i] for i in g if any(R.items[i].cells.values())), None)
+    if it is None:
+        return
+    x, y = R.g.pos(next(iter(next(c for c in it.cells.values() if c))))
+    st = RT.stamp(R, net, 0.2, max(0, x - r), max(0, y - r), x + r, y + r)
+    st.update(board=R.name, at=[x + R.x0, y + R.y0], what=["live"] + sorted(set(R.items[i].what for i in g))[:5])
+    live.append(st)
+
+
 def autoroute(R, first=(), width=0.2, layer_cost=None, skip=()):
     """`first`: (net, widths, kwargs) routed in that order; then every other net with
-    pieces left, shortest first, at `width`."""
+    pieces left, shortest first, at `width`; then rip-up and reroute (repair())."""
     import time
-    done = set()
+    R.freeze_vias()
+    spec, order = {}, []
     for net, widths, kw in first:
-        if net not in R.by_net:
+        if net not in R.by_net or net in spec:
             continue
         t = time.time()
         k = dict(layer_cost=layer_cost)
         k.update(kw)
-        route_power(R, net, widths, **k)
-        done.add(net)
+        spec[net] = (widths, k)
+        order.append(net)
+        if not route_power(R, net, widths, **k):
+            live_stamp(R, net)
+            if os.environ.get("ROUTE_WHY") and net in R.region:
+                cls, region = R.region[net]
+                print("   why %s: %s" % (net, " ".join(sorted(set(R.walls(net, cls, region, planned=True))))))
+            if len(R.live) >= int(os.environ.get("ROUTE_STOP") or 10 ** 6):
+                return                            # debugging: stop at the n-th failure
         if time.time() - t > 20:
             print("   %s %-22s %.1f s" % (R.name, net, time.time() - t))
-    rest = [n for n in R.by_net if not n.startswith("<") and n not in done and n not in skip and R.unrouted(n)]
+    rest = [n for n in R.by_net if not n.startswith("<") and n not in spec and n not in skip and R.unrouted(n)]
     rest.sort(key=lambda n: span(R, n))
     for net in rest:
         t = time.time()
+        spec[net] = ((width, 0.15), dict(layer_cost=layer_cost))
+        order.append(net)
         if not R.route_net(net, width, layer_cost=layer_cost, bbox_margin=12.0):
             R.failed = [f for f in R.failed if f[0] != net]
             route_power(R, net, (width, 0.15), layer_cost=layer_cost)
         if time.time() - t > 20:
             print("   %s %-22s %.1f s" % (R.name, net, time.time() - t))
+    repair(R, spec, order)
+    R.failed = [f for f in R.failed if R.unrouted(f[0])]
+
+
+def repair(R, spec, order, rounds=2, most=8, depth=1):
+    """Rip-up and reroute.  For each net still in pieces: route it again to see the
+    pocket its search was walled into, take out the router's copper of the nets (`most`
+    at most) that bound the pocket, route the walled-in net first and then those, in
+    their first order; a net that ends in pieces then gets the same, `depth` levels
+    down.  Kept if fewer of the nets touched end in pieces than before; otherwise every
+    one of them gets its old copper back, exactly."""
+    import time
+    rank = {n: i for i, n in enumerate(order)}
+    tried = set()
+
+    def attempt(net, depth, saved, was):
+        widths, kw = spec[net]
+        R.region.pop(net, None)
+        if route_power(R, net, widths, **kw):
+            return [net]
+        cls, region = R.region.get(net, (None, None))
+        walls = [n for n in R.walls(net, cls, region) if n in spec and n not in saved][:most] if region else []
+        if not walls or (net, tuple(walls)) in tried:
+            return [net]
+        tried.add((net, tuple(walls)))
+        for n in walls:
+            saved[n] = R.routed_copper(n)
+            was[n] = R.unrouted(n) > 0
+            R.rip(n)
+        group = [net] + sorted(walls, key=rank.get)
+        for n in group:
+            widths, kw = spec[n]
+            route_power(R, n, widths, **kw)
+        touched = list(group)
+        if depth > 0:
+            for n in group:
+                if R.unrouted(n):
+                    touched += attempt(n, depth - 1, saved, was)
+        return touched
+
+    for rnd in range(rounds):
+        fixed = 0
+        for net in [n for n in order if R.unrouted(n)]:
+            if not R.unrouted(net):
+                continue
+            t = time.time()
+            saved, was = {net: R.routed_copper(net)}, {net: True}
+            nfail = len(R.failed)
+            touched = set(attempt(net, depth, saved, was))
+            before = sum(1 for n in saved if was[n])
+            after = sum(1 for n in saved if R.unrouted(n))
+            if after < before:
+                fixed += before - after
+                verdict = "kept"
+            else:
+                for n in saved:
+                    R.rip(n)
+                    R.restore(n, saved[n])
+                R.failed = R.failed[:nfail]
+                verdict = "undone"
+            if len(saved) > 1:
+                print("   %s repair %s: ripped %s; %d -> %d in pieces, %s (%.0f s)"
+                      % (R.name, net, " ".join(n.split("/")[-1] for n in saved if n != net), before, after,
+                         verdict, time.time() - t))
+        if not fixed:
+            break
+
+
+def stitch(R, net, pitch=7.0, layers=(0, 2)):
+    """Ground vias on a grid wherever one fits with room round it for the pours on
+    `layers`: every island of pour the tracks cut off then holds a via to the plane, so
+    the filler keeps it (copper on every layer, nothing floating).  Returns how many."""
+    g = R.g
+    heavy = [g.g[(L_, "heavy")] for L_ in layers]
+    vg = [g.g[(L_, "via")] for L_ in range(RR.NL)]
+    n = 0
+    y = pitch / 2
+    while y < g.h:
+        x = pitch / 2
+        while x < g.w:
+            k = g.k(x, y)
+            if not g.novia[k] and not g.outside[k] and all(not v[k] for v in vg) and all(not h[k] for h in heavy):
+                R.via(net, x, y)
+                n += 1
+            x += pitch
+        y += pitch
+    return n
 
 
 # ======================================================================================
@@ -573,35 +872,133 @@ def base_plan(R):
     rpi_local(R, pads)
     power_entry(R, pads)
     buck(R, pads)
+    ep_vias(R, "U3")
+    for ref in ("U3", "U5", "U6", "U7", "U8"):
+        ep_ties(R, ref)
+    # the top round the RP2354A is behind the tree: as cheap as the bottom there, so its
+    # lines spread out on top before they need a via
+    i0, j0 = R.g.cell(84.0, 0.0)
+    i1, j1 = R.g.cell(124.0, 30.0)
+    R.g.cheap = (0, i0, j0, i1, j1, 1.0 / BOTTOM[0])
+    for net, widths, kw in CORNER:
+        if net in R.by_net and not route_power(R, net, widths, layer_cost=BOTTOM, **kw):
+            print("   base: %s left in pieces before the fan-out" % net)
+    print("   base: fan-out %d + %d" % (fan(R, "U4"), fan(R, "U3")))
     n = R.fanout("GND")
     n5 = R.fanout("+5V")
+    # 3.3 V has no plane: a via beside each pad (the RP2354A's are planned) gives every
+    # pin a way onto every layer before the long lines fill the board round it
+    n3 = R.fanout("+3V3", skip=("U4.",))
+    print("   base: %d vias beside 3.3 V pads" % n3)
+    for ref in ("U4", "U3"):
+        fanout_band(R, ref)
     print("   base: planned copper and fan-outs: %d tracks, %d vias (%d ground, %d 4.8 V)"
           % (R.n_tracks, R.n_vias, n, n5))
 
 
+# the widths each power line is widened toward after routing, widest first
+_COIL = (1.5, 1.0, 0.6)
+BASE_WIDEN = {"+12V": (1.0, 0.6), "VBUS": (0.4,), "VSYS": (0.4,), "+3V3": (0.4, 0.3), "+1V1": (0.4, 0.3),
+              "Net-(U1-SW)": (1.0, 0.6)}
+for _k in ("LEV", "PEND1", "PEND2", "PEND3"):
+    BASE_WIDEN["/Base/%s_A" % _k] = BASE_WIDEN["/Base/%s_B" % _k] = _COIL
+for _w in ("OWL", "CAT"):
+    for _c in "ABC":
+        BASE_WIDEN["/Base/%s_%s" % (_w, _c)] = (1.2, 0.8, 0.6)
+
+
+def widen(R, table):
+    for net, widths in table.items():
+        if net in R.by_net:
+            d, t = R.fatten(net, widths)
+            if t:
+                print("   %s: %-18s %3d of %3d tracks widened" % (R.name, net, d, t))
+
+
+def pair_order(R, a, b):
+    """Two nets that each join a bridge pin to one of a coil's two terminals: the one
+    whose pads lie farther apart first."""
+    def reach(net):
+        pts = [R.pads.xy[k] for k in R.pads.of.get(net, [])]
+        return max((math.hypot(p[0] - q[0], p[1] - q[1]) for p in pts for q in pts), default=0.0)
+    return sorted((a, b), key=reach, reverse=True)
+
+
+POWER = {"GND", "+5V", "+3V3", "+1V1", "+12V", "VBUS", "VSYS"}
+
+
+def travel_order(R, ref, nets):
+    """A chip's lines, those that head straight out first and those that must travel
+    round the chip last (they go round the outside of the others instead of hugging the
+    pin row and walling the rest in): by the angle between each pin's direction from the
+    chip's centre and its nearest destination's."""
+    xs = [xy for (r, num), xy in R.pads.xy.items() if r == ref]
+    cx, cy = sum(p[0] for p in xs) / len(xs), sum(p[1] for p in xs) / len(xs)
+    turn = {}
+    for net in nets:
+        mine = [xy for (r, num), xy in R.pads.xy.items() if r == ref and R.pads.net[(r, num)] == net]
+        others = [R.pads.xy[k] for k in R.pads.of.get(net, []) if k[0] != ref]
+        if not mine or not others:
+            continue
+        px, py = mine[0]
+        dx, dy = min(others, key=lambda q: math.hypot(q[0] - px, q[1] - py))
+        a = math.atan2(py - cy, px - cx)
+        b = math.atan2(dy - cy, dx - cx)
+        turn[net] = abs((b - a + math.pi) % (2 * math.pi) - math.pi)
+    return sorted(turn, key=turn.get)
+
+
+# the RP2354A's corner, top layer: crystal, USB, QSPI select, debug.  Routed before the
+# chip's fan-out, which would otherwise wall the crystal in.
+_TOP = dict(layers=(0,))
+CORNER = [
+    ("/Base/XIN", (0.15,), _TOP), ("/Base/XOUT", (0.15,), _TOP), ("Net-(C27-Pad2)", (0.15,), _TOP),
+    ("/Base/USB_DM", (0.2,), _TOP), ("/Base/USB_DP", (0.2,), _TOP),
+    ("/Base/USB_D+", (0.2,), {}), ("/Base/USB_D-", (0.2,), {}),
+    ("Net-(J2-CC1)", (0.15,), _TOP), ("Net-(J2-CC2)", (0.15,), _TOP),
+    ("/Base/QSPI_SS", (0.15,), {}), ("Net-(R14-Pad1)", (0.15,), {}),
+    ("Net-(J4-SWCLK)", (0.2,), {}), ("Net-(J4-SWDIO)", (0.2,), {}),
+    ("Net-(J5-RX)", (0.2,), {}), ("Net-(J5-TX)", (0.2,), {}),
+]
+
+
 def base_route(R):
     n = lambda label: "/Base/" + label
-    usb = dict(layers=(0,))
-    first = [
-        # the RP2354A's corner first, top layer: crystal, USB, QSPI select, debug
-        (n("XIN"), (0.15,), usb), (n("XOUT"), (0.15,), usb), ("Net-(C27-Pad2)", (0.15,), usb),
-        (n("USB_DM"), (0.2,), usb), (n("USB_DP"), (0.2,), usb),
-        (n("USB_D+"), (0.2,), {}), (n("USB_D-"), (0.2,), {}),
-        ("Net-(J2-CC1)", (0.15,), usb), ("Net-(J2-CC2)", (0.15,), usb),
-        (n("QSPI_SS"), (0.15,), {}), ("Net-(R14-Pad1)", (0.15,), {}),
-        ("Net-(J4-SWCLK)", (0.2,), {}), ("Net-(J4-SWDIO)", (0.2,), {}),
-        ("Net-(J5-RX)", (0.2,), {}), ("Net-(J5-TX)", (0.2,), {}),
-        ("+1V1", (0.25, 0.2), {}), ("VBUS", (0.5, 0.3), {}), ("VSYS", (0.5, 0.3), {}),
-        # wide lines: 12 V, the coils and the perch's coil through the socket
-        ("+12V", (1.0, 0.6, 0.3), {}),
-        (n("LEV_A"), (1.5, 1.0), {}), (n("LEV_B"), (1.5, 1.0), {}),
+    taken = set()
+    early = list(CORNER)                  # routed in the plan already, before the fan-out
+    taken = {e[0] for e in early}
+    # then every short local connection (a chip's own capacitors and resistors), before
+    # anything long passes by; then the RP2354A's lines and the LED drivers' in the
+    # order of their pins round each chip, rivers that need not cross
+    local = [net for net in R.by_net if not net.startswith("<") and net not in POWER and net not in taken
+             and net not in BASE_WIDEN and span(R, net) < 10.0]
+    early += [(net, (0.2, 0.15), {}) for net in sorted(local, key=lambda m: span(R, m))]
+    taken |= set(local)
+    mcu = [m for m in R.by_net if any(r == "U4" for r, _ in R.pads.of.get(m, [])) and m not in POWER
+           and m not in taken and m.startswith("/Base/")]
+    early += [(net, (0.2, 0.15), {}) for net in travel_order(R, "U4", set(mcu))]
+    taken |= set(mcu)
+    for chip in ("U3",):
+        chans = [m for m in R.by_net if any(r == chip for r, _ in R.pads.of.get(m, [])) and m not in POWER
+                 and m not in taken]
+        early += [(net, (0.2, 0.15), {}) for net in travel_order(R, chip, set(chans))]
+        taken |= set(chans)
+    first = early + [
+        ("+1V1", (0.25, 0.2), {}), ("VBUS", (0.4, 0.25), {}), ("VSYS", (0.4, 0.25), {}),
+        # the power lines at a width every pin they reach can take (a DRV8874's are 0.4 mm
+        # at 0.65 mm pitch); widened afterwards wherever there is room (WIDEN)
+        ("+12V", (0.4, 0.25), {}),
     ]
-    for k in (1, 2, 3):
-        first += [(n("PEND%d_A" % k), (1.5, 1.0), {}), (n("PEND%d_B" % k), (1.5, 1.0), {})]
+    # each bridge's two coil lines: the one whose coil terminal lies farther from the bridge
+    # first, so it takes the outer way round and the nearer one still reaches its terminal
+    for name in ["LEV"] + ["PEND%d" % k for k in (1, 2, 3)]:
+        first += [(net, (0.4, 0.25), {}) for net in pair_order(R, n(name + "_A"), n(name + "_B"))]
     for w in ("OWL", "CAT"):
-        first += [(n("%s_%s" % (w, c)), (1.2, 0.8), {}) for c in "ABC"]
-    first += [("Net-(U1-SW)", (1.0, 0.6), {}), ("+3V3", (0.3, 0.2), {})]
+        first += [(n("%s_%s" % (w, c)), (0.4, 0.25), {}) for c in "ABC"]
+    first += [("Net-(U1-SW)", (0.6, 0.4), {}), ("+3V3", (0.2, 0.15), {})]
     autoroute(R, first, width=0.2, layer_cost=BOTTOM)
+    widen(R, BASE_WIDEN)
+    print("   base: %d stitching vias" % stitch(R, "GND"))
 
 
 def base_pours(R):
@@ -634,14 +1031,27 @@ def tree_plan(R):
     the height of the tree underneath, from the base's socket to the perch's."""
     R.planes = {"GND_T": None, "+5V_T": None}
     no_tracks(R, 1)
+    ep_vias(R, "U101")
+    ep_ties(R, "U101")
+    print("   tree: fan-out %d" % fan(R, "U101"))
     n = R.fanout("GND_T")
     n5 = R.fanout("+5V_T")
+    fanout_band(R, "U101")
     print("   tree: fan-outs: %d ground, %d 4.8 V" % (n, n5))
 
 
 def tree_route(R):
-    first = [("/Tree/LEV_A", (1.5, 1.0), {}), ("/Tree/LEV_B", (1.5, 1.0), {}), ("+3V3_T", (0.3, 0.2), {})]
+    wide = {"/Tree/LEV_A", "/Tree/LEV_B", "+3V3_T", "+5V_T", "GND_T"}
+    local = [m for m in R.by_net if not m.startswith("<") and m not in wide and span(R, m) < 10.0]
+    early = [(m, (0.2, 0.15), {}) for m in sorted(local, key=lambda m: span(R, m))]
+    chans = [m for m in R.by_net if any(r == "U101" for r, _ in R.pads.of.get(m, [])) and m not in wide
+             and m not in local]
+    early += [(m, (0.2, 0.15), {}) for m in travel_order(R, "U101", set(chans))]
+    first = early + [("/Tree/LEV_A", (0.4, 0.25), {}), ("/Tree/LEV_B", (0.4, 0.25), {}),
+                     ("+3V3_T", (0.2, 0.15), {})]
     autoroute(R, first, width=0.2, layer_cost=BOTTOM)
+    widen(R, {"/Tree/LEV_A": _COIL, "/Tree/LEV_B": _COIL, "+3V3_T": (0.4, 0.3)})
+    print("   tree: %d stitching vias" % stitch(R, "GND_T"))
 
 
 def tree_pours(R):
@@ -660,8 +1070,10 @@ def perch_plan(R):
 
 
 def perch_route(R):
-    first = [("/Perch/LEV_A", (1.5, 1.0), {}), ("/Perch/LEV_B", (1.5, 1.0), {})]
+    first = [("/Perch/LEV_A", (0.4, 0.25), {}), ("/Perch/LEV_B", (0.4, 0.25), {})]
     autoroute(R, first, width=0.2, layer_cost=BOTTOM)
+    widen(R, {"/Perch/LEV_A": _COIL, "/Perch/LEV_B": _COIL, "+3V3_P": (0.4, 0.3)})
+    print("   perch: %d stitching vias" % stitch(R, "GND_P", layers=(2,)))
 
 
 def perch_pours(R):

@@ -1501,9 +1501,10 @@ def spell_book(cv):
     # --- the footer: revision, date and where the design lives ---
     fy = L.BASE_H - 2.6
     footer = "%s rev %s, %s   %s" % (BI.TITLE, BI.REV, BI.DATE, BI.URL)
-    bv.text(footer, U_(x3), fy, 1.0, "center")
-    fw = text_width(footer, 1.0) / 2 + 0.6
-    bv.claim(U_(x3) - fw, fy - 1.0, U_(x3) + fw, fy + 1.0, "spell book: the footer")
+    fh = 1.3                                            # (the repository's address: legible, 1.3 mm)
+    bv.text(footer, U_(x3), fy, fh, "center")
+    fw = text_width(footer, fh) / 2 + 0.6
+    bv.claim(U_(x3) - fw, fy - fh, U_(x3) + fw, fy + fh, "spell book: the footer")
     # --- a few stars between the spells ---
     for (u, y, r) in ((172.0, 82.0, 1.3), (180.0, 68.0, 1.0), (178.0, 95.0, 1.1), (12.0, 108.0, 1.2), (6.0, 98.0, 1.0),
                       (139.0, 99.0, 1.1), (62.0, 99.0, 1.0), (114.0, 93.0, 1.0), (40.0, 38.0, 0.0)):
@@ -1578,9 +1579,10 @@ def tree_front(cv):
 def tree_back(cv):
     cx = L.TREE_TOP_PLUG[0]
     name = BI.for_line()
-    for s, y, h in ((BI.TITLE, 24.0, 2.6), ("the owls' tree, rev " + BI.REV, 28.4, 1.5), (name, 34.0, 2.4)):
+    for s, y, h in ((BI.TITLE, 24.0, 2.6), ("the owls' tree, rev " + BI.REV, 28.4, 1.5), (name, 34.0, 2.4),
+                    (BI.URL, 38.6, 1.2)):
         cv.text(BOT, s, cx, y, h, 0, "center")
-    return [(box(cx - 24.0, 20.5, cx + 24.0, 37.0), "the tree's name, on its back")]
+    return [(box(cx - 24.0, 20.5, cx + 24.0, 40.0), "the tree's name and its repository, on its back")]
 
 
 # ======================================================================================

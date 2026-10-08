@@ -225,7 +225,9 @@ def rpi_local(R, pads):
     (x, y), (cx, cy) = u1("45"), p("C18", "1")
     line("C18", "1", [(x, y), (cx + (cy - y), y), (cx, cy)])
     (x, y), (cx, cy) = u1("30"), p("C16", "1")
-    line("C16", "1", [(x, y), (x, cy + (x - cx)), (cx, cy)])
+    # (GPiBridge's ran out level beside pin 29 first, which left GPIO's pin 29 no room
+    # for its via: here a short stub, then up at 45 degrees to the capacitor, moved up)
+    line("C16", "1", [(x, y), (x, y - 0.45), (cx, y - 0.45 - abs(x - cx)), (cx, cy)])
     (x, y) = u1("1")
     # pin 1's 3.3 V line: straight out of the pin, a step across to the capacitors' column
     # (0.35 mm further out than GPiBridge's, clear of GPIO0's way out), down it through
@@ -245,14 +247,17 @@ def rpi_local(R, pads):
         X.via("GND", xv, yg)
     # DVDD pin 6's capacitor: from Raspberry Pi's via inside the ring, along their In2
     # (our In1, inside the ground island) to a via beside the +1V1 test point
-    c10_via = (21.45, 10.8)
+    # (theirs went to a via 2 mm past the pins, in this board's fan-out: here In1 runs on
+    # past it and across to a via just beyond the capacitor's own pad, the test point
+    # beyond that)
+    cx, cy = p("C10", "1")
+    c10_via = (cx + 0.85, cy)
     vx, vy = G_U1[0] + 2.15, G_U1[1] + 0.8
     tx, ty = p("TP3", "1")
-    X.polyline("+1V1", 1, [(vx, vy), (c10_via[0], vy)], 0.3)
+    X.polyline("+1V1", 1, [(vx, vy), (c10_via[0], vy), c10_via], 0.3)
     X.via("+1V1", *c10_via)
     X.track("+1V1", 0, c10_via, (tx, ty), 0.25)
-    cx, cy = p("C10", "1")
-    X.polyline("+1V1", 0, [c10_via, (cx, c10_via[1] + (cx - c10_via[0])), (cx, cy)], 0.25)
+    X.track("+1V1", 0, c10_via, (cx, cy), 0.25)
     # DVDD pin 23's capacitor: by the bottom layer round arc A's via
     cx, cy = p("C11", "1")
     X.via("+1V1", 17.0, 8.0)
@@ -434,38 +439,144 @@ def ep_ties(R, ref, width=0.25):
 SKIP_FAN = ("USB_D", "XIN", "XOUT", "QSPI", "VREG", "Net-(U4-", "Net-(C27")
 
 
-def _seg_free(R, L, g, a, b):
+def local_first(R, ref, reach=8.0):
+    """A chip's short local nets (a current-setting resistor, a regulator's capacitor),
+    routed before its fan-out: the fan's vias would otherwise wall them in, and they
+    need no via.  Returns how many it joined."""
+    n = 0
+    nets = {R.pads.net[k] for k in R.pads.xy if k[0] == ref}
+    for net in sorted((m for m in nets if m), key=lambda m: span(R, m)):        # the shortest first
+        if net in POWER or net.startswith("unconnected") or not R.unrouted(net) or span(R, net) > reach:
+            continue
+        if route_power(R, net, (0.2, 0.15)):
+            n += 1
+        else:
+            print("   %s: local net %s left in pieces before the fan-out" % (R.name, net))
+    return n
+
+
+_LID = {0: pcbnew.F_Cu, 1: pcbnew.In1_Cu, 2: pcbnew.B_Cu}
+
+
+def local_copper(R, L_, box):
+    """The copper on layer L_ (pads as their bounding boxes, tracks, vias, zones) inside
+    `box` (router millimetres), for exact clearance checks of planned lines:
+    [(net, kind, shape, bounding box)]."""
+    lid = _LID[L_]
+    bx0, by0, bx1, by1 = box
+    out = []
+
+    def bbox(x0, y0, x1, y1):
+        return (min(x0, x1), min(y0, y1), max(x0, x1), max(y0, y1))
+
+    def near(b):
+        return b[0] <= bx1 and b[2] >= bx0 and b[1] <= by1 and b[3] >= by0
+
+    for fp in R.board.GetFootprints():
+        for p in fp.Pads():
+            if not p.IsOnLayer(lid):
+                continue
+            bb = p.GetBoundingBox()
+            x0, y0 = R.B(pcbnew.VECTOR2I(bb.GetX(), bb.GetY()))
+            x1, y1 = R.B(pcbnew.VECTOR2I(bb.GetRight(), bb.GetBottom()))
+            b = bbox(x0, y0, x1, y1)
+            if near(b):
+                out.append((p.GetNetname(), "rect", b, b, "%s.%s" % (fp.GetReference(), p.GetNumber())))
+    for t in R.board.GetTracks():
+        if t.GetClass() == "PCB_VIA":
+            x, y = R.B(t.GetPosition())
+            r = pcbnew.ToMM(t.GetWidth(lid)) / 2
+            b = (x - r, y - r, x + r, y + r)
+            if near(b):
+                out.append((t.GetNetname(), "disc", (x, y, r), b, "via"))
+        elif t.GetLayer() == lid:
+            a, c = R.B(t.GetStart()), R.B(t.GetEnd())
+            hw = pcbnew.ToMM(t.GetWidth()) / 2
+            b = (min(a[0], c[0]) - hw, min(a[1], c[1]) - hw, max(a[0], c[0]) + hw, max(a[1], c[1]) + hw)
+            if near(b):
+                out.append((t.GetNetname(), "seg", (a, c, hw), b, "track"))
+    for z in R.board.Zones():
+        if z.GetIsRuleArea() or not z.IsOnLayer(lid):
+            continue
+        ol = z.Outline()                              # kept alive while its chains are read
+        for i in range(ol.OutlineCount()):
+            ch = ol.Outline(i)
+            pts = [R.B(ch.CPoint(j)) for j in range(ch.PointCount())]
+            if pts:
+                b = (min(q[0] for q in pts), min(q[1] for q in pts), max(q[0] for q in pts), max(q[1] for q in pts))
+                if near(b):
+                    out.append((z.GetNetname(), "poly", pts, b, "zone"))
+    return out
+
+
+def _clear_of(copper, net, a, b, need, why=None):
+    """Is the segment a-b (its centre line) at least `need` from every copper of another
+    net in `copper` (local_copper())?  `why`: a list to collect what is in the way."""
+    sx0, sy0 = min(a[0], b[0]) - need, min(a[1], b[1]) - need
+    sx1, sy1 = max(a[0], b[0]) + need, max(a[1], b[1]) + need
+    for n, kind, sh, bb, what in copper:
+        if n == net or bb[0] > sx1 or bb[2] < sx0 or bb[1] > sy1 or bb[3] < sy0:
+            continue
+        if kind == "disc":
+            d = _pt_seg((sh[0], sh[1]), a, b) - sh[2]
+        elif kind == "seg":
+            d = _seg_seg(a, b, sh[0], sh[1]) - sh[2]
+        else:
+            pts = [(sh[0], sh[1]), (sh[2], sh[1]), (sh[2], sh[3]), (sh[0], sh[3])] if kind == "rect" else sh
+            if RT.point_in_poly(a[0], a[1], pts) or RT.point_in_poly(b[0], b[1], pts):
+                d = 0.0
+            else:
+                d = min(_seg_seg(a, b, pts[i - 1], pts[i]) for i in range(len(pts)))
+        if d < need:
+            if why is None:
+                return False
+            why.append("%s %s" % (what, n.split("/")[-1]))
+    return not why
+
+
+def _keep_free(R, L, a, b):
     kl = R.g.keep[L]
-    return not any(g[k] or kl[k] for k in R.g.shape_cells(("seg", a[0], a[1], b[0], b[1], 0.0), 0.0))
+    return not any(kl[k] or R.g.outside[k] for k in R.g.shape_cells(("seg", a[0], a[1], b[0], b[1], 0.0), 0.0))
 
 
-def _via_free(R, x, y):
+def _via_free(R, copper, net, x, y):
+    """A via of `net` at (x, y): clear of other nets' copper on every layer (exact), and
+    where the grid allows a drill (not too near another) inside the board."""
     if not (0 <= x < R.g.w and 0 <= y < R.g.h):
         return False
     k = R.g.k(x, y)
-    return not (R.g.novia[k] or R.g.outside[k]) and all(not R.g.g[(L, "via")][k] for L in range(RR.NL))
+    if R.g.novia[k] or R.g.outside[k]:
+        return False
+    need = RT.VIA[0] / 2 + RR.CLEAR
+    return all(_clear_of(copper[L], net, (x, y), (x, y), need) for L in range(RR.NL))
 
 
-def fan(R, ref, width=0.15, dmin=0.9, dmax=4.5):
+def fan(R, ref, width=0.15, power=()):
     """A planned fan-out for a fine-pitch chip: each signal pin a short straight stub,
-    then a straight line out to a via of its own.  Per side the pins go from the middle
-    outward, each via outward of the one before, so the lines spread like a fan and none
-    crosses another or passes in front of a pin still to come; each via is the cheapest
-    spot (nearest, least sideways) whose via and lines the router's grid allows.  The
-    router then starts each net from its via, with every layer to choose from.  (Left to
-    the router, the first nets hugged the chip and walled the later pins in; and lines
-    straight out at the pins' 0.4 mm pitch leave no room for a via between them.)
-    Returns how many pins it fanned out, and prints those it could not."""
+    then a straight line out to a via of its own, the vias of a side evenly spaced in one
+    row or two staggered rows (_fan_pattern), so the lines spread like a fan and none
+    crosses another.  The pattern's own clearances are exact; against everything else
+    the copper already there decides (exact too: a planned line is at any angle, which a
+    grid can only judge to within its pitch); the pattern that serves the most pins is
+    drawn, then one for each run of pins it left out.  The router then
+    starts each net from its via, with every layer to choose from.  (Left to the router,
+    the first nets hugged the chip and walled the later pins in; and lines straight out
+    at the pins' 0.4 mm pitch leave no room for a via between them.)  Returns how many
+    pins it fanned out; route_unfanned() routes the rest first."""
     fp = next(f for f in R.board.GetFootprints() if f.GetReference() == ref)
     L_ = 2 if fp.GetLayer() == pcbnew.B_Cu else 0
-    g = R.g.g[(L_, RR.width_class(width))]
     xs = [xy for (r, num), xy in R.pads.xy.items() if r == ref]
     cx, cy = sum(p[0] for p in xs) / len(xs), sum(p[1] for p in xs) / len(xs)
     sides = {}
     for p in fp.Pads():
         net = p.GetNetname()
-        if not net or net in POWER or any(k in net for k in SKIP_FAN) or p.GetAttribute() != pcbnew.PAD_ATTRIB_SMD:
+        if not net or (net in POWER and net not in power) or any(k in net for k in SKIP_FAN) \
+                or p.GetAttribute() != pcbnew.PAD_ATTRIB_SMD or net.startswith("unconnected"):
             continue
+        if net not in power and not R.unrouted(net):
+            continue                                  # a local net, joined already (local_first())
+        if (ref, p.GetNumber()) in R.__dict__.get("prefanned", ()):
+            continue                                  # its way out planned already (straight_via())
         bb = p.GetBoundingBox()
         x0, y0 = R.B(pcbnew.VECTOR2I(bb.GetX(), bb.GetY()))
         x1, y1 = R.B(pcbnew.VECTOR2I(bb.GetRight(), bb.GetBottom()))
@@ -480,60 +591,219 @@ def fan(R, ref, width=0.15, dmin=0.9, dmax=4.5):
             u, tip = (0.0, (1.0 if dy > 0 else -1.0)), (y1 - y0) / 2
         t = (-u[1], u[0])                             # along the side
         sides.setdefault(u, []).append(((px - cx) * t[0] + (py - cy) * t[1], (px, py), tip, net, p.GetNumber()))
-    def place(u, s0, xy, tip, net, sign, prev):
-        """The pin's stub, line and via at the cheapest legal spot outward (`sign`) of
-        `prev` along the side (None: anywhere); returns the via's place along the side,
-        or why there is none."""
+    allpads = sorted(pcbnew.ToMM(p.GetPosition().x) for p in fp.Pads())
+    pitch = min((b - a for a, b in zip(allpads, allpads[1:]) if b - a > 0.2), default=0.5)
+    def legal(u, pin, spots):
+        """Of `spots` (place along the side, depth, straight run), those where the pin's
+        stub, line and via are clear of everything already on the board."""
+        s0, (px, py), tip, net, num = pin
         t = (-u[1], u[0])
-        px, py = xy
-        at = lambda h, o: (px + u[0] * h + t[0] * o, py + u[1] * h + t[1] * o)
+        at = lambda hh, s: (px + u[0] * hh + t[0] * (s - s0), py + u[1] * hh + t[1] * (s - s0))
         a = tip + 0.25
-        cands = []
-        for i in range(int(round(dmin * 10)), int(round(dmax * 10)) + 1):
-            for j in range(-30, 31):
-                o = j * 0.1
-                if abs(o) > 0.7 * (tip + i * 0.1 - a) + 1e-6:
-                    continue                          # steeper than 35 degrees shuts the next pin in
-                if prev is not None and (sign * j < -2 or sign * (s0 + o) <= sign * prev + 0.05):
-                    continue
-                cands.append((i * 0.1 + 0.6 * abs(o) + (0.4 * abs(o) if sign * j < 0 else 0), tip + i * 0.1, o))
-        cands.sort()
-        R.lift(net)
-        try:
-            if not _seg_free(R, L_, g, at(tip, 0), at(a, 0)):
-                return "its stub is shut"
-            pick = next(((h, o) for _, h, o in cands
-                         if _via_free(R, *at(h, o)) and _seg_free(R, L_, g, at(a, 0), at(h, o))), None)
-        finally:
-            R.drop(net)
-        if pick is None:
-            return "no spot"
-        h, o = pick
-        R.polyline(net, L_, [(px, py), at(a, 0), at(h, o)], width)
-        R.via(net, *at(h, o))
-        return s0 + o
+        need = width / 2 + RR.CLEAR
+        if not _clear_of(copper[L_], net, at(tip, s0), at(a, s0), need):
+            return set()
+        straight = {}
+        out = set()
+        for v, h, st in spots:
+            if st not in straight:
+                straight[st] = _clear_of(copper[L_], net, at(a, s0), at(a + st, s0), need) \
+                    and _keep_free(R, L_, at(a, s0), at(a + st, s0))
+            if straight[st] and _via_free(R, copper, net, *at(h, v)) and _keep_free(R, L_, at(a + st, s0), at(h, v)) \
+                    and _clear_of(copper[L_], net, at(a + st, s0), at(h, v), need):
+                out.add((v, h, st))
+        return out
 
+    def choose(u, pins):
+        """The cheapest pattern for these pins that the board allows for the most of
+        them: (pins it cannot serve, pattern, which it serves), or None."""
+        nonlocal copper
+        copper = {L: local_copper(R, L, (cx - 12, cy - 12, cx + 12, cy + 12)) for L in range(RR.NL)}
+        geos = [geo for geo in (_fan_pattern(pins, *pat[1:]) for pat in _fan_patterns(pins)) if geo is not None]
+        good = [legal(u, pin, {geo[i] for geo in geos}) for i, pin in enumerate(pins)]
+        best = None
+        for geo in geos:                              # cheapest first
+            ok = [vhs in good[i] for i, vhs in enumerate(geo)]
+            if best is None or ok.count(False) < best[0]:
+                best = (ok.count(False), geo, ok)
+                if not best[0]:
+                    break
+        return best
+
+    def group(u, pins):
+        """The cheapest pattern for these pins that the board allows for the most of
+        them, drawn; returns the pins it left out."""
+        best = choose(u, pins)
+        if best is None:
+            return list(pins)
+        _, geo, ok = best
+        t = (-u[1], u[0])
+        need = width / 2 + RR.CLEAR
+        left = []
+        for pin, (v, h, st), fine in zip(pins, geo, ok):
+            s0, (px, py), tip, net, num = pin
+            at = lambda hh, s: (px + u[0] * hh + t[0] * (s - s0), py + u[1] * hh + t[1] * (s - s0))
+            a = tip + 0.25
+            if fine:
+                R.polyline(net, L_, [(px, py), at(a + st, s0), at(h, v)], width)
+                R.via(net, *at(h, v))
+                continue
+            clear = lambda p, q: _clear_of(copper[L_], net, p, q, need) and _keep_free(R, L_, p, q)
+            if not clear(at(tip, s0), at(a, s0)):
+                left.append(pin)
+                continue
+            # no via where the pattern puts it: the empty slot between its neighbours'
+            # vias is twice as wide as a via, room for the line to go on through it to
+            # a via further out
+            on = None
+            if clear(at(a, s0), at(a + st, s0)) and clear(at(a + st, s0), at(h, v)):
+                on = next(((d, dv) for d in (0.4, 0.8, 1.2, 1.6, 2.0, 2.5, 3.0, 3.5, 4.0) for dv in (0.0, 0.2, -0.2, 0.4, -0.4)
+                           if _via_free(R, copper, net, *at(h + d, v + dv)) and clear(at(h, v), at(h + d, v + dv))), None)
+            if on:
+                d, dv = on
+                R.polyline(net, L_, [(px, py), at(a + st, s0), at(h, v), at(h + d, v + dv)], width)
+                R.via(net, *at(h + d, v + dv))
+                continue
+            if os.environ.get("FAN_WHY"):
+                why = []
+                for p_, q_ in ((at(a, s0), at(a + st, s0)), (at(a + st, s0), at(h, v)), (at(h, v), at(h, v))):
+                    _clear_of(copper[L_], net, p_, q_, need, why)
+                for L in range(RR.NL):
+                    _clear_of(copper[L], net, at(h, v), at(h, v), RT.VIA[0] / 2 + RR.CLEAR, why)
+                print("   why %s.%s (%s): %s" % (ref, num, net.split("/")[-1], ", ".join(sorted(set(why))) or "the grid (keep, edge or drill)"))
+            # else the line still holds the pin's place in the fan as far as it is clear
+            # (its neighbours lean over a gap), and the router takes the net on from its end
+            pts = [(px, py), at(a, s0)]
+            f = next((f for f in (1.0, 0.75, 0.5, 0.25) if clear(at(a, s0), at(a + st * f, s0))), 0.0) if st else 0.0
+            if f:
+                pts.append(at(a + st * f, s0))
+            if f == 1.0:
+                g = next((g for g in (1.0, 0.8, 0.6, 0.4, 0.2)
+                          if clear(at(a + st, s0), at(a + st + (h - a - st) * g, s0 + (v - s0) * g))), 0.0)
+                if g:
+                    pts.append(at(a + st + (h - a - st) * g, s0 + (v - s0) * g))
+            R.polyline(net, L_, pts, width)
+            R.__dict__.setdefault("partial", []).append("%s.%s" % (ref, num))
+        return left
+
+    def runs(pins, gap):
+        """The pins in runs of neighbours (no gap wider than `gap` along the side)."""
+        out = [[pins[0]]]
+        for p0, p1 in zip(pins, pins[1:]):
+            if p1[0] - p0[0] > gap:
+                out.append([])
+            out[-1].append(p1)
+        return out
+
+    def fan_part(u, pins):
+        """A pattern for these pins; those it leaves out, a pattern for each run of them
+        between the pins it served, until a run gets nothing."""
+        left = group(u, pins)
+        if not left or len(left) == len(pins):
+            return left
+        return [p for run in runs(left, 1.5 * pitch) for p in fan_part(u, run)]
+
+    copper = {}
     done, missed = 0, []
     for u, pins in sorted(sides.items()):
         pins.sort()
-        mid = len(pins) // 2
-        for seq, sign in ((pins[mid:], 1.0), (pins[:mid][::-1], -1.0)):
-            prev = -sign * 1e9
-            for s0, xy, tip, net, num in seq:
-                r = place(u, s0, xy, tip, net, sign, prev)
-                if isinstance(r, str):
-                    missed.append((u, s0, xy, tip, net, sign, "%s.%s" % (ref, num), r))
-                else:
-                    prev = r
-                    done += 1
-    # a pin the fan left out: its line anywhere the copper so far allows
-    for u, s0, xy, tip, net, sign, who, why in missed:
-        r = place(u, s0, xy, tip, net, sign, None)
-        if isinstance(r, str):
-            print("   %s: no fan-out for %s (%s, then %s)" % (R.name, who, why, r))
-        else:
-            done += 1
-    return done
+        # a side's pins in groups wherever two or more pins between them take no part
+        # (power, the crystal's): each group its own fan, the gap kept clear
+        left = [p for run in runs(pins, 2.5 * pitch) for p in fan_part(u, run)]
+        missed += left
+        done += len(pins) - len(left)
+    for s0, xy, tip, net, num in missed:
+        R.__dict__.setdefault("unfanned", []).append(net)
+    part = [w for w in R.__dict__.pop("partial", []) if w.startswith(ref + ".")]
+    if part:
+        print("   %s: fan-out lines without a via for %s" % (R.name, " ".join(part)))
+    if missed:
+        print("   %s: no fan-out for %s" % (R.name, " ".join("%s.%s" % (ref, p[4]) for p in missed)))
+    return done - len(part)
+
+
+def route_unfanned(R):
+    """The few pins the fan-outs left out (a capacitor or the crystal's lines in front of
+    them), routed whole at once while the board round them is still empty."""
+    for net in R.__dict__.pop("unfanned", []):
+        if R.unrouted(net) and not route_power(R, net, (0.15,)):
+            print("   %s: %s left in pieces (its pin has no fan-out)" % (R.name, net))
+
+
+# a fan's own clearances, exact: track to track, track to via, via to via (0.15 mm
+# rule plus 0.02 mm), for a 0.15 mm track and a 0.45 mm via
+FAN_TT, FAN_TV, FAN_VV = 0.32, 0.47, 0.62
+
+
+def _pt_seg(p, a, b):
+    ax, ay = b[0] - a[0], b[1] - a[1]
+    n = ax * ax + ay * ay
+    t = 0.0 if n == 0 else max(0.0, min(1.0, ((p[0] - a[0]) * ax + (p[1] - a[1]) * ay) / n))
+    return math.hypot(p[0] - a[0] - t * ax, p[1] - a[1] - t * ay)
+
+
+def _seg_seg(p, q, a, b):
+    def side(o, x, y):
+        return (x[0] - o[0]) * (y[1] - o[1]) - (x[1] - o[1]) * (y[0] - o[0])
+    if side(p, q, a) * side(p, q, b) < 0 and side(a, b, p) * side(a, b, q) < 0:
+        return 0.0
+    return min(_pt_seg(p, a, b), _pt_seg(q, a, b), _pt_seg(a, p, q), _pt_seg(b, p, q))
+
+
+def _fan_patterns(pins):
+    """The fan patterns to try for one side, cheapest (most compact) first: (cost, rows,
+    via spacing along the side, depth of the first row past the pads, sideways shift,
+    straight run out of the pins before the lines lean).  Besides the shifts round the
+    middle, a row with its first or last via straight out of its pin (something beside
+    that end of the side)."""
+    out = []
+    n = len(pins)
+    for rows, Ps in ((2, (0.5, 0.55, 0.65)), (1, (0.65, 0.72, 0.8))):
+        for P in Ps:
+            half = (pins[0][0] + pins[-1][0]) / 2
+            ends = tuple(round(e + d, 3) for e in (pins[0][0] - (half - (n - 1) / 2.0 * P), pins[-1][0] - (half + (n - 1) / 2.0 * P))
+                         for d in (0.0, 0.1, -0.1, 0.2, -0.2))
+            for i in range(4, 20):
+                h0 = i * 0.2
+                for shift in (0.0, 0.4, -0.4, 0.8, -0.8) + ends:
+                    for st in (0.0, 0.8, 1.6, 2.4):
+                        if st + 0.6 > h0:
+                            continue
+                        out.append((h0 + (0.3 if rows == 2 else 0.0) + 0.4 * abs(shift) + (P - 0.5) + 0.1 * st,
+                                    rows, P, h0, shift, st))
+    out.sort()
+    return out
+
+
+def _fan_pattern(pins, rows, P, h0, shift, st, dh=0.55):
+    """Each pin's via (place along the side, depth) and straight run for one pattern:
+    vias evenly spaced `P` apart, centred on the pins (plus `shift`), in one row `h0`
+    past the pads or two staggered rows (lines to the second pass between the first's
+    vias); each line straight out of its pin for `st` (through a gap between capacitors
+    at the pins' own pitch), then leaning to its via.  None if a line leans more than 35
+    degrees or the pattern's own copper is too close anywhere."""
+    n = len(pins)
+    centre = (pins[0][0] + pins[-1][0]) / 2 + shift
+    geo, parts = [], []
+    for i, (s0, xy, tip, net, num) in enumerate(pins):
+        a = tip + 0.25
+        v = centre + (i - (n - 1) / 2.0) * P
+        h = tip + h0 + (dh if rows == 2 and i % 2 else 0.0)
+        if abs(v - s0) > 0.7 * (h - a - st) + 1e-9:
+            return None
+        v, h = round(v, 4), round(h, 4)
+        geo.append((v, h, st))
+        parts.append(([((s0, tip), (s0, a + st)), ((s0, a + st), (v, h))], (v, h)))
+    for i in range(n):
+        for j in range(i + 1, min(n, i + 3)):
+            (si, vi), (sj, vj) = parts[i], parts[j]
+            if math.hypot(vi[0] - vj[0], vi[1] - vj[1]) < FAN_VV:
+                return None
+            if any(_pt_seg(vi, *sg) < FAN_TV for sg in sj) or any(_pt_seg(vj, *sg) < FAN_TV for sg in si):
+                return None
+            if any(_seg_seg(a[0], a[1], b[0], b[1]) < FAN_TT for a in si for b in sj):
+                return None
+    return geo
 
 
 def fanout_band(R, ref, band=1.2):
@@ -881,16 +1151,24 @@ def base_plan(R):
     i1, j1 = R.g.cell(124.0, 30.0)
     R.g.cheap = (0, i0, j0, i1, j1, 1.0 / BOTTOM[0])
     for net, widths, kw in CORNER:
-        if net in R.by_net and not route_power(R, net, widths, layer_cost=BOTTOM, **kw):
+        if net in R.by_net and net not in CRYSTAL and not route_power(R, net, widths, layer_cost=BOTTOM, **kw):
             print("   base: %s left in pieces before the fan-out" % net)
-    print("   base: fan-out %d + %d" % (fan(R, "U4"), fan(R, "U3")))
+    xout(R, pads)
+    straight_via(R, "U4", "19", 2.2)            # beside XIN, at the end of its group
+    local = sum(local_first(R, ref) for ref in ("U3", "U15"))
+    print("   base: %d local nets; fan-out %d + %d + %d" % (
+        local, fan(R, "U4"), fan(R, "U3", power=("+3V3",)), fan(R, "U15", power=("+3V3",))))
+    for net, widths, kw in CORNER:
+        if net in CRYSTAL and net in R.by_net and not route_power(R, net, widths, layer_cost=BOTTOM, **kw):
+            print("   base: %s left in pieces after the fan-out" % net)
+    route_unfanned(R)
     n = R.fanout("GND")
     n5 = R.fanout("+5V")
     # 3.3 V has no plane: a via beside each pad (the RP2354A's are planned) gives every
     # pin a way onto every layer before the long lines fill the board round it
     n3 = R.fanout("+3V3", skip=("U4.",))
     print("   base: %d vias beside 3.3 V pads" % n3)
-    for ref in ("U4", "U3"):
+    for ref in ("U4", "U3", "U15"):
         fanout_band(R, ref)
     print("   base: planned copper and fan-outs: %d tracks, %d vias (%d ground, %d 4.8 V)"
           % (R.n_tracks, R.n_vias, n, n5))
@@ -924,7 +1202,7 @@ def pair_order(R, a, b):
     return sorted((a, b), key=reach, reverse=True)
 
 
-POWER = {"GND", "+5V", "+3V3", "+1V1", "+12V", "VBUS", "VSYS"}
+POWER = {"GND", "+5V", "+3V3", "+1V1", "+12V", "VBUS", "VSYS", "GND_T", "+5V_T", "+3V3_T"}
 
 
 def travel_order(R, ref, nets):
@@ -960,6 +1238,45 @@ CORNER = [
     ("Net-(J4-SWCLK)", (0.2,), {}), ("Net-(J4-SWDIO)", (0.2,), {}),
     ("Net-(J5-RX)", (0.2,), {}), ("Net-(J5-TX)", (0.2,), {}),
 ]
+def straight_via(R, ref, num, depth, width=0.15):
+    """A pin's own way out, planned before its chip's fan-out: straight out of the pin to
+    a via `depth` from its centre (a pin at the end of a group, where the fan's pattern
+    would lean it into the crystal's lines); fan() then leaves it out."""
+    fp = next(f for f in R.board.GetFootprints() if f.GetReference() == ref)
+    xs = [xy for (r, n), xy in R.pads.xy.items() if r == ref]
+    cx, cy = sum(p[0] for p in xs) / len(xs), sum(p[1] for p in xs) / len(xs)
+    px, py = R.pads.xy[(ref, num)]
+    dx, dy = px - cx, py - cy
+    u = ((1.0 if dx > 0 else -1.0), 0.0) if abs(dx) > abs(dy) else (0.0, (1.0 if dy > 0 else -1.0))
+    net = R.pads.net[(ref, num)]
+    v = (px + u[0] * depth, py + u[1] * depth)
+    R.track(net, 2 if fp.GetLayer() == pcbnew.B_Cu else 0, (px, py), v, width)
+    R.via(net, *v)
+    R.__dict__.setdefault("prefanned", set()).add((ref, num))
+
+
+def xout(R, pads):
+    """The crystal's two lines, planned: XOUT east from its pin to just short of the
+    crystal, then north to its series resistor; XIN east beside it to the crystal's pad
+    (its capacitor the router joins after the fan-out).  (Routed, they cut diagonally in
+    front of the pins either side of them and closed them in; this way the fan-out's vias
+    for those pins fit between them and the pins.)"""
+    net = "/Base/XOUT"
+    x0, y0 = pads.xy[("U4", "22")]
+    r = next(k for k in pads.of[net] if k[0] != "U4")
+    rx, ry = pads.xy[r]
+    xc = rx - 0.95
+    R.polyline(net, 0, [(x0, y0), (xc, y0), (xc, ry + 0.4), (xc + 0.4, ry), (rx, ry)], 0.15)
+    net = "/Base/XIN"
+    x0, y0 = pads.xy[("U4", "21")]
+    yx, yy = pads.xy[("Y1", "1")]
+    R.polyline(net, 0, [(x0, y0), (yx - abs(yy - y0), y0), (yx, yy)], 0.15)
+
+
+# the crystal's lines, after the chip's fan-out: they run east from the middle of a side
+# (pins 21, 22) and would close in the pins on either side of them; the fan's two groups
+# there leave them the corridor between
+CRYSTAL = ("/Base/XIN", "/Base/XOUT", "Net-(C27-Pad2)")
 
 
 def base_route(R):
@@ -1033,7 +1350,8 @@ def tree_plan(R):
     no_tracks(R, 1)
     ep_vias(R, "U101")
     ep_ties(R, "U101")
-    print("   tree: fan-out %d" % fan(R, "U101"))
+    print("   tree: %d local nets; fan-out %d" % (local_first(R, "U101"), fan(R, "U101", power=("+3V3_T",))))
+    route_unfanned(R)
     n = R.fanout("GND_T")
     n5 = R.fanout("+5V_T")
     fanout_band(R, "U101")

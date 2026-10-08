@@ -220,6 +220,11 @@ def place_parts(board, comps, nets):
             n = pin_net.get((ref, pad.GetNumber()))
             if n:
                 pad.SetNet(netinfo[n])
+                # an exposed pad joins its ground pour solid: its heat goes into the
+                # plane, and spokes round its thermal vias would be starved
+                sz = pad.GetSize(pcbnew.F_Cu) if hasattr(pad, "GetSize") else pad.GetSize()
+                if n.startswith("GND") and pcbnew.ToMM(sz.x) * pcbnew.ToMM(sz.y) > 2.0:
+                    pad.SetLocalZoneConnection(pcbnew.ZONE_CONNECTION_FULL)
         fps[ref] = fp
     return fps, netinfo
 

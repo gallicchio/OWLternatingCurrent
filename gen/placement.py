@@ -74,14 +74,14 @@ gp(15.1, 17.4, 90, "usb:r_dm")            # their R1
 gp(16.15, 17.4, 90, "usb:r_dp")           # their R2
 gp(17.2, 17.4, 270, "decap:54")           # their C19, QSPI_IOVDD
 gp(18.25, 17.4, 270, "decap:53")          # their C20, USB_OTP_VDD
-gp(11.4, 4.4, 180, "decap:30")            # their C16
-gp(9.9, 10.15, 180, "decap:38")            # their C17
+gp(10.8, 4.4, 180, "decap:30")            # their C16, 0.6 mm further along (gen/routes.py rpi_local)
+gp(9.9, 10.2, 180, "decap:38")             # their C17, midway between pins 37 and 40 (both go straight out past it)
 # their C12 sat in front of pins 40-43, which GPiBridge left unused; here they are the
 # ADC inputs: DVDD pin 39's capacitor goes underneath, under the chip's north edge, a short
 # bottom-layer line from Raspberry Pi's 1.1 V via; their C21 moves 0.15 mm toward the
 # corner, so GPIO26-29 leave through one 1.6 mm gap in the capacitor row
 b.put("decap:39", L.MCU[0] - 1.6, L.MCU[1] - 2.3, 0, "B")
-gp(9.9, 12.55, 180, "decap:44")           # their C21
+gp(9.9, 12.6, 180, "decap:44")            # their C21, midway between pins 43 and 46
 gp(9.9, 13.45, 180, "decap:45")           # their C18
 # (this column 0.35 mm further from the chip than GPiBridge's, out of GPIO0's way;
 # gen/routes.py steps pin 1's line across to it)
@@ -90,7 +90,7 @@ gp(20.65, 13.63, 270, "decap:11")         # their C14
 gp(21.7, 13.63, 270, "decap:20")          # their C15
 gp(22.75, 13.63, 270, "decap:6")          # their C10
 gp(18.6, 2.35, 90, "decap:23")            # their C11
-gp(22.3, 10.8, 0, "tp:1v1")               # their TP3
+gp(24.55, 13.13, 0, "tp:1v1")             # their TP3, past the south side's fan-out (gen/routes.py rpi_local)
 gp(14.95, 2.2, 90, "Y1")
 gp(17.3, 3.3, 270, "xtal:c_in")           # their C4
 gp(11.55, 2.2, 90, "xtal:c_out")          # their C5
@@ -201,10 +201,13 @@ for k, who in enumerate(("drv:pd_sleep", "drv:pu_fault", "fam:pd_en", "i2c:pu_sc
 
 # the LED driver, centrally under the star arc
 b.put("U3", 92.0, 50.0, 0, "B")
-b.near("u3:cvcc", "U3", -1.0, -5.6, 90)
-b.near("u3:cvcc_hf", "U3", 1.0, -5.6, 90)
-b.near("u3:cvcap", "U3", 5.4, 2.6, 90)
-b.near("u3:riref", "U3", 5.4, 5.6, 90)
+# its capacitors and IREF resistor at the two ends of the pin row they serve, in front of
+# the ground pins there (37-39, 46), which go inward to the exposed pad: the row's middle
+# (VCC, SDA, SCL, VCC, IREF, VCAP) keeps its way out
+LP_PARTS = {"cvcc_hf": (1.95, -4.6, 270), "cvcc": (1.95, -6.4, 270), "cvcap": (-2.15, -4.6, 270),
+            "riref": (-2.15, -6.4, 90)}             # (each capacitor's pad 1 toward the pins)
+for _k, (_x, _y, _r) in LP_PARTS.items():
+    b.near("u3:" + _k, "U3", _x, _y, _r)
 b.put("U15", 79.0, 50.0, 0, "B")                    # the IMU
 b.near("u15:cvdd", "U15", -3.6, -1.6, 90)
 b.near("u15:cvddio", "U15", -3.6, 1.6, 90)
@@ -284,10 +287,8 @@ t = TREE
 t.put("J101", L.TREE_BASE_PLUG[0] - 8.89, L.TREE_H - HEADER_BODY_FACE, 270, "B")   # pins down into the base
 t.put("J102", L.TREE_TOP_PLUG[0] + 8.89, HEADER_BODY_FACE, 90, "B")                 # pins up into the perch
 t.put("U101", L.TREE_W / 2, 62.0, 0, "B")
-t.near("u101:cvcc", "U101", -1.0, -5.6, 90)
-t.near("u101:cvcc_hf", "U101", 1.0, -5.6, 90)
-t.near("u101:cvcap", "U101", 5.0, 3.0, 90)
-t.near("u101:riref", "U101", 5.0, 6.0, 90)
+for _k, (_x, _y, _r) in LP_PARTS.items():               # as the base's LED driver's
+    t.near("u101:" + _k, "U101", _x, _y, _r)
 t.put("tree:c5v", L.TREE_W / 2 + 14.0, L.TREE_H - 16.0, 90, "B")
 for k, owl in enumerate("ABC"):
     cx, cy = L.OWLS[k]

@@ -35,8 +35,8 @@ CLEAN = {
     "base": [("up", 86.0, 104.0),        # the USB-C's mouth
              ("up", 143.0, 161.0),       # the barrel jack's
              ("down", 164.0, 181.0)],    # the sound switch's lever
-    "tree": [("up", 27.0, 49.0),         # the perch header's pins, out past the top edge
-             ("down", 27.0, 49.0)],      # the base header's, past the foot
+    "tree": [("up", 24.0, 52.0),         # the perch header's pins (and courtyard), out past the top edge
+             ("down", 24.0, 52.0)],      # the base header's, past the foot
     "perch": [("left", -5.0, 5.0), ("right", -5.0, 5.0),    # the owl's notches
               ("up", -5.0, 5.0)],                           # the thread hole, 0.8 mm in
     "bat": [("up", -4.0, 4.0), ("down", -4.0, 4.0)],        # the cap's notches

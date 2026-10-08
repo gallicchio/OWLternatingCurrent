@@ -534,9 +534,9 @@ class Router:
                 return any(self.items[j].plane and (poly is None or self._inside(self.items[j], poly)) for j in g)
         return False
 
-    def _via_spot(self, net, it, reach, width):
+    def _via_spot(self, net, it, reach, width, ok_spot=None):
         """Breadth-first from the pad's cells on F.Cu to the nearest cell
-        where a via of `net` fits; returns (path, (x, y))."""
+        where a via of `net` fits (and `ok_spot(x, y)` allows); returns (path, (x, y))."""
         cls = R.width_class(width)
         L = min(it.cells)
         self.lift(net)
@@ -559,7 +559,8 @@ class Router:
                     # (a via needs no free track cell: keep only bars tracks, as on
                     # a plane's layer; novia holds the via keep-outs)
                     if k not in it.cells[L] and not self.g.novia[k] and all(not v[k] for v in vg) \
-                            and (not poly or point_in_poly(*self.g.pos(k), poly)):
+                            and (not poly or point_in_poly(*self.g.pos(k), poly)) \
+                            and (ok_spot is None or ok_spot(*self.g.pos(k))):
                         path = []
                         c = k
                         while c is not None:

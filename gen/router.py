@@ -146,6 +146,9 @@ class Grid:
         return out
 
     def _disc(self, x, y, r):
+        # never less than the grid's own half-diagonal: a query along a line's centre
+        # (radius 0) gets the nodes round each point, not only a node it lands on exactly
+        r = max(r, PITCH * 0.71)
         ci, cj = self.cell(x, y)
         n = int(math.ceil(r / PITCH)) + 1
         out = []

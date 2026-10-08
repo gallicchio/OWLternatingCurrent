@@ -246,8 +246,9 @@ def build_footprints(share, models_needed):
     write(os.path.join(PRETTY, "Fiducial_1mm_Mask2mm.kicad_mod"), ser(parse(open(path, encoding="utf-8").read())[0]) + "\n")
     for name, d, what in (("Tooling_NPTH_2mm", 2.0, "a 2 mm tooling hole on the panel's rail (JLCPCB's assembly line)"),
                           ("MouseBite_NPTH_0.5mm", 0.5, "one mouse-bite hole of a breakaway tab")):
+        # a mouse bite's courtyard is its hole and 0.1 mm: the next bite is 0.75 mm along
         write(os.path.join(PRETTY, name + ".kicad_mod"), PANEL_HOLE % dict(name=name, d=d, what=what,
-                                                                        cy=d / 2 + 0.25) + "\n")
+                                                                        cy=d / 2 + (0.1 if d < 1 else 0.25)) + "\n")
     done |= {"Fiducial_1mm_Mask2mm", "Tooling_NPTH_2mm", "MouseBite_NPTH_0.5mm"}
     return len(done)
 

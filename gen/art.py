@@ -1496,7 +1496,8 @@ def spell_book(cv):
     name = BI.for_line()
     rframe(bv, tu0 + 2.6, y + 1.2, tu1 - 2.6, y + 9.0, 1.4, 0.2, stars=False)
     box_text(bv, [(name, 3.0, "fit")], tu0 + 3.6, y + 2.7, tu1 - 3.6)
-    box_text(bv, [("Made with Claude, Halloween 2026", 1.3, "wrap")], tu0 + 1.6, y + 11.2, tu1 - 1.6)
+    box_text(bv, [("Made with Claude", 1.3, "wrap"), ("by Jason Gallicchio", 1.3, "wrap"), ("for Halloween 2026", 1.3, "wrap")],
+             tu0 + 1.6, y + 11.2, tu1 - 1.6)
     bv.claim(tu0 - 1.4, 0.5, tu1 + 1.4, 32.0, "spell book: the title page and its dedication")
     # --- the footer: revision, date and where the design lives ---
     fy = L.BASE_H - 2.6

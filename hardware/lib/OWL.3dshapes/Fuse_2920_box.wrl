@@ -1,0 +1,5 @@
+#VRML V2.0 utf8
+# a stand-in made by gen/library.py: the part's size, no detail
+Transform { translation 0 0 0.1969 children [ Shape {
+  appearance Appearance { material Material { diffuseColor 0.780 0.660 0.420 specularColor 0.2 0.2 0.2 shininess 0.3 } }
+  geometry Box { size 2.9134 2.0079 0.3937 } } ] }

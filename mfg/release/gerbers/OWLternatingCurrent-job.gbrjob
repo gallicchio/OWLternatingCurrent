@@ -5,7 +5,7 @@
       "Application": "Pcbnew",
       "Version": "10.0.6"
     },
-    "CreationDate": "2026-10-08T08:22:26-07:00"
+    "CreationDate": "2026-10-08T10:31:22-07:00"
   },
   "GeneralSpecs": {
     "ProjectId": {
@@ -19,7 +19,7 @@
     },
     "LayerNumber": 4,
     "BoardThickness": 1.6,
-    "Finish": "None"
+    "Finish": "ENIG"
   },
   "DesignRules": [
     {
@@ -101,6 +101,7 @@
   "MaterialStackup": [
     {
       "Type": "Legend",
+      "Color": "White",
       "Name": "Top Silk Screen"
     },
     {
@@ -109,6 +110,7 @@
     },
     {
       "Type": "SolderMask",
+      "Color": "R80G0B80",
       "Thickness": 0.01,
       "Name": "Top Solder Mask"
     },
@@ -119,7 +121,7 @@
     },
     {
       "Type": "Dielectric",
-      "Thickness": 0.48,
+      "Thickness": 0.2104,
       "Material": "FR4",
       "Name": "F.Cu/In1.Cu",
       "Notes": "Type: dielectric layer 1 (from F.Cu to In1.Cu)"
@@ -131,7 +133,7 @@
     },
     {
       "Type": "Dielectric",
-      "Thickness": 0.48,
+      "Thickness": 1.065,
       "Material": "FR4",
       "Name": "In1.Cu/In2.Cu",
       "Notes": "Type: dielectric layer 2 (from In1.Cu to In2.Cu)"
@@ -143,7 +145,7 @@
     },
     {
       "Type": "Dielectric",
-      "Thickness": 0.48,
+      "Thickness": 0.2104,
       "Material": "FR4",
       "Name": "In2.Cu/B.Cu",
       "Notes": "Type: dielectric layer 3 (from In2.Cu to B.Cu)"
@@ -155,6 +157,7 @@
     },
     {
       "Type": "SolderMask",
+      "Color": "R80G0B80",
       "Thickness": 0.01,
       "Name": "Bottom Solder Mask"
     },
@@ -164,6 +167,7 @@
     },
     {
       "Type": "Legend",
+      "Color": "White",
       "Name": "Bottom Silk Screen"
     }
   ]

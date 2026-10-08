@@ -447,6 +447,43 @@ def fill(board):
     print("pours: %d zones, %d filled" % (len(zs), n))
 
 
+# The physical stack-up, written into the board file (KiCad's Python cannot set it): JLCPCB's
+# JLC04161H-7628 with 1 oz copper inside and out, and the colours that are ordered, so
+# KiCad's 3D view and renders show the board as it will come (purple, white, ENIG).
+STACKUP = [("F.SilkS", "Top Silk Screen", [("color", '"White"')]),
+           ("F.Paste", "Top Solder Paste", []),
+           ("F.Mask", "Top Solder Mask", [("color", '"Purple"'), ("thickness", "0.01")]),
+           ("F.Cu", "copper", [("thickness", "0.035")]),
+           ("dielectric 1", "prepreg", [("thickness", "0.2104"), ("material", '"FR4"'), ("epsilon_r", "4.4"),
+                                        ("loss_tangent", "0.02")]),
+           ("In1.Cu", "copper", [("thickness", "0.035")]),
+           ("dielectric 2", "core", [("thickness", "1.065"), ("material", '"FR4"'), ("epsilon_r", "4.6"),
+                                     ("loss_tangent", "0.02")]),
+           ("In2.Cu", "copper", [("thickness", "0.035")]),
+           ("dielectric 3", "prepreg", [("thickness", "0.2104"), ("material", '"FR4"'), ("epsilon_r", "4.4"),
+                                        ("loss_tangent", "0.02")]),
+           ("B.Cu", "copper", [("thickness", "0.035")]),
+           ("B.Mask", "Bottom Solder Mask", [("color", '"Purple"'), ("thickness", "0.01")]),
+           ("B.Paste", "Bottom Solder Paste", []),
+           ("B.SilkS", "Bottom Silk Screen", [("color", '"White"')])]
+
+
+def write_stackup(path):
+    """Put STACKUP into the saved board file's setup, in place of any there."""
+    text = open(path, encoding="utf-8").read()
+    if "(stackup" in text:
+        return
+    lines = ["\t\t(stackup"]
+    for name, kind, props in STACKUP:
+        lines.append('\t\t\t(layer "%s"' % name)
+        lines.append('\t\t\t\t(type "%s")' % kind)
+        lines += ["\t\t\t\t(%s %s)" % kv for kv in props]
+        lines.append("\t\t\t)")
+    lines += ['\t\t\t(copper_finish "ENIG")', "\t\t\t(dielectric_constraints no)", "\t\t)"]
+    i = text.index("\t(setup\n") + len("\t(setup\n")
+    open(path, "w", encoding="utf-8").write(text[:i] + "\n".join(lines) + "\n" + text[i:])
+
+
 def prune(board):
     """Vias the routing did not need, taken out (KiCad's DRC: via_dangling): a via that
     joins copper on fewer than two layers, most of them planned beside a pad that the
@@ -644,6 +681,7 @@ def main():
             print("prune: %d vias and track ends the routing did not need" % n)
             fill(board)
     board.Save(PCB)
+    write_stackup(PCB)
     import project
     project.write(HW)
     print("board: %d footprints on %d boards%s -> %s"

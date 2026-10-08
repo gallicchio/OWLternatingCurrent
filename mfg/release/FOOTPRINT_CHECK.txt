@@ -3,7 +3,7 @@ FOOTPRINT vs ORDERED PART -- does the part fit the copper?
 
 board  hardware/OWLternatingCurrent.kicad_pcb
 BOM    release/BOM_JLCPCB.csv
-run    2026-10-08T08:22:25-07:00
+run    2026-10-08T10:31:21-07:00
 412 footprint(s) placed, 1315 drill(s) on the board
 
   ok C14663      C_0603_1608Metric                            C0603              24 placement(s) bottom

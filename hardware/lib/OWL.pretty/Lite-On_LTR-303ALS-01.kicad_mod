@@ -231,7 +231,7 @@
 		(uuid "1322ca49-e08c-59c3-812d-ec6a15f88de0")
 	)
 	(embedded_fonts no)
-	(model "${KIPRJMOD}/lib/OWL.3dshapes/Lite-On_LTR-303ALS-01.step"
+	(model "${KIPRJMOD}/lib/OWL.3dshapes/LTR-303ALS_box.wrl"
 		(offset
 			(xyz 0 0 0)
 		)

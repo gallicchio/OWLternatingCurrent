@@ -131,7 +131,7 @@
 		(uuid "60b69fe0-92e9-5599-a00c-edb0b3db381b")
 	)
 	(embedded_fonts no)
-	(model "${KIPRJMOD}/lib/OWL.3dshapes/Fuse_2920_7451Metric.step"
+	(model "${KIPRJMOD}/lib/OWL.3dshapes/Fuse_2920_box.wrl"
 		(offset
 			(xyz 0 0 0)
 		)

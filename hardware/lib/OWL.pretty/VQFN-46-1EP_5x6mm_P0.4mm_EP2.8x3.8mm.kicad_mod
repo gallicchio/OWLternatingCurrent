@@ -751,7 +751,7 @@
 		(uuid "5a49f47e-6223-5ec5-8187-d701dc0a58bd")
 	)
 	(embedded_fonts no)
-	(model "${KIPRJMOD}/lib/OWL.3dshapes/VQFN-46-1EP_5x6mm_P0.4mm_EP2.8x3.8mm.step"
+	(model "${KIPRJMOD}/lib/OWL.3dshapes/QFN-42-1EP_5x6mm_P0.4mm_EP3.7x4.7mm.step"
 		(offset
 			(xyz 0 0 0)
 		)

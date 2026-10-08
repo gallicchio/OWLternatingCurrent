@@ -331,7 +331,7 @@
 		(uuid "e20a696a-ad9c-512f-9c69-f3698083e744")
 	)
 	(embedded_fonts no)
-	(model "${KIPRJMOD}/lib/OWL.3dshapes/SW_SPDT_Shouhan_MSK12C02.step"
+	(model "${KIPRJMOD}/lib/OWL.3dshapes/SW_SPDT_PCM12.step"
 		(offset
 			(xyz 0 0 0)
 		)

@@ -201,7 +201,7 @@
 		(uuid "75f11850-85a0-5151-b56c-e240a7749749")
 	)
 	(embedded_fonts no)
-	(model "${KIPRJMOD}/lib/OWL.3dshapes/LED_Everlight-SMD3528_3.5x2.8mm_67-21ST.step"
+	(model "${KIPRJMOD}/lib/OWL.3dshapes/LED_RGB_Wuerth-PLCC4_3.2x2.8mm_150141M173100.step"
 		(offset
 			(xyz 0 0 0)
 		)

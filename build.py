@@ -15,16 +15,19 @@ The steps, each a script that exits non-zero when its gate fails:
     schematic  gen/schematic.py       every sheet: base, tree, perch, bat, two tokens
     erc        tools/sch_check.py     KiCad 10's format, ERC at every severity, the netlist
     netcheck   tools/net_check.py     the netlist against the pin, mux, connector and LED tables
+    art        gen/art.py             hardware/art.json (outlines, silkscreen, gold) and docs/images/art_*.png
     board      gen/board.py           the panel: placement, copper, pours  (when it exists)
     drc        tools/pcb_check.py     DRC at every severity with schematic parity
     release    mfg/make_release.py    mfg/release/: gerbers, BOM, CPL, checks, cost, order settings
+    images     tools/render_3d.py     docs/images/3d_*.png: each board, the panel, the set assembled
 
 Until gen/board.py exists, the board and DRC steps are skipped and the release makes
 its board-free half (the BOM, its checks, the parts' cost); the build then ends with
 status 3, "INCOMPLETE", because there is nothing to order yet.
 
 Needs KiCad 10 (tools/kienv.py finds it) and network access to JLCPCB's parts API and
-EasyEDA (answers are cached: tools/jlc_cache.json, mfg/jlc_footprint_cache.json).
+EasyEDA (answers are cached: tools/jlc_cache.json, mfg/jlc_footprint_cache.json); the
+images step needs Blender 4.2 or later (tools/render_3d.py finds it).
 Everything a reviewer or the fab needs (hardware/, mfg/release/) is committed, so
 nothing has to be built to look at the design or to order it.
 """
@@ -78,9 +81,11 @@ STEPS = [
     ("schematic", lambda: py("gen/schematic.py"), ""),
     ("erc", lambda: py("tools/sch_check.py"), "1"),
     ("netcheck", lambda: py("tools/net_check.py"), "3"),
+    ("art", lambda: py("gen/art.py"), ""),
     ("board", board, ""),
     ("drc", drc, "5"),
     ("release", release, "8 9 12"),
+    ("images", lambda: py("tools/render_3d.py"), ""),
 ]
 
 # What each gate of CLAUDE_PCB.md section 10 is held by in this build, printed at the end

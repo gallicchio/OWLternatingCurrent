@@ -27,7 +27,15 @@ RELEASE = os.path.join(ROOT, "mfg", "release")
 IMAGE_PREFIX = ""
 SCRATCH = os.path.join(ROOT, "build", NAME)
 
-# Printed on the back with the "spell book" of the board's physics.  Jason supplies the
-# name (QUESTIONS.md); until then the build prints the placeholder and stamps the release
-# DRAFT.
-FOR_NAME = None
+# Printed on the back with the "spell book" of the board's physics: a name, or "" for
+# none (the open-source board says FOR_NONE instead).  None means not yet decided: the
+# build then prints a placeholder and stamps the release DRAFT.
+FOR_NAME = ""
+FOR_NONE = "a young owl"
+
+
+def for_line():
+    """The dedication's line on the back: "for <name>", "for a young owl", or a blank."""
+    if FOR_NAME is None:
+        return "for ______"
+    return "for " + (FOR_NAME or FOR_NONE)

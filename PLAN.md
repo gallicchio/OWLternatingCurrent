@@ -285,8 +285,8 @@ Status: `[ ]` to do, `[~]` under way, `[x]` done.
     tree is a board; no cat figurine: the tokens are boards.)
 12. [x] Firmware v0.1: every subsystem, host-tested (`firmware/`).
 13. [~] JLCPCB release written (`mfg/release/`, about $348 for 5 panels with 2
-    assembled); it says DRAFT until her name is in `gen/board_info.py FOR_NAME`, and the
-    order waits for that and for the design review (`DESIGN_REVIEW.md`); order by 10-14.
+    assembled; no name on the board: it reads "for a young owl"); the order waits for
+    the design review (`DESIGN_REVIEW.md`, three LLM reviewers); order by 10-14.
 14. [ ] Firmware while the boards are in the post: scenes, familiars, pendulum,
     levitation.
 15. [ ] Bring-up (`HANDBOOK.md`).
@@ -348,6 +348,6 @@ The repository would be `github.com/gallicchio/hocus-flux` (or the chosen name);
 
 - Which features (§2 is the recommendation)?
 - The name (§6; my pick is Hocus Flux).
-- Her name on the board? A line like "made for ___, Halloween 2026" on the back.
+- Her name on the board? (Answered 2026-10-08: no name; the project is open source.)
 - Do you have a 3D printer here (a Bambu?), or should the prints go to JLC3DP with
   the boards?

@@ -1,4 +1,4 @@
-# OWLternating Current rev A: cost estimate (DRAFT)
+# OWLternating Current rev A: cost estimate
 
 Written by `mfg/make_release.py` on 2026-10-08.  Parts: JLCPCB's live prices and stock (their parts API, asked at the times in the table).  Assembly fees: JLCPCB's published list (jlcpcb.com/help/article/pcb-assembly-price, updated 2026-09-09).  The bare panels: an estimate with a range.
 

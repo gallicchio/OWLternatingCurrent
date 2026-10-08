@@ -143,9 +143,9 @@ HOLE_ACCEPTED = {}
 
 def draft():
     """Why this release is a DRAFT (CLAUDE_PCB.md section 10, gate 10), or None."""
-    if not getattr(BI, "FOR_NAME", None):
-        return ("gen/board_info.py FOR_NAME (her name, printed on the back) is not set yet, so the board "
-                "carries a placeholder (QUESTIONS.md)")
+    if getattr(BI, "FOR_NAME", None) is None:
+        return ("gen/board_info.py FOR_NAME (the dedication printed on the back) is not decided yet, so the "
+                "board carries a placeholder")
     return None
 
 

@@ -1,6 +1,4 @@
-# OWLternating Current rev A: JLCPCB order settings (DRAFT)
-
-**DRAFT:** gen/board_info.py FOR_NAME (her name, printed on the back) is not set yet, so the board carries a placeholder (QUESTIONS.md).  Order once the build no longer says DRAFT.
+# OWLternating Current rev A: JLCPCB order settings
 
 Written by `mfg/make_release.py` on 2026-10-08.  On jlcpcb.com, **Order now**, upload `OWLternatingCurrent_gerbers.zip`, then choose, in the order the page asks:
 

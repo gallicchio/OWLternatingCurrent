@@ -10,6 +10,81 @@ The repository is generated: nearly every file under `hardware/`, `mfg/release/`
 `tools/` or `mfg/` (`build.py` runs them in order and stops at the first failing check).
 A reviewer should read the generators, not only their output.
 
+## 0. For the reviewers: where to work and what to write
+
+Three reviewers work on this repository at the same time, independently. Jason will read
+only what you leave in your directory, never the chat. So write everything there,
+including what you would otherwise have said in the chat.
+
+**Your directory.** Make one directory at the repository's root, named
+`review_LLM_<name>_<version>`, after your model, for example `review_LLM_Gemini_3.0` or
+`review_LLM_GPT_5.1`. Use only letters, digits, dots and underscores. Do **all** your work
+in it: notes, scripts, logs, renders, copies, and the report.
+
+**Change nothing else.**
+- Do not create, edit, move or delete any file outside your directory.
+- Do not change git. No commit, add, rm, mv, checkout, switch, restore, reset, stash,
+  branch, tag, clean, rebase, merge, pull, push or config. Commands that only read (log,
+  show, diff, blame, grep, archive) are fine.
+- Do not run the project's scripts in place. They write into `hardware/`, `mfg/release/`,
+  `build/`, `docs/images/` and `firmware/src/`, and the other two reviewers are reading
+  those files. To run, rebuild or modify anything, copy the project into your directory
+  first, from the repository's root:
+
+  ```
+  D=review_LLM_<name>_<version>
+  mkdir -p "$D"
+  rsync -a --exclude .git --exclude build/ --exclude 'review_*' --exclude datasheets/ \
+        --exclude references/ --exclude reference/ --exclude 'sim/*/out/' ./ "$D/project/"
+  cd "$D/project"
+  ```
+
+  The copy is about 115 MB and builds into itself: every script finds its paths from its
+  own location. Use it for any change you want to try; then put the change in your report
+  as a patch (`diff -ru`), so Jason can apply it.
+- The datasheets in `datasheets/` and Hans Rosenberg's checklist in `references/` are not
+  in git (copyright) and must not be published. Read them in place, and do not copy them
+  or long passages from them into your directory: the repository is going to be public,
+  and so may your directory.
+
+**Tools.**
+- KiCad 10's Python, which every board and DRC script needs, is found by
+  `tools/kienv.py`; the scripts start it themselves.
+- `python3 build.py` runs every step (about 20 minutes, most of it the board's routing).
+  `python3 build.py --only drc` and `python3 tools/pcb_check.py --list <kind>` check the
+  board as it is.
+- `python3 tools/render_pcb.py name=F.Cu,Edge.Cuts --crop x0,y0,x1,y1` draws copper to
+  `build/view/`; `--crop` takes panel millimetres from its top-left corner (the base's
+  corner is at 7.4, 7.4).
+- `make -C firmware/test` runs the firmware's host tests (30 s). The `sim/physics/`
+  scripts reproduce the physics.
+- The three of you share one machine, so keep long builds to one at a time.
+
+**The report: `REPORT.md` in your directory.** It must stand alone. Jason reads it without
+the chat, and possibly beside the other two. Write it as you go; if you are interrupted, a
+half-finished report beats none.
+
+1. **Verdict** in one paragraph: order as it is, order after named fixes, or do not order;
+   and your confidence.
+2. **Findings**, most severe first, numbered. For each one:
+   - severity:
+     - **blocker:** the board cannot be made, or something on it will not work or is unsafe;
+     - **major:** a feature is likely to fail, or a part is out of its ratings;
+     - **minor:** works, but worse than it should;
+     - **nit**;
+   - where (file and line, or reference designator and net);
+   - what is wrong;
+   - the evidence (a calculation, a datasheet's figure or page, a simulation, a DRC or
+     render output you made, kept in your directory);
+   - the fix you propose;
+   - how sure you are.
+3. **Section 10's questions**, each answered by number.
+4. **What you checked and found right**, so the next pass need not repeat it.
+5. **What you could not check**, and why.
+6. **Publishing:** anything that should not be in a public repository (copyrighted text or
+   drawings, personal information, absolute paths, keys).
+7. **Patches**, if any, as files in your directory, listed here.
+
 ## 1. What it is
 
 A Halloween display for a six-year-old who wants to be an owl: a purple, ENIG, 4-layer
@@ -22,7 +97,7 @@ board set that shows physics as magic.
 | **The pendulum bat** (C2) | a bat on a thread that never stops swinging, or circles the moon | three coils under the swing give it timed kicks; a 3-axis Hall sensor under the rest point times them |
 | **The levitating bat** (C3) | the bat floats in the air under the owl's perch | a magnet in the printed owl holds the bat's magnet up; a 10 kHz loop on a Hall sensor and the perch's coil keeps it from falling or jumping up (Earnshaw's theorem says it cannot float on magnets alone) |
 | **Theremin** (B5) | move a hand toward the gold moon and a note rises; toward the gold ghost and it gets louder | two relaxation oscillators whose capacitance includes the hand; a speaker that a slide switch turns off |
-| **The spell book** | the back of the base: the equations behind each trick, and her name | silkscreen |
+| **The spell book** | the back of the base: the equations behind each trick, "for a young owl" | silkscreen |
 
 Rev A is to be ordered from JLCPCB fully assembled (both sides, through-hole parts too):
 Jason's own work is to print one plate of PLA (the owl, the bat's cap, four feet), drop
@@ -311,8 +386,6 @@ with the file and line is the most useful form.
 
 ## 11. Known risks and open items
 
-- **Her name** for the spell book (`gen/board_info.py FOR_NAME`) is not set yet; until
-  it is, the release says DRAFT and the back reads "for ______".
 - **The levitation** is the riskiest feature (about 65 % to work first time, by our own
   estimate): the firmware's tuning tables come from simulations, and there is no
   printed cradle to hold the bat at the float height while the loop starts (the

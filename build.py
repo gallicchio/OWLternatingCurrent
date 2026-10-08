@@ -97,7 +97,7 @@ GATES = [
      "mfg/make_release.py (parts.py match words, value, package, MPN, stock; FOOTPRINT_CHECK.txt)"),
     (9, "CPL native and JLC-corrected, PLACEMENT_CHECKS.txt",
      "mfg/make_release.py (both sides, simulated against JLCPCB's drawings)"),
-    (10, "revision and date on the silkscreen; DRAFT until real", "mfg/make_release.py stamps DRAFT while gen/board_info.py FOR_NAME is unset"),
+    (10, "revision and date on the silkscreen; DRAFT until real", "mfg/make_release.py stamps DRAFT while gen/board_info.py FOR_NAME is undecided (None)"),
     (11, "every rail's width by net", None),
     (12, "hand_solder_bom.csv empty", "mfg/make_release.py"),
     (13, "netlist: one-pin nets, rail aliases, freewheel paths, fuses, polarity", None),

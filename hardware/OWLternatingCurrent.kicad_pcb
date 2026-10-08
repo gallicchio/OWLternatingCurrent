@@ -216887,7 +216887,7 @@
 			(justify mirror)
 		)
 	)
-	(gr_text "Made by her dad and"
+	(gr_text "Made with Claude,"
 		(at 131.3 78.56 0)
 		(layer "B.SilkS")
 		(uuid "f8bcaa02-017f-4399-8c88-876d25cb5812")
@@ -216899,7 +216899,7 @@
 			(justify mirror)
 		)
 	)
-	(gr_text "Claude, Halloween 2026"
+	(gr_text "Halloween 2026"
 		(at 131.3 80.666 0)
 		(layer "B.SilkS")
 		(uuid "7451f21b-3ff3-4ac8-be23-e7c96ece72e8")
@@ -217163,6 +217163,18 @@
 			(justify mirror)
 		)
 	)
+	(gr_text "for a young owl"
+		(at 131.3 70.39 0)
+		(layer "B.SilkS")
+		(uuid "62d4deaf-0f6a-4ada-97b7-af98b936abc0")
+		(effects
+			(font
+				(size 1.9 1.9)
+				(thickness 0.285)
+			)
+			(justify mirror)
+		)
+	)
 	(gr_text "EMF = −dΦ/dt"
 		(at 95.4 139.3695 0)
 		(layer "B.SilkS")
@@ -217211,7 +217223,7 @@
 			(justify mirror)
 		)
 	)
-	(gr_text "for ______"
+	(gr_text "for a young owl"
 		(at 91.4 227.8 90)
 		(layer "B.SilkS")
 		(uuid "b2814f61-5f36-4ada-8ae4-659538c8baab")
@@ -217267,18 +217279,6 @@
 			(font
 				(size 2.6 2.6)
 				(thickness 0.39)
-			)
-			(justify mirror)
-		)
-	)
-	(gr_text "for ______"
-		(at 131.3 70.995 0)
-		(layer "B.SilkS")
-		(uuid "62d4deaf-0f6a-4ada-97b7-af98b936abc0")
-		(effects
-			(font
-				(size 3 3)
-				(thickness 0.45)
 			)
 			(justify mirror)
 		)

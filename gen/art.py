@@ -1493,11 +1493,11 @@ def spell_book(cv):
     tu0, tu1 = U_(mx) - 53.2, U_(mx) - 22.6
     rframe(bv, tu0, 1.6, tu1, 30.6, 2.0, 0.22, double=True)
     y = box_text(bv, [("The Spell Book", 2.6, "fit"), ("of " + BI.TITLE, 1.4, "fit")], tu0 + 1.6, 3.6, tu1 - 1.6)
-    name = "for " + (BI.FOR_NAME if BI.FOR_NAME else "______")
+    name = BI.for_line()
     rframe(bv, tu0 + 2.6, y + 1.2, tu1 - 2.6, y + 9.0, 1.4, 0.2, stars=False)
     box_text(bv, [(name, 3.0, "fit")], tu0 + 3.6, y + 2.7, tu1 - 3.6)
-    box_text(bv, [("Made by her dad and Claude, Halloween 2026", 1.3, "wrap")], tu0 + 1.6, y + 11.2, tu1 - 1.6)
-    bv.claim(tu0 - 1.4, 0.5, tu1 + 1.4, 32.0, "spell book: the title page and her name")
+    box_text(bv, [("Made with Claude, Halloween 2026", 1.3, "wrap")], tu0 + 1.6, y + 11.2, tu1 - 1.6)
+    bv.claim(tu0 - 1.4, 0.5, tu1 + 1.4, 32.0, "spell book: the title page and its dedication")
     # --- the footer: revision, date and where the design lives ---
     fy = L.BASE_H - 2.6
     footer = "%s rev %s, %s   %s" % (BI.TITLE, BI.REV, BI.DATE, BI.URL)
@@ -1577,7 +1577,7 @@ def tree_front(cv):
 
 def tree_back(cv):
     cx = L.TREE_TOP_PLUG[0]
-    name = "for " + (BI.FOR_NAME if BI.FOR_NAME else "______")
+    name = BI.for_line()
     for s, y, h in ((BI.TITLE, 24.0, 2.6), ("the owls' tree, rev " + BI.REV, 28.4, 1.5), (name, 34.0, 2.4)):
         cv.text(BOT, s, cx, y, h, 0, "center")
     return [(box(cx - 24.0, 20.5, cx + 24.0, 37.0), "the tree's name, on its back")]

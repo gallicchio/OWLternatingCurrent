@@ -28,8 +28,9 @@ soldering iron.
 The panel snaps apart at the mouse bites by hand (bend each board gently along its row of
 little holes; a file or sandpaper smooths the nubs).
 
-**Before ordering:** `gen/board_info.py` `FOR_NAME` must be set to her name (it is printed
-on the back of the base, in the spell book). Until then the release says DRAFT.
+The back of the base and of the tree reads "for a young owl". To print a name there
+instead, set `FOR_NAME` in `gen/board_info.py` and run `python3 build.py board` (about
+20 minutes) before uploading.
 
 ## 2. The power adapter
 

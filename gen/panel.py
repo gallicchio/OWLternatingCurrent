@@ -85,10 +85,11 @@ def bbox(poly):
 
 
 # ---- finding the tabs -------------------------------------------------------------------
-def find_tabs(edges, holes_of=None):
+def find_tabs(edges, holes_of=None, courtyards=()):
     """edges: {name: outer outline in panel mm}.  Returns [(name, E, d, g, other)]: the
     board's edge point E, its outward direction d, the gap g to what lies beyond, and the
-    other board's name (None: the frame)."""
+    other board's name (None: the frame).  No tab where its bites would land in one of
+    `courtyards` (panel mm boxes: a part that overhangs the edge, a header's pins)."""
     inner = (L.RAIL, L.RAIL, L.PANEL_W - L.RAIL, L.PANEL_H - L.RAIL)
     tabs = []
     for name, poly in edges.items():
@@ -109,6 +110,8 @@ def find_tabs(edges, holes_of=None):
                     if _clean_conflict(name, side, s, d):
                         continue
                     t = _tab_at(name, poly, s, d, along, (x0, y0, x1, y1), edges, inner)
+                    if t and _in_courtyard(t, along, courtyards):
+                        continue
                     if t:
                         tabs.append(t)
                         made += 1
@@ -125,6 +128,23 @@ def find_tabs(edges, holes_of=None):
         seen += [E, F]
         out.append(t)
     return out
+
+
+def _in_courtyard(t, along, courtyards):
+    """Whether a tab's bites (its width along the edge, both ends of its gap) fall in a
+    part's courtyard.  courtyards: [(bounding box, contains(x, y))] in panel mm."""
+    name, E, d, g, other = t
+    pts = []
+    for k in (-1.0, -0.5, 0.0, 0.5, 1.0):
+        for f in (BITE_OUT, g - BITE_OUT):                 # the two rows of holes
+            for df in (-BITE_D / 2 - 0.05, 0.0, BITE_D / 2 + 0.05):
+                off = k * (TAB_W / 2 + BITE_D / 2)
+                pts.append((E[0] + d[0] * (f + df) + along[0] * off, E[1] + d[1] * (f + df) + along[1] * off))
+    for (x0, y0, x1, y1), contains in courtyards:
+        for x, y in pts:
+            if x0 <= x <= x1 and y0 <= y <= y1 and contains(x, y):
+                return True
+    return False
 
 
 def _clean_conflict(name, side, s_panel, d):
@@ -206,7 +226,21 @@ def _tab_at(name, poly, s, d, along, box, edges, inner):
 def build(board, PP, mm, edges, holes, load_fp, seed):
     """Draw the panel: Edge.Cuts, tabs' mouse bites, fiducials, tooling holes.
     edges: {name: outer outline}; holes: [outline] (the boards' own cut-outs)."""
-    tabs = find_tabs(edges)
+    o = PP(0.0, 0.0)
+    ox, oy = pcbnew.ToMM(o.x), pcbnew.ToMM(o.y)
+    yards, keep = [], []
+    for fp in board.GetFootprints():
+        fp.BuildCourtyardCaches()
+        for layer in (pcbnew.F_CrtYd, pcbnew.B_CrtYd):
+            cy = pcbnew.SHAPE_POLY_SET(fp.GetCourtyard(layer))     # (a copy, kept alive)
+            if cy.OutlineCount():
+                keep.append(cy)
+                bb = cy.BBox()
+                a, b = bb.GetOrigin(), bb.GetEnd()
+                box = (pcbnew.ToMM(min(a.x, b.x)) - ox, pcbnew.ToMM(min(a.y, b.y)) - oy,
+                       pcbnew.ToMM(max(a.x, b.x)) - ox, pcbnew.ToMM(max(a.y, b.y)) - oy)
+                yards.append((box, lambda x, y, cy=cy: cy.Contains(PP(x, y))))
+    tabs = find_tabs(edges, courtyards=yards)
 
     def sps(polys):
         ps = pcbnew.SHAPE_POLY_SET()

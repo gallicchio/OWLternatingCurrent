@@ -82,14 +82,14 @@ gp(9.9, 10.2, 180, "decap:38")             # their C17, midway between pins 37 a
 # corner, so GPIO26-29 leave through one 1.6 mm gap in the capacitor row
 b.put("decap:39", L.MCU[0] - 1.6, L.MCU[1] - 2.3, 0, "B")
 gp(9.9, 12.6, 180, "decap:44")            # their C21, midway between pins 43 and 46
-gp(9.9, 13.45, 180, "decap:45")           # their C18
+gp(9.9, 13.55, 180, "decap:45")           # their C18, 0.1 mm out of the next one's courtyard
 # (this column 0.35 mm further from the chip than GPiBridge's, out of GPIO0's way;
 # gen/routes.py steps pin 1's line across to it)
 gp(19.6, 13.63, 270, "decap:1")           # their C13
 gp(20.65, 13.63, 270, "decap:11")         # their C14
 gp(21.7, 13.63, 270, "decap:20")          # their C15
 gp(22.75, 13.63, 270, "decap:6")          # their C10
-gp(18.6, 2.35, 90, "decap:23")            # their C11
+gp(19.6, 2.35, 90, "decap:23")            # their C11, 1 mm further along: its bottom-layer 1.1 V line passes under the east side's fan-out
 gp(24.55, 13.13, 0, "tp:1v1")             # their TP3, past the south side's fan-out (gen/routes.py rpi_local)
 gp(14.95, 2.2, 90, "Y1")
 gp(17.3, 3.3, 270, "xtal:c_in")           # their C4
@@ -177,7 +177,7 @@ b.put("F1", 152.35, 20.5, 270, "B")      # pad 1 up, under the jack's centre pin
 b.put("Q1", 152.35, 30.0, 90, "B")       # drain (5-8) up, source (1-3) down, gate at its west end
 b.put("R1", 147.5, 29.5, 90, "B")        # gate pull-down: pad 1 (gate) down
 b.put("D1", 147.5, 34.0, 90, "B")        # gate clamp: anode (gate) up, cathode in the hub
-b.put("D2", 158.5, 35.0, 0, "B")         # cathode (pad 1) west, in the hub
+b.put("D2", 159.0, 35.0, 0, "B")         # cathode (pad 1) west, in the hub (its outline clear of Q1's pin-1 mark)
 b.put("C2", 150.5, 40.0, 270, "B")       # pad 1 up, in the hub
 b.put("TP1", 155.5, 38.5, 0, "B")
 # the buck turned so that GND, SW and VIN (pins 1-3) face east: the input capacitors
@@ -204,8 +204,8 @@ b.put("U3", 92.0, 50.0, 0, "B")
 # its capacitors and IREF resistor at the two ends of the pin row they serve, in front of
 # the ground pins there (37-39, 46), which go inward to the exposed pad: the row's middle
 # (VCC, SDA, SCL, VCC, IREF, VCAP) keeps its way out
-LP_PARTS = {"cvcc_hf": (1.95, -4.6, 270), "cvcc": (1.95, -6.4, 270), "cvcap": (-2.15, -4.6, 270),
-            "riref": (-2.15, -6.4, 90)}             # (each capacitor's pad 1 toward the pins)
+LP_PARTS = {"cvcc_hf": (1.95, -5.4, 270), "cvcc": (1.95, -8.4, 90), "cvcap": (-2.15, -5.4, 270),
+            "riref": (-2.15, -8.4, 90)}             # (the two VCC capacitors' ground pads face each other)
 for _k, (_x, _y, _r) in LP_PARTS.items():
     b.near("u3:" + _k, "U3", _x, _y, _r)
 b.put("U15", 79.0, 50.0, 0, "B")                    # the IMU
@@ -229,7 +229,8 @@ for tile, (ref, x, y, rot) in DRV.items():
     b.near(tile + ":cvm_bulk", ref, 6.6, -3.4, 90)
     b.near(tile + ":ripropi", ref, 0.975, 5.8, 90)
     b.near(tile + ":rf", ref, 2.7, 5.8, 90)
-    b.near(tile + ":cf", ref, 4.4, 5.8, 90)
+    # (tile3's at the row's other end: its usual place is under coil L5's terminal tab)
+    b.near(tile + ":cf", ref, -0.75 if tile == "tile3" else 4.4, 5.8, 90)
 
 # the mux and its dividers, then the perch-current amplifier, between the levitation
 # bridge and the audio

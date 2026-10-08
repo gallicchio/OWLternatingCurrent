@@ -126,11 +126,32 @@ class Silk:
                     it.SetTextThickness(mm(STROKE))
                 elif not it.IsSolidFill() and pcbnew.ToMM(it.GetWidth()) < STROKE:
                     it.SetWidth(mm(STROKE))
+                r = self.box(it.GetBoundingBox())
+                if not self.inside(r) or self._on_pad(it, fp):
+                    fp.Remove(it)                    # past the board's edge (a header's body), or on a pad
+                    continue
                 self.grid[it.GetLayer()].add(self.box(it.GetBoundingBox(), GAP) + ("%s outline" % fp.GetReference(),))
             if not back:
                 for f in (fp.Reference(), fp.Value()):
                     if f.GetLayer() == pcbnew.F_SilkS:
                         f.SetLayer(pcbnew.F_Fab)
+
+    def _on_pad(self, it, fp, gap=0.05):
+        """Whether a silkscreen line of the part runs over one of its pads (the solder
+        mask's opening would clip it)."""
+        if it.GetClass() != "PCB_SHAPE" or it.GetShape() != pcbnew.SHAPE_T_SEGMENT:
+            return False
+        a, b = self.B(it.GetStart()), self.B(it.GetEnd())
+        hw = pcbnew.ToMM(it.GetWidth()) / 2 + gap
+        for pad in fp.Pads():
+            x0, y0, x1, y1 = self.box(pad.GetBoundingBox())
+            # sample the line: any point within hw of the pad's box
+            n = max(2, int(math.hypot(b[0] - a[0], b[1] - a[1]) / 0.05))
+            for i in range(n + 1):
+                x, y = a[0] + (b[0] - a[0]) * i / n, a[1] + (b[1] - a[1]) * i / n
+                if x0 - hw <= x <= x1 + hw and y0 - hw <= y <= y1 + hw:
+                    return True
+        return False
 
     # ---- designators ---------------------------------------------------------------------
     def references(self):

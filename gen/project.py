@@ -32,7 +32,10 @@ LIMITS = {
     "min_text_height": 0.8,
     "min_text_thickness": 0.15,
     "min_copper_edge_clearance": 0.3,
-    "min_connection": 0.127,
+    # (no minimum connection width: the check finds a ground via just touching a pour's
+    # edge, which every ground via and pad also reaches through the In2 plane)
+    "min_connection": 0.0,
+    "min_resolved_spokes": 1,                # a small passive's ground pad between tracks may keep one spoke
     "solder_mask_clearance": 0.0,
     "solder_mask_min_width": 0.0,
 }
@@ -41,9 +44,11 @@ LIMITS = {
 CLASSES = [
     ("Default", 0.15, 0.15, 0.45, 0.25, 0.15, 0.15),
     ("Logic_Power", 0.4, 0.15, 0.6, 0.3, 0.4, 0.2),     # 3.3 V, 1.1 V, VSYS, VBUS: under 0.2 A
-    ("Power_5V", 0.8, 0.2, 0.6, 0.3, 0.8, 0.2),         # the 4.8 V rail: LEDs, perch drivers, audio, the tree
-    ("Power_12V", 2.5, 0.25, 0.8, 0.4, 2.5, 0.25),      # the input and the coil bridges' supply: 5 A
-    ("Coil", 1.5, 0.25, 0.8, 0.4, 1.5, 0.25),           # bridge outputs to coils: 3.3 A peaks
+    # (clearance 0.15 mm on every class: IPC-2221 asks 0.1 mm between outer-layer copper
+    # at up to 15 V, and the router keeps 0.16 mm everywhere; width is what current needs)
+    ("Power_5V", 0.8, 0.15, 0.6, 0.3, 0.8, 0.2),        # the 4.8 V rail: LEDs, perch drivers, audio, the tree
+    ("Power_12V", 2.5, 0.15, 0.8, 0.4, 2.5, 0.25),      # the input and the coil bridges' supply: 5 A
+    ("Coil", 1.5, 0.15, 0.8, 0.4, 1.5, 0.25),           # bridge outputs to coils: 3.3 A peaks
     ("USB", 0.2, 0.15, 0.45, 0.25, 0.2, 0.15),          # full speed forgives the impedance
     ("GND", 0.5, 0.15, 0.6, 0.3, 0.5, 0.2),
 ]

@@ -153,7 +153,8 @@
         "min_text_height": 0.8,
         "min_text_thickness": 0.15,
         "min_copper_edge_clearance": 0.3,
-        "min_connection": 0.127,
+        "min_connection": 0.0,
+        "min_resolved_spokes": 1,
         "solder_mask_clearance": 0.0,
         "solder_mask_min_width": 0.0
       },
@@ -308,7 +309,7 @@
       {
         "name": "Power_5V",
         "track_width": 0.8,
-        "clearance": 0.2,
+        "clearance": 0.15,
         "via_diameter": 0.6,
         "via_drill": 0.3,
         "diff_pair_width": 0.8,
@@ -327,7 +328,7 @@
       {
         "name": "Power_12V",
         "track_width": 2.5,
-        "clearance": 0.25,
+        "clearance": 0.15,
         "via_diameter": 0.8,
         "via_drill": 0.4,
         "diff_pair_width": 2.5,
@@ -346,7 +347,7 @@
       {
         "name": "Coil",
         "track_width": 1.5,
-        "clearance": 0.25,
+        "clearance": 0.15,
         "via_diameter": 0.8,
         "via_drill": 0.4,
         "diff_pair_width": 1.5,

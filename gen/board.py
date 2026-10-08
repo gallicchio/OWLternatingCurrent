@@ -447,6 +447,140 @@ def fill(board):
     print("pours: %d zones, %d filled" % (len(zs), n))
 
 
+def prune(board):
+    """Vias the routing did not need, taken out (KiCad's DRC: via_dangling): a via that
+    joins copper on fewer than two layers, most of them planned beside a pad that the
+    router then reached another way.  Tracks meeting at such a via on its one layer get
+    a short joint to its centre (the router may end a track anywhere on a via's pad);
+    a lone track to it is a stub, taken out back to the first pad, zone, via or fork.
+    Run on filled zones; refill after.  Returns how many items went."""
+    CU = [pcbnew.F_Cu, pcbnew.In1_Cu, pcbnew.In2_Cu, pcbnew.B_Cu]
+    pads, zones, by_net = {}, {}, {}
+    for fp in board.GetFootprints():
+        for p in fp.Pads():
+            pads.setdefault(p.GetNetname(), []).append(p)
+    for z in board.Zones():
+        if not z.GetIsRuleArea():
+            zones.setdefault(z.GetNetname(), []).append(z)
+    shapes = {}                                   # copper drawn as shapes: antennas, coil turns
+    for d in list(board.GetDrawings()) + [g for fp in board.GetFootprints() for g in fp.GraphicalItems()]:
+        if d.GetClass() in ("PCB_SHAPE", "PCB_FP_SHAPE") and d.GetLayer() in CU and d.GetNetname():
+            shapes.setdefault(d.GetNetname(), []).append(d)
+    # (board.GetTracks() is not called again once something is deleted: SWIG loses
+    # track of its types then; the lists here are kept up to date instead)
+    for t in board.GetTracks():
+        by_net.setdefault(t.GetNetname(), []).append(t)
+    is_via = lambda t: t.GetClass() == "PCB_VIA"
+
+    def touching(net, pos, me, layer=None, reach=0):
+        """(layers, tracks, anything but tracks) of `net` within `reach` (nm) of pos, `me`
+        left out; a via is through every layer."""
+        layers, tracks, other = set(), [], False
+        for t in by_net.get(net, []):
+            if t is me or not t.HitTest(pos, reach):
+                continue
+            if is_via(t):
+                layers |= set(CU)
+                other = True
+            elif layer is None or t.GetLayer() == layer:
+                layers.add(t.GetLayer())
+                tracks.append(t)
+        for p in pads.get(net, []):
+            on = {L for L in CU if (layer is None or L == layer) and p.IsOnLayer(L) and p.HitTest(pos, reach, L)}
+            layers |= on
+            other = other or bool(on)
+        for z in zones.get(net, []):
+            on = {L for L in CU if (layer is None or L == layer) and z.IsOnLayer(L) and z.HitTestFilledArea(L, pos, reach)}
+            layers |= on
+            other = other or bool(on)
+        for d in shapes.get(net, []):
+            if (layer is None or d.GetLayer() == layer) and d.HitTest(pos, reach):
+                layers.add(d.GetLayer())
+                other = True
+        return layers, tracks, other
+
+    def drop(t):
+        lst = by_net[t.GetNetname()]
+        lst[:] = [x for x in lst if x is not t]
+        board.Delete(t)                       # (Remove() hands it to Python, and SWIG then loses its types)
+
+    def stub(net, here, t):
+        """Take out the stub that starts at `here` with track t, back along it while
+        nothing else meets it; returns how many tracks went."""
+        n = 0
+        while t is not None:
+            far = t.GetEnd() if (t.GetStart() - here).EuclideanNorm() <= (t.GetEnd() - here).EuclideanNorm() else t.GetStart()
+            L, w = t.GetLayer(), t.GetWidth()
+            # something else ending on its body (the router may join a line anywhere
+            # along a stub): it is cut back to there, not taken out
+            join = None
+            for o in by_net.get(net, []):
+                if o is t:
+                    continue
+                for q in ((o.GetPosition(),) if is_via(o) else (o.GetStart(), o.GetEnd())):
+                    if (q - far).EuclideanNorm() <= max(w, 1) // 2 or not t.HitTest(q, 0):
+                        continue
+                    d = (q - here).EuclideanNorm()
+                    if join is None or d < join[0]:
+                        join = (d, q)
+            if join is not None:
+                ax, ay = far.x, far.y
+                fx, fy = here.x - ax, here.y - ay
+                L2 = fx * fx + fy * fy
+                k = max(0.0, min(1.0, ((join[1].x - ax) * fx + (join[1].y - ay) * fy) / L2)) if L2 else 0.0
+                cut = pcbnew.VECTOR2I(int(ax + fx * k), int(ay + fy * k))
+                if t.GetStart() == far:
+                    t.SetEnd(cut)
+                else:
+                    t.SetStart(cut)
+                return n + 1
+            drop(t)
+            n += 1
+            _, nxt, other = touching(net, far, None, L, reach=w // 2)
+            if other or len(nxt) != 1:
+                break
+            o = nxt[0]
+            if min((o.GetStart() - far).EuclideanNorm(), (o.GetEnd() - far).EuclideanNorm()) > max(w, o.GetWidth()) // 2:
+                break                             # it meets the middle of a track: that goes on both ways
+            here, t = far, o
+        return n
+
+    gone = 0
+    for net in list(by_net):
+        if not net:
+            continue
+        for v in [t for t in by_net[net] if is_via(t)]:
+            pos = v.GetPosition()
+            # (anything on the via's pad joins it: the router may start a track anywhere on it)
+            layers, tracks, other = touching(net, pos, v, reach=v.GetWidth(pcbnew.F_Cu) // 2)
+            if len(layers) >= 2:
+                continue
+            drop(v)
+            gone += 1
+            if len(tracks) >= 2 or other:
+                for o in tracks:
+                    end = min((o.GetStart(), o.GetEnd()), key=lambda e: (e - pos).EuclideanNorm())
+                    if (end - pos).EuclideanNorm() > 0:
+                        j = pcbnew.PCB_TRACK(board)
+                        j.SetStart(end); j.SetEnd(pos); j.SetWidth(o.GetWidth())
+                        j.SetLayer(o.GetLayer()); j.SetNet(o.GetNet())
+                        board.Add(j)
+                        by_net[net].append(j)
+                continue
+            gone += stub(net, pos, tracks[0] if tracks else None)
+    # then tracks with an end touching nothing (a planned stub the router did not use)
+    for net in list(by_net):
+        for t in [t for t in by_net.get(net, []) if not is_via(t)]:
+            if not any(x is t for x in by_net[net]):
+                continue                          # (gone with an earlier stub)
+            for e in (t.GetStart(), t.GetEnd()):
+                _, near, other = touching(net, e, t, t.GetLayer(), reach=t.GetWidth() // 2)
+                if not near and not other:
+                    gone += stub(net, e, t)
+                    break
+    return gone
+
+
 def led_positions():
     """Every LED's place on its own board (the placement: KiCad coordinates, millimetres),
     for the firmware's light show (gen/firmware_leds.py reads it into led_map.h)."""
@@ -505,6 +639,10 @@ def main():
             print("   PANEL: %s has %d tab(s)" % (n, per.get(n, 0)))
     if routers and "--nopour" not in args:
         fill(board)
+        n = prune(board) if not os.environ.get("NOPRUNE") else 0
+        if n:
+            print("prune: %d vias and track ends the routing did not need" % n)
+            fill(board)
     board.Save(PCB)
     import project
     project.write(HW)

@@ -363,13 +363,17 @@ def coils(R):
             import coils as CO
             R._item("<coil:%s>" % ref, ("disc", cx, cy, r), [0, 1], clear=0.02, what="coil " + ref)
             a = math.radians(fp.GetOrientationDegrees())
-            hole = c["r_in"] - CO.SENSOR_HOLE
-            for k in R.g._disc(cx, cy, r):
+            # (the grid bars a track's centre: its copper reaches half a width further,
+            # so the opening is taken in and the disc out by the widest line's half, and
+            # a little)
+            m = 0.25
+            hole = c["r_in"] - CO.SENSOR_HOLE - m
+            for k in R.g._disc(cx, cy, r + m):
                 x, y = R.g.pos(k)
                 dx, dy = x - cx, y - cy
                 # into the footprint's frame (the inverse of placement.rel for side F)
                 lx, ly = dx * math.cos(a) - dy * math.sin(a), dx * math.sin(a) + dy * math.cos(a)
-                if math.hypot(lx, ly) < hole or (abs(lx) <= CO.CORRIDOR_W / 2 and ly > 0):
+                if math.hypot(lx, ly) < hole or (abs(lx) <= CO.CORRIDOR_W / 2 - m and ly > 0):
                     continue
                 R.g.keep[2][k] = 1
                 R.g.novia[k] = 1
@@ -410,7 +414,7 @@ def ep_vias(R, ref, nx=2, ny=3, inset=0.55):
             R.via(net, x, y)
 
 
-def ep_ties(R, ref, width=0.25):
+def ep_ties(R, ref, width=0.2):
     """Each pin on the exposed pad's net straight into the pad: along the pin, past the
     row's inner end, then to the pad's centre, so the pin needs no via of its own in the
     ring where the other pins escape."""
@@ -628,6 +632,37 @@ def fan(R, ref, width=0.15, power=()):
                 best = (ok.count(False), geo, ok)
                 if not best[0]:
                     break
+        dbg = os.environ.get("FAN_DEBUG", "")
+        names = ["%s.%s" % (ref, pin[4]) for pin in pins]
+        if dbg in names and best and best[0]:
+            k = names.index(dbg)
+            shown = 0
+            for geo in geos:
+                if geo[k] not in good[k]:
+                    continue
+                bad = [names[i] for i, vhs in enumerate(geo) if vhs not in good[i]]
+                print("   debug %s: pattern %s fails %s" % (dbg, [tuple(round(c, 2) for c in g) for g in geo], bad))
+                for i, vhs in enumerate(geo):
+                    if vhs in good[i]:
+                        continue
+                    s0, (px, py), tip, net, num = pins[i]
+                    t = (-u[1], u[0])
+                    at = lambda hh, ss: (px + u[0] * hh + t[0] * (ss - s0), py + u[1] * hh + t[1] * (ss - s0))
+                    v, h, st = vhs
+                    a = tip + 0.25
+                    why = []
+                    need = width / 2 + RR.CLEAR
+                    for p_, q_ in ((at(tip, s0), at(a, s0)), (at(a, s0), at(a + st, s0)), (at(a + st, s0), at(h, v))):
+                        _clear_of(copper[L_], net, p_, q_, need, why)
+                    for L in range(RR.NL):
+                        _clear_of(copper[L], net, at(h, v), at(h, v), RT.VIA[0] / 2 + RR.CLEAR, why)
+                    k_ = R.g.k(*at(h, v))
+                    if R.g.novia[k_]:
+                        why.append("no drill here (novia)")
+                    print("      %s: %s" % (names[i], ", ".join(sorted(set(why))) or "keep/edge"))
+                shown += 1
+                if shown >= 6:
+                    break
         return best
 
     def group(u, pins):
@@ -762,7 +797,7 @@ def _fan_patterns(pins):
         for P in Ps:
             half = (pins[0][0] + pins[-1][0]) / 2
             ends = tuple(round(e + d, 3) for e in (pins[0][0] - (half - (n - 1) / 2.0 * P), pins[-1][0] - (half + (n - 1) / 2.0 * P))
-                         for d in (0.0, 0.1, -0.1, 0.2, -0.2))
+                         for d in (0.0, 0.1, -0.1, 0.2, -0.2, 0.3, -0.3, 0.4, -0.4))
             for i in range(4, 20):
                 h0 = i * 0.2
                 for shift in (0.0, 0.4, -0.4, 0.8, -0.8) + ends:
@@ -833,13 +868,19 @@ def coil_stubs(R, pads, ref, spread=1.3, width=0.8):
     mx, my = (p1[0] + p2[0]) / 2 - cx, (p1[1] + p2[1]) / 2 - cy
     d = math.hypot(mx, my)
     ux, uy = mx / d, my / d                         # outward
+    copper = local_copper(R, layer, (cx - 30, cy - 30, cx + 30, cy + 30))
     for num, p in (("1", p1), ("2", p2)):
+        net = pads.net[(ref, num)]
         sx, sy = p[0] - (p1[0] + p2[0]) / 2, p[1] - (p1[1] + p2[1]) / 2
         s = math.hypot(sx, sy)
         sx, sy = sx / s, sy / s                     # sideways, away from the other terminal
         a = (p[0] + ux * 1.0, p[1] + uy * 1.0)
-        b = (a[0] + (ux + sx) * spread, a[1] + (uy + sy) * spread)
-        R.polyline(pads.net[(ref, num)], layer, [p, a, b], width)
+        # (shorter where a part stands in the way: the router takes the line on)
+        for sp in (spread, spread * 0.6, spread * 0.3, 0.0):
+            b = (a[0] + (ux + sx) * sp, a[1] + (uy + sy) * sp)
+            if _clear_of(copper, net, a, b, width / 2 + RR.CLEAR) and _clear_of(copper, net, p, a, width / 2 + RR.CLEAR):
+                break
+        R.polyline(net, layer, [p, a, b], width)
 
 
 def route_power(R, net, widths, **kw):
@@ -1265,7 +1306,9 @@ def xout(R, pads):
     x0, y0 = pads.xy[("U4", "22")]
     r = next(k for k in pads.of[net] if k[0] != "U4")
     rx, ry = pads.xy[r]
-    xc = rx - 0.95
+    # the crystal stands between: up its near side, clear of its pads, to the resistor's row
+    y1 = next(f for f in R.board.GetFootprints() if f.GetReference() == "Y1")
+    xc = min(R.B(pcbnew.VECTOR2I(p.GetBoundingBox().GetX(), p.GetBoundingBox().GetY()))[0] for p in y1.Pads()) - 0.35
     R.polyline(net, 0, [(x0, y0), (xc, y0), (xc, ry + 0.4), (xc + 0.4, ry), (rx, ry)], 0.15)
     net = "/Base/XIN"
     x0, y0 = pads.xy[("U4", "21")]

@@ -231,8 +231,10 @@ def main():
     os.makedirs(WORK, exist_ok=True)
     os.makedirs(IMAGES, exist_ok=True)
     lib = os.path.join(WORK, "lib")
-    if not os.path.exists(lib):
-        os.symlink(os.path.join(ROOT, "hardware", "lib"), lib)     # ${KIPRJMOD}/lib for the models
+    if not os.path.exists(lib):                    # (a link left broken by a moved repository goes)
+        if os.path.lexists(lib):
+            os.remove(lib)
+        os.symlink(os.path.relpath(os.path.join(ROOT, "hardware", "lib"), WORK), lib)     # ${KIPRJMOD}/lib
     subprocess.run(kienv.python() + [os.path.abspath(__file__), "--split"], check=True)
     if only in (None, "boards"):
         boards(draft)

@@ -6,7 +6,7 @@ order them all on the same day.
 
 | # | what | from | how many | about |
 |---|---|---|---|--:|
-| 1 | **The boards, assembled** (both sides, all six boards on one panel) | JLCPCB, uploading `mfg/release/` | 5 panels, 2 of them assembled | $343 + shipping + duty (~$120) |
+| 1 | **The boards, assembled** (both sides, all six boards on one panel) | JLCPCB, uploading `mfg/release/` | 5 panels, 2 of them assembled | $348 + shipping + duty (~$122) |
 | 2 | **12 V power adapter**, 5.5 x 2.1 mm barrel, centre positive | Pololu #1468, "Wall Power Adapter: 12VDC, 5A, 5.5x2.1mm Barrel Jack, Center-Positive" | 1 | $20 |
 | 3 | **Magnets**: neodymium discs, 10 mm x 2 mm, grade N52, magnetised through the thickness (axially) | AMF Magnets USA, "Neodymium Disc - 10mm x 2mm \| N52", product code 20053A | 10 (the build uses 2; the rest are spares for a reprint) | $27 |
 | 4 | **PLA filament**, any colour | what you have | 13 g | |
@@ -59,21 +59,26 @@ pause, and how to drop the magnets in are in `print/README.md`.
 
 ## 5. The thread
 
-For the pendulum (the bat swinging over the three coils instead of floating): thread it
-through the 1.2 mm hole at the front of the perch, with a knot on top bigger than the
-hole, and tie the other end round the bat's cap so that **the bat's underside hangs about
-7 mm above the base** (the knot to the top of the cap about 117 mm). Clear fishing line
-makes the bat look as if it flies on its own.
+For the pendulum (the bat swinging over the three coils instead of floating):
+
+1. Make a bridle on the bat: pass about 10 cm of thread under the cap's head arm and
+   under its tail arm (each arm stands 1.6 mm off the board) and tie the two ends
+   together above the dome, so the bat hangs level from the knot.
+2. Thread the rest through the 1.2 mm hole at the front of the perch, with a knot on top
+   bigger than the hole, so that **the bat's underside hangs about 7 mm above the base**:
+   about 117 mm of thread from the perch's underside to the bridle's knot.
+
+Clear fishing line makes the bat look as if it flies on its own.
 
 ## What it costs
 
 | | |
 |---|--:|
-| JLCPCB, 5 panels with 2 assembled (estimate; `mfg/release/COST_ESTIMATE.md`) | $343 |
-| US duty, collected by JLCPCB (DDP) | ~$120 |
+| JLCPCB, 5 panels with 2 assembled (estimate; `mfg/release/COST_ESTIMATE.md`) | $348 |
+| US duty, collected by JLCPCB (DDP) | ~$122 |
 | shipping (UPS Express Saver DDP) | at checkout, ~$30-40 |
 | adapter and magnets | ~$47 |
-| **total** | **~$545** |
+| **total** | **~$550** |
 
 The second assembled panel is a spare (a second owl and a second set of boards); the three
 bare panels are JLCPCB's minimum order.

@@ -1,0 +1,115 @@
+FOOTPRINT vs ORDERED PART -- does the part fit the copper?
+=========================================================
+
+board  hardware/OWLternatingCurrent.kicad_pcb
+BOM    release/BOM_JLCPCB.csv
+run    2026-10-08T03:18:13-07:00
+412 footprint(s) placed, 1315 drill(s) on the board
+
+  ok C14663      C_0603_1608Metric                            C0603              24 placement(s) bottom
+  !! C516136     LED_Everlight-SMD3528_3.5x2.8mm_67-21ST      LED-SMD_L3.5-W2.8- 22 placement(s)
+       land  worst pad-centre miss 0.275 mm (pad 1) at 0 deg, 2 pad(s) matched by name
+       datum their origin sits at (-0.266, +0.000) mm in our footprint; the JLCPCB CPL is moved there
+  !! C516136     LED_Everlight-SMD3528_3.5x2.8mm_67-21ST      LED-SMD_L3.5-W2.8- 2 placement(s) bottom
+       land  worst pad-centre miss 0.275 mm (pad 1) at 0 deg, 2 pad(s) matched by name
+       datum their origin sits at (-0.266, +0.000) mm in our footprint; the JLCPCB CPL is moved there
+  ok C51933300   LED_0603_1608Metric                          LED0603-R-RD       18 placement(s)
+  ok C1525       C_0402_1005Metric                            C0402              11 placement(s)
+  ok C1525       C_0402_1005Metric                            C0402              1 placement(s) bottom
+  ok C15849      C_0603_1608Metric                            C0603              1 placement(s)
+  ok C15849      C_0603_1608Metric                            C0603              9 placement(s) bottom
+  ok C15850      C_0805_2012Metric                            C0805              10 placement(s) bottom
+  ok C25803      R_0603_1608Metric                            R0603              10 placement(s) bottom
+  ok C21190      R_0603_1608Metric                            R0603              8 placement(s) bottom
+  ok C25804      R_0603_1608Metric                            R0603              8 placement(s) bottom
+  ok C965800     LED_0603_1608Metric                          LED0603-R-RD_ORANG 8 placement(s)
+  ok C57112      C_0603_1608Metric                            C0603              7 placement(s) bottom
+  ok C21122      C_0603_1608Metric                            C0603              6 placement(s) bottom
+  ok C4190       R_0603_1608Metric                            R0603              6 placement(s) bottom
+  !! C1855818    HTSSOP-16-1EP_4.4x5mm_P0.65mm_EP3.55x2.46mm_ HTSSOP-16_L5.0-W4. 4 placement(s) bottom
+       PADS  part has 17 pad position(s), footprint has 23
+  ok C22808      R_0603_1608Metric                            R0603              4 placement(s)
+  ok C23140      R_0603_1608Metric                            R0603              4 placement(s) bottom
+  ok C25076      R_0402_1005Metric                            R0402              4 placement(s)
+  ok C23186      R_0603_1608Metric                            R0603              3 placement(s) bottom
+  ok C23733      C_0402_RPi                                   C0402              1 placement(s)
+  ok C23733      C_0402_RPi_wide                              C0402              2 placement(s)
+  ok C516304     LED_RGB_5050-6                               LED-SMD_6P-L5.4-W5 3 placement(s)
+  ok C11702      R_0402_1005Metric                            R0402              2 placement(s)
+  ok C1548       C_0402_1005Metric                            C0402              2 placement(s)
+  ok C160389     JST_SH_BM03B-SRSS-TB_1x03-1MP_P1.00mm_Vertic CONN-SMD-3P-P1.00_ 2 placement(s)
+  ok C160472     LED_LiteOn_LTST-S270_SideView                LED-SMD_L1.7-W0.6- 2 placement(s)
+  ok C1644       C_0603_1608Metric                            C0603              2 placement(s) bottom
+  ok C22978      R_0603_1608Metric                            R0603              2 placement(s) bottom
+  ok C23162      R_0603_1608Metric                            R0603              2 placement(s) bottom
+  ok C25100      R_0402_1005Metric                            R0402              2 placement(s)
+  ok C25905      R_0402_1005Metric                            R0402              2 placement(s)
+  !! C2894988    PinHeader_2x08_P2.54mm_Horizontal            HDR-TH_16P-P2.54-H 2 placement(s) bottom
+       names the land pattern fits to 0.000 mm but the two libraries number the pins differently -- by name the worst miss is 2.54 mm at pad 2.  Placement is fine; the NET on each pin is the thing to look at
+       datum their origin sits at (+1.269, -8.890) mm in our footprint; the JLCPCB CPL is moved there
+  !! C2897409    PinSocket_2x08_P2.54mm_Vertical              HDR-TH_16P-P2.54-V 1 placement(s)
+       names the land pattern fits to 0.000 mm but the two libraries number the pins differently -- by name the worst miss is 2.54 mm at pad 16.  Placement is fine; the NET on each pin is the thing to look at
+       datum their origin sits at (-1.270, +8.890) mm in our footprint; the JLCPCB CPL is moved there
+  !! C2897409    PinSocket_2x08_P2.54mm_Vertical              HDR-TH_16P-P2.54-V 1 placement(s) bottom
+       names the land pattern fits to 0.000 mm but the two libraries number the pins differently -- by name the worst miss is 2.54 mm at pad 16.  Placement is fine; the NET on each pin is the thing to look at
+       datum their origin sits at (-1.270, -8.890) mm in our footprint; the JLCPCB CPL is moved there
+  ok C2934295    R_1206_3216Metric                            R1206              2 placement(s) bottom
+  ok C31850      R_0603_1608Metric                            R0603              2 placement(s) bottom
+  ok C45783      C_0805_2012Metric                            C0805              2 placement(s) bottom
+  ok C465729     SOIC-8_3.9x4.9mm_P1.27mm                     SOIC-8_L4.9-W3.9-P 2 placement(s) bottom
+  ok C52923      C_0402_1005Metric                            C0402              2 placement(s)
+  ok C701961     VQFN-46-1EP_5x6mm_P0.4mm_EP2.8x3.8mm         VQFN-46_L6.0-W5.0- 2 placement(s) bottom
+  ok C720477     SW_SPST_TS-1088-xR020                        SW-SMD_L3.9-W3.0-P 2 placement(s)
+  !! C7835       SOT-23-5                                     SOT-23-5_L3.0-W1.7 2 placement(s) bottom
+       land  worst pad-centre miss 0.196 mm (pad 4) at 180 deg, 5 pad(s) matched by name
+  ok C8598       D_SOD-123                                    SOD-123_L2.7-W1.6- 2 placement(s)
+  ok C97946      C_1206_3216Metric                            C1206              1 placement(s)
+  ok C97946      C_1206_3216Metric                            C1206              1 placement(s) bottom
+  !! C165948     USB_C_Receptacle_HRO_TYPE-C-31-M-12          USB-C_SMD-TYPE-C-3 1 placement(s)
+       datum their origin sits at (-0.000, -1.572) mm in our footprint; the JLCPCB CPL is moved there
+  ok C167223     L_Changjiang_FXL0630                         IND-SMD_L7.3-W6.8  1 placement(s) bottom
+  ok C173431     D_SOD-123                                    SOD-123_L2.8-W1.8- 1 placement(s) bottom
+  ok C189961     MSOP-8_3x3mm_P0.65mm                         MSOP-8_L3.0-W3.0-P 1 placement(s) bottom
+  ok C19077569   D_SMB                                        SMB_L4.3-W3.6-LS5. 1 placement(s) bottom
+  ok C19702      C_0603_1608Metric                            C0603              1 placement(s)
+  ok C20625731   Crystal_SMD_3225-4Pin_3.2x2.5mm              CRYSTAL-SMD_4P-L3. 1 placement(s)
+  ok C23147      R_0603_1608Metric                            R0603              1 placement(s) bottom
+  ok C25105      R_0402_RPi                                   R0402              1 placement(s)
+  ok C266123     SOT-23                                       SOT-23-3_L2.9-W1.3 1 placement(s) bottom
+  !! C2841482    SOIC-8_3.9x4.9mm_P1.27mm                     SOP-8_L5.0-W4.0-P1 1 placement(s) bottom
+       land  worst pad-centre miss 0.294 mm (pad 1) at 90 deg, 8 pad(s) matched by name
+  ok C311983     SOT-23-6                                     SOT-23-6_L2.9-W1.6 1 placement(s) bottom
+  ok C364577     Lite-On_LTR-303ALS-01                        TDFN-6_L2.0-W2.0-P 1 placement(s)
+  !! C3715882    SOT-23-6                                     SOT-23-6_L2.9-W1.6 1 placement(s) bottom
+       land  worst pad-centre miss 0.213 mm (pad 4) at 180 deg, 6 pad(s) matched by name
+  ok C381116     BarrelJack_XKB_DC-005-5A-2.0_Horizontal      DC-IN-TH_DC-005-5A 1 placement(s)
+  !! C38732      SOIC-8_3.9x4.9mm_P1.27mm                     SOP-8_L4.9-W3.9-P1 1 placement(s) bottom
+       land  worst pad-centre miss 0.209 mm (pad 1) at 90 deg, 8 pad(s) matched by name
+  !! C41378174   RP2350A_QFN-60_7x7mm_P0.4mm_RPi              QFN-60_L7.0-W7.0-P 1 placement(s)
+       PADS  part has 61 pad position(s), footprint has 69
+  !! C42411119   L_Abracon_AOTA-B201610_RPi                   IND-SMD_L2.0-W1.6_ 1 placement(s)
+       land  worst pad-centre miss 0.299 mm (pad 2) at 0 deg, 2 pad(s) matched by name
+  !! C431540     SW_SPDT_Shouhan_MSK12C02                     SW-TH_MSK12C02     1 placement(s)
+       datum their origin sits at (-0.001, -0.251) mm in our footprint; the JLCPCB CPL is moved there
+  !! C46550472   CP_Elec_10x12.6                              CAP-SMD_BD10.0-L10 1 placement(s)
+       land  worst pad-centre miss 0.150 mm (pad 2) at 0 deg, 2 pad(s) matched by name
+  ok C530531     Speaker_GSPK2307P_D23mm_P10mm                SPK-TH_BD23.0-P10. 1 placement(s)
+  !! C5446       SOT-23                                       SOT-23-3_L2.9-W1.6 1 placement(s)
+       land  worst pad-centre miss 0.396 mm (pad 3) at 180 deg, 3 pad(s) matched by name
+  ok C5645       TSSOP-16_4.4x5mm_P0.65mm                     TSSOP-16_L5.0-W4.4 1 placement(s) bottom
+  ok C77069      C_0805_2012Metric                            C0805              1 placement(s)
+  ok C910846     Fuse_2920_7451Metric                         F2920              1 placement(s) bottom
+  ok C967633     Bosch_LGA-14_3x2.5mm_P0.5mm                  LGA-14_L3.0-W2.5-P 1 placement(s) bottom
+
+worth a look: datum x7, land x9, names x3
+  land  a pad centre out by less than half a millimetre
+  datum the two libraries measure from different zeroes, and
+        JLCPCB places THEIR zero where the CPL says: the JLCPCB
+        CPL is moved by it (make_release.py), the native one not
+  names the pads line up but the pin NUMBERS disagree
+
+PROBLEMS: PADS x2
+
+HOLE is a stop-the-order problem: the part cannot sit down on the
+copper at all, and no amount of paste fixes it.  PADS and LAND want
+a human with the two drawings side by side.

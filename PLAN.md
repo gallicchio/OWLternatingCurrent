@@ -164,11 +164,11 @@ Steps 1 and 2 can happen while the boards are in the post. Step 4 needs both 2 a
 
 | board | size | what is on it |
 |---|---|---|
-| **Base** | ~170 × 120 mm | MCU, power, LED driver #1, sensors, 4 DRV8874 coil bridges, 4 UCC27524 perch drivers, theremin oscillators, audio, the art (gold moon with the witch, pumpkins, stars), two familiar perches, three pendulum coils, the tree socket |
+| **Base** | 190 × 130 mm | MCU, power, LED driver #1, sensors, 4 DRV8874 coil bridges, 2 UCC27524 perch bridges, theremin oscillators, audio, the art (gold moon with the witch, pumpkins, stars), two familiar perches, three pendulum coils, the tree socket |
 | **Tree** | ~75 × 110 mm, tree-shaped | stands in the base's 2 × 8 socket (right-angle header and two tabs); LED driver #2; owls with orange LED eyes; carries the perch coil's current and the Hall signal to the perch |
-| **Perch** | ~28 × 55 mm | plugs onto the tree's top header (socket on its underside); the levitation coil; a DRV5055 Hall sensor at the coil's centre on the underside; two violet LEDs shining down on the bat; holes for the owl (bias magnet) |
-| **Bat** | ~48 × 26 mm, bat-shaped | its 4-layer receive coil round the magnet; a C0G tuning capacitor; two orange side-view LED eyes looking forward; three holes for the cap that holds its magnet |
-| **Owl token, cat token** | ~38 mm | coil, C0G tank capacitor, an orange and a violet LED, 150 Ω each; the owl tuned to 150 kHz, the cat to 330 kHz |
+| **Perch** | 34 × 56 mm | plugs onto the tree's top header (socket on its underside); the levitation coil (3 layers); a DRV5055 Hall sensor in the coil's hole on the underside; two violet LEDs shining down on the bat; notches the printed owl (bias magnet) snaps into; the pendulum's thread hole |
+| **Bat** | ~48 × 26 mm, bat-shaped | its 4-layer receive coil round the magnet; a C0G tuning capacitor; two orange side-view LED eyes looking forward; notches in its head and tail edges for the cap that holds its magnet |
+| **Owl token, cat token** | ~33 × 36 mm | coil, C0G tank capacitor, an orange and a purple LED, 150 Ω each; the owl tuned to 142 kHz, the cat to 303 kHz (the coils as drawn, 12.5 µH) |
 
 ### The physics, as designed (`sim/physics/`)
 
@@ -210,8 +210,8 @@ None of these is a Basic part; each distinct Extended part costs about $3 to set
 | magnet tracking | TMAG5273A2 (3-axis Hall, ±266 mT) | C3715882 | 18,024 | 0.35 | under the pendulum's swing |
 | levitation sensor | DRV5055A4 (linear Hall) | C266123 | | | analog, for the 10 kHz loop |
 | motion, light | LSM6DS3TR-C (or LIS2DW12); LTR-303ALS-01 | C967633; C364577 | 29,432; | | |
-| 12 V input | DC-005-5A-2.0 jack; TPS259474L eFuse; SMBJ15A (Preferred: no setup fee); 470 µF/35 V polymer | C381116; C2864845; C19077569; C46550472 | 30.5k; 3,772; 7,969; 74.8k | | |
-| 12 → 5 V, 5 → 3.3 V | TPS54302 (3 A); TLV62569 | C311983; C141836 | 78,316; 243,695 | 0.23; | |
+| 12 V input | DC-005-5A-2.0 jack; 5 A PTC (BSMD2920) and AO4407A reverse-polarity P-MOSFET (they replaced the eFuse); SMBJ15A; 470 µF/35 V polymer | C381116; C910846, C2841482; C19077569; C46550472 | | | |
+| 12 → 4.8 V, VSYS → 3.3 V | TPS54302 (3 A); XC6206 LDO (ceramic-stable, replaced the AMS1117) | C311983; | 78,316; | 0.23; | |
 | familiar tanks | C0G 100 nF 1206 (Murata GRM31C5C1H104JA01L) | C97946 | | | |
 
 ## 3. The light show (sequencing)
@@ -237,7 +237,7 @@ eye.
 - LEDs: about 2-3 W at full brightness.
 - Coils: pulses of up to 1-2 A each, with a low average:
   - the pendulum needs 0.1-0.3 A in pulses;
-  - a familiar 0.1-0.24 A at 150-330 kHz, from 5 V;
+  - a familiar 0.1-0.24 A at 142-303 kHz, from 4.8 V;
   - the levitation about 20 mA rms steady (1 mW), with 1.6-2.4 A peaks while it
     catches the bat.
 - Logic: about 0.5 W.
@@ -270,21 +270,23 @@ Status: `[ ]` to do, `[~]` under way, `[x]` done.
    levitation, sliding and rolling.
 4. [x] Parts survey with JLCPCB stock (`research/jlc_parts_survey.md`); 81 datasheets
    in `datasheets/` (ignored by git), every chosen part's among them.
-5. [~] Antenna feasibility (`sim/antenna/`, running). [x] Prior art, names, fab facts,
+5. [x] Antenna feasibility (`sim/antenna/`). [x] Prior art, names, fab facts,
    safety (`research/web_research.md`).
-6. [ ] **Jason chooses** the features and the name.
-7. [ ] Tooling from GPiBridge, copied in so the project stands alone: the schematic
-   writer, JLCPCB API, footprint and rotation checks, release.
-8. [ ] Art: the characters (`art/shapes.py`) to KiCad silkscreen, mask and gold;
-   coils as generated footprints.
-9. [ ] Schematics, ERC; pins checked against datasheet figures.
-10. [ ] Base board: floorplan, placement, routing, zones, DRC; perch, bat and familiar
-    boards.
-11. [ ] 3D prints: tree, perch cap, bat body, owl and cat figurines (FreeCAD or
-    OpenSCAD).
-12. [ ] Firmware v0.1: power-up, LEDs, sensors, coil drive, USB console; host tests.
-13. [ ] JLCPCB release, cost estimate, `PLACEMENT_CHECKS.txt`; order by 10-14 or
-    10-16.
+6. [x] **Jason chose** C1, C2, C3 and B5, and the name OWLternating Current.
+7. [x] Tooling from GPiBridge, copied in so the project stands alone: the schematic
+   writer, the router, JLCPCB API, footprint and rotation checks, release.
+8. [x] Art (`gen/art.py`): outlines, silkscreen, mask and gold for every board, the
+   spell book; coils as generated footprints (`gen/coils.py`).
+9. [x] Schematics, ERC; pins checked against datasheet figures; pins bound from the
+   board (`gen/assign.py`).
+10. [x] Boards: floorplan, placement, panel and art; every net routed on all six boards,
+    zones filled, DRC clean at every severity with schematic parity (2026-10-08).
+11. [x] 3D prints: the owl, the bat's cap and four feet on one plate (`print/`). (The
+    tree is a board; no cat figurine: the tokens are boards.)
+12. [x] Firmware v0.1: every subsystem, host-tested (`firmware/`).
+13. [~] JLCPCB release written (`mfg/release/`, about $348 for 5 panels with 2
+    assembled); it says DRAFT until her name is in `gen/board_info.py FOR_NAME`, and the
+    order waits for that and for the design review (`DESIGN_REVIEW.md`); order by 10-14.
 14. [ ] Firmware while the boards are in the post: scenes, familiars, pendulum,
     levitation.
 15. [ ] Bring-up (`HANDBOOK.md`).

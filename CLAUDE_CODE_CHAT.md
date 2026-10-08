@@ -554,3 +554,47 @@ review document that I'll ask other LLMs to look at.
 - **13:20** Interfaces fixed and committed: `gen/pins.py` (all 30 GPIOs within the 8
   PWM slices), `gen/mech.py`, `gen/leds.py` (49 LEDs). Two agents started: the 3D
   prints (`print/`) and the firmware (`firmware/`).
+- **13:57** The base's schematic (A1): power, the RP2354A on GPiBridge's corner, both
+  LED drivers' sheets, sensors, four coil bridges, two perch bridges, mux, theremin,
+  audio. ERC clean, and a netlist check (200 checks) against `gen/pins.py` and
+  `gen/leds.py`. Datasheet reads changed it: the AMS1117 is not stable on ceramics
+  (XC6206 instead); the NS4150B's 5.25 V maximum made the "5 V" rail 4.8 V.
+- **14:15** The other five boards' schematics; a ×20.6 amplifier on each perch's
+  supply current, after the firmware's simulation showed 0.5 V/A could not see a token.
+- **14:30** The 3D prints: one plate, one pause for both magnets, slicer-checked on
+  four Bambu printers (`print/README.md`).
+- **14:50** Every one of 265 parts placed on six boards, from a table by each part's
+  role, so renumbering moves nothing.
+- **15:10** Three agents finished: the JLCPCB release tooling (`mfg/make_release.py`:
+  it caught the pumpkin LEDs wired backwards and the slide switch's posts 0.3 mm off
+  JLCPCB's drawing); the coils as generated footprints whose copper is the spiral; the
+  art and the spell book (`gen/art.py`).
+- **15:57** Pins bound from the board (your suggestion: river routing, binding each pin
+  where the river from the chip meets the river to it). `gen/assign.py`: LED driver
+  crossings 115 → 0 and 42 → 0, mux 6 → 0; the RP2354A's 132 → 84, most of those forced
+  by which way the chip faces. The insight went into `CLAUDE_PCB.md` §5. The firmware's
+  ADC code assumed ADC0-2; with HALL now on ADC1 its host test caught it.
+- **16:29** The panel brought inside JLCPCB's 250 × 250 mm for assembly (it was 323.6
+  mm long): 245.2 × 223.2 mm, the tree turned 90°, 24 tabs found automatically,
+  fiducials and tooling holes on the rails. The art on every board.
+- **17:30** Routing: the planned copper (the RP2354A's corner, the 12 V entry, the
+  buck's power loop) is in; the router still leaves nets unjoined on the base and the
+  tree. Fixing the router (it gave up a whole net at its first blocked piece) and
+  speeding it up.
+- **2026-10-08** Routing finished. What it took:
+  - **Planned fan-outs** for the RP2354A, both LED drivers and the IMU: each signal pin a
+    stub and a straight line to a via of its own, the vias of a side in an evenly spaced
+    row, so the lines spread like a fan. Left to the router, the first lines hugged the
+    chip and walled the later pins in (37 nets unjoined).
+  - **A grid bug:** a "radius 0" query (a line's centre) only checked grid points it hit
+    exactly, so planned lines at an angle overlapped (53 shorts in DRC). Planned lines are
+    now checked with exact geometry.
+  - **Placement fixes the fan-out's reports asked for:** capacitors that stood straight
+    in front of signal pins moved between them or to the ends of the row, the 1.1 V test
+    point past the fan, the crystal's two lines drawn by hand.
+  - **Rip-up and reroute:** a walled-in net's neighbours come out and go back after it;
+    kept only if fewer nets fail.
+  - **A prune** of vias and stubs the routing did not need (82).
+  - **Rules:** 0.15 mm clearance on every net class (12 V needs 0.1 by IPC-2221).
+  DRC: 0 violations, 0 unconnected, 0 parity. The release is written (DRAFT until her
+  name is set), about $348 + ~$122 duty. `DESIGN_REVIEW.md` is ready for other reviewers.

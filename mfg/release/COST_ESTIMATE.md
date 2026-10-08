@@ -1,14 +1,12 @@
 # OWLternating Current rev A: cost estimate (DRAFT)
 
-Written by `mfg/make_release.py` on 2026-10-07.  Parts: JLCPCB's live prices and stock (their parts API, asked at the times in the table).  Assembly fees: JLCPCB's published list (jlcpcb.com/help/article/pcb-assembly-price, updated 2026-09-09).  The bare panels: an estimate with a range.
+Written by `mfg/make_release.py` on 2026-10-08.  Parts: JLCPCB's live prices and stock (their parts API, asked at the times in the table).  Assembly fees: JLCPCB's published list (jlcpcb.com/help/article/pcb-assembly-price, updated 2026-09-09).  The bare panels: an estimate with a range.
 
-**The order:** 5 bare panels of 323.6 x 154.2 mm (499 cm2; all 6 boards on each), 4 layers, 1.6 mm, purple, ENIG, 1 oz inner copper; **2 of them assembled, on both sides** (Standard PCBA).
-
-**No released board yet:** the panel's size is gen/layout.py's plan, and the joints are counted from the library's footprints of the netlist's parts.
+**The order:** 5 bare panels of 245.2 x 223.2 mm (547 cm2; all 6 boards on each), 4 layers, 1.6 mm, purple, ENIG, 1 oz inner copper; **2 of them assembled, on both sides** (Standard PCBA).
 
 | item | how | cost |
 |---|---|--:|
-| bare panels | ESTIMATE, $42-167: GPiBridge's cart (2026-10-06, 4 layers, ENIG: $24.80 for 5 boards of 60 x 25.5 mm) for the fixed part, plus 2495 cm2 at $70.6-350 per m2 (JLCPCB's published 4-layer board charge, and five times it for a small order), plus up to $6 for each of the 5 further designs and $25 for 1 oz inner copper (neither is published); purple costs the same as green (JLCPCB) | $104.23 |
+| bare panels | ESTIMATE, $44-175: GPiBridge's cart (2026-10-06, 4 layers, ENIG: $24.80 for 5 boards of 60 x 25.5 mm) for the fixed part, plus 2736 cm2 at $70.6-350 per m2 (JLCPCB's published 4-layer board charge, and five times it for a small order), plus up to $6 for each of the 5 further designs and $25 for 1 oz inner copper (neither is published); purple costs the same as green (JLCPCB) | $109.31 |
 | assembly setup | Standard PCBA, both sides | $51.12 |
 | stencils | one for each side | $16.42 |
 | feeder loading | 67 distinct parts (BOM lines) x $1.53: Standard PCBA loads a feeder for every part, Basic and Extended alike | $102.51 |
@@ -17,10 +15,10 @@ Written by `mfg/make_release.py` on 2026-10-07.  Parts: JLCPCB's live prices and
 | panel of 6 designs | JLCPCB's fee for a panel with more than one design | $8.21 |
 | packing | $0.50 + $0.00003 per cm2 | $0.53 |
 | parts | 244 placements a panel on 67 BOM lines, for 2 panels with JLCPCB's attrition, at the price break for that quantity | $51.73 |
-| **total before shipping and duty** | | **$343.28** |
-| an assembled panel | the total over 2 | $171.64 |
+| **total before shipping and duty** | | **$348.37** |
+| an assembled panel | the total over 2 | $174.18 |
 
-The range on the bare panels moves the total from $280.93 to $405.64.  US duty, collected by JLCPCB under DDP at 35 % of the PCBs and the assembly (their tariff FAQ, 2026-09-09), adds about $120.15; shipping (UPS Express Saver DDP to California) is shown at checkout.
+The range on the bare panels moves the total from $282.64 to $414.09.  US duty, collected by JLCPCB under DDP at 35 % of the PCBs and the assembly (their tariff FAQ, 2026-09-09), adds about $121.93; shipping (UPS Express Saver DDP to California) is shown at checkout.
 
 ## Per-part fees: Basic, Preferred, Extended
 
@@ -30,14 +28,13 @@ The range on the bare panels moves the total from $280.93 to $405.64.  US duty, 
 | Preferred | 2 | 2 |
 | **Extended** | **36** | 98 |
 
-On Standard PCBA every distinct part costs the same $1.53 to load, Basic or Extended (Preferred parts are exempt only on Economic): $102.51.  On Economic PCBA, which purple 4-layer boards cannot have, the 36 Extended parts alone would cost $110.52 and Basic and Preferred nothing.
+On Standard PCBA every distinct part costs the same $1.53 to load, Basic or Extended (Preferred parts are exempt only on Economic): $102.51.  On Economic PCBA, which purple 4-layer boards cannot have, the 36 Extended parts alone would cost $110.52 and Basic and Preferred nothing.  5 part(s) sit on both sides (C1525, C15849, C97946, C516136, C2897409); if JLCPCB loads them once a side, add $7.65.
 
 The 36 distinct Extended parts: C160389 (BM03B-SRSS-TB(LF)(SN)), C160472 (LTST-S270KFKT), C165948 (TYPE-C-31-M-12), C167223 (FXL0630-100-M), C173431 (BZT52C10), C1855818 (DRV8874PWPR), C189961 (NS4150B), C20625731 (ABM8-272-T3), C25100 (0402WGF270JTCE), C266123 (DRV5055A4QDBZR), C2841482 (AO4407A), C2894988 (PZ254-2-08-W-8.5), C2897409 (PM254-2-08-Z-8.5), C2934295 (FRL1206FR500TS), C311983 (TPS54302DDCR), C364577 (LTR-303ALS-01), C3715882 (TMAG5273A2QDBVR), C381116 (DC-005-5A-2.0), C38732 (OPA2333AIDR), C41378174 (RP2354A), C42411119 (AOTA-B201610S3R3-101-T), C431540 (MSK12C02), C46550472 (MA35V470M10X13), C465729 (UCC27524DR), C516136 (HL-A-3528S7VC-S1-13HL), C516304 (HL-AF-5060S22OC-3-S1-THL), C51933300 (GL0603PU01), C530531 (GSPK2307P-8R1W), C5645 (74HC4051PW,118), C701961 (LP5036RJVR), C77069 (GRM21B5C1H223JA01L), C7835 (SN74LVC1G14DBVR), C910846 (BSMD2920-500-16V), C965800 (XL-1608UOC-06), C967633 (LSM6DS3TR-C), C97946 (GRM31C5C1H104JA01L).
 
 ## What to look at
 
-- **The panel is 323.6 mm long; JLCPCB recommends at most 250 x 250 mm for an assembled panel** (pcb-assembly-capabilities: "our system allows dimensions beyond the recommended size limits. Customers should evaluate the associated manufacturing risks"): warping in two reflows, and perhaps an engineering question
-- The bare panels are the least certain line ($41.87 to $166.58): read the price off JLCPCB's cart and put it in `PCB_QUOTE` in `mfg/make_release.py`
+- The bare panels are the least certain line ($43.58 to $175.04): read the price off JLCPCB's cart and put it in `PCB_QUOTE` in `mfg/make_release.py`
 - Feeder loading is the largest assembly fee: $102.51 for 67 distinct parts.  Each part dropped or merged into another value saves $1.53
 - **C1855818 DRV8874PWPR** costs $8.06 for the order (8 x $1.01)
 - **C701961 LP5036RJVR** costs $5.09 for the order (4 x $1.27)

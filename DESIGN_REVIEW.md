@@ -249,7 +249,7 @@ To look at the copper: `python3 tools/render_pcb.py` writes `build/view/pcb_*.pn
 `mfg/make_release.py` writes `mfg/release/`: gerbers, BOM and CPL in JLCPCB's format
 (bottom side 180 - angle, X not negated, checked against JLCPCB's own drawing of every
 chip part on both sides), placement and footprint checks, order settings and a cost
-estimate (about $343 for 5 panels with 2 assembled, before about $120 duty and
+estimate (about $348 for 5 panels with 2 assembled, before about $122 duty and
 shipping). It refuses to write a release if an LCSC code's description lacks the part,
 a part is short of stock, the zones are not filled, DRC is unclean, or a footprint's
 holes miss JLCPCB's drawing.

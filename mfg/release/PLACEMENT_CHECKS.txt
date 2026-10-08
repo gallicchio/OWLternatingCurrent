@@ -1,0 +1,163 @@
+OWLternating Current rev A: PLACEMENT CHECKS for JLCPCB's preview (2026-10-08)
+
+The panel is assembled on BOTH sides.  JLCPCB's preview shows each side; check both.
+
+MOVED in CPL_JLCPCB.csv to where JLCPCB's library puts the part's origin (their drawing's
+zero is not KiCad's; FOOTPRINT_CHECK.txt's 'datum').  In the preview each should sit squarely
+on its pads.  If one sits off them by about the same distance the other way, their library has
+changed: say so, and it goes into the code.
+
+  J2     C165948    top    USB_C_Receptacle_HRO_TYPE-C-31-M-12          moved (+0.000, -1.572) mm (x right, y up)
+  J3     C2897409   top    PinSocket_2x08_P2.54mm_Vertical              moved (+8.890, -1.270) mm (x right, y up)
+  SW3    C431540    top    SW_SPDT_Shouhan_MSK12C02                     moved (-0.001, +0.251) mm (x right, y up)
+  J101   C2894988   bottom PinHeader_2x08_P2.54mm_Horizontal            moved (+1.269, +8.890) mm (x right, y up)
+  J102   C2894988   bottom PinHeader_2x08_P2.54mm_Horizontal            moved (-1.269, -8.890) mm (x right, y up)
+  J201   C2897409   bottom PinSocket_2x08_P2.54mm_Vertical              moved (-8.890, -1.270) mm (x right, y up)
+
+ROTATIONS.  CPL_JLCPCB.csv's rotation is KiCad's angle, mirrored for the bottom side
+(180 - angle: JLCPCB looks at the bottom from below, the board turned over left-to-right;
+jlc_rotation.BOTTOM_FLIP, read on ten bottom-side parts of the Icepi Zero), plus each part's
+correction: read in an earlier preview where somebody has looked, else PREDICTED from JLCPCB's
+own drawing of the part turned until its pads lie on ours by pin number.  Every part below that
+nobody has yet seen right is listed with its prediction: check its pin 1 or polarity mark
+(JLCPCB's dot) against the board, write down any that is wrong and by how much, and it goes
+into mfg/jlc_rotation.py.
+
+Placed as the CPL says, JLCPCB's own drawing lands pin for pin on our pads for 30 chips on
+both sides (make_release.py's simulation of their placement).
+
+NOT YET SEEN RIGHT in a preview (26 part numbers, 84 placements):
+  C160472    orange                     LED_LiteOn_LTST-S270_SideView
+      top:    D301 D302
+      correction 0 (predicted): LTST-S270KFKT side-view LED: '-' (their pad 1) on the left and the lens toward -y at 0, as our footprint (pad 1 cathode, light toward -y) and the datasheet's top view (cathode left when the lens faces up)
+      look for: the cathode (pad 1); the lens must face the board's edge
+  C173431    BZT52C10                   D_SOD-123
+      bottom: D1
+      correction 0 (predicted): BZT52C10 SOD-123: '-' and the cathode bar on the left
+      look for: the cathode bar at pad 1
+  C1855818   DRV8874                    HTSSOP-16-1EP_4.4x5mm_P0.65mm_EP3.55x2.46mm_TI_PWP0016J
+      bottom: U5 U6 U7 U8
+      correction 0, predicted: JLCPCB's drawing turned 0 to lie on ours (bottom side, 17 pads by number, worst 0.02 mm)
+      look for: pin 1 by the silk mark; JLCPCB's dot on it
+  C189961    NS4150B                    MSOP-8_3x3mm_P0.65mm
+      bottom: U14
+      correction 270, predicted: JLCPCB's drawing turned 90 to lie on ours (bottom side, 8 pads by number, worst 0.03 mm)
+      look for: pin 1 by the silk mark
+  C19077569  SMBJ15A                    D_SMB
+      bottom: D2
+      correction 0 (predicted): SMBJ15A SMB: '-' and the cathode bar on the left
+      look for: the cathode bar at pad 1
+  C266123    DRV5055A4                  SOT-23
+      bottom: U201
+      correction 180, predicted: JLCPCB's drawing turned 180 to lie on ours (bottom side, 3 pads by number, worst 0.08 mm)
+      look for: pin 1 by the silk mark: one pin alone on one side, two on the other
+  C2841482   AO4407A                    SOIC-8_3.9x4.9mm_P1.27mm
+      bottom: Q1
+      correction 270, predicted: JLCPCB's drawing turned 90 to lie on ours (bottom side, 8 pads by number, worst 0.29 mm)
+      look for: pin 1 by the silk mark (the bevelled edge)
+  C2894988   BASE/PERCH                 PinHeader_2x08_P2.54mm_Horizontal
+      bottom: J101 J102
+      correction 90 (predicted): PZ254-2-08-W right-angle 2x8 header: JLCPCB draws the body and the bent pins toward +y at 0; our footprint's go toward +x, a quarter turn counter-clockwise. The hole pattern is the same turned half round, so only the drawing says which way the pins point: in the preview they must point off the board's edge
+      look for: the pins point off the board's edge; pin 1 at the square pad
+  C2897409   TREE                       PinSocket_2x08_P2.54mm_Vertical
+      top:    J3
+      bottom: J201
+      correction 90 (predicted): PM254-2-08-Z vertical 2x8 socket: JLCPCB draws its rows along x, ours along y; either quarter turn fits the holes and the part is the same turned half round
+      look for: pin 1 by the silk mark (square pad); keyed by nothing but the silk
+  C311983    TPS54302                   SOT-23-6
+      bottom: U1
+      correction 270, predicted: JLCPCB's drawing turned 90 to lie on ours (bottom side, 6 pads by number, worst 0.01 mm)
+      look for: pin 1 by the silk mark
+  C364577    LTR-303ALS                 Lite-On_LTR-303ALS-01
+      top:    U16
+      correction 270, predicted: JLCPCB's drawing turned 90 to lie on ours (top side, 6 pads by number, worst 0.10 mm)
+      look for: pin 1 by the silk mark
+  C3715882   TMAG5273A2                 SOT-23-6
+      bottom: U17
+      correction 180, predicted: JLCPCB's drawing turned 180 to lie on ours (bottom side, 6 pads by number, worst 0.21 mm)
+      look for: pin 1 by the silk mark
+  C381116    12V DC                     BarrelJack_XKB_DC-005-5A-2.0_Horizontal
+      top:    J1
+      correction 0, predicted: JLCPCB's drawing turned 0 to lie on ours (top side, 3 pads by number, worst 0.05 mm)
+      look for: the plug's opening at the board's edge (keyed by its pins)
+  C38732     OPA2333                    SOIC-8_3.9x4.9mm_P1.27mm
+      bottom: U18
+      correction 270, predicted: JLCPCB's drawing turned 90 to lie on ours (bottom side, 8 pads by number, worst 0.21 mm)
+      look for: pin 1 by the silk mark (the bevelled edge)
+  C431540    SOUND                      SW_SPDT_Shouhan_MSK12C02
+      top:    SW3
+      correction 0, predicted: JLCPCB's drawing turned 0 to lie on ours (top side, 3 pads by number, worst 0.00 mm)
+      look for: the lever over the board's edge, on its locating holes
+  C46550472  470u 35V                   CP_Elec_10x12.6
+      top:    C1
+      correction 0 (predicted): 470 uF polymer capacitor: '+' and the bevelled corners on the left, where our pad 1 (+) is
+      look for: the + (pad 1) by the silk +; the can's black stripe is the minus side
+  C465729    UCC27524                   SOIC-8_3.9x4.9mm_P1.27mm
+      bottom: U9 U10
+      correction 270, predicted: JLCPCB's drawing turned 90 to lie on ours (bottom side, 8 pads by number, worst 0.13 mm)
+      look for: pin 1 by the silk mark (the bevelled edge)
+  C516136    violet                     LED_Everlight-SMD3528_3.5x2.8mm_67-21ST
+      top:    D11 D13 D14 D15 D17 D18 D19 D20 D21 D22 D23 D24 D25 D27 D34 D35 D103 D107 D108 D109 D113 D115
+      bottom: D201 D202
+      correction 0 (predicted): HL-A-3528S7VC violet 3528 LED: '-' (their pad 1), the cathode bar and the corner mark on the left at 0, where our pad 1 is
+      look for: the cathode (pad 1) by the silk mark; the 3528's notched corner
+  C516304    orange x3                  LED_RGB_5050-6
+      top:    D5 D6 D30
+      correction 90, predicted: JLCPCB's drawing turned 270 to lie on ours (top side, 6 pads by number, worst 0.10 mm)
+      look for: pin 1 by the silk mark (the notched corner)
+  C51933300  purple                     LED_0603_1608Metric
+      top:    D7 D8 D9 D10 D12 D16 D26 D28 D29 D31 D32 D33 D102 D106 D112 D114 D402 D502
+      correction 0 (predicted): GL0603PU01 purple 0603 LED: '-' on the left, as C965800
+      look for: the cathode (pad 1) at the silk bracket's end; JLCPCB marks the cathode
+  C530531    8R 1W                      Speaker_GSPK2307P_D23mm_P10mm
+      top:    LS1
+      correction 0 (predicted): GSPK2307P speaker: '+' at their pad 1 on the left, as ours (either way sounds the same)
+      look for: on its two pins; the + mark at pad 1 (either way sounds the same)
+  C5645      74HC4051                   TSSOP-16_4.4x5mm_P0.65mm
+      bottom: U11
+      correction 270, predicted: JLCPCB's drawing turned 90 to lie on ours (bottom side, 16 pads by number, worst 0.00 mm)
+      look for: pin 1 by the silk mark
+  C701961    LP5036                     VQFN-46-1EP_5x6mm_P0.4mm_EP2.8x3.8mm
+      bottom: U3 U101
+      correction 0, predicted: JLCPCB's drawing turned 0 to lie on ours (bottom side, 47 pads by number, worst 0.04 mm)
+      look for: pin 1 by the silk mark; JLCPCB's dot on it
+  C8598      B5819W                     D_SOD-123
+      top:    D3 D4
+      correction 0 (predicted): B5819W SOD-123: '-' and the cathode bar on the left (ECP5 read the same mark)
+      look for: the cathode bar at pad 1
+  C965800    orange                     LED_0603_1608Metric
+      top:    D101 D104 D105 D110 D111 D116 D401 D501
+      correction 0 (predicted): XL-1608UOC-06 orange 0603 LED: JLCPCB's '-' (their pad 2) on the left at 0, where our pad 1, the cathode, is
+      look for: the cathode (pad 1) at the silk bracket's end; JLCPCB marks the cathode
+  C967633    LSM6DS3TR-C                Bosch_LGA-14_3x2.5mm_P0.5mm
+      bottom: U15
+      correction 0, predicted: JLCPCB's drawing turned 0 to lie on ours (bottom side, 14 pads by number, worst 0.00 mm)
+      look for: pin 1 by the silk mark
+
+READ RIGHT in an earlier preview (the same part number, this footprint or its twin):
+  C160389    JST_SH_BM03B-SRSS-TB_1x03-1MP_P1.00mm_Ve correction 180 (read); JLCPCB's drawing agrees: J4 J5
+  C165948    USB_C_Receptacle_HRO_TYPE-C-31-M-12      correction   0 (built); JLCPCB's drawing agrees: J2
+  C41378174  RP2350A_QFN-60_7x7mm_P0.4mm_RPi          correction   0 (read); JLCPCB's drawing agrees: U4
+  C42411119  L_Abracon_AOTA-B201610_RPi               correction 180 (read): L2
+  C5446      SOT-23                                   correction 180 (read); JLCPCB's drawing agrees: U2
+  C7835      SOT-23-5                                 correction 180 (sure); JLCPCB's drawing agrees: U12 U13
+
+No orientation to get wrong (two pads, no polarity): C_0402_1005Metric, C_0402_RPi, C_0402_RPi_wide, C_0603_1608Metric, C_0805_2012Metric, C_1206_3216Metric, Crystal_SMD_3225-4Pin_3.2x2.5mm, Fuse_2920_7451Metric, L_Changjiang_FXL0630, R_0402_1005Metric, R_0402_RPi, R_0603_1608Metric, R_1206_3216Metric, SW_SPST_TS-1088-xR020
+
+HEAVY PARTS ON THE BOTTOM (reflowed first, then upside down through the top's reflow; JLCPCB
+may glue them): F1 L1
+
+THROUGH-HOLE parts JLCPCB fits by hand (they go in one way by their pins, but look):
+  J1     top    BarrelJack_XKB_DC-005-5A-2.0_Horizontal        3 joints; the plug's opening at the board's edge (keyed by its pins)
+  J2     top    USB_C_Receptacle_HRO_TYPE-C-31-M-12            4 joints; the receptacle's mouth flush with the board's edge, on its pads
+  J3     top    PinSocket_2x08_P2.54mm_Vertical                16 joints; pin 1 by the silk mark (square pad); keyed by nothing but the silk
+  J101   bottom PinHeader_2x08_P2.54mm_Horizontal              16 joints; the pins point off the board's edge; pin 1 at the square pad
+  J102   bottom PinHeader_2x08_P2.54mm_Horizontal              16 joints; the pins point off the board's edge; pin 1 at the square pad
+  J201   bottom PinSocket_2x08_P2.54mm_Vertical                16 joints; pin 1 by the silk mark (square pad); keyed by nothing but the silk
+  LS1    top    Speaker_GSPK2307P_D23mm_P10mm                  2 joints; on its two pins; the + mark at pad 1 (either way sounds the same)
+
+FRAME: Mid X and Mid Y are millimetres from the drill/place origin (50.000, 273.200) on KiCad's page, y up, the same frame as
+the gerbers and the drill file.  Bottom-side X is NOT negated (JLCPCB reads both sides from the
+top).  KiCad's own position export agrees with every row of CPL_KiCad_native.csv.
+
+Fiducials: FID1 (F.Cu, 3.9 mm from the edge), FID2 (F.Cu, 3.9 mm from the edge), FID3 (F.Cu, 3.8 mm from the edge).

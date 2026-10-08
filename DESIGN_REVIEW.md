@@ -300,7 +300,13 @@ with the file and line is the most useful form.
 8. **The CPL rotations on the bottom side** (`mfg/jlc_rotation.py`): 180 - angle, X not
    negated, checked against JLCPCB's drawings of the chip parts. The LEDs' and diodes'
    polarity marks are predicted from JLCPCB's drawings, not yet seen in their preview.
-9. **Child safety** (`CLAUDE_PCB.md` section 16): two 10 x 2 mm magnets sealed inside
+9. **The RP2354A's corner as routed** (`gen/routes.py fan`, `xout`, `rpi_local`;
+   `python3 tools/render_pcb.py mcu=F.Cu,F.Fab,Edge.Cuts --crop 95,5,130,35`): the
+   fan-out moved some decoupling capacitors 0.5-2 mm further from their pins than
+   Raspberry Pi's layout, and the crystal's lines are planned by hand round the
+   crystal. Is the 1.1 V and 3.3 V decoupling still good enough, and are XIN/XOUT
+   short and guarded enough (12 MHz, 15 pF loads, ground pour round them on top)?
+10. **Child safety** (`CLAUDE_PCB.md` section 16): two 10 x 2 mm magnets sealed inside
    PLA prints, 12 V, a 1 W speaker, PCB edges after snapping the tabs.
 
 ## 11. Known risks and open items

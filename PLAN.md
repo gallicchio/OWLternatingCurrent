@@ -284,7 +284,7 @@ Status: `[ ]` to do, `[~]` under way, `[x]` done.
 11. [x] 3D prints: the owl, the bat's cap and four feet on one plate (`print/`). (The
     tree is a board; no cat figurine: the tokens are boards.)
 12. [x] Firmware v0.1: every subsystem, host-tested (`firmware/`).
-13. [~] JLCPCB release written (`mfg/release/`, about $348 for 5 panels with 2
+13. [~] JLCPCB release written (`mfg/release/`, about $366 for 5 panels with 2
     assembled; no name on the board: it reads "for a young owl"); the order waits for
     the design review (`DESIGN_REVIEW.md`, three LLM reviewers); order by 10-14.
 14. [ ] Firmware while the boards are in the post: scenes, familiars, pendulum,

@@ -6,7 +6,7 @@ order them all on the same day.
 
 | # | what | from | how many | about |
 |---|---|---|---|--:|
-| 1 | **The boards, assembled** (both sides, all six boards on one panel) | JLCPCB, uploading `mfg/release/` | 5 panels, 2 of them assembled | $348 + shipping + duty (~$122) |
+| 1 | **The boards, assembled** (both sides, all six boards on one panel) | JLCPCB, uploading `mfg/release/` | 5 panels, 2 of them assembled | $366 + shipping + duty (~$128) |
 | 2 | **12 V power adapter**, 5.5 x 2.1 mm barrel, centre positive | Pololu #1468, "Wall Power Adapter: 12VDC, 5A, 5.5x2.1mm Barrel Jack, Center-Positive" | 1 | $20 |
 | 3 | **Magnets**: neodymium discs, 10 mm x 2 mm, grade N52, magnetised through the thickness (axially) | AMF Magnets USA, "Neodymium Disc - 10mm x 2mm \| N52", product code 20053A | 10 (the build uses 2; the rest are spares for a reprint) | $27 |
 | 4 | **PLA filament**, any colour | what you have | 13 g | |
@@ -17,7 +17,8 @@ order them all on the same day.
 `mfg/release/ORDER_SETTINGS.md` says what to choose on each line of the order page, in the
 order the page asks, and why. In short: 4 layers, 1.6 mm, purple, ENIG, 1 oz copper inside
 and out, "Panel by Customer" with 6 different designs; Standard PCBA on both sides, parts
-by customer. Upload the gerbers zip, then `BOM_JLCPCB.csv` and `CPL_JLCPCB.csv`.
+by customer. Upload the gerbers zip, then `BOM_JLCPCB.csv` and
+`OWLternatingCurrent_cpl_jlcpcb_upload.csv` (not the `_cpl_kicad_native.csv` beside it).
 `PLACEMENT_CHECKS.txt` lists the parts whose rotation to look at in JLCPCB's placement
 preview, on both sides, before you confirm.
 
@@ -75,11 +76,11 @@ Clear fishing line makes the bat look as if it flies on its own.
 
 | | |
 |---|--:|
-| JLCPCB, 5 panels with 2 assembled (estimate; `mfg/release/COST_ESTIMATE.md`) | $348 |
-| US duty, collected by JLCPCB (DDP) | ~$122 |
+| JLCPCB, 5 panels with 2 assembled (estimate; `mfg/release/COST_ESTIMATE.md`) | $366 |
+| US duty, collected by JLCPCB (DDP) | ~$128 |
 | shipping (UPS Express Saver DDP) | at checkout, ~$30-40 |
 | adapter and magnets | ~$47 |
-| **total** | **~$550** |
+| **total** | **~$575** |
 
 The second assembled panel is a spare (a second owl and a second set of boards); the three
 bare panels are JLCPCB's minimum order.

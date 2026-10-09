@@ -2,7 +2,7 @@ OWLternating Current rev A: PLACEMENT CHECKS for JLCPCB's preview (2026-10-08)
 
 The panel is assembled on BOTH sides.  JLCPCB's preview shows each side; check both.
 
-MOVED in CPL_JLCPCB.csv to where JLCPCB's library puts the part's origin (their drawing's
+MOVED in OWLternatingCurrent_cpl_jlcpcb_upload.csv to where JLCPCB's library puts the part's origin (their drawing's
 zero is not KiCad's; FOOTPRINT_CHECK.txt's 'datum').  In the preview each should sit squarely
 on its pads.  If one sits off them by about the same distance the other way, their library has
 changed: say so, and it goes into the code.
@@ -14,7 +14,7 @@ changed: say so, and it goes into the code.
   J102   C2894988   bottom PinHeader_2x08_P2.54mm_Horizontal            moved (-1.269, -8.890) mm (x right, y up)
   J201   C2897409   bottom PinSocket_2x08_P2.54mm_Vertical              moved (-8.890, -1.270) mm (x right, y up)
 
-ROTATIONS.  CPL_JLCPCB.csv's rotation is KiCad's angle, mirrored for the bottom side
+ROTATIONS.  OWLternatingCurrent_cpl_jlcpcb_upload.csv's rotation is KiCad's angle, mirrored for the bottom side
 (180 - angle: JLCPCB looks at the bottom from below, the board turned over left-to-right;
 jlc_rotation.BOTTOM_FLIP, read on ten bottom-side parts of the Icepi Zero), plus each part's
 correction: read in an earlier preview where somebody has looked, else PREDICTED from JLCPCB's
@@ -158,6 +158,6 @@ THROUGH-HOLE parts JLCPCB fits by hand (they go in one way by their pins, but lo
 
 FRAME: Mid X and Mid Y are millimetres from the drill/place origin (50.000, 273.200) on KiCad's page, y up, the same frame as
 the gerbers and the drill file.  Bottom-side X is NOT negated (JLCPCB reads both sides from the
-top).  KiCad's own position export agrees with every row of CPL_KiCad_native.csv.
+top).  KiCad's own position export agrees with every row of OWLternatingCurrent_cpl_kicad_native.csv.
 
 Fiducials: FID1 (F.Cu, 3.9 mm from the edge), FID2 (F.Cu, 3.9 mm from the edge), FID3 (F.Cu, 3.8 mm from the edge).

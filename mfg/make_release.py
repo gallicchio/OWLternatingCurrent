@@ -18,13 +18,13 @@ Writes mfg/release/:
                                      the same files unzipped
     BOM_JLCPCB.csv                   Comment, Designator, Footprint, LCSC: one line per
                                      LCSC code, only the parts JLCPCB places
-    CPL_JLCPCB.csv                   Designator, Mid X, Mid Y, Layer, Rotation, with
+    OWLternatingCurrent_cpl_jlcpcb_upload.csv   the one to upload: Designator, Mid X, Mid Y, Layer, Rotation, with
                                      JLCPCB's conventions: the bottom-side mirror and
                                      each part's correction (mfg/jlc_rotation.py, read in
                                      a preview or predicted from JLCPCB's own drawing),
                                      and each part moved to where JLCPCB's drawing has its
                                      origin (mfg/footprint_check.py's datum)
-    CPL_KiCad_native.csv             KiCad's own positions and angles, for reference
+    OWLternatingCurrent_cpl_kicad_native.csv    KiCad's own positions and angles, for reference
     PLACEMENT_CHECKS.txt             what to look at in JLCPCB's placement preview
     FOOTPRINT_CHECK.txt              does each ordered part fit its copper?
     COST_ESTIMATE.md                 the order's price, fee by fee, and the parts' stock
@@ -147,6 +147,11 @@ def draft():
         return ("gen/board_info.py FOR_NAME (the dedication printed on the back) is not decided yet, so the "
                 "board carries a placeholder")
     return None
+
+
+# the placement files (CLAUDE_PCB.md section 8): the name says which one goes to JLCPCB
+CPL_UPLOAD = BI.NAME + "_cpl_jlcpcb_upload.csv"
+CPL_NATIVE = BI.NAME + "_cpl_kicad_native.csv"
 
 
 class Gate(Exception):
@@ -670,7 +675,7 @@ def gerber_box(path):
 
 
 def write_cpl(rows, out):
-    for name, key in (("CPL_JLCPCB.csv", "jlc"), ("CPL_KiCad_native.csv", "native")):
+    for name, key in ((CPL_UPLOAD, "jlc"), (CPL_NATIVE, "native")):
         with open(os.path.join(out, name), "w", newline="", encoding="utf-8") as f:
             w = csv.writer(f)
             w.writerow(["Designator", "Mid X", "Mid Y", "Layer", "Rotation"])
@@ -716,7 +721,7 @@ def placement_checks(out, placed, fps, cpl, preds, moved, sim_ok, sim_bad, aux, 
     L = ["%s rev %s: PLACEMENT CHECKS for JLCPCB's preview (%s)" % (BI.TITLE, BI.REV, datetime.date.today()), ""]
     L += ["The panel is assembled on BOTH sides.  JLCPCB's preview shows each side; check both.", ""]
     if moved:
-        L += ["MOVED in CPL_JLCPCB.csv to where JLCPCB's library puts the part's origin (their drawing's",
+        L += ["MOVED in " + CPL_UPLOAD + " to where JLCPCB's library puts the part's origin (their drawing's",
               "zero is not KiCad's; FOOTPRINT_CHECK.txt's 'datum').  In the preview each should sit squarely",
               "on its pads.  If one sits off them by about the same distance the other way, their library has",
               "changed: say so, and it goes into the code.", ""]
@@ -724,7 +729,7 @@ def placement_checks(out, placed, fps, cpl, preds, moved, sim_ok, sim_bad, aux, 
             L.append("  %-6s %-10s %-6s %-44s moved (%+.3f, %+.3f) mm (x right, y up)"
                      % (ref, fps[ref]["props"].get("LCSC", ""), cpl[ref]["jlc"]["side"], fps[ref]["short"][:44], dx, dy))
         L.append("")
-    L += ["ROTATIONS.  CPL_JLCPCB.csv's rotation is KiCad's angle, mirrored for the bottom side",
+    L += ["ROTATIONS.  " + CPL_UPLOAD + "'s rotation is KiCad's angle, mirrored for the bottom side",
           "(180 - angle: JLCPCB looks at the bottom from below, the board turned over left-to-right;",
           "jlc_rotation.BOTTOM_FLIP, read on ten bottom-side parts of the Icepi Zero), plus each part's",
           "correction: read in an earlier preview where somebody has looked, else PREDICTED from JLCPCB's",
@@ -793,7 +798,7 @@ def placement_checks(out, placed, fps, cpl, preds, moved, sim_ok, sim_bad, aux, 
     L += ["FRAME: Mid X and Mid Y are millimetres from the drill/place origin %s, y up, the same frame as"
           % ("(%.3f, %.3f) on KiCad's page" % aux if aux else "(not set: KiCad's page origin)"),
           "the gerbers and the drill file.  Bottom-side X is NOT negated (JLCPCB reads both sides from the",
-          "top).  KiCad's own position export agrees with every row of CPL_KiCad_native.csv.", ""]
+          "top).  KiCad's own position export agrees with every row of " + CPL_NATIVE + ".", ""]
     if feat["fiducials"]:
         L.append("Fiducials: %s." % ", ".join("%s (%s, %.1f mm from the edge)" % (f["ref"], f["layer"], f["edge"])
                                               for f in feat["fiducials"]))
@@ -1040,7 +1045,7 @@ def order_md(out, have_board, dims, panels, assembled, feat, B, cost, checks, wh
           "| Depanel / remove rails | No | JLCPCB ships assembled panels with their rails on; the boards snap out "
           "at the mouse bites at home |",
           "| anything else | the default | |", "",
-          "Then upload `BOM_JLCPCB.csv` and `CPL_JLCPCB.csv` (not `CPL_KiCad_native.csv`).  Every BOM line carries "
+          "Then upload `BOM_JLCPCB.csv` and `" + CPL_UPLOAD + "` (not `" + CPL_NATIVE + "`).  Every BOM line carries "
           "its LCSC code; nothing should be left unmatched.  In the placement preview, go through "
           "`PLACEMENT_CHECKS.txt` on both sides before confirming.", "",
           "**Shipping:** UPS Express Saver (DDP) or DHL Express Priority (DDP): a US individual must ship DDP, and "

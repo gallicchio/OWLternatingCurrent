@@ -48,7 +48,7 @@ Written by `mfg/make_release.py` on 2026-10-08.  On jlcpcb.com, **Order now**, u
 | Depanel / remove rails | No | JLCPCB ships assembled panels with their rails on; the boards snap out at the mouse bites at home |
 | anything else | the default | |
 
-Then upload `BOM_JLCPCB.csv` and `CPL_JLCPCB.csv` (not `CPL_KiCad_native.csv`).  Every BOM line carries its LCSC code; nothing should be left unmatched.  In the placement preview, go through `PLACEMENT_CHECKS.txt` on both sides before confirming.
+Then upload `BOM_JLCPCB.csv` and `OWLternatingCurrent_cpl_jlcpcb_upload.csv` (not `OWLternatingCurrent_cpl_kicad_native.csv`).  Every BOM line carries its LCSC code; nothing should be left unmatched.  In the placement preview, go through `PLACEMENT_CHECKS.txt` on both sides before confirming.
 
 **Shipping:** UPS Express Saver (DDP) or DHL Express Priority (DDP): a US individual must ship DDP, and JLCPCB collects the duty (about 35 % of the PCBs and assembly).  Lead time: 4-layer PCBs 2-5 days, Standard assembly at least 4 more (+1 for through-hole parts), then 4-5 business days in the post.
 
@@ -56,7 +56,7 @@ Then upload `BOM_JLCPCB.csv` and `CPL_JLCPCB.csv` (not `CPL_KiCad_native.csv`). 
 
 - Panel 245.2 x 223.2 mm; smallest track 0.150 mm; 1012 vias.
 - Assembly: 244 placements a panel on 67 BOM lines (36 Extended), 800 SMD pads and 73 through-hole joints a panel; top and bottom.
-- Estimate: $348.37 before shipping and duty (COST_ESTIMATE.md).
+- Estimate: $366.11 before shipping and duty (COST_ESTIMATE.md).
 - Checks passed: DRC 0 violations, 0 unconnected, 0 parity; 141 filled zone polygons; every netlist part on the board; every code matched (gen/parts.py's words, the value, the package, the MPN) and in stock; no ordered part wants a hole; the CPL agrees with KiCad's position export, and JLCPCB's drawings placed by it land on our pads (30 chips, both sides).
 
 Sources (read 2026-10-07): jlcpcb.com/help/article/pcb-assembly-price (2026-09-09), /capabilities/pcb-assembly-capabilities, /help/article/How-to-mark-on-PCB (2026-05-22), /help/article/how-to-add-edge-rails-fiducials-for-pcb-assembly-order, /help/article/Instructions-for-ordering, /help/article/us-tariff-policy-faq (2026-09-09).  The 4-layer fields' places on the page come from a 2024 printout of it and from others' 4-layer orders; the page itself is drawn by JavaScript.

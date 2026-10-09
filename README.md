@@ -49,7 +49,7 @@ The panel as it comes from JLCPCB (245.2 x 223.2 mm), top and bottom:
 ## Making one
 
 - [`ORDER_LIST.md`](ORDER_LIST.md): everything to buy (the boards, a 12 V adapter, two
-  magnets, a little PLA and some thread) and what it costs (about $550 for five panels,
+  magnets, a little PLA and some thread) and what it costs (about $575 for five panels,
   two of them assembled).
 - [`mfg/release/`](mfg/release/): the upload for JLCPCB, and `ORDER_SETTINGS.md`, which
   says what to choose on each line of their order page.

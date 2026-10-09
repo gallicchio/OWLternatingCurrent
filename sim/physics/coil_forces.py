@@ -2,7 +2,7 @@
 """What can a PCB coil do to a neodymium magnet?
 
 One canonical coil: a 4-layer spiral, 15 mm outer radius, 3 mm inner, 12 turns
-per layer (0.6 mm track, 1 mm pitch), on JLC04161H-7628.  Its resistance is
+per layer (0.6 mm track, 1 mm pitch), on JLC041611-7628.  Its resistance is
 computed for 1 oz outer / 0.5 oz inner (JLCPCB's default) and 2 oz / 1 oz.
 
 Questions:

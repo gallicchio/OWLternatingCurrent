@@ -14,7 +14,7 @@ Coordinates: each board's own frame (gen/layout.py: millimetres, x right, y down
 board's PANEL_OFFSETS place it on the panel, and ORIGIN puts the panel's top-left corner
 on KiCad's page.
 
-The stack-up (JLC04161H-7628, 1.6 mm, 1 oz on every layer): F.Cu is the scene's side
+The stack-up (JLC041611-7628, 1.6 mm, 1 oz on every layer): F.Cu is the scene's side
 (LEDs, antennas, the coils' top turns); In1.Cu carries the supplies as pours and some
 signals; In2.Cu is ground, unbroken except under the coils and the antennas; B.Cu is the
 electronics' side.
@@ -448,7 +448,7 @@ def fill(board):
 
 
 # The physical stack-up, written into the board file (KiCad's Python cannot set it): JLCPCB's
-# JLC04161H-7628 with 1 oz copper inside and out, and the colours that are ordered, so
+# JLC041611-7628 with 1 oz copper inside and out, and the colours that are ordered, so
 # KiCad's 3D view and renders show the board as it will come (purple, white, ENIG).
 STACKUP = [("F.SilkS", "Top Silk Screen", [("color", '"White"')]),
            ("F.Paste", "Top Solder Paste", []),

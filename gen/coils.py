@@ -72,7 +72,7 @@ import project
 
 TAU = 2 * math.pi
 LAYERS = ["F.Cu", "In1.Cu", "In2.Cu", "B.Cu"]
-# copper centres below the top copper's, in metres: JLC04161H-7628 with 35 um copper on
+# copper centres below the top copper's, in metres: JLC041611-7628 with 35 um copper on
 # every layer, 0.2104 mm prepreg and a 1.065 mm core (gen/board.py's stack-up)
 Z = {"F.Cu": 0.0, "In1.Cu": -0.2454e-3, "In2.Cu": -1.3454e-3, "B.Cu": -1.5908e-3}
 PLATING = 20e-6                   # via barrel copper, m (JLCPCB: 18 um minimum)

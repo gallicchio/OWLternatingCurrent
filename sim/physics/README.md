@@ -36,7 +36,7 @@ The self-tests agree with closed forms to better than 0.02 %:
 
 ## The canonical coil
 
-A 4-layer spiral on JLC04161H-7628: 15 mm outer radius, 3 mm inner, 12 turns per
+A 4-layer spiral on JLC041611-7628: 15 mm outer radius, 3 mm inner, 12 turns per
 layer, 0.6 mm track at 1 mm pitch.
 - L = 31.5 µH.
 - R = 3.35 Ω with JLCPCB's default copper (1 oz outer, 0.5 oz inner), 1.68 Ω with

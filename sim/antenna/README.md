@@ -44,7 +44,7 @@ with reasonable efficiency. Which topology works best, and how much tuning margi
 there?
 
 The board assumed throughout: 1.6 mm FR4 (εr 4.4, tan δ 0.02). It's either 2-layer or
-JLC04161H-7628 4-layer; with every copper layer cleared under the antenna they're the same
+JLC041611-7628 4-layer; with every copper layer cleared under the antenna they're the same
 model. The rest of the board is a 100 × 80 mm via-stitched ground. The antenna sits on a
 bare-FR4 tab in the middle of the 100 mm edge.
 
@@ -158,7 +158,7 @@ currents cancel in the far field and add reactance at the feed.
 * **Feed.** The tail point lands on a **2.4 mm wide feed** whose end is **0.5 mm from
   the ground-pour edge**. That 0.5 mm is the port gap. In KiCad, the RF trace from the pi
   network crosses the pour edge and widens to 2.4 mm under the tail. Up to the pour edge
-  the line is ordinary 50 Ω. On the JLC04161H-7628 4-layer stack that's a microstrip
+  the line is ordinary 50 Ω. On the JLC041611-7628 4-layer stack that's a microstrip
   over L2 (about 0.35 mm wide). On 2-layer 1.6 mm it's a via-fenced coplanar waveguide
   (about 1 mm wide with 0.15–0.2 mm gaps). Take the exact width from JLCPCB's impedance
   calculator.

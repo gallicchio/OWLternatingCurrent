@@ -152,7 +152,7 @@ meet only through mated connectors, and each sheet's PWR_FLAGs say so.
 - **On USB alone** the RP2354A, the LED drivers' logic and the sensors run (it can be
   programmed with no adapter), but the LED anodes (+5V) are dark and the coils (+12V) off.
   The firmware reads VBUS, V5 and V12 through the mux and knows which.
-- **Stack-up and planes** (JLC04161H-7628, 1.6 mm, 1 oz on all four layers): F.Cu the
+- **Stack-up and planes** (JLC041611-7628, 1.6 mm, 1 oz on all four layers): F.Cu the
   scene and its LEDs; In1 the 4.8 V plane (ground under the RP2354A's corner, where a few
   lines may run); In2 solid ground; B.Cu the electronics. Ground and 4.8 V reach their
   planes through a via at every pad; +12V and +3V3 are routed (+12V at 1.0 mm, 0.6 where
@@ -236,7 +236,7 @@ part role), art (`gen/art.py`), planned copper and routing (`gen/routes.py`,
 (`gen/panel.py`). Nothing on the board is drawn by hand in KiCad, and a build takes about
 15 minutes.
 
-**Stack** (JLC04161H-7628, 1.6 mm, 1 oz on every layer):
+**Stack** (JLC041611-7628, 1.6 mm, 1 oz on every layer):
 
 | layer | base | tree | perch | bat, tokens |
 |---|---|---|---|---|

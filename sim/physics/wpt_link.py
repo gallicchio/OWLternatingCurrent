@@ -24,7 +24,7 @@ OUT = os.path.join(HERE, "results")
 os.makedirs(OUT, exist_ok=True)
 
 # --- geometry -----------------------------------------------------------------
-# TX: 4 layers of JLC04161H-7628 (L1-L2 0.21 mm, L2-L3 1.065 mm, L3-L4 0.21 mm),
+# TX: 4 layers of JLC041611-7628 (L1-L2 0.21 mm, L2-L3 1.065 mm, L3-L4 0.21 mm),
 # 1 oz outer / 0.5 oz inner unless 2 oz is ordered.
 TX = dict(r_out=16e-3, r_in=6e-3, n=10, w=0.6e-3,
           z=[0.0, -0.21e-3, -1.275e-3, -1.485e-3], t=[mg.OZ, mg.OZ / 2, mg.OZ / 2, mg.OZ])

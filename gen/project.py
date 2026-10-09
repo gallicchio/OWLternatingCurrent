@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """The KiCad project file: design rules at least as strict as JLCPCB's for the
-JLC04161H-7628 4-layer stack-up, the net classes, and the ERC settings.
+JLC041611-7628 4-layer stack-up, the net classes, and the ERC settings.
 
     python3 gen/project.py      writes hardware/OWLternatingCurrent.kicad_pro and .kicad_dru
 

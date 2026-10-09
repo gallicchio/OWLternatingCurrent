@@ -13,14 +13,14 @@ Written by `mfg/make_release.py` on 2026-10-09.  On jlcpcb.com, **Order now**, u
 | Product Type | Industrial/Consumer electronics | |
 | Different Design | 6 (type it in: the buttons stop at 4) | base, tree, perch, bat, owl token and cat token on one panel; with Panel by Customer, JLCPCB takes up to 10 |
 | Delivery Format | Panel by Customer | the panel is ours: rails, tabs and mouse bites are in the gerbers.  If the page asks for columns and rows, 1 x 1: one panel of six different boards, nothing repeated |
-| PCB Thickness | 1.6 mm | the JLC04161H-7628 stack-up; the 3D prints (gen/mech.py) are drawn for 1.6 |
+| PCB Thickness | 1.6 mm | the JLC041611-7628 stack-up; the 3D prints (gen/mech.py) are drawn for 1.6 |
 | PCB Color | Purple | Halloween.  Purple on 4 layers rules out Economic PCBA, hence Standard below |
 | Silkscreen | White | |
 | Material Type | FR4-Standard TG 135-140 | the 4-layer default; nothing here runs hot enough to need more |
 | Surface Finish | ENIG | the moon and the ghost (the theremin's antennas) are bare gold copper; lead-free for a child's hands; flat pads for the 0.4 mm QFNs |
 | Outer Copper Weight | 1 oz | 5 A in pours is enough at 1 oz (PLAN.md section 4) |
 | Inner Copper Weight | 1 oz | halves the coils' inner-layer resistance (3.35 to 2.2 ohm): a third less heat (PLAN.md section 4) |
-| Impedance Control / Layer Stackup | Yes, JLC04161H-7628 | the stack-up gen/project.py's rules and the coils' physics assume (if the page pairs 1 oz inner copper with a different 7628 stack-up, take that one; no line on this board needs a controlled impedance) |
+| Impedance Control / Layer Stackup | Yes, JLC041611-7628 (no letter after 7628) | the stack-up gen/project.py's rules and the coils' physics assume: one 7628 prepreg each side of a 1.065 mm core.  JLCPCB's names read JLC, layers, thickness, outer copper, inner copper, prepreg: JLC04161H-7628 is the same build with 0.5 oz (H) inner copper, so with 1 oz inner chosen the page lists only the ...11- names; 7628A-H are other core and prepreg layerings.  No line on this board needs a controlled impedance; 'Yes' only brings up the list |
 | Via Covering | Tented | the default; the exposed pads' thermal vias wick a little solder, as Raspberry Pi's layout intends (GPiBridge, built this way) |
 | Min via hole size/diameter | 0.25mm/(0.35/0.4mm) | the board's smallest via is 0.25 mm in 0.45 mm; the page may fill this in from the drill file: check that it agrees |
 | Board Outline Tolerance | +-0.2mm (Regular) | |

@@ -15,7 +15,7 @@ POCKET_D = 10.35         # printed pocket: PLA prints holes ~0.15-0.2 mm small
 POCKET_T = 2.25
 
 # --- boards --------------------------------------------------------------------------
-PCB_T = 1.6              # every board on the panel (JLC04161H stack-up)
+PCB_T = 1.6              # every board on the panel (JLC041611 stack-up)
 COPPER_TO_SURFACE = 0.05 # top copper to the top of the solder mask, roughly
 
 # --- the perch (horizontal, plugs onto the tree's top header) ------------------------

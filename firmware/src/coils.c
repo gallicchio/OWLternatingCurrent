@@ -112,6 +112,11 @@ static bool fon[2];
 
 void perch_init(void)
 {
+    /* The perches rely on slice_setup's inverted B channel: with A = cc and B = P - cc
+     * (perch_set), A's pulse is centred on the period's start and B's, inverted, on
+     * TOP: the +-4.8 V three-level wave with its fundamental at the commanded frequency.
+     * Both channels non-inverted would put the two pulses a half-period apart with the
+     * same sign, and the fundamental would cancel (review 2026-10-09). */
     for (int p = 0; p < 2; p++) {
         slice_setup(FSLICE[p], 749);
         pwm_set_both_levels(FSLICE[p], 0, 750);           /* both legs low */

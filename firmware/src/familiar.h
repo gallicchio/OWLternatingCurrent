@@ -1,11 +1,11 @@
 /* familiar.h: the wireless familiars (PLAN.md C1): find a token on a perch, say
  * which it is, and light it.
  *
- * What is measured.  FAMn_ISENSE is the perch bridge's 5 V supply current, averaged
- * (RC-filtered).  The coil sees +5 V during leg A's pulse, -5 V during leg B's and 0
- * while both legs are low, so the supply delivers the coil's power: I = P / 5 V, with
+ * What is measured.  FAMn_ISENSE is the perch bridge's 4.8 V supply current, averaged
+ * (RC-filtered).  The coil sees +4.8 V during leg A's pulse, -4.8 V during leg B's and 0
+ * while both legs are low, so the supply delivers the coil's power: I = P / 4.8 V, with
  * P = sum over the odd harmonics of (Vn^2 / 2) G(n f), G = Re(Y) the perch's
- * conductance and Vn = (4 / (n pi)) 5 V sin(n pi duty); plus the drivers' own draw
+ * conductance and Vn = (4 / (n pi)) 4.8 V sin(n pi duty); plus the drivers' own draw
  * (a few mA, independent of the duty).  An empty perch is almost purely inductive:
  * G = R1 / (R1^2 + (w L1)^2), small and falling as 1/f^2.  A token (a coil with a
  * C0G tank and two LEDs, the owl tuned to FAM_OWL_HZ, the cat to FAM_CAT_HZ) absorbs
@@ -73,8 +73,12 @@
 #define FAM_RAMP_DOWN_S        1.5f
 #define FAM_DITHER             0.01f      /* [CHOICE] +-1 % frequency dither in DRIVE ... */
 #define FAM_DITHER_HALF_S      0.005f     /* ... 5 ms each side: 100 Hz */
-#define FAM_L1_H               28.5e-6f   /* [SIM] familiar.py: the perch coil */
-#define FAM_R1_OHM             4.2f       /* [SIM] familiar.py: the perch coil's resistance, 150-330 kHz */
+#define FAM_L1_H               30.3e-6f   /* [SIM] gen/coils.py: the perch coil as drawn (familiar.py's
+                                             idealised 28.5 uH until the review of 2026-10-09) */
+#define FAM_R1_OHM             4.2f       /* [SIM] familiar.py: the perch coil's resistance, 150-330 kHz.
+                                             The UCC27524's own output resistance (ROH 5 ohm typical at
+                                             12 V, more at 4.8 V) is in series with it and in no model:
+                                             measure the loop on the first board and fold it in here */
 
 typedef enum { FAM_NONE = 0, FAM_OWL, FAM_CAT, FAM_UNKNOWN } fam_who;
 typedef enum { FAM_ST_OFF = 0, FAM_ST_IDLE, FAM_ST_SWEEP, FAM_ST_FIT, FAM_ST_RAMP_UP, FAM_ST_DRIVE,

@@ -98,8 +98,8 @@ Orca Slicer should open `plate_bambu.3mf` the same way, but I haven't tested it:
 
 1. **Feet:** from underneath the base board, push each pumpkin's split peg up through a corner hole until the barb clicks over the top. The board rests on the pumpkin's flat top.
 2. **Owl:** ideally before plugging the perch onto the tree, so you can hold the perch in your hand. Set the owl over the coil, **facing the front** (away from the tree socket), with its wings over the two notches in the perch's sides. Press straight down until both wings click under the board, or hook one wing under first and press the other side down. Its base sits flat on the coil.
-3. **Bat cap: ears toward the bat's head.** Hook the head end under the head edge, then press the tail end down until it clicks under the tail edge. The hooks pull the cap down, so the magnet presses on the bat through the cap's 0.4 mm floor.
-4. To take either off, spread a wing or a cap end outward with a fingernail and lift.
+3. **Bat cap: ears toward the bat's head.** Hook the head end under the head edge, then press the tail end down until it clicks under the tail edge. The hooks pull the cap down, so the magnet presses on the bat through the cap's 0.4 mm floor. **Then glue it**: a drop of cyanoacrylate where each hook meets the board's edge, and let it set. The cap holds a 10 x 2 mm N52 magnet and is small enough to swallow; glued to the bat (48 x 25 mm) it is not a small part, and the magnet is sealed in the print anyway. (Review of 2026-10-09: a snap-on cap is not retention a child cannot defeat.)
+4. To take the owl off, spread a wing outward with a fingernail and lift. The cap stays on.
 
 ![assembly check](out/assembly.png)
 

@@ -671,9 +671,9 @@ def main():
     tabs, n_bites, per = PN.build(board, PP, mm, edges, holes, load_fp, seed)
     print("panel: %.1f x %.1f mm, %d tabs (%s), %d mouse-bite holes, 3 fiducials, 4 tooling holes"
           % (PANEL_W, PANEL_H, len(tabs), ", ".join("%s %d" % kv for kv in sorted(per.items())), n_bites))
-    for n in PL.BOARDS:
-        if per.get(n, 0) < 2:
-            print("   PANEL: %s has %d tab(s)" % (n, per.get(n, 0)))
+    weak = [n for n in PL.BOARDS if per.get(n, 0) < 2]
+    for n in weak:
+        print("   PANEL: %s has %d tab(s)" % (n, per.get(n, 0)))
     if routers and "--nopour" not in args:
         fill(board)
         n = prune(board) if not os.environ.get("NOPRUNE") else 0
@@ -687,6 +687,12 @@ def main():
     print("board: %d footprints on %d boards%s -> %s"
           % (len(fps), len(PL.BOARDS), "" if art else " (placeholder outlines: no gen/art.py yet)",
              os.path.relpath(PCB, ROOT)))
+    if weak:
+        # a board on one tab breaks loose in the oven or in the post (the perch once hung
+        # from tabs in its two notches, which the clean-edge check now refuses): the board
+        # file is written for a look, but the build stops here
+        print("BOARD FAILED: fewer than two tabs on %s (gen/panel.py find_tabs)" % ", ".join(weak))
+        return 1
     return 0
 
 

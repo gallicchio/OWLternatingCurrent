@@ -1336,7 +1336,13 @@ def base_route(R):
     taken |= set(local)
     mcu = [m for m in R.by_net if any(r == "U4" for r, _ in R.pads.of.get(m, [])) and m not in POWER
            and m not in taken and m.startswith("/Base/")]
-    early += [(net, (0.2, 0.15), {}) for net in travel_order(R, "U4", set(mcu))]
+    # the two lines shared by all four coil bridges (sleep and fault: five and six pads
+    # across the board) go before the chip's other lines: routed among them in travel
+    # order they twice ended in pieces, walled in by the LED channels (2026-10-09), and
+    # the rip-up could not free them
+    shared = [m for m in (n("DRV_nSLEEP"), n("DRV_nFAULT")) if m in mcu]
+    early += [(net, (0.2, 0.15), {}) for net in shared]
+    early += [(net, (0.2, 0.15), {}) for net in travel_order(R, "U4", set(mcu) - set(shared))]
     taken |= set(mcu)
     for chip in ("U3",):
         chans = [m for m in R.by_net if any(r == chip for r, _ in R.pads.of.get(m, [])) and m not in POWER

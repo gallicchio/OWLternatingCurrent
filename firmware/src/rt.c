@@ -491,6 +491,10 @@ void rt_start(bool cold_boot, const lev_cal_data *cal)
     thermal_params tp;
     thermal_default_params(&tp);
     for (int c = 0; c < COIL_COUNT; c++) {
+        /* the levitation coil's own resistance (three layers, 2.56 ohm), not the pendulum
+         * coils' 2.29: until the cold calibration measures it, u = i R / V12 would have
+         * been 10 % short of the current asked for (review 2026-10-09) */
+        tp.r20_ohm = (c == COIL_LEV) ? LEV_COIL_R20_OHM : COIL_R20_OHM;
         thermal_init(&rt_thermal[c], &tp, AMBIENT_DEFAULT_C);
         if (cold_boot)                      /* after a power-on, not after a watchdog reset */
             thermal_assume_cold(&rt_thermal[c]);

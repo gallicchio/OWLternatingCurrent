@@ -319,13 +319,21 @@ The repository would be `github.com/gallicchio/hocus-flux` (or the chosen name);
   - So every magnet is printed in (pause the print, drop the magnet in, print over it),
     never glued into an open pocket. That includes the bat's, the bias magnet in the
     perch cap, and any pendulum or rolling magnet.
+  - The part that holds a magnet must itself be too big to swallow, or fixed to one that
+    is: the bat's snap-on cap is glued to the bat once fitted (review of 2026-10-09,
+    Grok: the cap alone fits the small-parts cylinder).
 - **Violet light:** 405 nm, not 395 nm. 395 nm looks dim, so the blink reflex does not
   protect the eye. Use low current and diffuse the LEDs. IEC 62471's limits are measured
   at 200 mm; a child at 2 cm gets about 100 times the exposure.
-- **Heat:** every coil's duty is limited in firmware, with a temperature sensor beside
-  the coils, so nothing a hand can reach passes about 45 °C.
-- **Power:** a UL-listed 12 V adapter, a fuse on the board, rounded corners, and ENIG
-  (lead-free).
+- **Heat:** every coil's duty is limited in firmware, each coil's own resistance being its
+  thermometer (calibrated cold at power-up; the TMAG5273 between the pendulum coils reads
+  their ambient), so nothing a hand can reach passes about 45 °C.
+- **Power:** a UL-listed 12 V adapter, a 3 A PTC on the board (one a 3-5 A brick can
+  trip), rounded corners, and ENIG (lead-free).
+- **Sound:** the amplifier's gain is 1.1 (220 k inputs): 0.2 W full scale, under a toy's
+  85 dB whatever the firmware does; the slide switch holds it in shutdown.
+- **Touch:** the theremin's bare gold has an ESD diode at each pad; snapped edges are
+  sanded before the boards reach a child.
 
 ## 8. Precedents (`research/web_research.md` §2)
 
@@ -351,3 +359,30 @@ The repository would be `github.com/gallicchio/hocus-flux` (or the chosen name);
 - Her name on the board? (Answered 2026-10-08: no name; the project is open source.)
 - Do you have a 3D printer here (a Bambu?), or should the prints go to JLC3DP with
   the boards?
+
+## 10. After the review of 2026-10-09: for the bench and for rev B
+
+What the five reviews changed is in `docs/REVIEW_2026-10-09.md`. Left for later, in
+the order they matter:
+
+- **At bring-up** (firmware, no copper): measure the perch loop's resistance with the
+  UCC27524 in it and fold it into `FAM_R1_OHM` (the driver's ROH is in no model);
+  confirm the IMU's axis signs by tilting; scope the 4.8 V rail at the amplifier through
+  an LED step; a current step into the levitation coil with the Hall sensor recorded
+  (does `kcs` match 2.9 mT/A, how much 100 kHz is left); `lev cal zero` before the
+  first float.
+- **A printed cradle** that holds the bat at the float height while the loop catches
+  it (print/, OpenSCAD): the one piece of the levitation that does not exist.
+- **Port `sim/physics/levitation_loop.py`** to the one-magnet design and the DRV8874's
+  ripple and chopper; its committed results are the old two-magnet plant, and the
+  firmware's gains were re-validated only by the C host test. Add plant-vs-controller
+  mismatch cases (mass, Br, coil +-10 %) to `test_lev`.
+- **The familiar drive:** no time limit on driving a "token" (a phone's Qi coil could
+  fit the model and be driven forever at 0.25 W: harmless, odd); the leave check could
+  run during the ramp too.
+- **GPIO binding, rev B:** `gen/assign.py` scores a fixed-cut proxy, not the cyclic
+  count it reports; re-ranking its best candidates with `cyclic_crossings` finds 76
+  crossings where it kept 84, and letting bridges use GPIO16-25 finds 48-63. Not
+  rebound for rev A (the board routes clean as it is).
+- **The panel:** the bat hangs by two tabs on its head edge (its other edges are
+  curved); fine for a few reflows, worth a third if a bat ever breaks loose.

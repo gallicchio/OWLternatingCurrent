@@ -8,16 +8,21 @@
  *   TMAG5273A2 (0x35)   3-axis Hall under the pendulum: X, Y, Z at +-133 mT and its
  *                       temperature, continuous conversion, 8x averaging (pendulum.h's noise)
  *
- * [ASSUMED] the IMU's axes are the board's (x right, y toward the sky, z out of the
- * face); IMU_AXIS_* below fix it once the placement is known.
+ * [ASSUMED] a chip on the top side at 0 degrees would have the board's axes (x right,
+ * y toward the sky, z out of the face).  U15 is on the BOTTOM at 0 degrees: KiCad
+ * mirrors a back-side footprint top-to-bottom (its pad 1 is at local (-1.26, -0.75) in
+ * the library and lands at (-1.26, +0.75) on the board, checked in the board file), so
+ * the chip's y runs along the board's -y and its z points into the board: Y and Z flip,
+ * X keeps its sense.  Still to be confirmed by tilting the first board (the wisps roll
+ * the wrong way if a sign is wrong; harmless).
  */
 #pragma once
 #include <stdbool.h>
 #include <stdint.h>
 
-#define IMU_AXIS_X  (+1)    /* board x = IMU_AXIS_X * IMU x  [ASSUMED] */
-#define IMU_AXIS_Y  (+1)
-#define IMU_AXIS_Z  (+1)
+#define IMU_AXIS_X  (+1)    /* board x = IMU_AXIS_X * IMU x  [ASSUMED, see above] */
+#define IMU_AXIS_Y  (-1)    /* mirrored by the bottom-side placement */
+#define IMU_AXIS_Z  (-1)    /* the chip faces down */
 
 typedef struct {
     bool present;

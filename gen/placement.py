@@ -213,6 +213,11 @@ b.near("u15:cvdd", "U15", -3.6, -1.6, 90)
 b.near("u15:cvddio", "U15", -3.6, 1.6, 90)
 b.near("u16:cvdd", "U16", 3.2, 0.0, 90)
 b.put("U17", L.PEND_REST[0], L.PEND_REST[1], 0, "B")    # under the pendulum's rest point
+# its 100 nF 21 mm away, behind the two rear pendulum coils: the first spot clear of
+# their courtyards (a 0603 beside the sensor, in the 2.75 mm channel between the coils,
+# overlapped both courtyards and blocked the one 0.6 mm-wide pass through which the
+# bridges' shared fault line threads the coils: tried in the review of 2026-10-09).  The
+# sensor draws 2.5 mA and talks I2C; the capacitor is a slow reservoir, not a bypass
 b.put("u17:cvcc", L.PEND_REST[0], L.PEND_REST[1] - 21.0, 0, "B")
 
 # the coil bridges: the levitation bridge by the tree's socket, each pendulum bridge
@@ -273,6 +278,12 @@ for name, (x, y) in (("PITCH", (64.0, 38.0)), ("VOL", (42.0, 116.0))):
     b.near("osc_%s:rout" % name, u, 3.8, 0.0, 90)
     b.near("osc_%s:rf" % name, u, 0.0, 3.6, 0)
     b.near("osc_%s:ct" % name, u, -3.8, 0.0, 90)
+    # the 1k to the antenna's pad and the ESD diode, both on the chip's far side from the
+    # shape: the pad is on the scene side inside the shape's keep-out, where no via may
+    # go, so a diode at the chip's near side (0.2 mm inside the keep-out) could not be
+    # reached from the pad's copper; the routed track is a few millimetres either way
+    b.near("osc_%s:resd" % name, u, 3.8, -3.6, 0)
+    b.near("osc_%s:desd" % name, u, 3.8, 3.6, 0)
 
 
 # ======================================================================================

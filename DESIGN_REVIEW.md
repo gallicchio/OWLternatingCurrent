@@ -12,9 +12,12 @@ A reviewer should read the generators, not only their output.
 
 ## 0. For the reviewers: where to work and what to write
 
-Three reviewers work on this repository at the same time, independently. Jason will read
+Several reviewers work on this repository at the same time, independently. Jason will read
 only what you leave in your directory, never the chat. So write everything there,
 including what you would otherwise have said in the chat.
+
+(Round 1, 2026-10-09: four LLM reviews and the author's own, what each found and what
+changed, are in `docs/REVIEW_2026-10-09.md`.)
 
 **Your directory.** Make one directory at the repository's root, named
 `review_LLM_<name>_<version>`, after your model, for example `review_LLM_Gemini_3.0` or
@@ -93,16 +96,18 @@ board set that shows physics as magic.
 | feature | what she sees | the physics |
 |---|---|---|
 | **Light show** | violet stars, orange pumpkins that flicker like candles, purple will-o'-wisps, owls whose eyes open at dusk | 49 LEDs on two LP5036s, every change a fade through CIE L*; dusk and dawn from a light sensor |
-| **Wireless familiars** (C1) | put the owl token or the cat token on its perch and its eyes light; each perch lights only its own animal | resonant inductive power: each perch drives its coil at the token's tank frequency (owl 142 kHz, cat 303 kHz) and finds it by the drop in its own supply current |
+| **Wireless familiars** (C1) | put the owl token or the cat token on its perch and its eyes light; each perch lights only its own animal | resonant inductive power: each perch drives its coil at the token's tank frequency (owl 142 kHz, cat 303 kHz) and finds it by the rise in its own supply current (the power the token takes) |
 | **The pendulum bat** (C2) | a bat on a thread that never stops swinging, or circles the moon | three coils under the swing give it timed kicks; a 3-axis Hall sensor under the rest point times them |
 | **The levitating bat** (C3) | the bat floats in the air under the owl's perch | a magnet in the printed owl holds the bat's magnet up; a 10 kHz loop on a Hall sensor and the perch's coil keeps it from falling or jumping up (Earnshaw's theorem says it cannot float on magnets alone) |
 | **Theremin** (B5) | move a hand toward the gold moon and a note rises; toward the gold ghost and it gets louder | two relaxation oscillators whose capacitance includes the hand; a speaker that a slide switch turns off |
 | **The spell book** | the back of the base: the equations behind each trick, "for a young owl" | silkscreen |
 
-Rev A is to be ordered from JLCPCB fully assembled (both sides, through-hole parts too):
-Jason's own work is to print one plate of PLA (the owl, the bat's cap, four feet), drop
-in two magnets at a pause, snap the boards apart, plug them together, and flash firmware
-over USB-C. `ORDER_LIST.md` lists everything to buy.
+Rev A is to be ordered from JLCPCB assembled (both sides, through-hole parts too, except
+the tree's two right-angle headers and the perch's socket, soldered at home: see
+`docs/REVIEW_2026-10-09.md`): Jason's own work is to print one plate of PLA (the owl, the
+bat's cap, four feet), drop in two magnets at a pause, snap the boards apart and sand the
+edges, solder the three connectors, plug the boards together, glue the bat's cap, and
+flash firmware over USB-C. `ORDER_LIST.md` lists everything to buy.
 
 ## 2. The boards and how they connect
 
@@ -132,7 +137,7 @@ meet only through mated connectors, and each sheet's PWR_FLAGs say so.
 ## 3. Power
 
 - **Input:** 12 V, 3-5 A brick on a 5.5 x 2.1 mm barrel jack (J1, centre positive) ->
-  F1 (5 A PTC, 2920) -> Q1 (AO4407A P-MOSFET, reverse-polarity protection; D1 a 10 V
+  F1 (3 A hold / 6 A trip PTC, 24 V, 2920) -> Q1 (AO4407A P-MOSFET, reverse-polarity protection; D1 a 10 V
   zener gate clamp, R1 100 k pull-down) -> **+12V**. D2 (SMBJ15A TVS) and C1 (470 uF 35 V
   polymer) on +12V. The jack's line runs straight down through F1 and Q1 into a 12 V pour
   under them (`gen/routes.py power_entry`).
@@ -192,9 +197,10 @@ sets each bank's brightness for its brightest LED and dithers the colour registe
   49 turns, 33.2 uH, 2.29 ohm), one the levitation coil on the perch (L201, 3 layers, 43
   turns, 30.1 uH, 2.56 ohm) through the tree.
 - Two UCC27524 (dual low-side drivers used as a full bridge from 4.8 V) drive the
-  familiar perches (L6, L7: 30.3 uH, 2.13 ohm) through a 10 uF blocking capacitor; a 0.5
-  ohm shunt in each bridge's ground return, x20.6 (OPA2333) and filtered, gives the
-  supply current (10.3 V/A) that tells the firmware a token is there.
+  familiar perches (L6, L7: 30.3 uH, 2.13 ohm) through a 10 uF blocking capacitor; a 0.1
+  ohm shunt in each bridge's ground return, x101 (OPA2333) and filtered, gives the
+  supply current (10.1 V/A) that tells the firmware a token is there. (0.1 ohm, not
+  0.5: the driver stands on the shunt and its start threshold is 4.5 V at most.)
 - Every coil is a generated footprint whose own copper is the spiral, a KiCad net tie
   (`gen/coils.py`, its checks; L and R from `sim/physics/magnetics.py`).
 
@@ -208,10 +214,12 @@ perch currents and the three rail dividers on one ADC pin.
 ### 5.4 Theremin and audio
 Two 74LVC1G14 Schmitt relaxation oscillators (U12 pitch, U13 volume), each with its
 antenna (the gold moon and ghost: F.Cu on its net under an ENIG mask opening, no plane
-under it on any layer, a 3 mm keep-out round it), counted by PIO. Audio: one PWM output,
-two RC stages, an NS4150B class-D amplifier, an 8 ohm 1 W speaker (GSPK2307P, soldered
-by JLCPCB). The SOUND slide switch holds the amplifier's CTRL low (shutdown) whatever the
-firmware does.
+under it on any layer, a 3 mm keep-out round it), counted by PIO. The gold is touched by
+hand, so each antenna's pad has an ESD diode to ground (ESD9L5.0ST5G, 0.9 pF) and 1 k
+in series to the gate. Audio: one PWM output, two RC stages, an NS4150B class-D
+amplifier at a gain of 1.1 (220 k inputs: full scale is 0.2 W, under a toy's 85 dB
+whatever the firmware does), an 8 ohm 1 W speaker (GSPK2307P, soldered by JLCPCB). The
+SOUND slide switch holds the amplifier's CTRL low (shutdown) whatever the firmware does.
 
 ## 6. Mechanics and the 3D prints
 `print/`: one PLA plate (owl, bat cap, four feet), one pause for both magnets
@@ -273,8 +281,9 @@ inside each board's edge.
 4. **A maze router** (A* on a 0.1 mm grid, three routing layers) routes the rest in a
    fixed order:
    - short local nets first;
-   - the RP2354A's lines and the LED channels in "travel order" (those heading straight
-     out first, those that travel round the chip last);
+   - the two lines shared by all four coil bridges (sleep and fault, five and six pads
+     across the board), then the RP2354A's other lines and the LED channels in "travel
+     order" (those heading straight out first, those that travel round the chip last);
    - power, then the coil pairs (the farther first), then everything else.
 5. **Rip-up and reroute** (`routes.repair`). For a net still in pieces, the router-laid
    nets that bound the pocket it was walled into come out. The walled-in net goes first,
@@ -282,7 +291,7 @@ inside each board's edge.
    copper goes back exactly. It finishes the last 5-8 nets of the base.
 6. **Widening**, ground stitching vias, pours. Then `board.prune` removes what the
    routing did not need: vias that join copper on one layer only, and track stubs with a
-   free end. In this build that was 82 items, mostly planned vias beside 3.3 V pads that
+   free end. In this build that was 84 items, mostly planned vias beside 3.3 V pads that
    the router reached another way.
 
 **Placement changes the fan-out asked for** (each one's reason is in `gen/placement.py`):
@@ -301,7 +310,7 @@ inside each board's edge.
 
 | board | tracks | vias | nets left in pieces |
 |---|--:|--:|--:|
-| base | 3471 | 1028 | 0 |
+| base | 3521 | 1085 | 0 |
 | tree | 296 | 159 | 0 |
 | perch | 94 | 22 | 0 |
 | bat | 39 | 5 | 0 |
@@ -310,11 +319,13 @@ inside each board's edge.
 KiCad's DRC at every severity, with schematic parity (`tools/pcb_check.py`, written to
 `hardware/checks/drc.json`): 0 violations, 0 unconnected items, 0 parity errors.
 
-**The panel** (`gen/panel.py`): 245.2 x 223.2 mm, 23 tabs (base 15, tree 8, perch 3,
-owl token 4, cat token 3, bat 2), 140 mouse-bite holes. A tab is placed only where its
+**The panel** (`gen/panel.py`): 245.2 x 223.2 mm, 22 tabs (base 16, tree 6, perch 2,
+owl token 4, cat token 3, bat 2), 132 mouse-bite holes. A tab is placed only where its
 holes miss every part's courtyard (the tree's headers reach past its edges) and the
 edges that must stay clean (the USB and barrel-jack mouths, the switch's lever, the
-perch's and the bat's notches). Three fiducials and four tooling holes sit on 5 mm rails.
+perch's and the bat's notches), on both boards it joins; a board with fewer than two
+tabs fails the build. Three fiducials (a pad on each side) and four tooling holes sit
+on 5 mm rails.
 
 To look at the copper: `python3 tools/render_pcb.py` writes `build/view/pcb_*.png`;
 `--crop` takes board millimetres.
@@ -324,7 +335,7 @@ To look at the copper: `python3 tools/render_pcb.py` writes `build/view/pcb_*.pn
 `mfg/make_release.py` writes `mfg/release/`: gerbers, BOM and CPL in JLCPCB's format
 (bottom side 180 - angle, X not negated, checked against JLCPCB's own drawing of every
 chip part on both sides), placement and footprint checks, order settings and a cost
-estimate (about $366 for 5 panels with 2 assembled, before about $128 duty and
+estimate (about $356 for 5 panels with 2 assembled, before about $125 duty and
 shipping). It refuses to write a release if an LCSC code's description lacks the part,
 a part is short of stock, the zones are not filled, DRC is unclean, or a footprint's
 holes miss JLCPCB's drawing.
@@ -347,15 +358,16 @@ with the file and line is the most useful form.
    long cord? The 12 V reaches the four DRV8874s through routed copper widened to 1 mm
    where it fits and 0.4 mm into the pins: is that enough for 3.3 A trip currents in
    short pulses?
-2. **The 4.8 V buck** (TPS54302, 400 kHz, 10 uH FXL0630, two 10 uF outputs): stable
+2. **The 4.8 V buck** (TPS54302, 400 kHz, 10 uH FXL0630, two 22 uF outputs): stable
    with ceramic outputs and the rail's load (49 LEDs to 1 A, an NS4150B, two UCC27524
    bridges at 142 and 303 kHz)? Its power loop is planned copper (VIN to the input
    capacitors beside the pins, SW straight to the inductor): look at the layout render.
 3. **The levitation** (`sim/physics/levitation_onemagnet.py`, `levitation_loop.py`,
    `firmware/src/lev_ctrl.c`): one N52 10 x 2 mm magnet in the owl 14.05 mm above the
-   perch's top copper holds a 3.7 g bat about 8.5 mm under it; a DRV5055 in the coil's
-   hole and a 10 kHz loop stabilise it vertically. Is the loop's margin real with the
-   DRV8874's PWM (40 kHz) and its current regulation in the loop? Does the Hall sensor
+   perch's top copper holds a 3.6 g bat about 8.5 mm under it (the magnets are on
+   opposite faces of the perch, 24 mm apart); a DRV5055 in the coil's hole and a 10 kHz
+   loop stabilise it vertically. Is the loop's margin real with the DRV8874's PWM
+   (100 kHz since the review; 40 kHz before) and its current regulation in the loop? Does the Hall sensor
    see enough of the bat and little enough of its own coil?
 4. **The familiars** (`sim/physics/familiar.py`, `firmware/src/familiar.c`): finding a
    token by the bridge's supply current through a 0.5 ohm shunt, x20.6 and a 1 ms
@@ -368,7 +380,7 @@ with the file and line is the most useful form.
    constraints the firmware has (PWM slices, ADC pins, I2C0, UART0), is there a binding
    with fewer crossings than 84? Are the constraints themselves right for the RP2350's
    GPIO function table?
-7. **The panel** (`gen/panel.py`): 23 tabs with mouse bites, three fiducials and four
+7. **The panel** (`gen/panel.py`): 22 tabs with mouse bites, three fiducials and four
    tooling holes on 5 mm rails; the tree turned 90 degrees. The tree's two right-angle
    headers' pins reach 6 mm past its top and bottom edges, below the panel's plane: one
    over the left rail, one over the perch's edge. Will JLCPCB's assembly accept that?
@@ -381,8 +393,8 @@ with the file and line is the most useful form.
    Raspberry Pi's layout, and the crystal's lines are planned by hand round the
    crystal. Is the 1.1 V and 3.3 V decoupling still good enough, and are XIN/XOUT
    short and guarded enough (12 MHz, 15 pF loads, ground pour round them on top)?
-10. **Child safety** (`CLAUDE_PCB.md` section 16): two 10 x 2 mm magnets sealed inside
-   PLA prints, 12 V, a 1 W speaker, PCB edges after snapping the tabs.
+10. **Child safety**: two 10 x 2 mm magnets sealed inside PLA prints (the bat's cap now
+   glued on), 12 V, a 1 W speaker, PCB edges after snapping the tabs.
 
 ## 11. Known risks and open items
 

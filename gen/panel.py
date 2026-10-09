@@ -100,10 +100,20 @@ def find_tabs(edges, holes_of=None, courtyards=()):
             along = (abs(d[1]), abs(d[0]))              # the direction along the side
             lo_, hi_ = (x0, x1) if along[0] else (y0, y1)
             length = hi_ - lo_
-            fracs = (0.5,) if length < 40 else ((0.2, 0.8) if length < 100 else (0.12, 0.5, 0.88))
+            # a short side gets its middle; a 30-40 mm side its fifths as well, unnudged
+            # (the perch's 34 mm top has the thread hole in the middle, and its other
+            # sides face the tree's canopy, the bat's wing and a 22 mm gap: before the
+            # far-board check it hung from tabs in its two notches; a token's circle is
+            # not straight at its fifths, and nudged toward the middle they would only
+            # crowd its one tab)
+            NUDGES = (0.0, 3.0, -3.0, 6.0, -6.0, 9.0, -9.0)
+            fracs = ([(0.5, NUDGES)] if length < 30
+                     else [(0.5, NUDGES), (0.2, (0.0,)), (0.8, (0.0,))] if length < 40
+                     else [(0.2, NUDGES), (0.8, NUDGES)] if length < 100
+                     else [(0.12, NUDGES), (0.5, NUDGES), (0.88, NUDGES)])
             made = 0
-            for f in fracs:
-                for nudge in (0.0, 3.0, -3.0, 6.0, -6.0, 9.0, -9.0):
+            for f, nudges in fracs:
+                for nudge in nudges:
                     s = lo_ + f * length + nudge
                     if not (lo_ + TAB_W < s < hi_ - TAB_W):
                         continue
@@ -111,6 +121,10 @@ def find_tabs(edges, holes_of=None, courtyards=()):
                         continue
                     t = _tab_at(name, poly, s, d, along, (x0, y0, x1, y1), edges, inner)
                     if t and _in_courtyard(t, along, courtyards):
+                        continue
+                    # the board at the tab's far end has clean edges of its own (a tab
+                    # once landed in the perch's notch, found from the tree's side)
+                    if t and t[4] is not None and _clean_conflict_far(t[4], s, d):
                         continue
                     if t:
                         tabs.append(t)
@@ -164,6 +178,16 @@ def _clean_conflict(name, side, s_panel, d):
         lo_p, hi_p = sorted((a[k], b[k]))
         if lo_p - TAB_W / 2 - 0.5 <= s_panel <= hi_p + TAB_W / 2 + 0.5:
             return True
+    return False
+
+
+def _clean_conflict_far(other, s_panel, d):
+    """The same test for the board at a tab's far end: its side that faces back along -d,
+    at the same panel coordinate along the tab."""
+    for side_, dd in DIRS.items():
+        p = dir_to_panel(other, dd)
+        if abs(p[0] + d[0]) < 1e-6 and abs(p[1] + d[1]) < 1e-6:
+            return _clean_conflict(other, side_, s_panel, p)
     return False
 
 

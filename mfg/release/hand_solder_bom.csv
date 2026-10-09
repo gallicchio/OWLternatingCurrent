@@ -1,1 +1,4 @@
-Designator,Value,Footprint,LCSC (to order loose)
+Designator,Value,Footprint,LCSC (to order loose),MPN,Why
+J101,BASE,PinHeader_2x08_P2.54mm_Horizontal,C2894988,PZ254-2-08-W-8.5,right-angle header off the tree's foot: its pins would hang over the panel's rail
+J102,PERCH,PinHeader_2x08_P2.54mm_Horizontal,C2894988,PZ254-2-08-W-8.5,right-angle header off the tree's top: its pins would hang over the perch
+J201,TREE,PinSocket_2x08_P2.54mm_Vertical,C2897409,PM254-2-08-Z-8.5,through-hole socket on the perch's underside: keeps the line's through-hole work on one side

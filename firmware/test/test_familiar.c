@@ -71,8 +71,9 @@ static void df_init(void)
         for (int k = 0; k < K; k++) {
             double th = 2 * M_PI * (k + 0.5) / K, v = V * sin(th);
             double i = 0;
-            if (v > 1.85) { i = (v - 1.85) / 77.0; io += i; }
-            if (-v > 2.85) { double j = (-v - 2.85) / 82.0; i = -j; iv += j; }
+            /* the token's legs as built: 150 ohm each plus the LED's own 9 / 14 ohm */
+            if (v > 1.85) { i = (v - 1.85) / 159.0; io += i; }
+            if (-v > 2.85) { double j = (-v - 2.85) / 164.0; i = -j; iv += j; }
             fund += i * sin(th);
         }
         fund *= 2.0 / K;
@@ -348,13 +349,15 @@ int main(void)
         snprintf(what, sizeof what, "cat, ISENSE %.0f V/A through the 12-bit ADC", GAINS[gi]);
         expect_token(what, 330e3, M0, 1.0, 2.5e-3, FAM_CAT);
     }
-    adc_v_per_a = FAM_ISENSE_V_PER_A;                    /* the board as drawn: reported, not asserted */
-    printf("owl, ISENSE at the board's %.2f V/A (config.h) through the ADC (a count is %.2f mA):\n",
-           (double)FAM_ISENSE_V_PER_A, 3.3 / 4096.0 / FAM_ISENSE_V_PER_A * 1e3);
-    result b = run(150e3, M0, 6.0, 1e9, 1.0, 2.5e-3, false, true);
-    if (!b.arrived || b.who != FAM_OWL)
-        printf("WARNING: at %.2f V/A the familiars cannot be found; the sense needs >= 2 V/A, ideally ~10 V/A "
-               "(README: open questions)\n", (double)FAM_ISENSE_V_PER_A);
+    adc_v_per_a = FAM_ISENSE_V_PER_A;                    /* the board as drawn: asserted since 2026-10-09 */
+    {
+        char what[96];
+        snprintf(what, sizeof what, "owl, ISENSE at the board's %.1f V/A (config.h) through the ADC (a count is %.2f mA)",
+                 (double)FAM_ISENSE_V_PER_A, 3.3 / 4096.0 / FAM_ISENSE_V_PER_A * 1e3);
+        expect_token(what, 150e3, M0, 1.0, 2.5e-3, FAM_OWL);
+        snprintf(what, sizeof what, "cat, ISENSE at the board's %.1f V/A through the ADC", (double)FAM_ISENSE_V_PER_A);
+        expect_token(what, 330e3, M0, 1.0, 2.5e-3, FAM_CAT);
+    }
     adc_v_per_a = 0.0;
 
     if (failures) {

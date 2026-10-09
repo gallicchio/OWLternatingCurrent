@@ -7,7 +7,11 @@ Constraints that shaped it (RP2350 datasheet, GPIO function table, section 9.4):
   * On the 60-pin RP2354A, GPIO16-29 reuse PWM slices 0-6, so only 8 slices are
     independent.  Each coil bridge gets a whole slice (its two inputs are the
     slice's A and B outputs: same frequency, independent duty), on GPIO0-11; the
-    audio gets slice 7 (GPIO14); everything on GPIO16 and up is non-PWM.
+    audio gets slice 7 (GPIO14); everything on GPIO16 and up is non-PWM.  That last
+    rule is a choice, not the chip's: PWM is legal on GPIO16-29 too, and gen/assign.py
+    could cut the ring crossings from 84 to about 60 by using them (review 2026-10-09).
+    It is kept because GPIO16-29 share the chip's back edge with the ADC pins (26-29)
+    that carry the levitation loop's two signals: no 100 kHz bridge PWM beside them.
   * The theremin's two oscillators are counted by PIO, not by a PWM slice.
   * GPIO26-29 are the only ADC inputs: the levitation loop's two fast signals
     (Hall sensor, coil current) get their own; the slow ones share ADC2 through
@@ -41,7 +45,7 @@ DEFAULT = {
     16: ("SDA", "io", "I2C0 SDA: LED drivers, IMU, light sensor, 3-axis Hall; the tree's LED driver"),
     17: ("SCL", "out", "I2C0 SCL"),
     18: ("THEREMIN_PITCH", "in", "pitch oscillator (moon antenna), counted by PIO"),
-    19: ("THEREMIN_VOL", "in", "volume oscillator (pumpkin antenna), counted by PIO"),
+    19: ("THEREMIN_VOL", "in", "volume oscillator (ghost antenna), counted by PIO"),
     20: ("MUX_S0", "out", "74HC4051 select bit 0"),
     21: ("MUX_S1", "out", "74HC4051 select bit 1"),
     22: ("MUX_S2", "out", "74HC4051 select bit 2"),

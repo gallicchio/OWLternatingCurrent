@@ -30,7 +30,7 @@ Writes mfg/release/:
     COST_ESTIMATE.md                 the order's price, fee by fee, and the parts' stock
     ORDER_SETTINGS.md                what to choose on JLCPCB's order page, in its order
     excluded_from_assembly.csv       what is on the panel but not placed, and why
-    hand_solder_bom.csv              its header alone: JLCPCB fits every part
+    hand_solder_bom.csv              the parts soldered at home (HAND_SOLDER below), with their codes
     OWLternatingCurrent_assembly_top.pdf, _bottom.pdf   designators, from the fab layers
 
 Gates: the release stops, and leaves mfg/release/ as it was, if any of these fails
@@ -196,12 +196,24 @@ def not_a_part(c):
     return (named or keys or [None])[0]
 
 
+# Parts JLCPCB does not fit, soldered at home after the panel is snapped apart: the tree's
+# two right-angle headers would hang past its edges over the rail and over the perch,
+# below the panel, and the perch's socket is a through-hole part on the second side.
+# Three parts, 48 joints, ten minutes with an iron; bought loose (ORDER_LIST.md).
+HAND_SOLDER = {"J101": "right-angle header off the tree's foot: its pins would hang over the panel's rail",
+               "J102": "right-angle header off the tree's top: its pins would hang over the perch",
+               "J201": "through-hole socket on the perch's underside: keeps the line's through-hole work on one side"}
+
+
 def classify(comps):
-    """placed: JLCPCB fits it (it has an LCSC code); none: not a part; dnp: marked
-    do-not-place or excluded from the BOM; nocode: a gate failure."""
+    """placed: JLCPCB fits it (it has an LCSC code); hand: soldered at home (HAND_SOLDER);
+    none: not a part; dnp: marked do-not-place or excluded from the BOM; nocode: a gate
+    failure."""
     for c in comps:
         if c["dnp"] or c["no_bom"]:
             c["cls"], c["why"] = "dnp", "marked do-not-populate or excluded from the BOM in the schematic"
+        elif c["ref"] in HAND_SOLDER:
+            c["cls"], c["why"] = "hand", "hand-soldered at home: " + HAND_SOLDER[c["ref"]]
         elif c["lcsc"]:
             c["cls"], c["why"] = "placed", ""
         else:
@@ -342,12 +354,15 @@ def write_excluded(comps, extra, out):
     with open(os.path.join(out, "excluded_from_assembly.csv"), "w", newline="", encoding="utf-8") as f:
         w = csv.writer(f)
         w.writerow(["Designator", "Value", "Footprint", "Why JLCPCB does not place it"])
-        for c in sorted((c for c in comps if c["cls"] in ("none", "dnp")), key=lambda c: refkey(c["ref"])):
+        for c in sorted((c for c in comps if c["cls"] in ("none", "dnp", "hand")), key=lambda c: refkey(c["ref"])):
             w.writerow([c["ref"], c["value"], c["fp"], c["why"]])
         for ref, value, fp, why in extra:
             w.writerow([ref, value, fp, why])
     with open(os.path.join(out, "hand_solder_bom.csv"), "w", newline="", encoding="utf-8") as f:
-        csv.writer(f).writerow(["Designator", "Value", "Footprint", "LCSC (to order loose)"])
+        w = csv.writer(f)
+        w.writerow(["Designator", "Value", "Footprint", "LCSC (to order loose)", "MPN", "Why"])
+        for c in sorted((c for c in comps if c["cls"] == "hand"), key=lambda c: refkey(c["ref"])):
+            w.writerow([c["ref"], c["value"], c["fp"], c["lcsc"], c["mpn"], HAND_SOLDER[c["ref"]]])
 
 
 # ---------------------------------------------------------------------------------------
@@ -1012,8 +1027,8 @@ def order_md(out, have_board, dims, panels, assembled, feat, B, cost, checks, wh
           "2026-05-22)%s |" % ("; this board still carries it: take it off" if feat.get("jlc_text") else ""),
           "| Electrical Test | Flying Probe Fully Test | |",
           "| Gold Fingers / Castellated Holes / Edge Plating | No | |",
-          "| PCB Remark | \"Customer panel of %d different designs joined by mouse bites; keep the rails on; parts "
-          "on both sides.\" | |" % designs,
+          "| PCB Remark | \"Customer panel of %d different designs joined by mouse bites; keep the rails on; SMD "
+          "parts on both sides, through-hole parts on the top side only.\" | |" % designs,
           "| anything else | the default | |", "",
           "## PCB Assembly", "",
           "| field | choose | why |", "|---|---|---|",

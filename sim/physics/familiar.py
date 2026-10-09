@@ -117,7 +117,7 @@ def main():
         R1 = R_at(TX, f)
         V1 = 0.2 * np.hypot(X, R1)
         print(f"perch at {f/1e3:.0f} kHz: |Z| = {np.hypot(X, R1):.1f} ohm -> 0.2 A needs {V1:.1f} V amplitude "
-              f"(a 12 V full bridge's fundamental is {4/np.pi*12:.1f} V)")
+              f"(the 4.8 V bridge's fundamental is {4/np.pi*4.8:.1f} V: it reaches {4/np.pi*4.8/np.hypot(X, R1):.2f} A)")
     json.dump(res, open(os.path.join(OUT, "familiar.json"), "w"), indent=1)
 
     fig, ax = plt.subplots(figsize=(7, 4.2))

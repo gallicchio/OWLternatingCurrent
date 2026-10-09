@@ -10,16 +10,17 @@ and coils doing things that look like magic.*
 *Rendered from the design files (KiCad and Blender, `tools/render_3d.py`). The boards have
 not been made yet.*
 
-**Status (2026-10-08):** designed, every net routed on all six boards, KiCad's DRC clean,
-the JLCPCB release written (`mfg/release/`). Being reviewed before the first order
-([`DESIGN_REVIEW.md`](DESIGN_REVIEW.md)).
+**Status (2026-10-09):** designed, every net routed on all six boards, KiCad's DRC clean,
+reviewed by five readers before the first order ([`DESIGN_REVIEW.md`](DESIGN_REVIEW.md),
+[`docs/REVIEW_2026-10-09.md`](docs/REVIEW_2026-10-09.md)), the JLCPCB release written
+(`mfg/release/`). Not yet ordered.
 
 ## What it does
 
 | feature | what you see | the physics |
 |---|---|---|
 | **Light show** | violet stars, orange pumpkins that flicker like candles, purple will-o'-wisps, owls whose eyes open at dusk | 49 LEDs on two LP5036 drivers, every change a fade; dusk and dawn from a light sensor |
-| **Wireless familiars** | put the owl token or the cat token on its perch and its eyes light; each perch lights only its own animal | resonant inductive power: each perch drives its coil at its token's frequency (owl 142 kHz, cat 303 kHz) and finds it by the drop in its own supply current |
+| **Wireless familiars** | put the owl token or the cat token on its perch and its eyes light; each perch lights only its own animal | resonant inductive power: each perch drives its coil at its token's frequency (owl 142 kHz, cat 303 kHz) and finds it by the rise in its own supply current, the power the token takes |
 | **The pendulum bat** | a bat on a thread that never stops swinging, or circles the moon | three coils under the swing give it timed kicks; a 3-axis Hall sensor under the rest point times them |
 | **The levitating bat** | the bat floats in the air under the owl's perch | a magnet in the printed owl holds the bat's magnet up; a 10 kHz loop on a Hall sensor and the perch's coil keeps it from falling or jumping up (Earnshaw's theorem says it cannot float on magnets alone) |
 | **Theremin** | move a hand toward the gold moon and a note rises; toward the gold ghost and it gets louder | two relaxation oscillators whose capacitance includes your hand; a speaker a slide switch turns off |
@@ -30,8 +31,9 @@ the JLCPCB release written (`mfg/release/`). Being reviewed before the first ord
 ## The boards
 
 One 4-layer panel (JLCPCB, 1.6 mm, purple solder mask, ENIG), assembled by JLCPCB on both
-sides, through-hole parts included. The six boards snap apart and plug together: the tree
-stands in the base's socket, the perch sits on the tree.
+sides, all but three connectors (the tree's two headers and the perch's socket, soldered at
+home: 48 joints). The six boards snap apart and plug together: the tree stands in the
+base's socket, the perch sits on the tree.
 
 | board | from above | from below | in perspective |
 |---|---|---|---|
@@ -48,9 +50,9 @@ The panel as it comes from JLCPCB (245.2 x 223.2 mm), top and bottom:
 
 ## Making one
 
-- [`ORDER_LIST.md`](ORDER_LIST.md): everything to buy (the boards, a 12 V adapter, two
-  magnets, a little PLA and some thread) and what it costs (about $575 for five panels,
-  two of them assembled).
+- [`ORDER_LIST.md`](ORDER_LIST.md): everything to buy (the boards, three connectors, a
+  12 V adapter, two magnets, a little PLA, thread and a drop of glue) and what it costs
+  (about $565 for five panels, two of them assembled).
 - [`mfg/release/`](mfg/release/): the upload for JLCPCB, and `ORDER_SETTINGS.md`, which
   says what to choose on each line of their order page.
 - [`print/README.md`](print/README.md): the owl, the bat's cap and four feet, on one plate,

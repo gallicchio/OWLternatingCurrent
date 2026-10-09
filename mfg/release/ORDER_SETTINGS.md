@@ -1,6 +1,6 @@
 # OWLternating Current rev A: JLCPCB order settings
 
-Written by `mfg/make_release.py` on 2026-10-08.  On jlcpcb.com, **Order now**, upload `OWLternatingCurrent_gerbers.zip`, then choose, in the order the page asks:
+Written by `mfg/make_release.py` on 2026-10-09.  On jlcpcb.com, **Order now**, upload `OWLternatingCurrent_gerbers.zip`, then choose, in the order the page asks:
 
 ## The PCB
 
@@ -28,7 +28,7 @@ Written by `mfg/make_release.py` on 2026-10-08.  On jlcpcb.com, **Order now**, u
 | Mark on PCB | Remove Mark | nothing on the art.  JLCPCB has added no order number by default since May 2026 and asks that "JLCJLCJLCJLC" not be put on the silkscreen (help: How to mark on PCB, 2026-05-22) |
 | Electrical Test | Flying Probe Fully Test | |
 | Gold Fingers / Castellated Holes / Edge Plating | No | |
-| PCB Remark | "Customer panel of 6 different designs joined by mouse bites; keep the rails on; parts on both sides." | |
+| PCB Remark | "Customer panel of 6 different designs joined by mouse bites; keep the rails on; SMD parts on both sides, through-hole parts on the top side only." | |
 | anything else | the default | |
 
 ## PCB Assembly
@@ -54,9 +54,9 @@ Then upload `BOM_JLCPCB.csv` and `OWLternatingCurrent_cpl_jlcpcb_upload.csv` (no
 
 ## Numbers behind the choices
 
-- Panel 245.2 x 223.2 mm; smallest track 0.150 mm; 1012 vias.
-- Assembly: 244 placements a panel on 67 BOM lines (36 Extended), 800 SMD pads and 73 through-hole joints a panel; top and bottom.
-- Estimate: $366.11 before shipping and duty (COST_ESTIMATE.md).
-- Checks passed: DRC 0 violations, 0 unconnected, 0 parity; 141 filled zone polygons; every netlist part on the board; every code matched (gen/parts.py's words, the value, the package, the MPN) and in stock; no ordered part wants a hole; the CPL agrees with KiCad's position export, and JLCPCB's drawings placed by it land on our pads (30 chips, both sides).
+- Panel 245.2 x 223.2 mm; smallest track 0.150 mm; 1059 vias.
+- Assembly: 245 placements a panel on 68 BOM lines (35 Extended), 808 SMD pads and 25 through-hole joints a panel; top and bottom.
+- Estimate: $355.98 before shipping and duty (COST_ESTIMATE.md).
+- Checks passed: DRC 0 violations, 0 unconnected, 0 parity; 146 filled zone polygons; every netlist part on the board; every code matched (gen/parts.py's words, the value, the package, the MPN) and in stock; no ordered part wants a hole; the CPL agrees with KiCad's position export, and JLCPCB's drawings placed by it land on our pads (30 chips, both sides).
 
 Sources (read 2026-10-07): jlcpcb.com/help/article/pcb-assembly-price (2026-09-09), /capabilities/pcb-assembly-capabilities, /help/article/How-to-mark-on-PCB (2026-05-22), /help/article/how-to-add-edge-rails-fiducials-for-pcb-assembly-order, /help/article/Instructions-for-ordering, /help/article/us-tariff-policy-faq (2026-09-09).  The 4-layer fields' places on the page come from a 2024 printout of it and from others' 4-layer orders; the page itself is drawn by JavaScript.

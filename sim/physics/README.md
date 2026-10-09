@@ -171,6 +171,17 @@ firmware, which can be finished while the boards are in the post.
 
 ### 3b. The levitating bat, closed loop (`levitation_loop.py`)
 
+**Superseded (review of 2026-10-09).** This script and the table below are the earlier
+two-magnet design: a 2.7 g bat, a 4 x 1 mm bias magnet 3 mm up, the canonical four-layer
+coil (31.5 uH, 3.35 ohm), a 25 mV/mT sensor and an ideal +-12 V source. The boards as
+drawn are the one-magnet design of 3a (3.6 g, 10 x 2 mm at 14 mm, the three-layer coil,
+the DRV5055A4 at 7.5 mV/mT), whose closed loop is validated by the firmware's host test
+(`firmware/test/test_lev.c` against `lev_plant.h`, written by
+`firmware/tools/gen_lev_tables.py` from the same field computations). Neither models the
+DRV8874: its PWM ripple (1 A peak to peak at 100 kHz on 30 uH) and its 3.3 A chopper are
+why `LEV_I_MAX_A` is 2.6 A. Porting this script to the one-magnet plant with the driver
+in it is on the list (`PLAN.md` section 10).
+
 The vertical axis, simulated in time with nothing linearised:
 - **Plant:** the bias attraction and the coil's force per amp, both from the field
   computations as functions of the gap; the coil's L and R; the bridge's ±12 V limit.

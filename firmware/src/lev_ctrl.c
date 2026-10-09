@@ -116,7 +116,7 @@ static const param_def PARAMS[] = {
     P(g0_mm, 4.0f, 14.0f, true),        /* the float gap it starts from */
     P(mass_g, 1.0f, 10.0f, true),       /* the bat */
     P(i_max, 0.1f, LEV_I_MAX_A, false), /* lifting current limit */
-    P(catch_mm, 0.5f, 5.0f, false),     /* catch window round g0 */
+    P(catch_mm, 0.5f, 8.0f, false),     /* catch window round g0 */
     P(loss_mm, 1.0f, 8.0f, false),      /* lost beyond this from the set-point */
     P(ramp_mm_s, 0.0f, 100.0f, false),  /* the catch walks the set-point this fast (0: a step) */
     P(steady_s, 0.02f, 2.0f, false),    /* the bat must be still this long to be caught */
@@ -219,8 +219,10 @@ void lev_init(lev_ctrl *c)
     c->g0_mm = LEV_G0_MM;
     c->mass_g = LEV_MASS_KG * 1e3f;
     c->i_max = LEV_I_MAX_A;
-    c->catch_mm = 5.0f;          /* a bat 3 mm off, plus the DRV5055's VQ tolerance (8 mT: ~2 mm there)
-                                    until `lev cal zero` has measured it */
+    c->catch_mm = 7.0f;          /* a bat 3 mm off, plus the DRV5055's VQ tolerance until `lev cal zero`
+                                    has measured it: 8 mT reads as up to 2.7 mm at g0 + 3 mm, where the
+                                    field only changes 3 mT/mm (review 2026-10-09: at 5 mm a -8 mT part
+                                    never caught a bat resting 3 mm low) */
     c->loss_mm = 5.0f;
     c->ramp_mm_s = 6.0f;
     c->steady_s = 0.15f;

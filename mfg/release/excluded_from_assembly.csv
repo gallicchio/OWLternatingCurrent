@@ -5,6 +5,9 @@ H1,foot,MountingHole_3.2mm_M3,FOOTHOLE: a printed foot snaps in here
 H2,foot,MountingHole_3.2mm_M3,FOOTHOLE: a printed foot snaps in here
 H3,foot,MountingHole_3.2mm_M3,FOOTHOLE: a printed foot snaps in here
 H4,foot,MountingHole_3.2mm_M3,FOOTHOLE: a printed foot snaps in here
+J101,BASE,PinHeader_2x08_P2.54mm_Horizontal,hand-soldered at home: right-angle header off the tree's foot: its pins would hang over the panel's rail
+J102,PERCH,PinHeader_2x08_P2.54mm_Horizontal,hand-soldered at home: right-angle header off the tree's top: its pins would hang over the perch
+J201,TREE,PinSocket_2x08_P2.54mm_Vertical,hand-soldered at home: through-hole socket on the perch's underside: keeps the line's through-hole work on one side
 L3,33uH coil,Coil_PEND,marked do-not-populate or excluded from the BOM in the schematic
 L4,33uH coil,Coil_PEND,marked do-not-populate or excluded from the BOM in the schematic
 L5,33uH coil,Coil_PEND,marked do-not-populate or excluded from the BOM in the schematic
@@ -155,14 +158,6 @@ MB129,MouseBite_NPTH_0.5mm,MouseBite_NPTH_0.5mm,"a board feature, not a part (no
 MB130,MouseBite_NPTH_0.5mm,MouseBite_NPTH_0.5mm,"a board feature, not a part (not in the schematic)"
 MB131,MouseBite_NPTH_0.5mm,MouseBite_NPTH_0.5mm,"a board feature, not a part (not in the schematic)"
 MB132,MouseBite_NPTH_0.5mm,MouseBite_NPTH_0.5mm,"a board feature, not a part (not in the schematic)"
-MB133,MouseBite_NPTH_0.5mm,MouseBite_NPTH_0.5mm,"a board feature, not a part (not in the schematic)"
-MB134,MouseBite_NPTH_0.5mm,MouseBite_NPTH_0.5mm,"a board feature, not a part (not in the schematic)"
-MB135,MouseBite_NPTH_0.5mm,MouseBite_NPTH_0.5mm,"a board feature, not a part (not in the schematic)"
-MB136,MouseBite_NPTH_0.5mm,MouseBite_NPTH_0.5mm,"a board feature, not a part (not in the schematic)"
-MB137,MouseBite_NPTH_0.5mm,MouseBite_NPTH_0.5mm,"a board feature, not a part (not in the schematic)"
-MB138,MouseBite_NPTH_0.5mm,MouseBite_NPTH_0.5mm,"a board feature, not a part (not in the schematic)"
-MB139,MouseBite_NPTH_0.5mm,MouseBite_NPTH_0.5mm,"a board feature, not a part (not in the schematic)"
-MB140,MouseBite_NPTH_0.5mm,MouseBite_NPTH_0.5mm,"a board feature, not a part (not in the schematic)"
 TH1,Tooling_NPTH_2mm,Tooling_NPTH_2mm,"a board feature, not a part (not in the schematic)"
 TH2,Tooling_NPTH_2mm,Tooling_NPTH_2mm,"a board feature, not a part (not in the schematic)"
 TH3,Tooling_NPTH_2mm,Tooling_NPTH_2mm,"a board feature, not a part (not in the schematic)"

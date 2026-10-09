@@ -61,7 +61,7 @@ typedef struct {
     volatile float hall_mT;                    /* as lev_input.hall_mT */
     volatile float i_meas[COIL_COUNT];         /* |I| from the mirrors, A */
     volatile float u[COIL_COUNT];              /* mean bridge voltage / 12 V applied */
-    volatile float fam_isense[2];              /* perch current amplitude, A */
+    volatile float fam_isense[2];              /* each perch bridge's average supply current, A */
     volatile float temp_C[COIL_COUNT], r_ohm[COIL_COUNT];
     volatile uint32_t faults;                  /* RT_FAULT_* */
     volatile bool power_ok;                    /* 12 V present: coils may run */

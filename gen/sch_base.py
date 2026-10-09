@@ -65,7 +65,7 @@ def power_in():
     pwr_flag(xg + 5.08, sleeve[1] + G)
     # F1, then Q1 (drain toward the jack, source toward the load, gate below)
     xf = tip[0] + 12.7
-    fl, fr = hpart("PTC5A", "F1", xf, Y12, ref_at=(xf, Y12 - 3.0), val_at=(xf, Y12 + 3.3))
+    fl, fr = hpart("PTC3A", "F1", xf, Y12, ref_at=(xf, Y12 - 3.0), val_at=(xf, Y12 + 3.3))
     W(tip, fl)
     xq = fr[0] + 11.43
     q1 = part("AO4407A", "Q1", xq, Y12 + G, rot=90, mirror="y", ref_at=(xq - 1.0, Y12 - 4.3),
@@ -94,8 +94,10 @@ def power_in():
     pwr_flag(xfl, Y12 + G, rot=180)
     tp(xt, Y12, "+12V", ref="TP1")
     note(17.78, 82.55,
-         "12 V, 5 A adapter (5.5 x 2.1 mm plug, centre positive; ORDER_LIST.md). "
-         "F1 resets itself after a short: it holds 5 A and trips by 10 A. "
+         "12 V, 3-5 A adapter (5.5 x 2.1 mm plug, centre positive; ORDER_LIST.md). "
+         "F1 resets itself after a short: it holds 3 A and trips by 6 A, which a 3-5 A "
+         "brick can deliver (the board draws 1.5 A at most on average), and it is rated 24 V, "
+         "the TVS's clamp. "
          "Q1 conducts only when the plug is the right way round: its body diode lifts the "
          "source, then the gate, pulled to ground by R1, turns it fully on (9.5 mOhm: 0.15 W "
          "at 4 A). D1 keeps the gate within 10 V of the source. Plugged in backwards, Q1 "
@@ -416,7 +418,7 @@ def audio_theremin():
     tag("audio:r2"); l2, r2 = series("R1K", xc1 - 7.62, y_in)
     xc2 = l2[0] - 5.08
     tag("audio:cinp"); l3, r3 = series("C22N", xc2 - 7.62, y_in)
-    tag("audio:rinp"); l4, r4 = series("R100K", l3[0] - 7.62, y_in)
+    tag("audio:rinp"); l4, r4 = series("R220K", l3[0] - 7.62, y_in)
     line(y_in, [x, r1[0]])
     line(y_in, [l1[0], xc1, r2[0]])
     line(y_in, [l2[0], xc2, r3[0]])
@@ -430,10 +432,10 @@ def audio_theremin():
     inn, inp, ctrl, byp = u14.pin("4"), u14.pin("3"), u14.pin("1"), u14.pin("2")
     vop, von = u14.pin("8"), u14.pin("5")
     W(inp, l4)
-    # INN: the same 100k and 22n, to ground, rising away from the signal line
+    # INN: the same 220k and 22n, to ground, rising away from the signal line
     yn = inn[1] - 10.16
     W(inn, (inn[0] + G, inn[1]), (inn[0] + G, yn))
-    tag("audio:rinn"); l5, r5 = series("R100K", inn[0] + G + 6.35, yn)
+    tag("audio:rinn"); l5, r5 = series("R220K", inn[0] + G + 6.35, yn)
     tag("audio:cinn"); l6, r6 = series("C22N", r5[0] + 6.35, yn)
     W((inn[0] + G, yn), l5); W(r5, l6)
     gnd(*r6)
@@ -471,9 +473,10 @@ def audio_theremin():
     W(vop, ls.pin("1")); W(von, ls.pin("2"))
     note(22.86, y_in - 22.86,
          "AUDIO is PWM at about 150 kHz. Two RC stages (1k, 10n: 16 kHz each) leave the "
-         "tone and take the carrier down 38 dB; 22n and 100k pass 72 Hz and up. U14, "
-         "NS4150B: class D, gain 240k/100k = 2.4. Full scale is about 0.5 W in the 8 ohm, "
-         "23 mm speaker, more than a bedroom needs: the firmware sets the volume. "
+         "tone and take the carrier down 38 dB; 22n and 220k pass 33 Hz and up. U14, "
+         "NS4150B: class D, gain 240k/220k = 1.1. Full scale is about 0.2 W in the 8 ohm, "
+         "23 mm speaker (78 dB at a metre), a bedroom's worth and under a toy's 85 dB "
+         "whatever the firmware does; the firmware sets the volume below that. "
          "SW3 off (or no 12 V adapter) shuts U14 down: no sound at all, whatever the "
          "firmware does.", cols=48)
 
@@ -504,15 +507,25 @@ def audio_theremin():
         tag("osc_%s:rf" % name); lf, rf = series("R100K", (xn + xi) / 2, yf, above=False)
         W((xn, yf), rf); W(lf, (xi, yf), (xi, ydst))
         W(i, (xi, ydst))
-        # the timing capacitor and the antenna (the copper shape) on the input
+        # the timing capacitor on the input; then 1k out to the antenna's pad, where an ESD
+        # diode takes a spark from the bare gold to ground (the shape is touched by hand)
         xa = xi - 7.62
         W((xi, ydst), (xa, ydst))
         tag("osc_%s:ct" % name); down("C15P", xa, ydst)
-        ant = part("ANTENNA", "AE1" if name == "PITCH" else "AE2", xa - 7.62, ydst - 5.08,
-                   value=antenna, ref_at=(xa - 11.0, ydst - 7.0), val_at=(xa - 11.0, ydst - 7.0), justify="right")
-        W((xa, ydst), ant.pin("1"))
-        J(xi, ydst); J(xa, ydst); J(xn, ydst)
-        label(xi + 0.6, ydst, antenna.upper(), size=0.9)      # the copper shape's net: MOON, GHOST
+        tag("osc_%s:resd" % name); lr, rr = series("R1K", xa - 7.62, ydst)
+        W((xa, ydst), rr)
+        xe = lr[0] - 5.08
+        W(lr, (xe, ydst))
+        tag("osc_%s:desd" % name)
+        d = part("ESD_LOWCAP", nref("D"), xe, ydst + G + 3.81, rot=270, ref_at=(xe + 2.2, ydst + 5.3),
+                 val_at=(xe + 2.2, ydst + 6.5), fsize=1.0)
+        W(d.pin("1"), (xe, ydst))                                # cathode on the pad's net
+        gnd(*d.pin("2"))
+        ant = part("ANTENNA", "AE1" if name == "PITCH" else "AE2", xe - 7.62, ydst - 5.08,
+                   value=antenna, ref_at=(xe - 11.0, ydst - 7.0), val_at=(xe - 11.0, ydst - 7.0), justify="right")
+        W((xe, ydst), ant.pin("1"))
+        J(xi, ydst); J(xa, ydst); J(xn, ydst); J(xe, ydst)
+        label(xe + 0.6, ydst, antenna.upper(), size=0.9)      # the copper shape's net: MOON, GHOST
         label(ro[0] + 2.0, ydst, "THEREMIN_" + name)
 
     title(22.86, 220.98, "THEREMIN")
@@ -524,7 +537,9 @@ def audio_theremin():
          "10 cm away adds a fraction of a picofarad and lowers the frequency by a few "
          "kHz; the RP2354A's PIO counts each for 10 ms (100 Hz resolution), 100 times a "
          "second. Pitch from the moon, volume from the ghost. The two run about 20 % "
-         "apart (different shapes), so they do not lock to each other.", cols=48)
+         "apart (different shapes), so they do not lock to each other. The gold is bare "
+         "and a child will touch it: an ESD diode (0.9 pF) at each pad takes the spark "
+         "to ground, and 1k between the pad and the gate limits what gets past it.", cols=48)
 
 
 # ======================================================================================
@@ -664,7 +679,7 @@ def bus_left():
     gnd(*u17.pin("2")); gnd(*u17.pin("3"))
     note(212.09, 403.86,
          "I2C at 400 kHz, 3.3 V, 2.2k pull-ups; on it: U3 (LP5036, 0x30), the tree's LP5036 "
-         "(0x31, through the socket), U15 (LSM6DS3TR-C, 0x6A: taps and tilt), U16 (LTR-303, "
+         "(0x32, through the socket), U15 (LSM6DS3TR-C, 0x6A: taps and tilt), U16 (LTR-303, "
          "0x29: the owls wake at dusk), U17 (TMAG5273A2, 0x35: times the pendulum's kicks). "
          "Interrupts the firmware does not use stay open.", cols=48)
     note(17.78, 431.8,
@@ -851,7 +866,6 @@ def mux():
 # ======================================================================================
 XU = 563.88
 YU = {1: 401.32, 2: 462.28}                       # the owl's perch, the cat's
-X_ISENSE = {1: 698.5, 2: 703.58}
 
 
 def bridges(u11):
@@ -887,8 +901,10 @@ def bridges(u11):
 def bridge(u, yu, k, u11):
     """One UCC27524 as a full bridge: channel A drives one end of the perch coil, channel
     B the other, through a 10 uF capacitor that blocks DC (a stuck output cannot pass
-    current), from 4.8 V.  Its ground returns through 0.5 R, whose filtered voltage tells
-    the firmware how much power the coil delivers: more when a token sits on it."""
+    current), from 4.8 V.  Its ground returns through 0.1 R, whose filtered voltage tells
+    the firmware how much power the coil delivers: more when a token sits on it.  0.1 R,
+    not more: the chip stands on it, and its supply must stay above its start threshold
+    (4.5 V at most at 25 C) when the rail is at its 4.61 V worst case."""
     vdd = u.pin("6")
     yr = vdd[1] - 12.7
     W(vdd, (vdd[0], yr))
@@ -909,20 +925,21 @@ def bridge(u, yu, k, u11):
     label(oa[0] + 0.6, oa[1], who + "_A", size=0.9)
     label(xb + 1.0, L.pin("2")[1], who + "_B", size=0.9)
     label(r[0] + 0.6, r[1], who + "_C", size=0.9)
-    # the return: 0.5 R to ground, then 10k and 100n to the mux
+    # the return: 0.1 R to ground, then 10k and 100n to the mux
     g = u.pin("3")
     yn = g[1] + G
     W(g, (g[0], yn))
-    tag("br%d:rshunt" % k); down("R0R5", g[0], yn, text="left")
+    tag("br%d:rshunt" % k); down("R0R1", g[0], yn, text="left")
     W((g[0], yn), (g[0] - 5.08, yn))
-    pwr_flag(g[0] - 5.08, yn)               # the chip's ground: GND through 0.5 R
+    pwr_flag(g[0] - 5.08, yn)               # the chip's ground: GND through 0.1 R
     tag("br%d:rf" % k); l, r = series("R10K", g[0] + 8.89, yn, above=False)
     xc = r[0] + 5.08
     W((g[0], yn), l)
     J(g[0], yn)
     tag("br%d:cf" % k); down("C100N", xc, yn)
-    # x 20.6 (U18, OPA2333, zero drift): 0.5 R x 20.6 = 10.3 V per amp, 80 uA a count, so
-    # the firmware's low-duty sweep sees a token's 0.2-0.5 mA
+    # x 101 (U18, OPA2333, zero drift: 10 uV of offset is 1 mV out, 0.1 mA): 0.1 R x 101 =
+    # 10.1 V per amp, 80 uA a count, so the firmware's low-duty sweep sees a token's
+    # 0.2-0.5 mA; the 350 kHz GBW leaves 3.5 kHz, plenty for a 1 ms filter's output
     xa = xc + 20.32
     amp = part("OPA2333", "U18", xa, yn + G, unit=k, ref_at=(xa - 14.5, yn - 4.8), val_at=(xa - 14.5, yn - 4.4))
     pp, pn, po = amp.pin("3" if k == 1 else "5"), amp.pin("2" if k == 1 else "6"), amp.pin("1" if k == 1 else "7")
@@ -932,7 +949,7 @@ def bridge(u, yu, k, u11):
     W(po, (xo, po[1]), (xo, yf), r2)
     W(l2, (xn, yf), (xn, pn[1]), pn)
     J(xo, po[1])
-    tag("br%d:rgain_g" % k); down("R5K1", xn, yf, text="left")
+    tag("br%d:rgain_g" % k); down("R1K", xn, yf, text="left")
     J(xn, yf)
     W((xo, po[1]), (xo + 10.16, po[1]))
     label(xo + 10.16, po[1], "FAM%d_ISENSE" % k)

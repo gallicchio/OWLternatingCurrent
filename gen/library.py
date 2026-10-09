@@ -271,9 +271,21 @@ def build_footprints(share, models_needed):
         else:
             raise SystemExit("unknown footprint source %r for %s" % (src, key))
         done.add(name)
-    # the panel's own marks (gen/panel.py places them; no part, so no schematic symbol)
+    # the panel's own marks (gen/panel.py places them; no part, so no schematic symbol).
+    # The fiducial gets a second pad on the back: the panel is assembled on both sides,
+    # and the line wants a mark on whichever side it is looking at (review 2026-10-09)
     path = os.path.join(share, "footprints", "Fiducial.pretty", "Fiducial_1mm_Mask2mm.kicad_mod")
-    write(os.path.join(PRETTY, "Fiducial_1mm_Mask2mm.kicad_mod"), ser(parse(open(path, encoding="utf-8").read())[0]) + "\n")
+    fid = parse(open(path, encoding="utf-8").read())[0]
+    front = [c for c in fid if isinstance(c, list) and head(c) == "pad"]
+    assert len(front) == 1, "the stock fiducial has one pad"
+    back = parse(ser(front[0]))[0]
+    for c in back:
+        if isinstance(c, list) and head(c) == "layers":
+            c[1:] = [("str", "B.Cu"), ("str", "B.Mask")]
+        elif isinstance(c, list) and head(c) == "uuid":
+            c[1] = ("str", str(uuid.uuid4()))
+    fid.insert(fid.index(front[0]) + 1, back)
+    write(os.path.join(PRETTY, "Fiducial_1mm_Mask2mm.kicad_mod"), ser(fid) + "\n")
     for name, d, what in (("Tooling_NPTH_2mm", 2.0, "a 2 mm tooling hole on the panel's rail (JLCPCB's assembly line)"),
                           ("MouseBite_NPTH_0.5mm", 0.5, "one mouse-bite hole of a breakaway tab")):
         # a mouse bite's courtyard is its hole and 0.1 mm: the next bite is 0.75 mm along

@@ -47,11 +47,16 @@ from levitation import force_between, ZB, Z             # noqa: E402
 import mech                                             # noqa: E402
 import parts                                            # noqa: E402
 
-# the levitation coil as built (gen/parts.py COILS["COIL_LEV"]); the simulations used the
-# canonical 12-turn, 3-15 mm spiral, which the cross-check below reports against
+# the levitation coil as built (gen/parts.py COILS["COIL_LEV"]): its spirals on the first
+# `layers` of the stack-up (F.Cu, In1, In2: the bottom layer is the Hall sensor's), their
+# track centres from r_out - width/2 in to r_in + width/2; the simulations used the
+# canonical 12-turn, 3-15 mm spiral, which the cross-check below reports against.
+# (Until the review of 2026-10-09 the tables came from an older four-layer, 11-turn coil:
+# the coil's grip was 6 % high and the generator no longer ran.)
 _C = parts.COILS["COIL_LEV"]
-assert _C["layers"] == len(Z), "the coil's layers and the stack-up's"
-COIL = mg.multilayer_coil(_C["turns"], _C["r_out"] * 1e-3, _C["r_in"] * 1e-3, Z, per_turn=64)
+assert _C["layers"] <= len(Z), "the coil's layers and the stack-up's"
+COIL = mg.multilayer_coil(_C["turns"], (_C["r_out"] - _C["width"] / 2) * 1e-3, (_C["r_in"] + _C["width"] / 2) * 1e-3,
+                          Z[:_C["layers"]], per_turn=64)
 
 G = 9.81
 BR = 1.43                       # N52, as every simulation here

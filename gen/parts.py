@@ -46,8 +46,11 @@ PARTS = {
                  ["AO4407A"], "reverse-polarity switch on the 12 V input: 9.5 mOhm, so 4 A costs 0.15 W"),
     "BZT52C10": P("D_Zener", "D_SOD-123", "stock:Diode_SMD", "C173431", "BZT52C10", "BZT52C10",
                   ["BZT52C10"], "holds the AO4407A's gate within 10 V of its source"),
-    "PTC5A": P("Polyfuse", "Fuse_2920_7451Metric", "stock:Fuse", "C910846", "BSMD2920-500-16V", "5A PTC",
-               ["BSMD2920-500"], "resettable fuse: holds 5 A, trips at 10 A; a short never needs a new fuse"),
+    "PTC3A": P("Polyfuse", "Fuse_2920_7451Metric", "stock:Fuse", "C2977527", "BSMD2920-300-24V", "3A PTC",
+               ["BSMD2920-300-24V"],
+               "resettable fuse: holds 3 A, trips at 6 A, rated 24 V (the TVS clamps at 24.4 V); a 3-5 A "
+               "brick can trip it, which the 5 A / 10 A part (review 2026-10-09) never saw; a short never "
+               "needs a new fuse"),
     "TPS54302": P("TPS54302", "SOT-23-6", "stock:Package_TO_SOT_SMD", "C311983", "TPS54302DDCR", "TPS54302",
                   ["TPS54302"], "12 V to 5 V, 3 A buck"),
     "XC6206": P("XC6206P332MR", "SOT-23", "stock:Package_TO_SOT_SMD", "C5446", "XC6206P332MR-G", "XC6206 3.3V",
@@ -101,6 +104,10 @@ PARTS = {
     "SS34": P("D_Schottky", "D_SMA", "stock:Diode_SMD", "C8678", "SS34", "SS34", ["SS34"], "Basic"),
     "B5819W": P("D_Schottky", "D_SOD-123", "stock:Diode_SMD", "C8598", "B5819W SL", "B5819W", ["B5819W"],
                 "USB VBUS into the 5 V rail when there is no 12 V; Basic"),
+    "ESD_LOWCAP": P("D_Zener", "D_SOD-923", "stock:Diode_SMD", "C82326", "ESD9L5.0ST5G", "ESD 0.9pF",
+                    ["ESD9L5.0ST5G"],
+                    "at each theremin antenna's pad: a child's spark into the bare gold goes to ground here, "
+                    "not into the 74LVC1G14 (2 kV HBM); 0.9 pF, next to the 15 pF plus the shape's own"),
     "C470U": P("C_Polarized", "CP_Elec_10x12.6", "stock:Capacitor_SMD", "C46550472",
                "MA35V470M10X13", "470u 35V", ["470uF", "35V"], "bulk on +12V: its ESR damps hot-plug ringing"),
     # --- LEDs (gen/leds.py says which goes where) -------------------------------------------
@@ -162,8 +169,9 @@ PARTS.update({
     "C15P_0402": passive("C", "15p", "0402", "C1548", "0402CG150J500NT", ["15pF", "C0G", "0402"]),
     "C1U_0402": passive("C", "1u", "0402", "C52923", "CL05A105KA5NQNC", ["1uF", "25V", "0402"]),
     "C10U_0603": passive("C", "10u", "0603", "C19702", "CL10A106KP8NNNC", ["10uF", "0603"]),
-    "R27_0402": passive("R", "27", "0402", "C25100", "0402WGF270JTCE", ["27Ω", "0402"],
-                        "USB series resistors: RP2350 datasheet, 27 ohms; 0402 as in Raspberry Pi's layout"),
+    "R27_0402": passive("R", "27", "0402", "C138021", "RC0402FR-0727RL", ["27Ω", "0402"],
+                        "USB series resistors: RP2350 datasheet, 27 ohms; 0402 as in Raspberry Pi's layout "
+                        "(Yageo: C25100, used before, had a 6941-piece minimum on its last reel)"),
     "R100_0402": passive("R", "100", "0402", "C25076", "0402WGF1000TCE", ["100Ω", "0402"]),
     "R1K_0402": passive("R", "1k", "0402", "C11702", "0402WGF1001TCE", ["1kΩ", "0402"]),
     "R5K1_0402": passive("R", "5.1k", "0402", "C25905", "0402WGF5101TCE", ["5.1kΩ", "0402"]),
@@ -184,7 +192,7 @@ PARTS.update({
     "C22N_C0G": passive("C", "22n C0G", "0805", "C77069", "GRM21B5C1H223JA01L", ["22nF", "C0G", "0805"],
                         "cat token's tank: 316 kHz"),
     "C68N_C0G": passive("C", "68n C0G", "1206", "C77084", "GRM31C5C1H683JA01L", ["68nF", "C0G", "1206"],
-                        "the bat's tank: 90 kHz"),
+                        "not used: the bat's tank is the 100 nF (82 kHz with its 37 uH); kept for a retune"),
     # Raspberry Pi's own footprints for the core regulator's parts (layout copied exactly)
     "C4U7_RPI_WIDE": passive("C", "4.7u", "0402RPiWide", "C23733", "CL05A475MP5NRNC", ["4.7uF", "0402"]),
     "C4U7_RPI": passive("C", "4.7u", "0402RPi", "C23733", "CL05A475MP5NRNC", ["4.7uF", "0402"]),
@@ -209,9 +217,13 @@ PARTS.update({
                     "4.8 V keeps the NS4150B well under its 5.25 V absolute maximum"),
     "R22K": passive("R", "22k", "0603", "C31850", "0603WAF2202T5E", ["22kΩ", "0603"]),
     "R100K": passive("R", "100k", "0603", "C25803", "0603WAF1003T5E", ["100kΩ", "0603"]),
+    "R220K": passive("R", "220k", "0603", "C22961", "0603WAF2203T5E", ["220kΩ", "0603"],
+                     "the audio amplifier's input resistors: 240k / 220k = x1.1, so full scale is about "
+                     "0.2 W in the 8 ohm speaker whatever the firmware does (review 2026-10-09)"),
     "R1M": passive("R", "1M", "0603", "C22935", "0603WAF1004T5E", ["1MΩ", "0603"]),
-    "R0R5": passive("R", "0.5", "1206", "C2934295", "FRL1206FR500TS", ["500mΩ", "1206"],
-                    "perch current sense: 0.24 A max makes 0.12 V"),
+    "R0R1": passive("R", "0.1", "1206", "C25334", "1206W4F100LT5E", ["100mΩ", "1206"],
+                    "perch current sense: 0.24 A max makes 24 mV, so the UCC27524 standing on it keeps "
+                    "its 4.8 V above its 4.5 V start threshold (0.5 R dropped 0.12 V: review 2026-10-09)"),
 })
 
 # The spiral of each coil (gen/coils.py), keyed like the coil parts above, in mm.  r_out and

@@ -104,5 +104,13 @@
 		(clearance 0.6)
 		(uuid "e341a3aa-2905-5e77-91ba-89f1cc09c041")
 	)
+	(pad "" smd circle
+		(at 0 0)
+		(size 1 1)
+		(layers "B.Cu" "B.Mask")
+		(solder_mask_margin 0.5)
+		(clearance 0.6)
+		(uuid "14ff6a77-12cc-5c11-ac3c-5f8c6fdc28ab")
+	)
 	(embedded_fonts no)
 )

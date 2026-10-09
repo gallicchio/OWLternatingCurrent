@@ -6,11 +6,13 @@ order them all on the same day.
 
 | # | what | from | how many | about |
 |---|---|---|---|--:|
-| 1 | **The boards, assembled** (both sides, all six boards on one panel) | JLCPCB, uploading `mfg/release/` | 5 panels, 2 of them assembled | $366 + shipping + duty (~$128) |
+| 1 | **The boards, assembled** (both sides, all six boards on one panel, all but three connectors) | JLCPCB, uploading `mfg/release/` | 5 panels, 2 of them assembled | $356 + shipping + duty (~$125) |
 | 2 | **12 V power adapter**, 5.5 x 2.1 mm barrel, centre positive | Pololu #1468, "Wall Power Adapter: 12VDC, 5A, 5.5x2.1mm Barrel Jack, Center-Positive" | 1 | $20 |
 | 3 | **Magnets**: neodymium discs, 10 mm x 2 mm, grade N52, magnetised through the thickness (axially) | AMF Magnets USA, "Neodymium Disc - 10mm x 2mm \| N52", product code 20053A | 10 (the build uses 2; the rest are spares for a reprint) | $27 |
 | 4 | **PLA filament**, any colour | what you have | 13 g | |
 | 5 | **Thread for the pendulum**: clear nylon monofilament (fishing line, 4-8 lb, about 0.2-0.3 mm) or black sewing thread | what you have | 30 cm | |
+| 1a | **Three connectors to solder at home** (`mfg/release/hand_solder_bom.csv`): 2 x PZ254-2-08-W-8.5 right-angle 2x8 headers (LCSC C2894988) and 1 x PM254-2-08-Z-8.5 2x8 socket (C2897409) | LCSC, in the JLCPCB order | 2 + 1 (buy 4 + 2: a spare set) | $2 |
+| 6 | **A drop of cyanoacrylate glue** for the bat's cap | what you have | | |
 
 ## 1. The boards (JLCPCB)
 
@@ -22,12 +24,20 @@ by customer. Upload the gerbers zip, then `BOM_JLCPCB.csv` and
 `PLACEMENT_CHECKS.txt` lists the parts whose rotation to look at in JLCPCB's placement
 preview, on both sides, before you confirm.
 
-JLCPCB solders everything, through-hole parts included: the speaker, the barrel jack, the
-slide switch, the tree's two headers and the two sockets. Nothing on the boards needs a
-soldering iron.
+JLCPCB solders everything but three connectors: the speaker, the barrel jack, the slide
+switch and the base's socket included. The tree's two right-angle headers (J101, J102)
+and the perch's socket (J201) are left off, because the headers' pins would hang out past
+the tree's edges over the panel's rail and over the perch while the panel goes through
+the line, and all three are through-hole parts on the panel's second side
+(`mfg/release/hand_solder_bom.csv`). Buy them from LCSC with the same order (row 1a) and
+solder them after the boards are snapped apart: 48 joints, ten minutes. Pin 1 of each is
+marked on the silkscreen; the headers go on the tree's back, pins pointing out past the
+foot and past the top; the socket goes on the perch's underside.
 
 The panel snaps apart at the mouse bites by hand (bend each board gently along its row of
-little holes; a file or sandpaper smooths the nubs).
+little holes). **Then sand every snapped edge smooth** (an emery board, a file) and wipe
+the boards: snapped FR4 leaves glass-fibre nubs that cut and splinter, and the tokens and
+the bat are handled by a child.
 
 The back of the base and of the tree reads "for a young owl". To print a name there
 instead, set `FOR_NAME` in `gen/board_info.py` and run `python3 build.py board` (about
@@ -51,6 +61,14 @@ explains the one pause in the print where they drop in). They must be **N52, 10.
 prints' pockets are drawn for that size. N35 magnets of the same size are a sixth weaker;
 the bat would float lower, or not at all. Any seller's 10 x 2 mm N52 discs will do if the
 AMF ones are out of stock.
+
+**They are a swallowing hazard.** A 10 x 2 mm N52 disc is a "hazardous magnet" in the toy
+rules (its flux index is ten times the limit), and the bat's cap, which holds one, is
+small enough to swallow if it comes off. So: the prints seal both magnets in during the
+print (no magnet is ever loose), the owl is too big to swallow, and the bat's cap is
+**glued to the bat** once it has clicked on (a drop of cyanoacrylate at each hook,
+`print/README.md`), so it cannot be pried off. Keep the eight spare magnets where a child
+cannot get them.
 
 ## 4. Filament
 
@@ -76,11 +94,11 @@ Clear fishing line makes the bat look as if it flies on its own.
 
 | | |
 |---|--:|
-| JLCPCB, 5 panels with 2 assembled (estimate; `mfg/release/COST_ESTIMATE.md`) | $366 |
-| US duty, collected by JLCPCB (DDP) | ~$128 |
+| JLCPCB, 5 panels with 2 assembled (estimate; `mfg/release/COST_ESTIMATE.md`) | $356 |
+| US duty, collected by JLCPCB (DDP) | ~$125 |
 | shipping (UPS Express Saver DDP) | at checkout, ~$30-40 |
-| adapter and magnets | ~$47 |
-| **total** | **~$575** |
+| adapter, magnets, the three connectors | ~$49 |
+| **total** | **~$565** |
 
 The second assembled panel is a spare (a second owl and a second set of boards); the three
 bare panels are JLCPCB's minimum order.

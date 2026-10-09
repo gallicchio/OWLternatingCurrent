@@ -437,7 +437,14 @@ def bind_gpio(ring, arr, gpio_t, start):
     bridges = sorted(BRIDGES, key=lambda b: (A(b[0]) + A(b[1])) / 2)
     adc = sorted(ADC_NETS, key=A)
     singles = sorted(SINGLES, key=A)
-    best, c_best = None, None
+    # score() cuts both circles at one place, which is a proxy: the count the report
+    # uses (crossings()) takes the best cut of each.  The two disagree (review of
+    # 2026-10-09, Kimi: the proxy's optimum had 84 true crossings while a binding it
+    # scored worse had 76), so the search keeps a pool of its best candidates by the
+    # proxy and the exact count picks among them at the end.
+    POOL = 400
+    pool = []                             # (proxy cost, binding), the best POOL so far
+    worst = float("inf")                  # the pool's worst, once it is full
     for chosen in combinations(range(8), 6):
         slots = sorted(chosen, key=lambda k: plin[2 * k])
         base = {}
@@ -470,10 +477,19 @@ def bind_gpio(ring, arr, gpio_t, start):
                             if not gpio_valid(a):
                                 continue
                             c, inv = score(a)
-                            if c_best is None or c < c_best:
-                                best, c_best = a, c
-    assert best is not None, "no valid GPIO assignment found"
-    return best, c_best
+                            if len(pool) < POOL or c < worst:
+                                pool.append((c, a))
+                                if len(pool) > POOL:
+                                    pool.sort(key=lambda t: t[0])
+                                    del pool[POOL:]
+                                    worst = pool[-1][0]
+    assert pool, "no valid GPIO assignment found"
+
+    def exact(a):
+        inv = crossings(ring, [(gpio_t[a[n]], arr[n]) for n in have])
+        return CROSS * inv + sum(ring.dist(arr[n], gpio_t[a[n]]) ** 2 for n in have)
+    best = min(pool, key=lambda t: exact(t[1]))[1]
+    return best, exact(best)
 
 
 # ======================================================================================

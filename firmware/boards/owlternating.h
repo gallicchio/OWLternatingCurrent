@@ -7,12 +7,12 @@
 #define OWLTERNATING_REV_A
 #define PICO_RP2350A 1                       /* the QFN-60 package: GPIO 0-29 */
 
-/* UART0 on GPIO12/13: the debug connector J5 (gen/pins.py) */
+/* UART0: the debug connector J5 (the pins are gen/pins.py's, written by gen/firmware_pins.py) */
 #define PICO_DEFAULT_UART 0
 #define PICO_DEFAULT_UART_TX_PIN 16
 #define PICO_DEFAULT_UART_RX_PIN 17
 
-/* I2C0 on GPIO16/17: the LED drivers and the sensors */
+/* I2C0: the LED drivers and the sensors (pins likewise) */
 #define PICO_DEFAULT_I2C 0
 #define PICO_DEFAULT_I2C_SDA_PIN 20
 #define PICO_DEFAULT_I2C_SCL_PIN 21

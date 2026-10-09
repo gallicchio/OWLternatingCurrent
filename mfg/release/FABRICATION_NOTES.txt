@@ -1,0 +1,102 @@
+OWLternating Current rev A -- FABRICATION NOTES (written 2026-10-09)
+
+JLCPCB ORDER FORM -- set it top to bottom; the fields are in the form's own order (as of 2026-10-09).
+A line marked >> is NOT JLCPCB's default: change it, and do not leave the default named on its right.
+18 fields differ from JLCPCB's defaults.
+
+  PCB
+      Base Material .............................  FR-4                           
+  >>  Layers ....................................  4                              NOT the default 2.  (the coils' four spirals; a ground plane under the MCU and the drivers)
+      Dimensions ................................  245.2 x 223.2 mm               (the panel's outline, from the board file's Edge.Cuts)
+      PCB Qty ...................................  5                              (JLCPCB's minimum; each is a whole panel of 6 boards, 2 of them assembled)
+      Product Type ..............................  Industrial/Consumer electronics (the only true one of the three; duty is 35% whatever is chosen)
+  PCB Specifications
+  >>  Different Design ..........................  6                              NOT the default 1.  (type it in, the buttons stop at 4: base, tree, perch, bat, owl token and cat token on one panel; Panel by Customer takes up to 10)
+  >>  Delivery Format ...........................  Panel by Customer              NOT the default Single PCB.  (the panel is ours: rails, tabs and mouse bites are in the gerbers.  If it asks for columns and rows, 1 x 1)
+      PCB Thickness .............................  1.6mm                          (the stack-up's; the 3D prints (gen/mech.py) are drawn for 1.6)
+  >>  PCB Color .................................  Purple                         NOT the default Green.  (Halloween.  Purple on 4 layers rules out Economic PCBA, hence Standard below)
+      Silkscreen ................................  White                          
+      Material Type .............................  FR4 TG135                      (the default; nothing here runs hot enough to need more)
+  >>  Surface Finish ............................  ENIG                           NOT the default OSP.  (the moon and the ghost (the theremin's antennas) are bare gold; lead-free for a child's hands; flat pads for the 0.4 mm QFNs)
+      Gold Thickness ............................  1 U"                           (appears under ENIG; 2 U" is for gold fingers, and the board has none)
+  High-spec Options
+      Outer Copper Weight .......................  1 oz                           (5 A in pours is enough at 1 oz (PLAN.md section 4))
+  >>  Inner Copper Weight .......................  1 oz                           NOT the default 0.5 oz.  (halves the coils' inner-layer resistance (3.35 to 2.2 ohm): a third less heat (PLAN.md section 4))
+      Specify Layer Sequence ....................  No                             (the Gerber names and the job file give the order; Yes only asks you to type it)
+  >>  Impedance Control .........................  Yes                            NOT the default No.  (only to bring up the stack-up list; no line on this board needs a controlled impedance)
+        its stack-up list .......................  JLC041611-7628                 (no letter after 7628: one 7628 prepreg each side of a 1.065 mm core, 1 oz copper inside and out, what gen/project.py's rules and the coils' physics assume.  JLCPCB's names read JLC, layers, thickness, outer copper, inner copper, prepreg: JLC04161H-7628 is the same build with 0.5 oz (H) inner copper, so with 1 oz inner chosen the page lists only the ...11- names; 7628A-H are other core and prepreg layerings)
+        then Impedance (the tolerance row) ......  No requirement                 (+-10% would oblige an impedance table in the zip and an engineering question)
+      Via Covering ..............................  Plugged                        (JLCPCB upgrades Tented to Plugged for free (2026-10-09): the mask-covered vias are filled with ink and covered.  The thermal vias inside the exposed pads sit in the pads' mask openings, so they stay open and wick a little solder, as Raspberry Pi's layout intends (GPiBridge, built this way))
+        the Conductive Adhesive / Horizontal Electroless Copper Plating row .. Not Specified                  (the default: JLCPCB's own choice of hole-wall plating)
+  >>  Min via hole size/diameter ................  0.25mm/(0.35/0.4mm)            NOT the default 0.3mm/(0.4/0.45mm).  (the board's smallest via is 0.45 mm across, 0.25 mm drill: the form must say so, or their review bounces or re-prices it)
+      Board Outline Tolerance ...................  +-0.2mm (Regular)              
+  >>  Confirm Production file ...................  Yes                            NOT the default No.  (about $1: JLCPCB's production Gerbers come back to check before they make it: the outline, the slots between the boards, the six designs)
+      Mark on PCB ...............................  Remove Mark                    (nothing on the art; JLCPCB adds no order number by default since May 2026)
+      Electrical Test ...........................  Flying Probe Fully Test        
+      Gold Fingers ..............................  No                             
+      Castellated Holes .........................  No                             
+      Press-Fit Hole ............................  No                             
+      Edge Plating ..............................  No                             
+      Blind Slots ...............................  No                             
+      UL Marking ................................  No                             
+      Backdrill .................................  No                             
+      Humidity Indicator Card ...................  No                             
+  >>  PCB Remark ................................  "Customer panel of 6 different designs joined by mouse bites; keep the rails on; SMD parts on both sides, through-hole parts on the top side only." NOT the default (none).  (typed in)
+
+  PCB Assembly
+  >>  PCB Assembly ..............................  On                             NOT the default Off.  
+  >>  PCBA Type .................................  Standard                       NOT the default Economic.  (purple on 4 layers is Standard only; Standard also does both sides)
+  >>  Assembly Side .............................  Both Sides                     NOT the default Top Side.  (the scene on top; the electronics underneath (gen/layout.py))
+  >>  PCBA Qty ..................................  2                              NOT the default 5.  (of the 5 panels; the rest are bare spares)
+  >>  Tooling holes .............................  Added by Customer              NOT the default Added by JLCPCB.  (4 tooling holes on the rails (TH1, TH2, TH3, TH4))
+  >>  Edge Rails/Fiducials ......................  Added by Customer              NOT the default Added by JLCPCB.  (5 mm rails with 3 fiducials on them (FID1, FID2, FID3), a pad on each side)
+  >>  Confirm Parts Placement ...................  Yes                            NOT the default No.  (free: the placement preview, read against PLACEMENT_CHECKS.txt -- BOTH sides)
+      Stencil Storage ...........................  No                             ($4.93, for a re-order)
+      Fixture Storage ...........................  No                             
+      Parts Selection ...........................  By Customer (Self-Service)     (the BOM carries every LCSC code)
+  Advanced Options
+  >>  Bake Components ...........................  Yes                            NOT the default No.  (JLCPCB recommends it for moisture-sensitive parts (MSL 3 and up: the LGA-14 accelerometer, the QFNs); about $7.50)
+      Photo Confirmation ........................  No                             
+      Board Cleaning ............................  No                             
+      Conformal Coating .........................  No                             
+      Special stencil ...........................  No                             
+      Packaging .................................  Antistatic bubble film         (the default)
+      Depanel boards & edge rail before delivery .. No                             (the panel comes whole with its rails; the boards snap out at the mouse bites at home)
+      Solder Paste ..............................  High temp.                     (the default, lead-free)
+      Flying Probe Test .........................  No                             (the bare panels are already flying-probe tested)
+      Nitrogen reflow soldering .................  No                             
+      Function test .............................  No                             
+      Assembly remark ...........................  No                             
+  Stencil
+      Stencil ...................................  Off                            (the assembly makes its own)
+  Files
+      BOM .......................................  OWLternatingCurrent_bom.csv    
+      CPL .......................................  OWLternatingCurrent_cpl_jlcpcb_upload.csv (not the _kicad_native one)
+
+NOTES
+Panel: 245.2 x 223.2 mm, 4 layers, 1.6 mm; JLCPCB stack-up JLC041611-7628 (1 oz outer and inner copper, 7628 prepreg each side of a 1.065 mm core).  Purple mask, white silkscreen, ENIG.
+Six designs on one customer panel: base, tree (turned 90 degrees), perch, bat, owl token, cat token, joined by tabs with 132 mouse-bite holes; 3 fiducials (a 1 mm dot in a 2 mm mask opening, a pad on each side) and 4 tooling holes on the 5 mm rails.
+Minimum track/space on the board: 0.150 mm.  Vias 0.45/0.25 mm, 1059 of them; smallest drill 0.25 mm.
+The gold moon and ghost (the theremin's antennas) are bare ENIG copper under mask openings: not a mistake.
+The copper coils (L3-L7, L201, L301, L401, L501) are spirals drawn in the footprints, not parts: nothing to fit.
+Through-hole parts JLCPCB fits, all on the TOP side: J1 (barrel jack), J3 (2x8 socket), LS1 (speaker).
+Hand solder (hand_solder_bom.csv), after the boards are snapped apart: J101, J102, J201 -- J101: right-angle header off the tree's foot: its pins would hang over the panel's rail; J102: right-angle header off the tree's top: its pins would hang over the perch; J201: through-hole socket on the perch's underside: keeps the line's through-hole work on one side.
+Upload: OWLternatingCurrent_bom.csv and OWLternatingCurrent_cpl_jlcpcb_upload.csv (JLCPCB's conventions: the bottom-side mirror, rotations read in previews or predicted from their drawings, parts moved to their library's origin); OWLternatingCurrent_cpl_kicad_native.csv is KiCad's own numbers for reference.
+THEN READ THE PLACEMENT PREVIEW against PLACEMENT_CHECKS.txt, both sides: the predicted rotations, the polarity marks of the diodes and LEDs, and the parts moved to JLCPCB's datum (SW3 needed a further nudge north on 2026-10-09: mfg/jlc_rotation.py JLC_DATUM_READINGS).
+Coordinates: the panel's top-left corner is the drill/place origin; the gerbers, the drill file and the CPL all use that frame (x right, y up in the CPL), so they agree.
+Shipping: UPS Express Saver (DDP) or DHL Express Priority (DDP): a US individual must ship DDP, and JLCPCB collects the duty (about 35% of the PCBs and assembly).  Lead time: 4-layer PCBs 2-5 days, Standard assembly at least 4 more (+1 for through-hole parts), then 4-5 business days in the post.
+Checks passed: DRC 0 violations, 0 unconnected, 0 parity; 146 filled zone polygons; every netlist part on the board; every code matched (gen/parts.py's words, the value, the package, the MPN) and in stock; no ordered part wants a hole; the CPL agrees with KiCad's position export, and JLCPCB's drawings placed by it land on our pads (30 chips, both sides).
+
+COST ESTIMATE: 5 panels, 2 assembled, itemised as JLCPCB's cart is (fees from jlcpcb.com/help/article/pcb-assembly-price, updated 2026-09-09; parts from their live API):
+  PCB    bare panels (5 panels; a model: $43.58 to $175.04, no quote yet) $   109.31
+  PCBA   setup fee, Standard, both sides                                $    51.12
+  PCBA   stencils, one for each side                                    $    16.42
+  PCBA   feeder loading (68 BOM lines x $1.53, Basic and Extended alike) $   104.04
+  PCBA   SMT assembly (808 pads x 2 panels x $0.0016)                   $     2.59
+  PCBA   hand-soldering labour and 25 through-hole joints x 2 x $0.0164 $     4.40
+  PCBA   panel of 6 designs                                             $     8.21
+  PCBA   packaging                                                      $     0.53
+  PCBA   components (68 lines, with JLCPCB's attrition and minimums)    $    59.36
+  TOTAL  before shipping and duty                                       $   355.98  ($177.99 per assembled panel)
+  US duty, DDP, about 35% of that: ~$124.59 more.  Shipping is shown at checkout (UPS Express Saver DDP, about $30-40).
+  Not in the total: baking the moisture-sensitive parts (about $7.50).  The bare panels are the least certain line: read the cart's number into PCB_QUOTE in mfg/make_release.py.

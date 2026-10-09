@@ -18,7 +18,7 @@ The steps, each a script that exits non-zero when its gate fails:
     art        gen/art.py             hardware/art.json (outlines, silkscreen, gold) and docs/images/art_*.png
     board      gen/board.py           the panel: placement, copper, pours  (when it exists)
     drc        tools/pcb_check.py     DRC at every severity with schematic parity
-    release    mfg/make_release.py    mfg/release/: gerbers, BOM, CPL, checks, cost, order settings
+    release    mfg/make_release.py    mfg/release/: gerbers, BOM, CPL, checks, cost, fabrication notes
     images     tools/render_3d.py     docs/images/3d_*.png: each board, the panel, the set assembled
 
 Until gen/board.py exists, the board and DRC steps are skipped and the release makes

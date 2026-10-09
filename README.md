@@ -53,8 +53,8 @@ The panel as it comes from JLCPCB (245.2 x 223.2 mm), top and bottom:
 - [`ORDER_LIST.md`](ORDER_LIST.md): everything to buy (the boards, three connectors, a
   12 V adapter, two magnets, a little PLA, thread and a drop of glue) and what it costs
   (about $565 for five panels, two of them assembled).
-- [`mfg/release/`](mfg/release/): the upload for JLCPCB, and `ORDER_SETTINGS.md`, which
-  says what to choose on each line of their order page.
+- [`mfg/release/`](mfg/release/): the upload for JLCPCB, and `FABRICATION_NOTES.txt`,
+  which walks down their order form field by field.
 - [`print/README.md`](print/README.md): the owl, the bat's cap and four feet, on one plate,
   with one pause to drop in the magnets.
 - [`firmware/README.md`](firmware/README.md): the RP2354A's firmware, flashed over USB-C.

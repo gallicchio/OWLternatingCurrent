@@ -191,6 +191,18 @@ JLC_ROTATION_BY_PART = {
                                   "either quarter turn fits the holes and the part is the same turned half round"),
 }
 
+# POSITIONS read in a preview, by LCSC code.  The CPL moves a part to where JLCPCB's
+# drawing has its origin (make_release.py datum_shift, from footprint_check.py's fit of
+# their drawing on our pads); where the preview then still showed it off its pads, the
+# reading goes here, and PLACEMENT_CHECKS.txt prints it under the part.  There is no
+# number to apply yet: a reading with a measurement becomes a correction in datum_shift.
+JLC_DATUM_READINGS = {
+    "C431540": ("MSK12C02 slide switch, SW3, OWL rev A preview (Jason, 2026-10-09): with the CPL's shift of "
+                "+0.251 mm north (the drawing's fit) it still sat a little south of its pads and was nudged north "
+                "by eye, amount not measured; the order went with his nudge.  JLCPCB's part is their SW-TH_MSK12C02: "
+                "its origin may be the pegs', not the pads'.  Next preview: measure how far, and put it here"),
+}
+
 # BOTTOM-SIDE PLACEMENTS ARE MIRRORED: rot -> 180 - rot, and it is CONFIRMED.
 #
 # KiCad reports a bottom footprint's angle in the board's top-view frame.

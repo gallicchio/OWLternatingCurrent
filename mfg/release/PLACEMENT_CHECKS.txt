@@ -10,6 +10,7 @@ changed: say so, and it goes into the code.
   J2     C165948    top    USB_C_Receptacle_HRO_TYPE-C-31-M-12          moved (+0.000, -1.572) mm (x right, y up)
   J3     C2897409   top    PinSocket_2x08_P2.54mm_Vertical              moved (+8.890, -1.270) mm (x right, y up)
   SW3    C431540    top    SW_SPDT_Shouhan_MSK12C02                     moved (-0.001, +0.251) mm (x right, y up)
+         READ: MSK12C02 slide switch, SW3, OWL rev A preview (Jason, 2026-10-09): with the CPL's shift of +0.251 mm north (the drawing's fit) it still sat a little south of its pads and was nudged north by eye, amount not measured; the order went with his nudge.  JLCPCB's part is their SW-TH_MSK12C02: its origin may be the pegs', not the pads'.  Next preview: measure how far, and put it here
 
 ROTATIONS.  OWLternatingCurrent_cpl_jlcpcb_upload.csv's rotation is KiCad's angle, mirrored for the bottom side
 (180 - angle: JLCPCB looks at the bottom from below, the board turned over left-to-right;

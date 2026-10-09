@@ -16,13 +16,19 @@ order them all on the same day.
 
 ## 1. The boards (JLCPCB)
 
-`mfg/release/ORDER_SETTINGS.md` says what to choose on each line of the order page, in the
-order the page asks, and why. In short: 4 layers, 1.6 mm, purple, ENIG, 1 oz copper inside
-and out, "Panel by Customer" with 6 different designs; Standard PCBA on both sides, parts
-by customer. Upload the gerbers zip, then `BOM_JLCPCB.csv` and
+`mfg/release/FABRICATION_NOTES.txt` walks down JLCPCB's order form field by field, in the
+form's own order, with every line that is not their default marked `>>`. In short: 4
+layers, 1.6 mm, purple, ENIG, 1 oz copper inside and out, stack-up JLC041611-7628, "Panel
+by Customer" with 6 different designs; Standard PCBA on both sides, parts by customer.
+Upload the gerbers zip, then `OWLternatingCurrent_bom.csv` and
 `OWLternatingCurrent_cpl_jlcpcb_upload.csv` (not the `_cpl_kicad_native.csv` beside it).
-`PLACEMENT_CHECKS.txt` lists the parts whose rotation to look at in JLCPCB's placement
-preview, on both sides, before you confirm.
+`PLACEMENT_CHECKS.txt` lists the parts whose rotation or position to look at in JLCPCB's
+placement preview, on both sides, before you confirm.
+
+**Ordered 2026-10-09** (rev A, commit 4949a73's files): 5 panels, 2 assembled, with
+those settings; JLCPCB's free upgrade of tented vias to plugged was taken. In the
+placement preview SW3 (the slide switch) sat a little south of its pads and was nudged
+north by eye; the next release's checks carry that reading.
 
 JLCPCB solders everything but three connectors: the speaker, the barrel jack, the slide
 switch and the base's socket included. The tree's two right-angle headers (J101, J102)

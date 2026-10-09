@@ -16,7 +16,7 @@ Writes mfg/release/:
                                      both pastes, edge cuts) and Excellon drill, all
                                      measured from the drill/place origin; gerbers/ holds
                                      the same files unzipped
-    BOM_JLCPCB.csv                   Comment, Designator, Footprint, LCSC: one line per
+    OWLternatingCurrent_bom.csv      Comment, Designator, Footprint, LCSC: one line per
                                      LCSC code, only the parts JLCPCB places
     OWLternatingCurrent_cpl_jlcpcb_upload.csv   the one to upload: Designator, Mid X, Mid Y, Layer, Rotation, with
                                      JLCPCB's conventions: the bottom-side mirror and
@@ -28,7 +28,8 @@ Writes mfg/release/:
     PLACEMENT_CHECKS.txt             what to look at in JLCPCB's placement preview
     FOOTPRINT_CHECK.txt              does each ordered part fit its copper?
     COST_ESTIMATE.md                 the order's price, fee by fee, and the parts' stock
-    ORDER_SETTINGS.md                what to choose on JLCPCB's order page, in its order
+    FABRICATION_NOTES.txt            JLCPCB's order form field by field in its own order, the
+                                     notes for the fab, and the cost itemised as their cart is
     excluded_from_assembly.csv       what is on the panel but not placed, and why
     hand_solder_bom.csv              the parts soldered at home (HAND_SOLDER below), with their codes
     OWLternatingCurrent_assembly_top.pdf, _bottom.pdf   designators, from the fab layers
@@ -150,6 +151,7 @@ def draft():
 
 
 # the placement files (CLAUDE_PCB.md section 8): the name says which one goes to JLCPCB
+BOM_UPLOAD = BI.NAME + "_bom.csv"
 CPL_UPLOAD = BI.NAME + "_cpl_jlcpcb_upload.csv"
 CPL_NATIVE = BI.NAME + "_cpl_kicad_native.csv"
 
@@ -339,7 +341,7 @@ def parts_report(placed, assembled, refresh):
 def write_bom(rows, out):
     """JLCPCB's BOM: one line per LCSC code (two lines for one code make JLCPCB's
     'multiple lines matched to the same part', GPSDO P32)."""
-    path = os.path.join(out, "BOM_JLCPCB.csv")
+    path = os.path.join(out, BOM_UPLOAD)
     with open(path, "w", newline="", encoding="utf-8") as f:
         w = csv.writer(f)
         w.writerow(["Comment", "Designator", "Footprint", "LCSC"])
@@ -741,8 +743,11 @@ def placement_checks(out, placed, fps, cpl, preds, moved, sim_ok, sim_bad, aux, 
               "on its pads.  If one sits off them by about the same distance the other way, their library has",
               "changed: say so, and it goes into the code.", ""]
         for ref, dx, dy in moved:
+            code = fps[ref]["props"].get("LCSC", "")
             L.append("  %-6s %-10s %-6s %-44s moved (%+.3f, %+.3f) mm (x right, y up)"
-                     % (ref, fps[ref]["props"].get("LCSC", ""), cpl[ref]["jlc"]["side"], fps[ref]["short"][:44], dx, dy))
+                     % (ref, code, cpl[ref]["jlc"]["side"], fps[ref]["short"][:44], dx, dy))
+            if code in jlc_rotation.JLC_DATUM_READINGS:
+                L.append("         READ: " + jlc_rotation.JLC_DATUM_READINGS[code])
         L.append("")
     L += ["ROTATIONS.  " + CPL_UPLOAD + "'s rotation is KiCad's angle, mirrored for the bottom side",
           "(180 - angle: JLCPCB looks at the bottom from below, the board turned over left-to-right;",
@@ -963,135 +968,229 @@ def cost_md(out, rows, fps, panels, assembled, dims, have_board, thin, comps):
                 tht=tht, sides=sides, designs=designs, asm=asm)
 
 
-def order_md(out, have_board, dims, panels, assembled, feat, B, cost, checks, why_not=""):
-    """ORDER_SETTINGS.md: what to choose on JLCPCB's order page, in the order it asks.
+# ---------------------------------------------------------------------------------------
+# FABRICATION_NOTES.txt: JLCPCB's order form field by field, IN THE FORM'S OWN ORDER (the
+# format of ECP5-2ADC-2DAC's mfg/make_fab.py; Jason, 2026-10-09: the notes he uploads from
+# must read down the form, so nothing is missed or mis-set).  A value in <angle brackets>
+# is filled in by fab_notes().  (section, field, value, why).  The form's rows are those of
+# the 4-layer, Panel-by-Customer order of 2026-10-09 (screenshots).
+# ---------------------------------------------------------------------------------------
+JLC_PCB_FORM = [
+    ("", "Base Material", "FR-4", ""),
+    ("", "Layers", "4", "the coils' four spirals; a ground plane under the MCU and the drivers"),
+    ("", "Dimensions", "<dims>", "the panel's outline, from the board file's Edge.Cuts"),
+    ("", "PCB Qty", "<panels>", "JLCPCB's minimum; each is a whole panel of <designs> boards, <assembled> of them assembled"),
+    ("", "Product Type", "Industrial/Consumer electronics", "the only true one of the three; duty is 35% whatever is chosen"),
+    ("PCB Specifications", "Different Design", "<designs>", "type it in, the buttons stop at 4: base, tree, perch, bat, owl token and cat token on one panel; Panel by Customer takes up to 10"),
+    ("PCB Specifications", "Delivery Format", "Panel by Customer", "the panel is ours: rails, tabs and mouse bites are in the gerbers.  If it asks for columns and rows, 1 x 1"),
+    ("PCB Specifications", "PCB Thickness", "1.6mm", "the stack-up's; the 3D prints (gen/mech.py) are drawn for 1.6"),
+    ("PCB Specifications", "PCB Color", "Purple", "Halloween.  Purple on 4 layers rules out Economic PCBA, hence Standard below"),
+    ("PCB Specifications", "Silkscreen", "White", ""),
+    ("PCB Specifications", "Material Type", "FR4 TG135", "the default; nothing here runs hot enough to need more"),
+    ("PCB Specifications", "Surface Finish", "ENIG", "the moon and the ghost (the theremin's antennas) are bare gold; lead-free for a child's hands; flat pads for the 0.4 mm QFNs"),
+    ("PCB Specifications", "Gold Thickness", "1 U\"", "appears under ENIG; 2 U\" is for gold fingers, and the board has none"),
+    ("High-spec Options", "Outer Copper Weight", "1 oz", "5 A in pours is enough at 1 oz (PLAN.md section 4)"),
+    ("High-spec Options", "Inner Copper Weight", "1 oz", "halves the coils' inner-layer resistance (3.35 to 2.2 ohm): a third less heat (PLAN.md section 4)"),
+    ("High-spec Options", "Specify Layer Sequence", "No", "the Gerber names and the job file give the order; Yes only asks you to type it"),
+    ("High-spec Options", "Impedance Control", "Yes", "only to bring up the stack-up list; no line on this board needs a controlled impedance"),
+    ("High-spec Options", "  its stack-up list", "JLC041611-7628", "no letter after 7628: one 7628 prepreg each side of a 1.065 mm core, 1 oz copper inside and out, what gen/project.py's rules and the coils' physics assume.  JLCPCB's names read JLC, layers, thickness, outer copper, inner copper, prepreg: JLC04161H-7628 is the same build with 0.5 oz (H) inner copper, so with 1 oz inner chosen the page lists only the ...11- names; 7628A-H are other core and prepreg layerings"),
+    ("High-spec Options", "  then Impedance (the tolerance row)", "No requirement", "+-10% would oblige an impedance table in the zip and an engineering question"),
+    ("High-spec Options", "Via Covering", "Plugged", "JLCPCB upgrades Tented to Plugged for free (2026-10-09): the mask-covered vias are filled with ink and covered.  The thermal vias inside the exposed pads sit in the pads' mask openings, so they stay open and wick a little solder, as Raspberry Pi's layout intends (GPiBridge, built this way)"),
+    ("High-spec Options", "  the Conductive Adhesive / Horizontal Electroless Copper Plating row", "Not Specified", "the default: JLCPCB's own choice of hole-wall plating"),
+    ("High-spec Options", "Min via hole size/diameter", "<minvia>", "the board's smallest via is <smallvia>: the form must say so, or their review bounces or re-prices it"),
+    ("High-spec Options", "Board Outline Tolerance", "+-0.2mm (Regular)", ""),
+    ("High-spec Options", "Confirm Production file", "Yes", "about $1: JLCPCB's production Gerbers come back to check before they make it: the outline, the slots between the boards, the six designs"),
+    ("High-spec Options", "Mark on PCB", "Remove Mark", "nothing on the art; JLCPCB adds no order number by default since May 2026<jlctext>"),
+    ("High-spec Options", "Electrical Test", "Flying Probe Fully Test", ""),
+    ("High-spec Options", "Gold Fingers", "No", ""),
+    ("High-spec Options", "Castellated Holes", "No", ""),
+    ("High-spec Options", "Press-Fit Hole", "No", ""),
+    ("High-spec Options", "Edge Plating", "No", ""),
+    ("High-spec Options", "Blind Slots", "No", ""),
+    ("High-spec Options", "UL Marking", "No", ""),
+    ("High-spec Options", "Backdrill", "No", ""),
+    ("High-spec Options", "Humidity Indicator Card", "No", ""),
+    ("High-spec Options", "PCB Remark", "<remark>", "typed in"),
+]
+JLC_PCBA_FORM = [
+    ("PCB Assembly", "PCB Assembly", "On", ""),
+    ("PCB Assembly", "PCBA Type", "Standard", "purple on 4 layers is Standard only; Standard also does both sides"),
+    ("PCB Assembly", "Assembly Side", "<sides>", "<sides_why>"),
+    ("PCB Assembly", "PCBA Qty", "<assembled>", "of the <panels> panels; the rest are bare spares"),
+    ("PCB Assembly", "Tooling holes", "<tooling>", "<tooling_why>"),
+    ("PCB Assembly", "Edge Rails/Fiducials", "<rails>", "<rails_why>"),
+    ("PCB Assembly", "Confirm Parts Placement", "Yes", "free: the placement preview, read against PLACEMENT_CHECKS.txt -- BOTH sides"),
+    ("PCB Assembly", "Stencil Storage", "No", "$4.93, for a re-order"),
+    ("PCB Assembly", "Fixture Storage", "No", ""),
+    ("PCB Assembly", "Parts Selection", "By Customer (Self-Service)", "the BOM carries every LCSC code"),
+    ("Advanced Options", "Bake Components", "Yes", "JLCPCB recommends it for moisture-sensitive parts (MSL 3 and up: the LGA-14 accelerometer, the QFNs); about $7.50"),
+    ("Advanced Options", "Photo Confirmation", "No", ""),
+    ("Advanced Options", "Board Cleaning", "No", ""),
+    ("Advanced Options", "Conformal Coating", "No", ""),
+    ("Advanced Options", "Special stencil", "No", ""),
+    ("Advanced Options", "Packaging", "Antistatic bubble film", "the default"),
+    ("Advanced Options", "Depanel boards & edge rail before delivery", "No", "the panel comes whole with its rails; the boards snap out at the mouse bites at home"),
+    ("Advanced Options", "Solder Paste", "High temp.", "the default, lead-free"),
+    ("Advanced Options", "Flying Probe Test", "No", "the bare panels are already flying-probe tested"),
+    ("Advanced Options", "Nitrogen reflow soldering", "No", ""),
+    ("Advanced Options", "Function test", "No", ""),
+    ("Advanced Options", "Assembly remark", "No", ""),
+    ("Stencil", "Stencil", "Off", "the assembly makes its own"),
+    ("Files", "BOM", "<bom>", ""),
+    ("Files", "CPL", "<cpl>", "not the _kicad_native one"),
+]
+# JLCPCB's defaults as the form opens (screenshots of 2026-10-09).  A field whose value
+# differs is marked ">>" in the notes, with the default to avoid: a late-night upload
+# must not keep a default by mistake.
+JLC_DEFAULTS = {
+    "Layers": "2", "PCB Qty": "5", "Product Type": "Industrial/Consumer electronics", "Different Design": "1",
+    "Delivery Format": "Single PCB", "PCB Thickness": "1.6mm", "PCB Color": "Green", "Silkscreen": "White",
+    "Material Type": "FR4 TG135", "Surface Finish": "OSP", "Gold Thickness": "1 U\"", "Outer Copper Weight": "1 oz",
+    "Inner Copper Weight": "0.5 oz", "Specify Layer Sequence": "No", "Impedance Control": "No",
+    "  then Impedance (the tolerance row)": "No requirement", "Via Covering": "Plugged",
+    "  the Conductive Adhesive / Horizontal Electroless Copper Plating row": "Not Specified",
+    "Min via hole size/diameter": "0.3mm/(0.4/0.45mm)", "Board Outline Tolerance": "+-0.2mm (Regular)",
+    "Confirm Production file": "No", "Mark on PCB": "Remove Mark", "Electrical Test": "Flying Probe Fully Test",
+    "Gold Fingers": "No", "Castellated Holes": "No", "Press-Fit Hole": "No", "Edge Plating": "No", "Blind Slots": "No",
+    "UL Marking": "No", "Backdrill": "No", "Humidity Indicator Card": "No", "PCB Remark": "(none)",
+    "PCB Assembly": "Off", "PCBA Type": "Economic", "Assembly Side": "Top Side", "PCBA Qty": "5",
+    "Tooling holes": "Added by JLCPCB", "Edge Rails/Fiducials": "Added by JLCPCB", "Confirm Parts Placement": "No",
+    "Stencil Storage": "No", "Fixture Storage": "No", "Parts Selection": "By Customer (Self-Service)",
+    "Bake Components": "No", "Photo Confirmation": "No", "Board Cleaning": "No", "Conformal Coating": "No",
+    "Special stencil": "No", "Packaging": "Antistatic bubble film", "Depanel boards & edge rail before delivery": "No",
+    "Solder Paste": "High temp.", "Flying Probe Test": "No", "Nitrogen reflow soldering": "No", "Function test": "No",
+    "Assembly remark": "No", "Stencil": "Off",
+}
+VIA_OPTIONS = [(0.3, (0.4, 0.45)), (0.25, (0.35, 0.4)), (0.2, (0.3, 0.35)), (0.15, (0.25, 0.3)), (0.1, (0.2, 0.25))]
 
-    The order and the names are JLCPCB's order page as far as it can be read without a
-    browser (2026-10-07: the page's own skeleton, a 2024 printout of it, and 4-layer
-    orders written up by others), with the help-centre articles (2026-09-09) for what
-    each option does."""
+
+def jlc_form(subs):
+    """The order form as text, in JLCPCB's order: section headings, then
+    'field ...... value   (why)', '>>' where the value is not the form's default."""
+    def fill(s):
+        for k, v in subs.items():
+            s = s.replace(k, v)
+        return s
+    out = ["JLCPCB ORDER FORM -- set it top to bottom; the fields are in the form's own order (as of 2026-10-09).",
+           "A line marked >> is NOT JLCPCB's default: change it, and do not leave the default named on its right.", ""]
+    n_change = 0
+    for title, form in (("PCB", JLC_PCB_FORM), ("PCBA", JLC_PCBA_FORM)):
+        last = None
+        for sec, field, value, why in form:
+            head = sec or title
+            if head != last:
+                out.append("  %s" % head)
+                last = head
+            v = fill(value)
+            d = JLC_DEFAULTS.get(field)
+            change = d is not None and not v.startswith(d) and not v.startswith("(")
+            n_change += change
+            mark = ">> " if change else "   "
+            tail = ("NOT the default %s.  " % d if change else "") + (("(" + fill(why) + ")") if why else "")
+            out.append("  %s %-44s %-30s %s" % (mark, field + " " + "." * max(2, 42 - len(field)), v, tail))
+        out.append("")
+    out.insert(2, "%d fields differ from JLCPCB's defaults." % n_change)
+    return out
+
+
+def fab_notes(out, have_board, dims, panels, assembled, feat, B, cost, checks, why_not=""):
+    """FABRICATION_NOTES.txt: the order form, the notes the fab and the next order need,
+    and the cost itemised as JLCPCB's cart is."""
     w, h = dims
-    via = min(B["vias"], key=lambda v: v[3]) if B and B["vias"] else None
-    tw = min(B["widths"]) if B and B["widths"] else None
+    designs = cost["designs"]
     fid = feat.get("fid_ok", [])
     tool = feat.get("tooling", [])
-    designs = cost["designs"]
+    via = min(B["vias"], key=lambda v: v[3]) if B and B["vias"] else None
+    tw = min(B["widths"]) if B and B["widths"] else None
     if via:
-        d = via[3]
-        via_opt = ("0.3mm/(0.4/0.45mm)" if d >= 0.3 - 1e-6 else "0.25mm/(0.35/0.4mm)" if d >= 0.25 - 1e-6 else
-                   "0.2mm/(0.3/0.35mm)" if d >= 0.2 - 1e-6 else "0.15mm/(0.25/0.3mm)")
-        via_txt = ("%s | the board's smallest via is %.2f mm in %.2f mm; the page may fill this in from the drill "
-                   "file: check that it agrees" % (via_opt, d, via[2]))
+        d_min, s_at = via[3], via[2]
+        hole, dias = next((h_, ds) for h_, ds in VIA_OPTIONS if h_ <= d_min + 1e-6)
+        minvia, smallvia = "%gmm/(%g/%gmm)" % (hole, dias[0], dias[1]), "%g mm across, %g mm drill" % (s_at, d_min)
     else:
-        via_txt = "the default | %s" % ("the board has no vias yet" if have_board else "no board yet")
-    L = ["# %s rev %s: JLCPCB order settings%s" % (BI.TITLE, BI.REV, " (DRAFT)" if draft() else ""), ""]
+        minvia, smallvia = "(from the board)", "(from the board)"
+    sides = sorted(cost["sides"])
+    subs = {"<dims>": "%.1f x %.1f mm" % (w, h) + ("" if have_board else " (planned)"), "<panels>": str(panels),
+            "<assembled>": str(assembled), "<designs>": str(designs), "<minvia>": minvia, "<smallvia>": smallvia,
+            "<jlctext>": "; this board still carries JLCJLCJLCJLC: take it off" if feat.get("jlc_text") else "",
+            "<remark>": "\"Customer panel of %d different designs joined by mouse bites; keep the rails on; SMD parts on "
+                        "both sides, through-hole parts on the top side only.\"" % designs,
+            "<sides>": "Both Sides" if len(sides) == 2 else (sides[0].capitalize() + " Side" if sides else "(from the board)"),
+            "<sides_why>": "the scene on top; the electronics underneath (gen/layout.py)" if len(sides) == 2 else "",
+            "<tooling>": ("(from the board)" if not have_board else "Added by Customer" if len(tool) >= 2 else "Added by JLCPCB"),
+            "<tooling_why>": ("Added by Customer if the panel's rails carry tooling holes, else Added by JLCPCB" if not have_board
+                              else "%d tooling holes on the rails (%s)" % (len(tool), ", ".join(t[0] for t in tool))
+                              if len(tool) >= 2 else "the panel's rails carry no tooling holes of their own"),
+            "<rails>": ("(from the board)" if not have_board else "Added by Customer" if len(fid) >= 3 else "Added by JLCPCB"),
+            "<rails_why>": ("Added by Customer if the rails carry three fiducials, else Added by JLCPCB" if not have_board
+                            else "%g mm rails with %d fiducials on them (%s), a pad on each side"
+                            % (LAYOUT.RAIL, len(fid), ", ".join(f["ref"] for f in fid))
+                            if len(fid) >= 3 else "the panel lacks three good fiducials on its rails; JLCPCB adds them"),
+            "<bom>": BOM_UPLOAD, "<cpl>": CPL_UPLOAD}
+    L = ["%s rev %s -- FABRICATION NOTES (written %s)%s" % (BI.TITLE, BI.REV, datetime.date.today(),
+                                                           " (DRAFT)" if draft() else ""), ""]
     if draft():
-        L += ["**DRAFT:** %s.  Order once the build no longer says DRAFT." % draft(), ""]
+        L += ["DRAFT: %s.  Order once the build no longer says DRAFT." % draft(), ""]
     if not have_board:
-        L += ["**NOT READY TO ORDER:** %s, so there are no gerbers and no CPL yet; the numbers below that come from "
+        L += ["NOT READY TO ORDER: %s, so there are no gerbers and no CPL yet; the numbers below that come from "
               "the board are gen/layout.py's plan." % (why_not or "the board is not finished"), ""]
-    L += ["Written by `mfg/make_release.py` on %s.  On jlcpcb.com, **Order now**, upload `%s_gerbers.zip`, then "
-          "choose, in the order the page asks:" % (datetime.date.today(), NAME), "",
-          "## The PCB", "",
-          "| field | choose | why |", "|---|---|---|",
-          "| Base Material | FR-4 | |",
-          "| Layers | 4 | the coils' four spirals; a ground plane under the MCU and the drivers |",
-          "| Dimensions | %.1f x %.1f mm | the panel's outline, read from the board file's Edge.Cuts%s |"
-          % (w, h, "" if have_board else " (planned)"),
-          "| PCB Qty | %d | JLCPCB's minimum; each one is a whole panel of %d boards |" % (panels, designs),
-          "| Product Type | Industrial/Consumer electronics | |",
-          "| Different Design | %d (type it in: the buttons stop at 4) | base, tree, perch, bat, owl token and cat "
-          "token on one panel; with Panel by Customer, JLCPCB takes up to 10 |" % designs,
-          "| Delivery Format | Panel by Customer | the panel is ours: rails, tabs and mouse bites are in the gerbers.  "
-          "If the page asks for columns and rows, 1 x 1: one panel of six different boards, nothing repeated |",
-          "| PCB Thickness | 1.6 mm | the JLC041611-7628 stack-up; the 3D prints (gen/mech.py) are drawn for 1.6 |",
-          "| PCB Color | Purple | Halloween.  Purple on 4 layers rules out Economic PCBA, hence Standard below |",
-          "| Silkscreen | White | |",
-          "| Material Type | FR4-Standard TG 135-140 | the 4-layer default; nothing here runs hot enough to need more |",
-          "| Surface Finish | ENIG | the moon and the ghost (the theremin's antennas) are bare gold copper; "
-          "lead-free for a child's hands; flat pads for the 0.4 mm QFNs |",
-          "| Outer Copper Weight | 1 oz | 5 A in pours is enough at 1 oz (PLAN.md section 4) |",
-          "| Inner Copper Weight | 1 oz | halves the coils' inner-layer resistance (3.35 to 2.2 ohm): a third less "
-          "heat (PLAN.md section 4) |",
-          "| Impedance Control / Layer Stackup | Yes, JLC041611-7628 (no letter after 7628) | the stack-up "
-          "gen/project.py's rules and the coils' physics assume: one 7628 prepreg each side of a 1.065 mm core.  "
-          "JLCPCB's names read JLC, layers, thickness, outer copper, inner copper, prepreg: JLC04161H-7628 is the "
-          "same build with 0.5 oz (H) inner copper, so with 1 oz inner chosen the page lists only the ...11- names; "
-          "7628A-H are other core and prepreg layerings.  No line on this board needs a controlled impedance; "
-          "'Yes' only brings up the list |",
-          "| Via Covering | Tented | the default; the exposed pads' thermal vias wick a little solder, as Raspberry "
-          "Pi's layout intends (GPiBridge, built this way) |",
-          "| Min via hole size/diameter | %s |" % via_txt,
-          "| Board Outline Tolerance | +-0.2mm (Regular) | |",
-          "| Confirm Production file | Yes | free: JLCPCB shows the panel as they will make it before production; "
-          "check the outline, the slots between the boards and the six designs |",
-          "| Mark on PCB | Remove Mark | nothing on the art.  JLCPCB has added no order number by default since "
-          "May 2026 and asks that \"JLCJLCJLCJLC\" not be put on the silkscreen (help: How to mark on PCB, "
-          "2026-05-22)%s |" % ("; this board still carries it: take it off" if feat.get("jlc_text") else ""),
-          "| Electrical Test | Flying Probe Fully Test | |",
-          "| Gold Fingers / Castellated Holes / Edge Plating | No | |",
-          "| PCB Remark | \"Customer panel of %d different designs joined by mouse bites; keep the rails on; SMD "
-          "parts on both sides, through-hole parts on the top side only.\" | |" % designs,
-          "| anything else | the default | |", "",
-          "## PCB Assembly", "",
-          "| field | choose | why |", "|---|---|---|",
-          "| PCB Assembly | on | |",
-          "| PCBA Type | Standard | purple on 4 layers is Standard only; Standard also does both sides |",
-          "| Assembly Side | %s | %s |" % (("Both Sides", "the scene on top; the electronics underneath "
-                                          "(gen/layout.py)") if len(cost["sides"]) == 2
-                                         else (sorted(cost["sides"])[0].capitalize() + " Side", "")),
-          "| PCBA Qty | %d | of the %d panels; the other %d are bare spares |" % (assembled, panels, panels - assembled),
-          "| Tooling holes | %s | %s |" % (
-              ("(from the board)", "Added by Customer if the panel's rails carry tooling holes, else Added by JLCPCB")
-              if not have_board else
-              ("Added by Customer", "%d tooling holes on the rails (%s)" % (len(tool), ", ".join(t[0] for t in tool)))
-              if len(tool) >= 2 else ("Added by JLCPCB", "the panel's rails carry no tooling holes of their own")),
-          "| Edge Rails/Fiducials | %s | %s |" % (
-              ("(from the board)", "Added by Customer if the rails carry three fiducials, else Added by JLCPCB")
-              if not have_board else
-              ("Added by Customer", "%g mm rails with %d fiducials on them (%s)"
-               % (LAYOUT.RAIL, len(fid), ", ".join(f["ref"] for f in fid)))
-              if len(fid) >= 3 else ("Added by JLCPCB", "the panel lacks three good fiducials on its rails; JLCPCB "
-                                     "adds them (and adds or fixes rails and fiducials that are missing or wrong, by "
-                                     "default)")),
-          "| Confirm Parts Placement | Yes | free.  Some rotations are predicted, not yet seen: "
-          "PLACEMENT_CHECKS.txt says what to look at, on both sides |",
-          "| Parts Selection | by Customer | every part has its LCSC code in the BOM |",
-          "| Stencil / Fixture Storage | No | $4.93 each, for a re-order |",
-          "| Bake Components | Yes | JLCPCB recommends it for moisture-sensitive parts (MSL 3 and up: the LGA-14 "
-          "accelerometer, the QFNs); about $7.50 |",
-          "| Depanel / remove rails | No | JLCPCB ships assembled panels with their rails on; the boards snap out "
-          "at the mouse bites at home |",
-          "| anything else | the default | |", "",
-          "Then upload `BOM_JLCPCB.csv` and `" + CPL_UPLOAD + "` (not `" + CPL_NATIVE + "`).  Every BOM line carries "
-          "its LCSC code; nothing should be left unmatched.  In the placement preview, go through "
-          "`PLACEMENT_CHECKS.txt` on both sides before confirming.", "",
-          "**Shipping:** UPS Express Saver (DDP) or DHL Express Priority (DDP): a US individual must ship DDP, and "
-          "JLCPCB collects the duty (about 35 % of the PCBs and assembly).  Lead time: 4-layer PCBs 2-5 days, "
-          "Standard assembly at least 4 more (+1 for through-hole parts), then 4-5 business days in the post.", ""]
-    L += ["## Numbers behind the choices", "",
-          "- Panel %.1f x %.1f mm%s; smallest track %s; %s." % (
-              w, h, "" if have_board else " (planned)", ("%.3f mm" % tw) if tw else "(from the board)",
-              ("%d vias" % len(B["vias"])) if B and B["vias"] else "vias: from the board"),
-          "- Assembly: %d placements a panel on %d BOM lines (%d Extended), %d SMD pads and %d through-hole joints "
-          "a panel%s; %s." % (cost["n_place"], cost["n_lines"], len(cost["ext"]), cost["smd"], cost["tht"],
-                              "" if have_board else " (from the library's footprints)",
-                              " and ".join(sorted(cost["sides"], reverse=True))),
-          "- Estimate: %s before shipping and duty (COST_ESTIMATE.md)." % money(cost["total"])]
+    L += jlc_form(subs)
+    hand = sorted(HAND_SOLDER)
+    L += ["NOTES",
+          "Panel: %.1f x %.1f mm%s, 4 layers, 1.6 mm; JLCPCB stack-up JLC041611-7628 (1 oz outer and inner copper, 7628 "
+          "prepreg each side of a 1.065 mm core).  Purple mask, white silkscreen, ENIG." % (w, h, "" if have_board else " (planned)"),
+          "Six designs on one customer panel: base, tree (turned 90 degrees), perch, bat, owl token, cat token, joined by "
+          "tabs with %s mouse-bite holes; 3 fiducials (a 1 mm dot in a 2 mm mask opening, a pad on each side) and 4 tooling "
+          "holes on the %g mm rails." % (len(feat.get("bites") or []) or "(from the board)", LAYOUT.RAIL),
+          "Minimum track/space on the board: %s.  Vias 0.45/0.25 mm, %s; smallest drill %s."
+          % (("%.3f mm" % tw) if tw else "(from the board)", ("%d of them" % len(B["vias"])) if B and B["vias"] else "(from the board)",
+             ("%g mm" % via[3]) if via else "(from the board)"),
+          "The gold moon and ghost (the theremin's antennas) are bare ENIG copper under mask openings: not a mistake.",
+          "The copper coils (L3-L7, L201, L301, L401, L501) are spirals drawn in the footprints, not parts: nothing to fit.",
+          "Through-hole parts JLCPCB fits, all on the TOP side: J1 (barrel jack), J3 (2x8 socket), LS1 (speaker).",
+          "Hand solder (hand_solder_bom.csv), after the boards are snapped apart: %s -- %s."
+          % (", ".join(hand), "; ".join("%s: %s" % (r, HAND_SOLDER[r]) for r in hand)),
+          "Upload: %s and %s (JLCPCB's conventions: the bottom-side mirror, rotations read in previews or predicted from "
+          "their drawings, parts moved to their library's origin); %s is KiCad's own numbers for reference."
+          % (BOM_UPLOAD, CPL_UPLOAD, CPL_NATIVE),
+          "THEN READ THE PLACEMENT PREVIEW against PLACEMENT_CHECKS.txt, both sides: the predicted rotations, the polarity "
+          "marks of the diodes and LEDs, and the parts moved to JLCPCB's datum (SW3 needed a further nudge north on "
+          "2026-10-09: mfg/jlc_rotation.py JLC_DATUM_READINGS).",
+          "Coordinates: the panel's top-left corner is the drill/place origin; the gerbers, the drill file and the CPL all "
+          "use that frame (x right, y up in the CPL), so they agree.",
+          "Shipping: UPS Express Saver (DDP) or DHL Express Priority (DDP): a US individual must ship DDP, and JLCPCB "
+          "collects the duty (about 35% of the PCBs and assembly).  Lead time: 4-layer PCBs 2-5 days, Standard assembly "
+          "at least 4 more (+1 for through-hole parts), then 4-5 business days in the post."]
     if max(w, h) > 250.0:
-        L.append("- **The panel is %.1f mm long.** JLCPCB recommends at most 250 x 250 mm for an assembled panel "
-                 "and accepts larger at the customer's risk (warping through two reflows).  Expect them to ask."
-                 % max(w, h))
+        L.append("THE PANEL IS %.1f mm LONG: JLCPCB recommends at most 250 x 250 mm for an assembled panel and accepts "
+                 "larger at the customer's risk (warping through two reflows).  Expect them to ask." % max(w, h))
     for n_ in feat.get("notes", []):
-        L.append("- **Panel:** " + n_ + ".")
-    L += checks
-    L += ["", "Sources (read 2026-10-07): jlcpcb.com/help/article/pcb-assembly-price (2026-09-09), "
-          "/capabilities/pcb-assembly-capabilities, /help/article/How-to-mark-on-PCB (2026-05-22), "
-          "/help/article/how-to-add-edge-rails-fiducials-for-pcb-assembly-order, "
-          "/help/article/Instructions-for-ordering, /help/article/us-tariff-policy-faq (2026-09-09).  The 4-layer "
-          "fields' places on the page come from a 2024 printout of it and from others' 4-layer orders; the page "
-          "itself is drawn by JavaScript."]
-    open(os.path.join(out, "ORDER_SETTINGS.md"), "w", encoding="utf-8").write("\n".join(L) + "\n")
+        L.append("Panel: " + n_ + ".")
+    L += [c.lstrip("- ") for c in checks]
+    F, L_ = FEES, cost["fees"]
+    n = len(cost["sides"])
+    L += ["",
+          "COST ESTIMATE: %d panels, %d assembled, itemised as JLCPCB's cart is (fees from %s; parts from their live API):"
+          % (panels, assembled, F["source"])]
+    rows = [("PCB", "bare panels (%d panels; a model: %s to %s, no quote yet)" % (panels, money(cost["pcb_lo"]), money(cost["pcb_hi"])), cost["pcb"]),
+            ("PCBA", "setup fee, Standard, %s" % ("both sides" if n == 2 else "one side"), L_["setup"]),
+            ("PCBA", "stencils, %s" % ("one for each side" if n == 2 else "one"), L_["stencil"]),
+            ("PCBA", "feeder loading (%d BOM lines x %s, Basic and Extended alike)" % (cost["n_lines"], money(F["feeder"])), L_["feeder"]),
+            ("PCBA", "SMT assembly (%d pads x %d panels x $%.4f)" % (cost["smd"], assembled, F["smt_joint"]), L_["joints"]),
+            ("PCBA", "hand-soldering labour and %d through-hole joints x %d x $%.4f" % (cost["tht"], assembled, F["tht_joint"]), L_["hand"]),
+            ("PCBA", "panel of %d designs" % designs, L_["designs"]),
+            ("PCBA", "packaging", L_["packing"])]
+    if L_["large"]:
+        rows.append(("PCB", "large board (over %.0f cm2)" % F["large"][0], L_["large"]))
+    rows.append(("PCBA", "components (%d lines, with JLCPCB's attrition and minimums)" % cost["n_lines"], cost["parts"]))
+    for kind, what, amount in rows:
+        L.append("  %-6s %-62s %s" % (kind, what, ("$%9.2f" % amount)))
+    L += ["  %-6s %-62s %s  (%s per assembled panel)" % ("TOTAL", "before shipping and duty", "$%9.2f" % cost["total"],
+                                                          money(cost["total"] / assembled)),
+          "  US duty, DDP, about 35%% of that: ~%s more.  Shipping is shown at checkout (UPS Express Saver DDP, about $30-40)."
+          % money(0.35 * cost["total"]),
+          "  Not in the total: baking the moisture-sensitive parts (about $7.50).  The bare panels are the least certain line: "
+          "read the cart's number into PCB_QUOTE in mfg/make_release.py."]
+    open(os.path.join(out, "FABRICATION_NOTES.txt"), "w", encoding="utf-8").write("\n".join(L) + "\n")
 
 
 # ---------------------------------------------------------------------------------------
@@ -1198,8 +1297,8 @@ def main(argv=None):
         feat = features(B, fps, box, parts={c["ref"] for c in comps})
 
         # ---- does every ordered part fit its copper? ---------------------------------
-        nbad, fp_lines = FC.report(os.path.join(stage, "BOM_JLCPCB.csv"), a.refresh, False, pcb=a.pcb,
-                                   bom_label=os.path.join(os.path.basename(a.out), "BOM_JLCPCB.csv"))
+        nbad, fp_lines = FC.report(os.path.join(stage, BOM_UPLOAD), a.refresh, False, pcb=a.pcb,
+                                   bom_label=os.path.join(os.path.basename(a.out), BOM_UPLOAD))
         open(os.path.join(stage, "FOOTPRINT_CHECK.txt"), "w", encoding="utf-8").write("\n".join(fp_lines) + "\n")
         holes, code = [], ""
         for l in fp_lines:
@@ -1262,7 +1361,7 @@ def main(argv=None):
                                                        if accepted else "", len(sim_ok))]
     why_not = ("the board file (hardware/%s.kicad_pcb) does not exist yet" % NAME if not os.path.exists(a.pcb)
                else "this is the board-free half of the release (--bom-only): the board is not finished")
-    order_md(stage, have_board, dims, a.panels, a.assembled, feat or {}, B, cost, checks, why_not)
+    fab_notes(stage, have_board, dims, a.panels, a.assembled, feat or {}, B, cost, checks, why_not)
     failures += scan_paths(stage)
     return finish(failures, stage, a, test, have_board=have_board, rows=rows, cost=cost)
 

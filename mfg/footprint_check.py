@@ -766,7 +766,7 @@ def default_bom():
     renamed, running this with no arguments still checks what went out.
     """
     def bom(d):
-        p = os.path.join(HERE, d, "BOM_JLCPCB.csv")
+        p = os.path.join(HERE, d, BI.NAME + "_bom.csv")
         return p if os.path.exists(p) else None
 
     return bom(os.path.basename(BI.RELEASE)) or next(

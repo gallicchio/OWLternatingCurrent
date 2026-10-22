@@ -53,6 +53,15 @@ Touch a magnet to the cold nozzle. A hardened-steel nozzle (stock on the X1C, X1
 
 Orca Slicer should open `plate_bambu.3mf` the same way, but I haven't tested it: look for the mark at layer 97.
 
+**Through 3DPrinterOS (the plan: we expect to print on a Bambu Lab X1 Carbon this way):**
+
+3DPrinterOS doesn't slice for Bambu printers; it sends a job you sliced in Bambu Studio. The pause is a line in that sliced G-code, so it goes through untouched.
+
+1. Do steps 1-2 above in Bambu Studio: open `plate_bambu.3mf`, keep the X1 Carbon, *Slice plate*, and check for the mark at layer 97.
+2. *File → Export → Export plate sliced file* to get a `.gcode.3mf`. (Plain `.3mf` or `.stl` won't do: those would be sliced again, without the pause.)
+3. At cloud.3dprinteros.com, *Add file*, choose the `.gcode.3mf` and the X1 Carbon, and print. The printer needs its SD card in.
+4. At the pause, resume from the **printer's touchscreen**. The X1 Carbon's stock nozzle is hardened steel, which is magnetic: **do the tape step** (step 5 under "At the pause").
+
 **Bambu Studio, adding the pause yourself (with `plate.3mf`):**
 
 1. Open `out/plate.3mf` (drag it in, or *File → Import*), choose printer, PLA and "0.20mm Standard", and *Slice plate*.

@@ -118,7 +118,7 @@ module owl_recess()            // hollow under the base: only a rim touches the 
     }
 
 // OPEN: the no-pause version.  The owl's pocket runs out of its back as a slot (with a
-// groove up each side wall for the silicone to key into); the cap's pocket has no floor.
+// groove up each side wall for the epoxy to key into); the cap's pocket has no floor.
 module owl_pocket()
     translate([0, 0, OWL_FLOOR])
         if (OPEN) linear_extrude(OPEN_GAP_T) {

@@ -448,7 +448,7 @@ def check_open(C, owl_info, cap_info):
     C.add("no-pause owl: the slot opens out of the owl's back", "yes",
           first_hit(body, (0, y_front + 1, zm), (0, 1, 0)) is None, "", "")
     plug = 40 - back - (y_front + M.MAGNET_D)
-    C.within("no-pause owl: silicone plug behind the magnet", plug, 3.0, None)
+    C.within("no-pause owl: epoxy plug behind the magnet", plug, 3.0, None)
     C.within("no-pause owl: thinnest plastic over the pocket", roof(body, (0, y_front + M.POCKET_D / 2), M.POCKET_D,
                                                                     top), 1.0, None)
     # --- the cap
@@ -534,7 +534,7 @@ def run(verbose=True):
         % (owl["height"], D.float_gap(owl["lift"]) or float("nan")),
         "overhangs  no floating islands; farthest unsupported spot %s"
         % ", ".join("%s %.1f mm" % (r["name"], r["worst"][0][0] if r["worst"] else 0) for r in oh[:3]),
-        "no-pause owl  slot %.1f x %.1f; magnet %.2f mm above the top copper, %.1f mm of silicone behind it"
+        "no-pause owl  slot %.1f x %.1f; magnet %.2f mm above the top copper, %.1f mm of epoxy behind it"
         % (opn["slot"], opn["gap"], opn["lift"], opn["plug"]),
         "no-pause cap  no floor; magnet top %.1f mm above the bat; pocket roofs bridged (%s mm out)"
         % (opn["magnet_top"], " / ".join("%.1f" % (r["worst"][0][0] if r["worst"] else 0) for r in oh[3:])),

@@ -479,11 +479,11 @@ def pictures(parallel, meshes):
             ["build/v_open_owl_back.png", "build/v_open_cap_below.png"],
             ["owl from behind: the magnet slides in flat through the slot",
              "bat cap from below: no floor; the bat closes the pocket"], cols=2,
-            title="No pause: the magnets go in after printing, held by silicone")
+            title="No pause: the magnets go in after printing, glued in with epoxy")
 
 
 def open_sections(meshes):
-    """out/no_pause/magnets_in.png: where each magnet and the silicone go, cut through."""
+    """out/no_pause/magnets_in.png: where each magnet and the epoxy go, cut through."""
     import matplotlib
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
@@ -507,7 +507,7 @@ def open_sections(meshes):
     ax.annotate("slide it in flat from the back,\npush it to the front with a wooden stick",
                 xy=(back, D.OWL_FLOOR + 1.2), xytext=(back - 3, D.OWL_FLOOR + 9), fontsize=8,
                 arrowprops=dict(arrowstyle="->", lw=0.7))
-    ax.annotate("then fill the slot with silicone;\nit keys into a groove in each side wall",
+    ax.annotate("then fill the slot with epoxy;\nit keys into a groove in each side wall",
                 xy=(D.OPEN_KEY_Y, D.OWL_FLOOR + 2.3), xytext=(1, D.OWL_FLOOR - 9.5), fontsize=8,
                 arrowprops=dict(arrowstyle="->", lw=0.7))
     ax.set_title("Owl, cut down its middle: face to the left, back to the right", fontsize=11)
@@ -522,13 +522,13 @@ def open_sections(meshes):
                            fc=C["mag"], ec="#555"))
     ax.text(0, D.CAP_OPEN_DEPTH - 1.0, "magnet, dot to the dome", ha="center", va="center", fontsize=7)
     ax.text(0, -0.8, "bat", color="white", fontsize=8, ha="center", va="center")
-    ax.annotate("cap upside down: magnet in, onto the roof;\nsilicone to the rim; press the bat on",
+    ax.annotate("cap upside down: magnet in, onto the roof;\nepoxy to the rim; press the bat on",
                 xy=(3, 0.3), xytext=(-3, -5.2), fontsize=8, arrowprops=dict(arrowstyle="->", lw=0.7))
     dim(ax, (7.2, 0), (7.2, D.CAP_OPEN_DEPTH), "%.1f" % D.CAP_OPEN_DEPTH, off=(0.9, 0))
     ax.set_title("Bat cap on the bat, cut along the body; head to the left", fontsize=11)
     ax.set_xlim(-16, 16); ax.set_ylim(-7, 8); ax.set_aspect("equal"); ax.grid(alpha=0.25)
     ax.set_xlabel("y (mm)"); ax.set_ylabel("z above the bat's top surface (mm)")
-    fig.suptitle("No pause: where the magnets and the silicone (light blue) go", fontsize=12)
+    fig.suptitle("No pause: where the magnets and the epoxy (light blue) go", fontsize=12)
     fig.savefig(os.path.join(OPEN_OUT, "magnets_in.png"), dpi=110, bbox_inches="tight")
     plt.close(fig)
 

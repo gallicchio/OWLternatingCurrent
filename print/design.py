@@ -145,15 +145,15 @@ CAP_PED_HALF_X = CAP_DOME_R + 1.0
 # --- the no-pause version (out/no_pause/): the magnets go in after printing ---------------
 # The owl's pocket opens out of its back through a slot the magnet slides along, flat; the
 # cap's pocket has no floor, so its magnet goes in from below before the cap goes on, and
-# the bat closes it.  Silicone fills what's left.  Both magnets end up where the pause
+# the bat closes it.  Two-part epoxy fills what's left.  Both magnets end up where the pause
 # version puts them: the owl's on its pocket floor (OWL_FLOOR), the cap's against its roof
 # (where the pause version's magnet is pulled when the bat floats).
 OPEN_GAP_T = 13 * LAYER       # the owl's pocket and slot, for a 2.0 mm magnet: room for the
-                              # bridged roof to sag a little, and for silicone
+                              # bridged roof to sag a little, and for the epoxy
 OPEN_SLOT_W = 10.5            # the slot (magnet 10.0); the pocket's round front end centres it
 OPEN_SLOT_END = OWL_B + 1.0   # the slot runs out through the owl's back
 OPEN_KEY_Y = 7.4              # a groove up each of the slot's side walls, behind the magnet:
-OPEN_KEY_W = 1.2              # the silicone plug keys into them (silicone barely sticks to PLA)
+OPEN_KEY_W = 1.2              # the epoxy plug keys into them
 OPEN_KEY_D = 0.8
 CAP_OPEN_DEPTH = CAP_FLOOR_T + POCKET_DEPTH   # bat's top surface to the cap pocket's roof
 

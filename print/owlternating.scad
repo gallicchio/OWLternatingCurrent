@@ -17,6 +17,7 @@ include <out/params.scad>
 include <out/shapes.scad>
 
 PART = "plate";
+OPEN = false;      // true: the no-pause version (build.py passes -D OPEN=true)
 FN = 72;
 
 // ---------------------------------------------------------------- helpers
@@ -116,8 +117,17 @@ module owl_recess()            // hollow under the base: only a rim touches the 
         for (s = [-1, 1]) translate([s * OWL_RECESS_RIDGE[0], 0, OWL_RECESS_RIDGE[1]]) cube(0.02, center = true);
     }
 
+// OPEN: the no-pause version.  The owl's pocket runs out of its back as a slot (with a
+// groove up each side wall for the silicone to key into); the cap's pocket has no floor.
 module owl_pocket()
-    translate([0, 0, OWL_FLOOR]) linear_extrude(POCKET_DEPTH) circle_c(POCKET_R);
+    translate([0, 0, OWL_FLOOR])
+        if (OPEN) linear_extrude(OPEN_GAP_T) {
+            circle_c(POCKET_R);
+            translate([-OPEN_SLOT_W / 2, 0]) square([OPEN_SLOT_W, OPEN_SLOT_END]);
+            for (s = [-1, 1]) translate([s * (OPEN_SLOT_W + OPEN_KEY_D) / 2, OPEN_KEY_Y])
+                square([OPEN_KEY_D + 0.02, OPEN_KEY_W], center = true);
+        }
+        else linear_extrude(POCKET_DEPTH) circle_c(POCKET_R);
 
 module owl() {
     difference() {
@@ -175,7 +185,8 @@ module cap() {
             }
             cap_ears();
         }
-        translate([0, 0, CAP_FLOOR_T]) linear_extrude(POCKET_DEPTH) circle_c(POCKET_R);
+        if (OPEN) translate([0, 0, -0.01]) linear_extrude(CAP_OPEN_DEPTH + 0.01) circle_c(POCKET_R);
+        else translate([0, 0, CAP_FLOOR_T]) linear_extrude(POCKET_DEPTH) circle_c(POCKET_R);
     }
 }
 
@@ -328,6 +339,8 @@ else if (PART == "view_plate_paused") view_plate_paused();
 else if (PART == "view_owl") color(C_OWL) import("out/assembled/owl_in_perch_frame.stl", convexity = 10);
 else if (PART == "view_cap") color(C_CAP) import("out/assembled/bat_cap_in_bat_frame.stl", convexity = 10);
 else if (PART == "view_foot") color(C_FOOT) import("build/foot.stl", convexity = 10);
+else if (PART == "view_owl_open") color(C_OWL) import("build/owl_open.stl", convexity = 10);
+else if (PART == "view_cap_open") color(C_CAP) import("build/cap_open.stl", convexity = 10);
 else if (PART == "view_owl_on_perch") {
     perch();
     color(C_OWL) import("out/assembled/owl_in_perch_frame.stl", convexity = 10);

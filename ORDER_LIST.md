@@ -13,6 +13,7 @@ order them all on the same day.
 | 5 | **Thread for the pendulum**: clear nylon monofilament (fishing line, 4-8 lb, about 0.2-0.3 mm) or black sewing thread | what you have | 30 cm | |
 | 1a | **Three connectors to solder at home** (`mfg/release/hand_solder_bom.csv`): 2 x PZ254-2-08-W-8.5 right-angle 2x8 headers (LCSC C2894988) and 1 x PM254-2-08-Z-8.5 2x8 socket (C2897409) | LCSC, in the JLCPCB order | 2 + 1 (buy 4 + 2: a spare set) | $2 |
 | 6 | **A drop of cyanoacrylate glue** for the bat's cap | what you have | | |
+| 7 | *Only for the no-pause print* (`print/README.md`): **clear RTV silicone** with a narrow nozzle, or two-part epoxy for the owl | what you have | a few drops | |
 
 ## 1. The boards (JLCPCB)
 

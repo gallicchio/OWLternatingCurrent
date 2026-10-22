@@ -1,6 +1,6 @@
 # The printed parts: an owl, the bat's cap, four feet
 
-One plate, PLA, no supports, no glue, **one pause** for both magnets.
+One plate, PLA, no supports, no glue, **one pause** for both magnets. Or no pause at all, with the magnets glued in afterwards: [the no-pause version](#the-no-pause-version-glue-the-magnets-in-afterwards).
 
 ![the plate](out/plate.png)
 
@@ -30,6 +30,7 @@ One plate, PLA, no supports, no glue, **one pause** for both magnets.
 | `plate.stl` | The whole plate as one STL. |
 | `owl.stl`, `bat_cap.stl`, `foot.stl` | One part each, with its stand-in, for a reprint. The owl and the cap still pause before layer 97. |
 | `assembled/*.stl` | The bare owl and cap in their boards' coordinates, for checking them against the boards. |
+| `no_pause/` | The same plate with **no pause**: `plate_bambu.3mf`, `plate.3mf`, `plate.stl`, `owl.stl`, `bat_cap.stl`. The magnets go in after printing ([below](#the-no-pause-version-glue-the-magnets-in-afterwards)). |
 | `*.png` | The pictures here. |
 
 ## Print settings
@@ -97,6 +98,29 @@ Orca Slicer should open `plate_bambu.3mf` the same way, but I haven't tested it:
 
 **Why "same face up" gets the polarity right.** Magnets stuck together in a stack all point the same way. Take the top two off the stack without flipping them and put each in its pocket with the same face up, and they point the same way. The owl and the cap both print the way they are used (owl standing, cap dome up). So on the board the owl's magnet and the bat's magnet point the same way, and **the bat is pulled up toward the owl**. In the cut-away below, both magnets are red side up. If a bat is ever pushed *away* from the owl, one magnet went in upside down; reprint that part.
 
+## The no-pause version: glue the magnets in afterwards
+
+`out/no_pause/` is the same plate, printed straight through, with nothing to do mid-print. The owl's pocket opens out of its **back** (toward the tree) as a slot the magnet slides along, flat. The bat cap's pocket has **no floor**: its magnet goes in from below, and the bat closes the pocket when the cap goes on. Silicone fills what's left. Each magnet ends up exactly where the pause version puts it. The owl's magnet rests on its pocket floor, 14.05 mm above the perch's top copper, where its weight and the bat's pull hold it. The cap's magnet sits against the pocket's roof, where the floating bat's pull would put it anyway.
+
+![the no-pause parts](out/no_pause/parts.png)
+![where the magnets and the silicone go](out/no_pause/magnets_in.png)
+
+**Print** `out/no_pause/plate_bambu.3mf` exactly as above: the same settings and the same "floating cantilever" warnings to ignore, but no mark at layer 97. Through 3DPrinterOS it's the same `.gcode.3mf` export. The roof over each empty pocket is a 10.5 mm bridge, which PLA spans easily. The owl's slot is 2.6 mm tall for a 2.0 mm magnet, so a slightly sagging roof won't jam it.
+
+**You'll also need:** a tube of clear RTV silicone with a narrow nozzle, and a **wooden or plastic** stick, such as a skewer or a toothpick. Don't use a screwdriver: the magnet would follow it back out.
+
+**Magnets in** (do this before snapping the parts onto the boards):
+
+1. Mark two magnets off the stack as in "At the pause", step 1: a dot on the top face of each, slid off sideways without turning over. Put the rest of the stack well away.
+2. **Owl:** stand it upright. Slide one magnet, **dot up**, flat into the slot in its back, and push it in with the stick until it stops against the front of the pocket. Its back edge is then about 4 mm inside the owl. Fill the slot with silicone to the owl's back surface, working it into the slot's two side grooves: they key the plug in, since silicone barely sticks to PLA. Leave the owl upright while it cures.
+3. **Bat cap:** hold it **upside down** (dome down, pocket opening up). Drop the other magnet in, **dot down**, toward the dome. Upside down, that's the same as dot up when the cap is on the bat. It rests on the pocket's roof. Fill the rest of the pocket (about 0.6 mm) with silicone, level with the rim.
+4. While the silicone is wet, press the bat on: turn the bat **top face down**, line the cap's ears up with the bat's head, and press until both hooks click. Wipe off what squeezes out. Then glue the hooks with cyanoacrylate, as in "Assembly", step 3. The silicone also bonds the magnet to the bat, so it's sealed in on every side.
+5. Let the silicone cure (see its tube, usually a day) before you put the owl on the perch.
+
+**Check the polarity** once it's cured: hold the bat under the owl and it should be pulled up. If it's pushed away, one magnet went in upside down. The owl's is the easy one to redo: dig out the silicone and slide its magnet out.
+
+**Child safety.** The cap's magnet is enclosed: plastic on top and sides, the bat underneath, the cap glued on. The owl's magnet is held by a silicone plug a few millimetres deep. That's less secure than the pause version, which seals the magnet in plastic. The owl is too big to swallow, but a determined child could dig the plug out and free the magnet. For a toy, prefer the pause version, or fill the owl's slot with **two-part epoxy** instead of silicone; epoxy keys into the grooves and doesn't come out.
+
 ## After printing
 
 1. Take the parts off the plate.
@@ -130,6 +154,8 @@ cap preload  1.8 / 3.5 N per hook (arm stress 17 / 33 MPa) when the board is 0.1
 cap mass  0.49 g of PLA (it prints solid; 1.24 g/cm3)
 owl  30.1 mm tall above the perch; bat floats 8.5 mm below the perch (sim/physics)
 overhangs  no floating islands; farthest unsupported spot owl 0.9 mm, bat cap 3.2 mm, foot 0.4 mm
+no-pause owl  slot 10.5 x 2.6; magnet 14.05 mm above the top copper, 4.2 mm of silicone behind it
+no-pause cap  no floor; magnet top 2.6 mm above the bat; pocket roofs bridged (5.3 / 5.2 mm out)
 ```
 <!-- numbers: end -->
 
@@ -143,7 +169,7 @@ overhangs  no floating islands; farthest unsupported spot owl 0.9 mm, bat cap 3.
 
 ## Safety
 
-Both magnets are sealed inside printed plastic: no glue, no open pocket (`PLAN.md` §7). The owl is too big to swallow. The bat cap is a small part with a magnet in it, so keep it hooked onto the bat; the 48 mm bat is not a small part. Swallowed neodymium magnets are dangerous; a grown-up should handle spare magnets and do the pause.
+Both magnets are sealed inside printed plastic: no glue, no open pocket (`PLAN.md` §7). (The no-pause version is the exception: its owl's magnet is held by a silicone plug. See its section.) The owl is too big to swallow. The bat cap is a small part with a magnet in it, so keep it hooked onto the bat; the 48 mm bat is not a small part. Swallowed neodymium magnets are dangerous; a grown-up should handle spare magnets and do the pause.
 
 ## For the board designer
 

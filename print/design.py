@@ -142,6 +142,21 @@ CAP_PLATFORM_TOP = CAP_Z0 + CAP_Z_BOTTOM - GAP_Z   # under the lips
 CAP_PLATEAU_TOP = CAP_Z0 - GAP_Z                    # under the floor and arms
 CAP_PED_HALF_X = CAP_DOME_R + 1.0
 
+# --- the no-pause version (out/no_pause/): the magnets go in after printing ---------------
+# The owl's pocket opens out of its back through a slot the magnet slides along, flat; the
+# cap's pocket has no floor, so its magnet goes in from below before the cap goes on, and
+# the bat closes it.  Silicone fills what's left.  Both magnets end up where the pause
+# version puts them: the owl's on its pocket floor (OWL_FLOOR), the cap's against its roof
+# (where the pause version's magnet is pulled when the bat floats).
+OPEN_GAP_T = 13 * LAYER       # the owl's pocket and slot, for a 2.0 mm magnet: room for the
+                              # bridged roof to sag a little, and for silicone
+OPEN_SLOT_W = 10.5            # the slot (magnet 10.0); the pocket's round front end centres it
+OPEN_SLOT_END = OWL_B + 1.0   # the slot runs out through the owl's back
+OPEN_KEY_Y = 7.4              # a groove up each of the slot's side walls, behind the magnet:
+OPEN_KEY_W = 1.2              # the silicone plug keys into them (silicone barely sticks to PLA)
+OPEN_KEY_D = 0.8
+CAP_OPEN_DEPTH = CAP_FLOOR_T + POCKET_DEPTH   # bat's top surface to the cap pocket's roof
+
 # --- the feet ----------------------------------------------------------------------------
 FOOT_PEG_D = M.FOOT_HOLE_D - 0.2     # shaft through the board
 FOOT_BARB_D = M.FOOT_HOLE_D + 0.4    # catches 0.2 mm of the board's top face
@@ -523,6 +538,12 @@ def check_invariants():
     assert OWL_SLAB_HALF_X <= OWL_LIP_TIP - GAP_XY, "owl's stand-in touches its lips"
     assert CAP_PLATFORM_TOP > 0
     assert OWL_ARM_HALF_W * 2 < OWL_NOTCH_LEN
+    assert on_grid(OPEN_GAP_T) and OPEN_GAP_T >= M.MAGNET_T + 0.4
+    assert OPEN_SLOT_W > M.MAGNET_D + 0.3
+    z = OWL_FLOOR + OPEN_GAP_T
+    assert OPEN_SLOT_END > owl_profile(OWL_FLOOR)[1], "slot doesn't reach the owl's back"
+    assert M.MAGNET_D - POCKET_R < OPEN_KEY_Y - OPEN_KEY_W / 2, "groove over the seated magnet"
+    assert OPEN_KEY_Y + OPEN_KEY_W / 2 < owl_profile(z)[1] - 1.0, "groove too near the owl's back"
 
 
 check_invariants()

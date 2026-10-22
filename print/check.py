@@ -21,6 +21,8 @@ import meshtools as mt      # noqa: E402
 
 OUT = os.path.join(HERE, "out")
 EPS = 1e-3
+OPEN_BRIDGE_REACH = 5.5   # no-pause parts: the roof over an empty pocket is a ~10.5 mm bridge,
+                          # which PLA spans well; its middle is ~5.3 mm from any wall
 
 
 class Checks:
@@ -383,6 +385,103 @@ def check_bambu(C):
     C.add("plate_bambu.3mf: six objects placed", model.count("<item "), model.count("<item ") == 6, "6", "", "%d")
 
 
+# ------------------------------------------------------------------ the no-pause version
+def z_base_of(body):
+    """The owl's base: the first surface above a point on its rim (as in check_owl)."""
+    for x in np.arange(13.9, 9.0, -0.1):
+        h = first_hit(body, (x, 0, -1), (0, 0, 1))
+        if h is not None and h - 1 < 6:
+            return h - 1
+    return None
+
+
+def check_open(C, owl_info, cap_info):
+    """out/no_pause/: the owl's pocket opens out of its back (+y) as a slot the magnet
+    slides along; the cap's pocket has no floor.  Each magnet must end up where the pause
+    version holds it, and must be able to get in."""
+    d = os.path.join(OUT, "no_pause")
+    owl_t = mt.read_stl(os.path.join(d, "owl.stl"))
+    cap_t = mt.read_stl(os.path.join(d, "bat_cap.stl"))
+    # --- the owl
+    solids, voids = shells(owl_t)
+    C.add("no-pause owl: closed, body + stand-in, no sealed pocket", "%d solid, %d void" % (len(solids), len(voids)),
+          mt.is_closed(owl_t) and len(solids) == 2 and not voids, "2 solid, 0 void", "")
+    body = max(solids, key=lambda s: mt.bbox(s)[1][2])
+    z_base = z_base_of(body)
+    zt = mt.bbox(body)[1][2]
+    # the channel: heights where a ray from behind the owl runs in past the coil's axis
+    front = {}
+    for z in np.arange(z_base + 5, z_base + 25, D.LAYER / 4):
+        h = first_hit(body, (0, 40, z), (0, -1, 0))
+        if h is not None and 40 - h < -2:
+            front[round(float(z), 4)] = 40 - h
+    zs = sorted(front)
+    zm = (zs[0] + zs[-1]) / 2
+    y_front = front[min(zs, key=lambda z: abs(z - zm))]
+    # floor and roof exactly, by rays down and up from the middle of the pocket
+    yc = y_front + M.POCKET_D / 2
+    floor = zm - first_hit(body, (0, yc, zm), (0, 0, -1))
+    top = zm + first_hit(body, (0, yc, zm), (0, 0, 1))
+    C.add("no-pause owl: one channel from the back to the pocket",
+          "z %.2f..%.2f" % (floor - z_base, top - z_base),
+          all(abs(b - a - D.LAYER / 4) < 1e-6 for a, b in zip(zs, zs[1:])), "unbroken", "")
+    C.within("no-pause owl: channel height (magnet %.1f)" % M.MAGNET_T, top - floor, M.MAGNET_T + 0.4,
+             M.MAGNET_T + 1.0)
+    lift = floor - z_base + M.COPPER_TO_SURFACE
+    C.near("no-pause owl: MAGNET'S BOTTOM ABOVE THE PERCH'S TOP COPPER", lift, owl_info["lift"], 0.001)
+    # the channel's width all the way out, and its middle
+    narrow, mid = 99.0, []
+    for y in np.arange(y_front + 0.5, 15.0, 0.25):
+        iv = along(body, (-30, y, zm), (1, 0, 0))
+        gaps = [(b0, a1) for (a0, b0), (a1, b1) in zip(iv, iv[1:]) if b0 < 0 < a1]
+        if not gaps and y > 8:
+            break                                   # out through the back
+        g = gaps[0] if gaps else (0, 0)
+        if y > y_front + M.MAGNET_D / 2:            # past the round end: the straight slot
+            narrow = min(narrow, g[1] - g[0])
+            mid.append((g[0] + g[1]) / 2)
+    C.within("no-pause owl: slot width all the way out (magnet %.0f)" % M.MAGNET_D, narrow, M.MAGNET_D + 0.3,
+             M.MAGNET_D + 0.8)
+    C.near("no-pause owl: slot centred on the coil (x)", float(np.mean(mid)), 0.0, 0.05)
+    C.near("no-pause owl: seated magnet centred on the coil (y)", y_front + M.MAGNET_D / 2, 0.0, 0.2)
+    back = first_hit(body, (0, 40, top + 1.0), (0, -1, 0))
+    C.add("no-pause owl: the slot opens out of the owl's back", "yes",
+          first_hit(body, (0, y_front + 1, zm), (0, 1, 0)) is None, "", "")
+    plug = 40 - back - (y_front + M.MAGNET_D)
+    C.within("no-pause owl: silicone plug behind the magnet", plug, 3.0, None)
+    C.within("no-pause owl: thinnest plastic over the pocket", roof(body, (0, y_front + M.POCKET_D / 2), M.POCKET_D,
+                                                                    top), 1.0, None)
+    # --- the cap
+    solids, voids = shells(cap_t)
+    C.add("no-pause cap: closed, body + pedestal, no sealed pocket", "%d solid, %d void" % (len(solids), len(voids)),
+          mt.is_closed(cap_t) and len(solids) == 2 and not voids, "2 solid, 0 void", "")
+    cbody = max(solids, key=lambda s: mt.bbox(s)[1][2])
+    # the pocket's axis is the cap's frame origin (the sealed cap's pocket sits there too)
+    z_board = first_hit(cbody, (M.POCKET_D / 2 + 0.3, 0, -1), (0, 0, 1)) - 1    # the dome's foot
+    z_roof = first_hit(cbody, (0, 0, -1), (0, 0, 1)) - 1
+    C.add("no-pause cap: pocket open to the bat (no floor)", "yes", z_roof > z_board + M.MAGNET_T, "", "")
+    C.near("no-pause cap: MAGNET'S TOP ABOVE THE BAT, against the roof", z_roof - z_board,
+           cap_info["pocket_top"] - cap_info["z_board"], 0.001)
+    dia = 2 * min(first_hit(cbody, (0, 0, z_board + 1.0), (np.cos(t), np.sin(t), 0))
+                  for t in np.linspace(0, 2 * np.pi, 180, endpoint=False))
+    C.near("no-pause cap: pocket diameter (flat to flat)", dia, M.POCKET_D, 0.02)
+    C.within("no-pause cap: thinnest plastic over the magnet", roof(cbody, (0, 0), M.POCKET_D, z_roof), 0.8, None)
+    plo, phi = mt.bbox(min(solids, key=lambda s: mt.bbox(s)[1][2]))
+    C.near("no-pause cap: pedestal top one layer under the dome's foot", z_board - phi[2], D.GAP_Z, 0.01)
+    # --- the plate
+    objs = mt.read_3mf(os.path.join(d, "plate.3mf"))
+    C.add("no-pause plate.3mf: owl, bat cap, four feet", len(objs), len(objs) == 6, "6 objects", "", "%d")
+    import zipfile
+    z = zipfile.ZipFile(os.path.join(d, "plate_bambu.3mf"))
+    xml = z.read("Metadata/custom_gcode_per_layer.xml").decode()
+    model = z.read("3D/3dmodel.model").decode()
+    C.add("no-pause plate_bambu.3mf: six objects, no custom G-code", "%d, %s" % (model.count("<item "),
+          "none" if "<layer " not in xml else "some"), model.count("<item ") == 6 and "<layer " not in xml,
+          "6, none", "")
+    return dict(owl=owl_t, cap=cap_t, lift=lift, gap=top - floor, slot=narrow, plug=plug,
+                magnet_top=z_roof - z_board, y_front=y_front, height=zt - z_base)
+
+
 def run(verbose=True):
     C = Checks()
     owl_t = mt.read_stl(os.path.join(OUT, "owl.stl"))
@@ -403,6 +502,15 @@ def run(verbose=True):
         C.add("%s: no floating islands when sliced" % name, len(r["floating"]), not r["floating"], "0", "", "%d")
         far = r["worst"][0][0] if r["worst"] else 0.0
         C.within("%s: farthest unsupported spot from the layer below" % name, far, None, 5.0)
+    opn = check_open(C, owl, cap)
+    # the roofs over the empty pockets are bridges ~10.4 mm across: halfway is ~5.2 mm out
+    for t, name in ((opn["owl"], "no-pause owl"), (opn["cap"], "no-pause bat cap")):
+        r = overhangs(t, name)
+        oh.append(r)
+        C.add("%s: no floating islands when sliced" % name, len(r["floating"]), not r["floating"], "0", "", "%d")
+        far = r["worst"][0][0] if r["worst"] else 0.0
+        C.within("%s: farthest unsupported spot (the pocket's roof, a bridge)" % name, far, None,
+                 OPEN_BRIDGE_REACH)
     # summary for the README and the pictures
     hk = D.cap_hook_snap()
     s = [
@@ -425,7 +533,11 @@ def run(verbose=True):
         "owl  %.1f mm tall above the perch; bat floats %.1f mm below the perch (sim/physics)"
         % (owl["height"], D.float_gap(owl["lift"]) or float("nan")),
         "overhangs  no floating islands; farthest unsupported spot %s"
-        % ", ".join("%s %.1f mm" % (r["name"], r["worst"][0][0] if r["worst"] else 0) for r in oh),
+        % ", ".join("%s %.1f mm" % (r["name"], r["worst"][0][0] if r["worst"] else 0) for r in oh[:3]),
+        "no-pause owl  slot %.1f x %.1f; magnet %.2f mm above the top copper, %.1f mm of silicone behind it"
+        % (opn["slot"], opn["gap"], opn["lift"], opn["plug"]),
+        "no-pause cap  no floor; magnet top %.1f mm above the bat; pocket roofs bridged (%s mm out)"
+        % (opn["magnet_top"], " / ".join("%.1f" % (r["worst"][0][0] if r["worst"] else 0) for r in oh[3:])),
     ]
     if verbose:
         w = max(len(r[1]) for r in C.rows)

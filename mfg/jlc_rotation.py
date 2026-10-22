@@ -179,8 +179,10 @@ JLC_ROTATION_BY_PART = {
     "C173431": (0, "predicted", "BZT52C10 SOD-123: '-' and the cathode bar on the left"),
     "C8598": (0, "predicted", "B5819W SOD-123: '-' and the cathode bar on the left (ECP5 read the same mark)"),
     "C19077569": (0, "predicted", "SMBJ15A SMB: '-' and the cathode bar on the left"),
-    "C46550472": (0, "predicted", "470 uF polymer capacitor: '+' and the bevelled corners on the left, where our "
-                                  "pad 1 (+) is"),
+    "C46550472": (0, "read", "470 uF polymer capacitor, C1: '+' and the bevelled corners on the left, where our "
+                             "pad 1 (+12V) is, '-' on the right at pad 2 (GND).  Asked and settled: JLCPCB's "
+                             "engineers queried C1's polarity on OWL rev A (2026-10-22, with a placement snapshot, "
+                             "kept in mfg/jlcpcb_order/); their '+' was on the left pad, and Jason said proceed"),
     "C530531": (0, "predicted", "GSPK2307P speaker: '+' at their pad 1 on the left, as ours (either way sounds "
                                 "the same)"),
     "C2894988": (90, "predicted", "PZ254-2-08-W right-angle 2x8 header: JLCPCB draws the body and the bent pins "

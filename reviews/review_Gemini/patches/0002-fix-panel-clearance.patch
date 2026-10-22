@@ -1,0 +1,19 @@
+--- /home/jason/stuff/mudd/pcbs/OWLternatingCurrent/gen/layout.py	2026-10-08 10:36:15.417181000 -0700
++++ /home/jason/stuff/mudd/pcbs/OWLternatingCurrent/review_Gemini/project/gen/layout.py	2026-10-08 22:22:14.060666833 -0700
+@@ -159,10 +159,12 @@
+     "owl_token": (RAIL + GAP + BASE_W + GAP + TOKEN_R, RAIL + GAP + TOKEN_R),
+     "cat_token": (RAIL + GAP + BASE_W + GAP + TOKEN_R, RAIL + GAP + 2 * TOKEN_R + GAP + TOKEN_R),
+     # turned 90 (counter-clockwise on the screen): the tree's (x, y) lands at
+-    # (ox + y, oy - x), its top edge on the left and its foot on the right
+-    "tree": (RAIL + GAP, _ROW2 + TREE_W),
+-    "perch": (RAIL + GAP + TREE_H + GAP + PERCH_W / 2, _ROW2 - PERCH_FRONT),
+-    "bat": (RAIL + GAP + TREE_H + GAP + PERCH_W + GAP + BAT_SPAN / 2, _ROW2 - BAT_HEAD_Y),
++    # (ox + y, oy - x), its top edge on the left and its foot on the right.
++    # Shift tree right by 6 mm so J102 pins clear the left rail; shift perch/bat right
++    # by 14 mm so J101 pins clear the perch board's edge.
++    "tree": (RAIL + GAP + 6.0, _ROW2 + TREE_W),
++    "perch": (RAIL + GAP + 6.0 + TREE_H + GAP + 8.0 + PERCH_W / 2, _ROW2 - PERCH_FRONT),
++    "bat": (RAIL + GAP + 6.0 + TREE_H + GAP + 8.0 + PERCH_W + GAP + BAT_SPAN / 2, _ROW2 - BAT_HEAD_Y),
+ }
+ PANEL_ROT = {"tree": 90.0}                       # degrees, KiCad's sense; the rest 0
+ PANEL_W = RAIL + GAP + BASE_W + GAP + 2 * TOKEN_R + GAP + RAIL

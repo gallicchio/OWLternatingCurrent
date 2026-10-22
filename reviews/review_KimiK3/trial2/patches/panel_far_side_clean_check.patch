@@ -1,0 +1,23 @@
+--- a/gen/panel.py
++++ b/gen/panel.py
+@@ -110,6 +110,20 @@
+                     if _clean_conflict(name, side, s, d):
+                         continue
+                     t = _tab_at(name, poly, s, d, along, (x0, y0, x1, y1), edges, inner)
++                    if t and t[4] is not None:
++                        # the tab's far end lands on another board: that board's clean
++                        # edges count too (a tab into the perch's notch sailed through
++                        # when only the originating board was checked)
++                        _, E_, d_, g_, other_ = t
++                        F_ = (E_[0] + d_[0] * g_, E_[1] + d_[1] * g_)
++                        od_ = (-d_[0], -d_[1])
++                        oside_ = next((os for os, ov in DIRS.items()
++                                       if abs(dir_to_panel(other_, ov)[0] - od_[0]) < 1e-6
++                                       and abs(dir_to_panel(other_, ov)[1] - od_[1]) < 1e-6),
++                                      None)
++                        if oside_ is not None and _clean_conflict(
++                                other_, oside_, F_[0 if abs(d_[1]) > 0.5 else 1], od_):
++                            continue
+                     if t and _in_courtyard(t, along, courtyards):
+                         continue
+                     if t:

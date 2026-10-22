@@ -45,3 +45,9 @@ __pycache__/
 # Questions and answers between Jason and Claude, while working.
 QUESTIONS.md
 ANSWERS.md
+
+# Outside design reviews (reviews/): their reports, notes, patches and small scripts are
+# committed; the full copies of the repository each reviewer worked in (with its
+# pico-sdk, ~130 MB each) and their editor settings are not.
+reviews/**/project/
+reviews/**/.vscode/

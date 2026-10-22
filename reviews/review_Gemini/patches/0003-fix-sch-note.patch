@@ -1,0 +1,11 @@
+--- /home/jason/stuff/mudd/pcbs/OWLternatingCurrent/gen/sch_base.py	2026-10-08 10:36:15.421180000 -0700
++++ /home/jason/stuff/mudd/pcbs/OWLternatingCurrent/review_Gemini/project/gen/sch_base.py	2026-10-08 22:22:27.975807949 -0700
+@@ -664,7 +664,7 @@
+     gnd(*u17.pin("2")); gnd(*u17.pin("3"))
+     note(212.09, 403.86,
+          "I2C at 400 kHz, 3.3 V, 2.2k pull-ups; on it: U3 (LP5036, 0x30), the tree's LP5036 "
+-         "(0x31, through the socket), U15 (LSM6DS3TR-C, 0x6A: taps and tilt), U16 (LTR-303, "
++         "(0x32, through the socket), U15 (LSM6DS3TR-C, 0x6A: taps and tilt), U16 (LTR-303, "
+          "0x29: the owls wake at dusk), U17 (TMAG5273A2, 0x35: times the pendulum's kicks). "
+          "Interrupts the firmware does not use stay open.", cols=48)
+     note(17.78, 431.8,

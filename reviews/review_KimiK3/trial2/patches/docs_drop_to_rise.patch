@@ -1,0 +1,10 @@
+--- a/DESIGN_REVIEW.md
++++ b/DESIGN_REVIEW.md
+@@ -96 +96 @@
+-| **Wireless familiars** (C1) | put the owl token or the cat token on its perch and its eyes light; each perch lights only its own animal | resonant inductive power: each perch drives its coil at the token's tank frequency (owl 142 kHz, cat 303 kHz) and finds it by the drop in its own supply current |
++| **Wireless familiars** (C1) | put the owl token or the cat token on its perch and its eyes light; each perch lights only its own animal | resonant inductive power: each perch drives its coil at the token's tank frequency (owl 142 kHz, cat 303 kHz) and finds it by the rise in its own supply current |
+--- a/README.md
++++ b/README.md
+@@ -22 +22 @@
+-| **Wireless familiars** | put the owl token or the cat token on its perch and its eyes light; each perch lights only its own animal | resonant inductive power: each perch drives its coil at its token's frequency (owl 142 kHz, cat 303 kHz) and finds it by the drop in its own supply current |
++| **Wireless familiars** | put the owl token or the cat token on its perch and its eyes light; each perch lights only its own animal | resonant inductive power: each perch drives its coil at its token's frequency (owl 142 kHz, cat 303 kHz) and finds it by the rise in its own supply current |

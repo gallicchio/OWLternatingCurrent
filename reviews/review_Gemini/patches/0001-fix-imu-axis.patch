@@ -1,0 +1,11 @@
+--- /home/jason/stuff/mudd/pcbs/OWLternatingCurrent/firmware/src/sensors.h	2026-10-08 10:36:15.415180000 -0700
++++ /home/jason/stuff/mudd/pcbs/OWLternatingCurrent/review_Gemini/project/firmware/src/sensors.h	2026-10-08 22:21:58.627510179 -0700
+@@ -17,7 +17,7 @@
+ 
+ #define IMU_AXIS_X  (+1)    /* board x = IMU_AXIS_X * IMU x  [ASSUMED] */
+ #define IMU_AXIS_Y  (+1)
+-#define IMU_AXIS_Z  (+1)
++#define IMU_AXIS_Z  (-1)    /* U15 is on B.Cu (bottom): chip +Z points down into table (-board Z) */
+ 
+ typedef struct {
+     bool present;

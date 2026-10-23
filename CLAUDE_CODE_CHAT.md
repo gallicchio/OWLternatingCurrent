@@ -598,3 +598,12 @@ review document that I'll ask other LLMs to look at.
   - **Rules:** 0.15 mm clearance on every net class (12 V needs 0.1 by IPC-2221).
   DRC: 0 violations, 0 unconnected, 0 parity. The release is written (DRAFT until her
   name is set), about $348 + ~$122 duty. `DESIGN_REVIEW.md` is ready for other reviewers.
+- **2026-10-23** JLCPCB asked whether LS1 (the GSPK2307P speaker, through-hole) is the
+  right way round on their 3D render (`mfg/jlcpcb_order/2026-10-23_question_about_LS1.png`).
+  - Checked against the board file: LS1 at rotation 0, pad 1 (square, left, -5 mm) on the
+    NS4150B's VOP, pad 2 (right) on VON.
+  - The datasheet's photo (page 5) shows the speaker's two pins marked '+' and '-'.
+  - JLCPCB's render puts the '+' and pin-1 dot on the left pin. They match: correct,
+    proceed. Reversed it would only invert the acoustic phase anyway.
+  - Recorded in `mfg/jlcpcb_order/README.md`. `mfg/jlc_rotation.py` now marks C530531's
+    correction of 0 as "read".

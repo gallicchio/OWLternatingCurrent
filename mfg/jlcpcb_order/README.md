@@ -21,3 +21,27 @@ With it came the two placement snapshots here (`*SMT_Snapshot.Top*.png`,
   pad and their '-' is on the right one, so the polarity matches.
 - `mfg/jlc_rotation.py` now records this part's correction of 0 as "read" (it had been
   "predicted").
+
+## 2026-10-23: LS1's orientation (same order)
+
+JLCPCB's engineer asked:
+
+> Are the orientation of THT parts LS1 on 3D render correct?
+
+Their render is `2026-10-23_question_about_LS1.png`.
+
+**The answer: correct, proceed.**
+- LS1 is the 23 mm 8 ohm speaker (GSPK2307P-8R1W, C530531, `Speaker_GSPK2307P_D23mm_P10mm`),
+  right of and below the 12 V jack J1 on the base board, at rotation 0. It is through-hole:
+  two pins 10 mm apart.
+- On the board file, pad 1 (square, at (-5, 0)) is '+', net `Net-(U14-VOP)`, and pad 2 (round,
+  at (+5, 0)) is '-', `Net-(U14-VON)`, the NS4150B's two bridged outputs.
+- The datasheet (`datasheets/GSPK2307P-8R1W.pdf`, page 5) photographs the back of the
+  speaker with its two pins marked '+' and '-'.
+- In the render, JLCPCB's magenta '+' and pin-1 dot are on the left pin and '-' is on the
+  right one, so the polarity matches. The pins are symmetric about the centre, so the
+  body is in the same place whichever way it turns.
+- It would sound the same reversed: a lone speaker on a bridged class-D output only
+  changes its acoustic phase. So the answer would be "proceed" either way, but it is
+  also right.
+- `mfg/jlc_rotation.py` now records this part's correction of 0 as "read".

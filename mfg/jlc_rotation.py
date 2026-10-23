@@ -183,8 +183,10 @@ JLC_ROTATION_BY_PART = {
                              "pad 1 (+12V) is, '-' on the right at pad 2 (GND).  Asked and settled: JLCPCB's "
                              "engineers queried C1's polarity on OWL rev A (2026-10-22, with a placement snapshot, "
                              "kept in mfg/jlcpcb_order/); their '+' was on the left pad, and Jason said proceed"),
-    "C530531": (0, "predicted", "GSPK2307P speaker: '+' at their pad 1 on the left, as ours (either way sounds "
-                                "the same)"),
+    "C530531": (0, "read", "GSPK2307P speaker, LS1: '+' and the pin-1 dot on the left, where our pad 1 (square, "
+                           "the NS4150B's VOP) is, '-' on the right at pad 2 (VON); either way sounds the same.  "
+                           "Asked and settled: JLCPCB's engineers queried LS1's 3D orientation on OWL rev A "
+                           "(2026-10-23, snapshot kept in mfg/jlcpcb_order/)"),
     "C2894988": (90, "predicted", "PZ254-2-08-W right-angle 2x8 header: JLCPCB draws the body and the bent pins "
                                   "toward +y at 0; our footprint's go toward +x, a quarter turn counter-clockwise. "
                                   "The hole pattern is the same turned half round, so only the drawing says which "

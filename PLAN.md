@@ -289,7 +289,7 @@ Status: `[ ]` to do, `[~]` under way, `[x]` done.
     the design review (`DESIGN_REVIEW.md`, three LLM reviewers); order by 10-14.
 14. [ ] Firmware while the boards are in the post: scenes, familiars, pendulum,
     levitation.
-15. [ ] Bring-up (`HANDBOOK.md`).
+15. [ ] Bring-up ([`BRINGUP.md`](BRINGUP.md)).
 
 ## 6. The name
 

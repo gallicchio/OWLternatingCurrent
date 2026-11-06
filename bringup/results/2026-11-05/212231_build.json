@@ -1,0 +1,11 @@
+{
+ "dir": "/home/jason/stuff/mudd/pcbs/OWLternatingCurrent/firmware/build-feynman",
+ "images": {
+  "owlternating.uf2": 264704,
+  "owl_bringup.uf2": 153600
+ },
+ "step": "build",
+ "time": "2026-11-05T21:22:31",
+ "simulated": false,
+ "warnings": []
+}

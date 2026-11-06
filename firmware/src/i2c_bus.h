@@ -1,4 +1,4 @@
-/* i2c_bus.h: I2C0 (GPIO16/17), shared by the LED drivers, the IMU, the light sensor and
+/* i2c_bus.h: I2C0 (GPIO20/21), shared by the LED drivers, the IMU, the light sensor and
  * the 3-axis Hall sensor.  Core 0 owns it; every transfer has a timeout, and a
  * stuck bus is freed with nine clocks. */
 #pragma once

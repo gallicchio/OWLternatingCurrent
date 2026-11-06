@@ -3,7 +3,7 @@
  * Start-up, in this order:
  *   1. board_safe_init(): every bridge input low, the DRV8874s asleep, the perch
  *      drivers disabled; before anything else can run;
- *   2. the UART log (GPIO12, 115200) and USB (one CDC serial port, the JSON console,
+ *   2. the UART log (GPIO16/17, 115200) and USB (one CDC serial port, the JSON console,
  *      and Raspberry Pi's reset interface for `picotool reboot -u`);
  *   3. the I2C bus (freed if stuck), a scan reported on the console, the LED drivers
  *      (the tree's may be absent: it is looked for again every few seconds), the
@@ -647,7 +647,7 @@ int main(void)
     } else {
         watchdog_hw->scratch[0] = 0;
     }
-    stdio_init_all();                    /* printf: UART0 on GPIO12, the debug connector */
+    stdio_init_all();                    /* printf: UART0 on GPIO16/17, the debug connector J5 */
     t0_us = time_us_64();
     tusb_init();
     console_init(&OPS);

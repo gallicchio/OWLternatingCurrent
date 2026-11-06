@@ -84,3 +84,48 @@ target_link_libraries(owlternating
 pico_enable_stdio_uart(owlternating 1)
 pico_enable_stdio_usb(owlternating 0)
 pico_add_extra_outputs(owlternating)
+
+# ---- owl_bringup: the bring-up image (src/bringup_main.c, src/bringup_cmd.c) -------------
+# For the first power-up of an untested board: the console, the ADC, I2C, single LEDs,
+# bounded coil and perch pulses, a test tone, the theremin's counters.  No watchdog, no
+# core 1, no DMA, nothing automatic.  The same USB IDs and reset interface as the main
+# image, named "OWL bring-up".
+add_executable(owl_bringup
+    src/bringup_main.c
+    src/bringup_cmd.c
+    src/usb_descriptors.c
+    src/board.c
+    src/i2c_bus.c
+    src/coils.c
+    ${PICO_SDK_PATH}/src/rp2_common/pico_stdio_usb/reset_interface.c
+)
+pico_generate_pio_header(owl_bringup ${CMAKE_CURRENT_LIST_DIR}/src/edge_count.pio)
+target_include_directories(owl_bringup PRIVATE src ${PICO_SDK_PATH}/src/rp2_common/pico_stdio_usb/include)
+target_compile_definitions(owl_bringup PRIVATE
+    PICO_STDIO_USB_ENABLE_RESET_VIA_VENDOR_INTERFACE=1
+    PICO_STDIO_USB_RESET_INTERFACE_SUPPORT_RESET_TO_BOOTSEL=1
+    PICO_STDIO_USB_RESET_INTERFACE_SUPPORT_RESET_TO_FLASH_BOOT=1
+    PICO_STDIO_USB_RESET_INTERFACE_SUPPORT_MS_OS_20_DESCRIPTOR=0
+    PICO_STDIO_USB_RESET_BOOTSEL_INTERFACE_DISABLE_MASK=0
+    PICO_STDIO_USB_RESET_RESET_TO_FLASH_DELAY_MS=100
+    PICO_STDIO_USB_ENABLE_RESET_VIA_BAUD_RATE=0
+    PICO_STDIO_UART_SUPPORT_CHARS_AVAILABLE_CALLBACK=0
+    OWL_USB_PRODUCT="OWL bring-up"
+    OWL_USB_CONSOLE="OWL bring-up console"
+)
+target_compile_options(owl_bringup PRIVATE -Wall -Wextra -Wno-unused-parameter -Wdouble-promotion)
+target_link_libraries(owl_bringup
+    pico_stdlib
+    pico_unique_id
+    pico_usb_reset_interface
+    hardware_adc
+    hardware_i2c
+    hardware_pio
+    hardware_pwm
+    hardware_watchdog
+    tinyusb_device
+    tinyusb_board
+)
+pico_enable_stdio_uart(owl_bringup 1)
+pico_enable_stdio_usb(owl_bringup 0)
+pico_add_extra_outputs(owl_bringup)

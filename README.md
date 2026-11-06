@@ -13,7 +13,8 @@ not been made yet.*
 **Status (2026-10-09):** designed, every net routed on all six boards, KiCad's DRC clean,
 reviewed by five readers before the first order ([`DESIGN_REVIEW.md`](DESIGN_REVIEW.md),
 [`docs/REVIEW_2026-10-09.md`](docs/REVIEW_2026-10-09.md)), the JLCPCB release written
-(`mfg/release/`). Not yet ordered.
+(`mfg/release/`). Ordered from JLCPCB; the boards arrived on 2026-11-05, and their
+bring-up is [`BRINGUP.md`](BRINGUP.md).
 
 ## What it does
 
@@ -58,6 +59,9 @@ The panel as it comes from JLCPCB (245.2 x 223.2 mm), top and bottom:
 - [`print/README.md`](print/README.md): the owl, the bat's cap and four feet, on one plate,
   with one pause to drop in the magnets.
 - [`firmware/README.md`](firmware/README.md): the RP2354A's firmware, flashed over USB-C.
+- [`BRINGUP.md`](BRINGUP.md): the first power-up, step by step, with the bench scripts in
+  [`bringup/`](bringup/) (the supply, scope and generator from Python, and a simulated
+  bench to try every step on).
 
 ## Building it from source
 

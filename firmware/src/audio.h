@@ -1,4 +1,4 @@
-/* audio.h: the theremin's voice out of GPIO14 (PWM slice 7, A).
+/* audio.h: the theremin's voice out of GPIO8 (PWM slice 4, A).
  *
  * The PWM runs at 150 MHz / (AUDIO_PWM_TOP + 1) = 146 kHz, 10 bits, into the RC
  * filter and the NS4150B class-D amplifier (its slide switch, not the firmware, turns

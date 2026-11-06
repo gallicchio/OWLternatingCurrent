@@ -19,6 +19,14 @@
 #define VID 0x1209
 #define PID 0x0001
 
+/* the names a host shows; the bring-up image (CMakeLists.txt) sets its own */
+#ifndef OWL_USB_PRODUCT
+#define OWL_USB_PRODUCT "OWLternating Current"
+#endif
+#ifndef OWL_USB_CONSOLE
+#define OWL_USB_CONSOLE "OWLternating console"
+#endif
+
 enum { STR_LANG = 0, STR_MANUFACTURER, STR_PRODUCT, STR_SERIAL, STR_CONSOLE, STR_RESET };
 
 #define EP_CONSOLE_NOTIF 0x81
@@ -104,8 +112,8 @@ bool tud_vendor_control_xfer_cb(uint8_t rhport, uint8_t stage, tusb_control_requ
 /* ---- strings -------------------------------------------------------------------- */
 static const char *strings[] = {
     [STR_MANUFACTURER] = "OWLternating Current (open hardware)",
-    [STR_PRODUCT] = "OWLternating Current",
-    [STR_CONSOLE] = "OWLternating console",
+    [STR_PRODUCT] = OWL_USB_PRODUCT,
+    [STR_CONSOLE] = OWL_USB_CONSOLE,
     [STR_RESET] = "Reset",
 };
 

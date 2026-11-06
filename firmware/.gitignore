@@ -6,3 +6,6 @@ test/test_*
 !test/test_*.c
 !test/test_*.h
 test/out/
+test/bringup_sim
+# This machine's build (bringup/run.py build): firmware/build-<hostname>.
+build-*/

@@ -3,8 +3,8 @@
 Version 0.1.0, for rev A. It is C11 on the Pico SDK 2.1.1 and TinyUSB, for the RP2354A
 (the RP2350A with 2 MB of flash in the package).
 
-**Status: it builds without warnings and passes ten host-test suites. It has not yet run on
-a board.** The boards are not made yet. The core paths are real; the advanced control
+**Status: it builds without warnings and passes eleven host-test suites. It has not yet run
+on a board.** The boards are not made yet. The core paths are real; the advanced control
 loops (levitation, pendulum, familiars, film, theremin) are implemented and tested against
 simulated plants, and await bench tuning. Every number that depends on the schematic and
 is not yet decided is marked `[ASSUMED]` in the source and listed under [Open
@@ -20,11 +20,71 @@ picotool load -x build/owlternating.uf2 -f   # or copy the .uf2 onto the RP2350 
 ```
 
 - **Needs:** CMake and `arm-none-eabi-gcc` (tested with 10.3).
+- **GCC 15 on the host** (Ubuntu 25.10 and later): the Pico SDK 2.1.1's `pioasm`, built for
+  the host during the build, is missing `#include <cstdint>` and fails to compile. Configure
+  and build with `CXXFLAGS="-include cstdint" cmake -S . -B build && CXXFLAGS="-include cstdint"
+  cmake --build build -j8`; the flag reaches only the host tools, not the RP2354A's code.
+- **Two images:** `owlternating.uf2` (the firmware) and `owl_bringup.uf2` ([the bring-up
+  image](#the-bring-up-image), for a board's first power-up).
 - **A blank board** starts in the ROM bootloader; `picotool load` or the `RP2350` drive.
 - **After that,** `picotool reboot -u -f` reaches BOOTSEL through the reset interface. So do
   the console's `reboot bootsel` and opening the serial port at 1200 baud.
 - **Three watchdog timeouts in a row** restart in BOOTSEL, so a bad image can always be
   replaced over USB (GPiBridge's rule).
+
+## The bring-up image
+
+`owl_bringup.uf2` is for the first power-up of an untested board, before the real firmware:
+whatever goes wrong then points at the hardware, not at the firmware. It is core 0 only:
+`board_safe_init()` first, then the console on USB (CDC "OWL bring-up", the same 1209:0001
+and reset interface, so `picotool reboot -u -f`, `bootsel` and 1200 baud reach BOOTSEL) and
+on the UART (J5, 115200). **No watchdog, no core 1, no DMA, nothing automatic.** A coil, a
+perch or a sound runs only inside a command, for a bounded time, and every command ends
+with every bridge low, the DRV8874s asleep and FAM_EN low.
+
+Flash it like the firmware: hold BOOT while plugging in USB (a blank board starts there
+anyway) and copy `build/owl_bringup.uf2` onto the `RP2350` drive, or `picotool load -x
+build/owl_bringup.uf2 -f`. Go back to the firmware the same way with `owlternating.uf2`.
+
+On boot it sends four lines (the UART has them all; USB gets the first again when a terminal
+opens the port): `boot` (image, version, chip ID), `i2c` (SDA/SCL found stuck low, freed),
+`rails`, and `i2c_scan`. Then one command a line in, one JSON object a line out, with
+`"ok":true`, or `"ok":false` and an `"error"`. The code is `src/bringup_cmd.c` (portable:
+parser, limits, sequences) behind `src/bringup_main.c` (the board).
+
+| command | what it does | reply (beyond `ok`, `cmd`) |
+|---|---|---|
+| `help` | the list | `commands` |
+| `id` | who is running | `image` ("bringup"), `version`, `board`, `uptime_ms`, `chip_id` |
+| `rails` | V12, V5, VBUS through the 74HC4051 (16 conversions each, 50 µs settle) | `v12`, `v5`, `vbus` (V), `usb_only`, `raw` (counts) |
+| `adc` | every ADC input and mux channel | `hall_V`, `hall_mT`, `lev_ipropi_A`, and `mux.<name>`: `ch`, `raw`, `V`, `value`, `unit` |
+| `gpio` | the inputs worth seeing | `nfault`, `button`, `imu_int`, `nsleep`, `fam_en` |
+| `i2c scan` | probes 0x08-0x77 | `found`, `names`, `missing` (of 0x30 0x32 0x6A 0x29 0x35) |
+| `i2c rd <addr> <reg> <n>` | reads 1-32 bytes (`0x..` for hex) | `bytes` |
+| `i2c wr <addr> <reg> <b0> [..b15]` | writes | `n` |
+| `sensors` | configures and reads the IMU, light sensor, 3-axis Hall; the perch's Hall | `imu` (`whoami`, `accel_g` in the chip's axes, `accel_board_g` with `sensors.h`'s assumed signs, `temp_C`), `als` (`lux`, `ch0`, `ch1`), `tmag` (`mT`, `temp_C`), `hall_lev_mT`; each `present`, or an `error` |
+| `led <name\|all> <0..1>` | one LED's (or every LED's) LP5036 colour register, linear, no fades; the driver configured on first use (reset, enabled, independent, banks at full) | `driver`, `out`, `name`, `duty` (`all`: `lit`, `drivers`) |
+| `led <drv 0\|1> <out 0..35> <0..1>` | one output by number | as above (`name` "unconnected" if no LED) |
+| `led off`, `led cap <0\|1>` | every output to 0; allow duty above 0.5 (`cap 1`) or not | |
+| `ledwalk [ms]` | each LED alone at 0.2 for ms (400), in `led_map.h` order; any input stops it | events `ledwalk` (`i`, `name`, `driver`, `out`), then `count`, `skipped`, `aborted` |
+| `coil <pend1\|pend2\|pend3\|lev> <duty> <ms>` | wakes the bridges, drives one coil at a fraction of 12 V (-0.5..0.5) for 1-500 ms, reads its current mirror throughout, then everything off. Refused below 10.8 V or if \|duty\| x V12 / R20 > 1 A; stopped at once by nFAULT or a mirror reading 1.5x what was expected (a short) | `v12`, `i_expected_A`, `i_mean_A`, `i_peak_A`, `i_before_A`, `i_off_A` (the mirror's offset), `i_net_A`, `r_loop_ohm`, `r_est_ohm` (less the bridge's 0.2 Ω), `nfault`, `ran_ms`, `pwm` |
+| `perch <1\|2> <freq_hz> <duty> <ms>` | one perch bridge at 50-450 kHz (clamped to 90-440 kHz by `coils.c`), duty 0-0.1, 1-2000 ms; ISENSE before (bridge off) and over the second half | `freq_hz` (as set), `isense_base_A`, `isense_on_A`, `isense_net_A`, `v5`. Refused below 4.5 V |
+| `sweep <1\|2> [f0 f1 steps duty]` | 100-400 kHz, 48 steps, duty 0.03, 20 ms a step; any input stops it | events `sweep_pt` (`f`, `i_A`), then `points`, `base_A`, `peak_f`, `peak_i_A`, `aborted` |
+| `tone <hz> <ms> [amp]` | a sine on the audio PWM (no DMA), 100-4000 Hz, 1-3000 ms, amplitude 0-0.25 (0.1), with slow ramps at each end; the SOUND switch mutes it | `hz`, `ms`, `amp` |
+| `osc [ms]` | counts both theremin oscillators' edges (PIO) over ms (100) | `pitch_hz`, `volume_hz` (0 and a `note` if no edges) |
+| `reboot`, `bootsel` (or `reboot bootsel`) | LEDs and bridges off first | |
+
+The coil drive is the main firmware's (`coils.c`): phase-correct PWM, forward for |duty| of
+each period and brake for the rest (so the DRV8874's current mirror reads throughout), 30 kHz
+for the pendulum coils and 100 kHz for the levitation coil.
+
+**Without a board:** `make -C test bringup_sim` builds `test/bringup_sim`, the same console
+on a simulated board (`test/bringup_board_sim.c`): command lines on stdin, JSON lines on
+stdout, flushed, the boot lines first. Environment variables make faults: `OWL_SIM_NO12V=1`,
+`OWL_SIM_USB_OFF=1`, `OWL_SIM_MISSING=0x32,0x29`, `OWL_SIM_TOKEN=owl|cat` (a resonance in the
+perch current), `OWL_SIM_NFAULT=1`, `OWL_SIM_SHORT=pend2`, `OWL_SIM_OSC_DEAD=1`,
+`OWL_SIM_SDA_STUCK=1`, `OWL_SIM_BUTTON=1`, `OWL_SIM_REALTIME=1` (waits take real time, so a
+walk or a sweep can be interrupted). `test_bringup` runs every command and limit against it.
 
 ## Generated files: edit the source, not these
 
@@ -98,7 +158,7 @@ realtime loops run on core 1; the scenes and the console run on core 0.
 
 ### Core 1's tick (100 µs)
 
-1. **The tick slice's wrap.** PWM slice 6 drives no pin. It runs in phase-locked step with
+1. **The tick slice's wrap.** PWM slice 0 (`PWM_SLICE_TICK`) drives no pin. It runs in phase-locked step with
    the levitation coil's slice: both are started together through the PWM block's EN
    register, and the tick's period is exactly 4 of the coil's 40 kHz periods (8 of its
    80 kHz ones with the carrier on). The wrap's interrupt starts the ADC burst, so every
@@ -297,7 +357,7 @@ mean energy (0.46) is below the wall's top (0.50), and about a third of it tunne
 ## The console
 
 USB serial "OWLternating console" (any baud; 1200 baud means BOOTSEL), and the UART at
-115200 (J5, GPIO12/13), which mirrors every line. One command a line in, one JSON object a
+115200 (J5, GPIO16/17), which mirrors every line. One command a line in, one JSON object a
 line out. Replies carry `"ok":true` or `"ok":false,"error":"..."`. Events arrive unasked on
 the same lines.
 
@@ -352,6 +412,7 @@ exactly as for the board.
 | `test_film` | Ten minutes of film mode with the thermal model | 136 steps, hottest coil 41.4 °C (42.4 °C if it cools worse than modelled), ≤ 1.000 A, ≤ 1.91 s on |
 | `test_console` | Every command, malformed input, the coil limits, the volume cap, JSON well-formedness (quotes escaped) | 61 replies, all well-formed |
 | `test_theremin` | Calibration, drift tracking, the exponential pitch map, the volume gate, a dead oscillator; the voice's pitch, ceiling, clickless onset and release | 200 → 1000 Hz; 440 Hz asked, 442 Hz measured with vibrato; peak under the ceiling |
+| `test_bringup` | The bring-up image's console (`bringup_cmd.c`) on a simulated board: every command and its reply's values, every refusal and limit (no 12 V, over 1 A, the LED cap, ranges, malformed and over-long lines), a short and nFAULT stopping a pulse, walks and sweeps interrupted, the boot lines, and after every command every bridge off and asleep | 469 checks; one reply per command; every line well-formed JSON with no NaN |
 | `test_rt` | Core 1 with the SDK modelled (`test/stubs/`), driven like the hardware: the safe pin state, the PWM's meaning against the DRV8874's truth table, no coil without 12 V, deadlines, owner limits, brown-out, nFAULT (retry, latch, clear), shorted and open coils, ten minutes of 1 A asked for, the levitation CAL through the glue | PWM within 1 count; current 1.4 ms after a request; brown-out off in 0.4 ms; nFAULT off in 1.0 ms; 1 A for 10 min derated to 0.45 A at 42.7 °C (plant 43.3 °C); CAL 3.18 mT/A (plant 3.11) |
 
 ## What is untested on hardware

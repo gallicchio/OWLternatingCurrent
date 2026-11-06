@@ -51,3 +51,6 @@ ANSWERS.md
 # pico-sdk, ~130 MB each) and their editor settings are not.
 reviews/**/project/
 reviews/**/.vscode/
+
+# Unison (the file sync) leaves these while it works.
+.unison*

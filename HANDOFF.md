@@ -114,12 +114,13 @@ around it.
   - Its X1C profile once failed with `wall_filament: 0 not in range` (a profile fault,
     not the file's).
   - Its defaults include tree supports and a brim: both must be off for these parts.
-- **The first print (2026-11-02) was the *pause* version.** Jason: "This worked, but I
-  should have printed the no_pause version". Through 3DPrinterOS it had no pause, so the
-  owl's and cap's magnet pockets are presumably sealed with nothing inside, and those two
-  parts can't take magnets. Confirm with Jason. The feet are the same in both versions.
-  - **Reprint `print/out/no_pause/plate.stl`** (`print/README.md` "Printing through
-    3DPrinterOS"), then epoxy the magnets in.
+- **Jason has printed both plates** through 3DPrinterOS.
+  - The pause version printed with no pause, so its owl's and cap's pockets are sealed
+    with nothing inside: those two parts can't take magnets.
+  - **The no-pause version looks fine; use it.** As of 2026-11-06 its stand-ins (the grey
+    slab and pedestal) are still on and the magnets aren't in yet. The next steps are
+    `print/README.md`'s "After printing", then "Magnets in" (two-part epoxy). After that,
+    check the polarity before the epoxy cures.
   - In `out/no_pause/magnets_in.png`, "bat" is the bat **circuit board**. The grey
     pedestal under the printed cap is thrown away.
 

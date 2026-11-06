@@ -2,11 +2,9 @@
 """Small mesh tools for the print build and its checks (numpy only).
 
 A mesh is an (n, 3, 3) float array of triangles, wound counter-clockwise seen from
-outside (STL's and 3MF's convention).
+outside (STL's convention).
 """
 import struct
-import zipfile
-from xml.sax.saxutils import escape
 
 import numpy as np
 
@@ -100,79 +98,6 @@ def is_closed(tris):
     e = np.concatenate([faces[:, [0, 1]], faces[:, [1, 2]], faces[:, [2, 0]]])
     fwd = {tuple(x) for x in e.tolist()}
     return len(fwd) == len(e) and all((b, a) in fwd for a, b in fwd)
-
-
-# ------------------------------------------------------------------ 3MF
-ZIP_DATE = (2026, 10, 7, 12, 0, 0)        # fixed, so rebuilding doesn't churn the binaries
-
-
-def _zput(z, name, data):
-    info = zipfile.ZipInfo(name, date_time=ZIP_DATE)
-    info.compress_type = zipfile.ZIP_DEFLATED
-    info.external_attr = 0o644 << 16
-    z.writestr(info, data)
-
-
-def write_3mf(path, objects, title="", designer="", extra_files=None):
-    """objects: list of (name, tris_in_local_frame, (tx, ty, tz)).  One <object> each,
-    placed by its build item, so slicers list the parts by name."""
-    out = ['<?xml version="1.0" encoding="UTF-8"?>',
-           '<model unit="millimeter" xml:lang="en-US" '
-           'xmlns="http://schemas.microsoft.com/3dmanufacturing/core/2015/02">']
-    if title:
-        out.append(' <metadata name="Title">%s</metadata>' % escape(title))
-    if designer:
-        out.append(' <metadata name="Designer">%s</metadata>' % escape(designer))
-    out.append(" <resources>")
-    for i, (name, tris, _) in enumerate(objects, 1):
-        verts, faces = weld(tris)
-        out.append('  <object id="%d" name="%s" type="model"><mesh><vertices>' % (i, escape(name)))
-        out.extend('<vertex x="%.5f" y="%.5f" z="%.5f"/>' % tuple(v) for v in verts)
-        out.append("</vertices><triangles>")
-        out.extend('<triangle v1="%d" v2="%d" v3="%d"/>' % tuple(f) for f in faces)
-        out.append("</triangles></mesh></object>")
-    out.append(" </resources>\n <build>")
-    for i, (_, _, (tx, ty, tz)) in enumerate(objects, 1):
-        out.append('  <item objectid="%d" transform="1 0 0 0 1 0 0 0 1 %.4f %.4f %.4f"/>' % (i, tx, ty, tz))
-    out.append(" </build>\n</model>\n")
-    ct = ('<?xml version="1.0" encoding="UTF-8"?>\n'
-          '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">'
-          '<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>'
-          '<Default Extension="model" ContentType="application/vnd.ms-package.3dmanufacturing-3dmodel+xml"/>'
-          '<Default Extension="xml" ContentType="application/xml"/>'
-          '</Types>\n')
-    rels = ('<?xml version="1.0" encoding="UTF-8"?>\n'
-            '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'
-            '<Relationship Target="/3D/3dmodel.model" Id="rel0" '
-            'Type="http://schemas.microsoft.com/3dmanufacturing/2013/01/3dmodel"/>'
-            '</Relationships>\n')
-    with zipfile.ZipFile(path, "w", zipfile.ZIP_DEFLATED) as z:
-        _zput(z, "[Content_Types].xml", ct)
-        _zput(z, "_rels/.rels", rels)
-        _zput(z, "3D/3dmodel.model", "\n".join(out))
-        for name, text in (extra_files or {}).items():
-            _zput(z, name, text)
-
-
-def read_3mf(path):
-    """[(name, tris placed by its build item)] -- for the checks."""
-    import xml.etree.ElementTree as ET
-    ns = {"m": "http://schemas.microsoft.com/3dmanufacturing/core/2015/02"}
-    with zipfile.ZipFile(path) as z:
-        root = ET.fromstring(z.read("3D/3dmodel.model"))
-    objs = {}
-    for o in root.find("m:resources", ns).findall("m:object", ns):
-        m = o.find("m:mesh", ns)
-        v = np.array([[float(x.get(k)) for k in "xyz"] for x in m.find("m:vertices", ns)])
-        f = np.array([[int(t.get(k)) for k in ("v1", "v2", "v3")] for t in m.find("m:triangles", ns)])
-        objs[o.get("id")] = (o.get("name"), v[f])
-    out = []
-    for it in root.find("m:build", ns).findall("m:item", ns):
-        name, tris = objs[it.get("objectid")]
-        t = [float(x) for x in it.get("transform", "1 0 0 0 1 0 0 0 1 0 0 0").split()]
-        R = np.array(t[:9]).reshape(3, 3)
-        out.append((name, tris @ R + np.array(t[9:])))
-    return out
 
 
 # ------------------------------------------------------------------ slicing
@@ -282,91 +207,3 @@ def solid_intervals(tris, origin, direction):
     """[(enter, exit), ...] along a ray that starts outside the mesh."""
     h = ray_hits(tris, origin, direction)
     return [(h[i], h[i + 1]) for i in range(0, len(h) - 1, 2)]
-
-
-# ------------------------------------------------------------------ Bambu Studio project
-BAMBU_APP = "BambuStudio-02.08.02.61"     # the version this layout was verified with
-
-
-def write_bambu_3mf(path, objects, settings, title="", designer="", pauses=(), note=""):
-    """A Bambu Studio project: the objects (as write_3mf), Bambu's project settings
-    (`settings`, the JSON text of Metadata/project_settings.config: Bambu Studio needs a
-    full set), and custom G-code run before each layer listed in `pauses` as
-    (layer top z, [G-code lines]).  Layout as Bambu Studio 2.8 writes it: per-object
-    meshes in 3D/Objects, a production-extension 3dmodel.model placing them,
-    Metadata/model_settings.config naming them, Metadata/custom_gcode_per_layer.xml
-    (type 4 = custom G-code)."""
-    ns = ('xmlns="http://schemas.microsoft.com/3dmanufacturing/core/2015/02" '
-          'xmlns:BambuStudio="http://schemas.bambulab.com/package/2021" '
-          'xmlns:p="http://schemas.microsoft.com/3dmanufacturing/production/2015/06" requiredextensions="p"')
-    uid = lambda a, b: "%08x-%04x-4c03-9d28-80fed5dfa1dc" % (a, b)
-    files = {}
-    rels = []
-    top = ['<?xml version="1.0" encoding="UTF-8"?>', '<model unit="millimeter" xml:lang="en-US" %s>' % ns,
-           ' <metadata name="Application">%s</metadata>' % BAMBU_APP,
-           ' <metadata name="BambuStudio:3mfVersion">1</metadata>',
-           ' <metadata name="Title">%s</metadata>' % escape(title),
-           ' <metadata name="Designer">%s</metadata>' % escape(designer),
-           ' <metadata name="Description">%s</metadata>' % escape(note),
-           " <resources>"]
-    cfg = ['<?xml version="1.0" encoding="UTF-8"?>', "<config>"]
-    items = []
-    for k, (name, tris, (tx, ty, tz)) in enumerate(objects, 1):
-        mesh_id, obj_id = 2 * k - 1, 2 * k
-        verts, faces = weld(tris)
-        m = ['<?xml version="1.0" encoding="UTF-8"?>', '<model unit="millimeter" xml:lang="en-US" %s>' % ns,
-             ' <metadata name="BambuStudio:3mfVersion">1</metadata>', " <resources>",
-             '  <object id="%d" p:UUID="%s" type="model">' % (mesh_id, uid(k << 16, 0)), "   <mesh>", "    <vertices>"]
-        m.extend('     <vertex x="%.5f" y="%.5f" z="%.5f"/>' % tuple(v) for v in verts)
-        m.append("    </vertices>\n    <triangles>")
-        m.extend('     <triangle v1="%d" v2="%d" v3="%d"/>' % tuple(f) for f in faces)
-        m.append("    </triangles>\n   </mesh>\n  </object>\n </resources>\n <build/>\n</model>\n")
-        fn = "3D/Objects/object_%d.model" % k
-        files[fn] = "\n".join(m)
-        rels.append(' <Relationship Target="/%s" Id="rel-%d" '
-                    'Type="http://schemas.microsoft.com/3dmanufacturing/2013/01/3dmodel"/>' % (fn, k))
-        top.append('  <object id="%d" p:UUID="%s" type="model">\n   <components>\n'
-                   '    <component p:path="/%s" objectid="%d" p:UUID="%s" transform="1 0 0 0 1 0 0 0 1 0 0 0"/>\n'
-                   '   </components>\n  </object>' % (obj_id, uid(k, 0), fn, mesh_id, uid(k << 16, 1)))
-        items.append('  <item objectid="%d" p:UUID="%s" transform="1 0 0 0 1 0 0 0 1 %.4f %.4f %.4f" printable="1"/>'
-                     % (obj_id, uid(k, 2), tx, ty, tz))
-        cfg += ['  <object id="%d">' % obj_id,
-                '    <metadata key="name" value="%s"/>' % escape(name, {'"': "&quot;"}),
-                '    <metadata key="extruder" value="1"/>',
-                '    <part id="%d" subtype="normal_part">' % mesh_id,
-                '      <metadata key="name" value="%s"/>' % escape(name, {'"': "&quot;"}),
-                '      <metadata key="matrix" value="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1"/>',
-                "    </part>", "  </object>"]
-    top.append(" </resources>")
-    top.append(' <build p:UUID="%s">' % uid(0xb0, 3))
-    top += items
-    top.append(" </build>\n</model>\n")
-    cfg += ["  <plate>", '    <metadata key="plater_id" value="1"/>', '    <metadata key="plater_name" value=""/>',
-            '    <metadata key="locked" value="false"/>', "  </plate>", "  <assemble>", "  </assemble>",
-            "</config>\n"]
-    gc = ['<?xml version="1.0" encoding="utf-8"?>', "<custom_gcodes_per_layer>", "<plate>", '<plate_info id="1"/>']
-    for z, lines in pauses:
-        g = "&#10;".join(escape(ln, {'"': "&quot;"}) for ln in lines)
-        gc.append('<layer top_z="%g" type="4" extruder="1" color="" extra="%s" gcode="%s"/>' % (z, g, g))
-    gc += ['<mode value="SingleExtruder"/>', "</plate>", "</custom_gcodes_per_layer>\n"]
-    files["3D/3dmodel.model"] = "\n".join(top)
-    files["3D/_rels/3dmodel.model.rels"] = ('<?xml version="1.0" encoding="UTF-8"?>\n<Relationships '
-                                            'xmlns="http://schemas.openxmlformats.org/package/2006/relationships">\n'
-                                            + "\n".join(rels) + "\n</Relationships>\n")
-    files["Metadata/model_settings.config"] = "\n".join(cfg)
-    files["Metadata/custom_gcode_per_layer.xml"] = "\n".join(gc)
-    files["Metadata/project_settings.config"] = settings
-    files["_rels/.rels"] = ('<?xml version="1.0" encoding="UTF-8"?>\n<Relationships '
-                            'xmlns="http://schemas.openxmlformats.org/package/2006/relationships">\n'
-                            ' <Relationship Target="/3D/3dmodel.model" Id="rel-1" '
-                            'Type="http://schemas.microsoft.com/3dmanufacturing/2013/01/3dmodel"/>\n</Relationships>\n')
-    files["[Content_Types].xml"] = ('<?xml version="1.0" encoding="UTF-8"?>\n<Types '
-                                    'xmlns="http://schemas.openxmlformats.org/package/2006/content-types">\n'
-                                    ' <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>\n'
-                                    ' <Default Extension="model" ContentType="application/vnd.ms-package.3dmanufacturing-3dmodel+xml"/>\n'
-                                    ' <Default Extension="xml" ContentType="application/xml"/>\n'
-                                    ' <Default Extension="config" ContentType="application/xml"/>\n</Types>\n')
-    order = ["[Content_Types].xml", "_rels/.rels", "3D/3dmodel.model", "3D/_rels/3dmodel.model.rels"]
-    with zipfile.ZipFile(path, "w", zipfile.ZIP_DEFLATED) as z:
-        for n in order + sorted(k for k in files if k not in order):
-            _zput(z, n, files[n])

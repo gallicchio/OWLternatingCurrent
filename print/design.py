@@ -174,13 +174,6 @@ FOOT_CORE_R = 3.6
 
 # --- the plate (bed coordinates of each part's print-frame origin) --------------------
 BED = (180.0, 180.0)      # the smallest Bambu bed (A1 mini); the plate fits well inside
-# plate_bambu.3mf's pause: lift the hot nozzle clear of the pockets, then wait.  On resume
-# Bambu Studio's next move spirals back down at the same spot and travels on at the next
-# layer's height, clear of everything (nothing on the plate is taller than PAUSE_Z yet).
-PAUSE_GCODE = ["; OWLternating Current: magnets in now (print/README.md)",
-               "G91", "G1 Z15 F900", "G90", "M400 U1"]
-PLATE_CENTRE = (128.0, 128.0)   # where plate.3mf puts the plate: the middle of a 256 mm bed
-                                # (X1, P1, A1), and still inside an A1 mini's 180 mm bed
 PLATE = {
     "owl": (-26.0, 10.0),
     "bat_cap": (30.0, 10.0),

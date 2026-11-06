@@ -4,8 +4,7 @@
   1. out/params.scad, out/shapes.scad   - numbers (gen/mech.py + design.py) and shapes
   2. OpenSCAD -> the parts' meshes        - owl, cap, foot, and the two breakaway stand-ins
   3. out/owl.stl, out/bat_cap.stl, out/foot.stl   - print-ready, one part each
-     out/plate_bambu.3mf                          - the plate as a Bambu Studio project, pause set
-     out/plate.3mf, out/plate.stl                - the whole plate for any slicer (add the pause)
+     out/plate.stl                                - the whole plate as one STL (add the pause)
      out/assembled/*_frame.stl                    - the bare parts in their boards' frames
      out/no_pause/                                - the same plate with no pause: the owl's
                                                     pocket opens out of its back, the cap's
@@ -167,16 +166,12 @@ def compose():
     owl_p = mt.translate(owl, (0, 0, D.OWL_Z0))
     cap_p = mt.translate(cap, (0, 0, D.CAP_Z0))
     mt.write_stl(os.path.join(OUT, "foot.stl"), foot, "foot (print four)")
-    plate = write_plate(OUT, owl_p, cap_p, slab, ped, foot,
-                        "pause before layer %d at %.2f mm" % (D.PAUSE_LAYER, D.PAUSE_LAYER_TOP),
-                        "pause preset before layer %d" % D.PAUSE_LAYER,
-                        [(D.PAUSE_LAYER_TOP, D.PAUSE_GCODE)], "the pause stays")
+    plate = write_plate(OUT, owl_p, cap_p, slab, ped, foot)
     # the no-pause version: the same plate, the owl and cap with open pockets
     owl_open = mt.read_stl(os.path.join(BUILD, "owl_open.stl"))
     cap_open = mt.read_stl(os.path.join(BUILD, "cap_open.stl"))
     write_plate(OPEN_OUT, mt.translate(owl_open, (0, 0, D.OWL_Z0)), mt.translate(cap_open, (0, 0, D.CAP_Z0)),
-                slab, ped, foot, "no pause: the magnets go in afterwards", "no pause", [],
-                "there is no pause")
+                slab, ped, foot)
     # render helpers (not committed)
     feet = np.concatenate([mt.translate(foot, D.PLATE["foot%d" % i] + (0.0,)) for i in range(1, 5)])
     mt.write_stl(os.path.join(BUILD, "plate_feet.stl"), feet)
@@ -189,31 +184,19 @@ def compose():
                 owl_open=owl_open, cap_open=cap_open)
 
 
-def write_plate(out, owl_p, cap_p, slab, ped, foot, what, bambu_what, pauses, pause_note):
-    """owl.stl, bat_cap.stl, plate.3mf, plate_bambu.3mf and plate.stl in `out`, from the
-    owl and the cap in print position; returns the plate's triangles."""
+def write_plate(out, owl_p, cap_p, slab, ped, foot):
+    """owl.stl, bat_cap.stl and plate.stl in `out`, from the owl and the cap in print
+    position; returns the plate's triangles."""
     import numpy as np
     os.makedirs(out, exist_ok=True)
     owl_print = np.concatenate([owl_p, slab])
     cap_print = np.concatenate([cap_p, ped])
     mt.write_stl(os.path.join(out, "owl.stl"), owl_print, "owl on its breakaway slab")
     mt.write_stl(os.path.join(out, "bat_cap.stl"), cap_print, "bat cap on its breakaway pedestal")
-    cx, cy = D.PLATE_CENTRE
-    at = lambda k: (D.PLATE[k][0] + cx, D.PLATE[k][1] + cy, 0.0)
-    objects = [("owl (on its breakaway slab)", owl_print, at("owl")),
-               ("bat cap (on its breakaway pedestal)", cap_print, at("bat_cap"))]
-    for i in range(1, 5):
-        objects.append(("foot %d" % i, foot, at("foot%d" % i)))
-    mt.write_3mf(os.path.join(out, "plate.3mf"), objects,
-                 title="OWLternating Current - print plate (PLA, 0.2 mm layers, no supports, %s)" % what,
-                 designer="Jason Gallicchio and Claude")
-    settings = open(os.path.join(HERE, "bambu", "project_settings.config")).read()
-    mt.write_bambu_3mf(os.path.join(out, "plate_bambu.3mf"), objects, settings,
-                       title="OWLternating Current - print plate (%s)" % bambu_what,
-                       designer="Jason Gallicchio and Claude", pauses=pauses,
-                       note="Bambu Studio project: X1 Carbon 0.4 / 0.20 mm Standard / Bambu PLA Basic; pick "
-                            "your own printer, %s.  See print/README.md." % pause_note)
-    plate = np.concatenate([mt.translate(t, (o[0] - cx, o[1] - cy, 0)) for _, t, o in objects])
+    at = lambda k: D.PLATE[k] + (0.0,)
+    parts = [(owl_print, at("owl")), (cap_print, at("bat_cap"))]
+    parts += [(foot, at("foot%d" % i)) for i in range(1, 5)]
+    plate = np.concatenate([mt.translate(t, o) for t, o in parts])
     mt.write_stl(os.path.join(out, "plate.stl"), plate, "whole plate")
     return plate
 
@@ -502,7 +485,7 @@ def open_sections(meshes):
     ax.add_patch(Rectangle((-14, -M.PCB_T), 28, M.PCB_T, fc=C["board"], ec="none"))
     ax.add_patch(Rectangle((y_mag, D.OWL_FLOOR), M.MAGNET_D, M.MAGNET_T, fc=C["mag"], ec="#555"))
     ax.text(y_mag + M.MAGNET_D / 2, D.OWL_FLOOR + 1.0, "magnet, dot up", ha="center", va="center", fontsize=8)
-    ax.text(0, -0.8, "perch", color="white", fontsize=8, ha="center", va="center")
+    ax.text(0, -0.8, "perch (circuit board)", color="white", fontsize=8, ha="center", va="center")
     dim(ax, (-11.5, 0), (-11.5, D.OWL_FLOOR), "%.2f" % D.OWL_FLOOR, off=(-1.4, 0))
     ax.annotate("slide it in flat from the back,\npush it to the front with a wooden stick",
                 xy=(back, D.OWL_FLOOR + 1.2), xytext=(back - 3, D.OWL_FLOOR + 9), fontsize=8,
@@ -521,12 +504,12 @@ def open_sections(meshes):
     ax.add_patch(Rectangle((-M.MAGNET_D / 2, D.CAP_OPEN_DEPTH - M.MAGNET_T), M.MAGNET_D, M.MAGNET_T,
                            fc=C["mag"], ec="#555"))
     ax.text(0, D.CAP_OPEN_DEPTH - 1.0, "magnet, dot to the dome", ha="center", va="center", fontsize=7)
-    ax.text(0, -0.8, "bat", color="white", fontsize=8, ha="center", va="center")
-    ax.annotate("cap upside down: magnet in, onto the roof;\nepoxy to the rim; press the bat on",
-                xy=(3, 0.3), xytext=(-3, -5.2), fontsize=8, arrowprops=dict(arrowstyle="->", lw=0.7))
+    ax.text(0, -0.8, "bat (the circuit board, not a printed part)", color="white", fontsize=8, ha="center", va="center")
+    ax.annotate("first lift the cap off its grey pedestal and throw that away;\nthen, cap upside down: magnet in, onto the roof;\nepoxy to the rim; press the bat board on (epoxy bonds the magnet to it)",
+                xy=(3, 0.3), xytext=(-9, -6.2), fontsize=8, arrowprops=dict(arrowstyle="->", lw=0.7))
     dim(ax, (7.2, 0), (7.2, D.CAP_OPEN_DEPTH), "%.1f" % D.CAP_OPEN_DEPTH, off=(0.9, 0))
     ax.set_title("Bat cap on the bat, cut along the body; head to the left", fontsize=11)
-    ax.set_xlim(-16, 16); ax.set_ylim(-7, 8); ax.set_aspect("equal"); ax.grid(alpha=0.25)
+    ax.set_xlim(-16, 16); ax.set_ylim(-8, 8); ax.set_aspect("equal"); ax.grid(alpha=0.25)
     ax.set_xlabel("y (mm)"); ax.set_ylabel("z above the bat's top surface (mm)")
     fig.suptitle("No pause: where the magnets and the epoxy (light blue) go", fontsize=12)
     fig.savefig(os.path.join(OPEN_OUT, "magnets_in.png"), dpi=110, bbox_inches="tight")

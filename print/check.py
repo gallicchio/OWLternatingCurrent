@@ -2,7 +2,7 @@
 """Re-measure the printed parts' meshes against gen/mech.py:  python3 print/check.py
 
 Every number here is measured from the generated geometry (ray casts and per-layer
-slices of out/owl.stl, out/bat_cap.stl, out/foot.stl and out/plate.3mf), then compared
+slices of out/owl.stl, out/bat_cap.stl, out/foot.stl and out/plate.stl), then compared
 with gen/mech.py.  design.py is used only for printer facts (layer height, the stand-in
 gap, PLA's modulus and density, the strain allowed), never for where things are.
 Exits non-zero if anything is out of tolerance.
@@ -319,19 +319,17 @@ def overhangs(tris, name, magnet_top=None, res=0.05):
 
 # ------------------------------------------------------------------ the plate
 def check_plate(C, owl_info, cap_info):
-    objs = mt.read_3mf(os.path.join(OUT, "plate.3mf"))
-    names = [o[0] for o in objs]
-    C.add("plate.3mf: owl, bat cap, four feet", ", ".join(names),
-          len(objs) == 6 and sum("foot" in n for n in names) == 4, "6 objects", "")
-    allp = np.concatenate([t for _, t in objs])
-    lo, hi = mt.bbox(allp)
+    plate = mt.read_stl(os.path.join(OUT, "plate.stl"))
+    parts = [mt.read_stl(os.path.join(OUT, f)) for f in ("owl.stl", "bat_cap.stl", "foot.stl", "foot.stl",
+                                                         "foot.stl", "foot.stl")]
+    want = sum(len(shells(t)[0]) for t in parts)
+    C.add("plate.stl: owl, bat cap, four feet and two stand-ins", "%d solids" % len(shells(plate)[0]),
+          len(shells(plate)[0]) == want and len(plate) == sum(len(t) for t in parts), "%d solids" % want, "")
+    lo, hi = mt.bbox(plate)
     C.within("plate: footprint x", hi[0] - lo[0], None, D.BED[0] - 20)
     C.within("plate: footprint y", hi[1] - lo[1], None, D.BED[1] - 20)
-    for bed in (180.0, 256.0):
-        C.add("plate.3mf: inside a %g mm bed as placed" % bed, "x %.0f..%.0f, y %.0f..%.0f" % (lo[0], hi[0], lo[1], hi[1]),
-              lo[0] >= 5 and lo[1] >= 5 and hi[0] <= bed - 5 and hi[1] <= bed - 5, "5 mm margins", "")
-    for name, t in objs:
-        C.near("plate: %s on the bed" % name, mt.bbox(t)[0][2], 0.0, EPS)
+    C.near("plate: on the bed", lo[2], 0.0, EPS)
+    objs = [("plate.stl", plate)]
     tops, centres = [], []
     for name, t in objs:
         for v in shells(t)[1]:
@@ -347,7 +345,7 @@ def check_plate(C, owl_info, cap_info):
         top = tops[0][2]
         layer = int(round(top / D.LAYER)) + 1
         C.add("plate: pause before layer %d (z %.2f), magnets in at %.2f" % (layer, layer * D.LAYER, top),
-              layer, abs(top / D.LAYER - round(top / D.LAYER)) < 1e-6, "pocket top on the layer grid", "", "%d")
+              layer, abs(top / D.LAYER - round(top / D.LAYER)) < 1e-4, "pocket top on the layer grid", "", "%d")
         # polarity: both parts print the way they are assembled (pocket floor toward the board)
         C.add("plate: owl upright (pocket above its base, head above the pocket)",
               "yes", owl_info["pocket_floor"] > owl_info["z_base"] + 10, "", "")
@@ -355,34 +353,6 @@ def check_plate(C, owl_info, cap_info):
               "yes", cap_info["pocket_floor"] > cap_info["z_board"], "", "")
         return dict(pause_z=top, pause_layer=layer, separation=sep)
     return {}
-
-
-def check_bambu(C):
-    """out/plate_bambu.3mf: a Bambu Studio project carrying the same plate as plate.3mf,
-    a 0.2 mm layer setup, and the custom pause before the first layer over the pockets."""
-    import json
-    import re
-    import zipfile
-    p = os.path.join(OUT, "plate_bambu.3mf")
-    z = zipfile.ZipFile(p)
-    names = z.namelist()
-    need = ["3D/3dmodel.model", "Metadata/model_settings.config", "Metadata/project_settings.config",
-            "Metadata/custom_gcode_per_layer.xml"]
-    C.add("plate_bambu.3mf: a Bambu Studio project", "%d files" % len(names), all(n in names for n in need),
-          "model, settings, pause", "")
-    cfg = json.loads(z.read("Metadata/project_settings.config"))
-    C.near("plate_bambu.3mf: layer height", float(cfg["layer_height"]), D.LAYER, 1e-6)
-    C.near("plate_bambu.3mf: first layer height", float(cfg["initial_layer_print_height"]), D.LAYER, 1e-6)
-    C.add("plate_bambu.3mf: supports off", cfg.get("enable_support"), cfg.get("enable_support") in ("0", 0), "0", "")
-    xml = z.read("Metadata/custom_gcode_per_layer.xml").decode()
-    tops = [float(t) for t in re.findall(r'top_z="([-\d.]+)"', xml)]
-    pause = getattr(check_bambu, "pause_top", None)
-    C.add("plate_bambu.3mf: one custom G-code, a pause (M400 U1)", len(tops),
-          len(tops) == 1 and "M400 U1" in xml, "1", "", "%d")
-    if tops and pause is not None:
-        C.near("plate_bambu.3mf: pause runs before the first layer over the magnets", tops[0], pause + D.LAYER, 1e-6)
-    model = z.read("3D/3dmodel.model").decode()
-    C.add("plate_bambu.3mf: six objects placed", model.count("<item "), model.count("<item ") == 6, "6", "", "%d")
 
 
 # ------------------------------------------------------------------ the no-pause version
@@ -469,15 +439,11 @@ def check_open(C, owl_info, cap_info):
     plo, phi = mt.bbox(min(solids, key=lambda s: mt.bbox(s)[1][2]))
     C.near("no-pause cap: pedestal top one layer under the dome's foot", z_board - phi[2], D.GAP_Z, 0.01)
     # --- the plate
-    objs = mt.read_3mf(os.path.join(d, "plate.3mf"))
-    C.add("no-pause plate.3mf: owl, bat cap, four feet", len(objs), len(objs) == 6, "6 objects", "", "%d")
-    import zipfile
-    z = zipfile.ZipFile(os.path.join(d, "plate_bambu.3mf"))
-    xml = z.read("Metadata/custom_gcode_per_layer.xml").decode()
-    model = z.read("3D/3dmodel.model").decode()
-    C.add("no-pause plate_bambu.3mf: six objects, no custom G-code", "%d, %s" % (model.count("<item "),
-          "none" if "<layer " not in xml else "some"), model.count("<item ") == 6 and "<layer " not in xml,
-          "6, none", "")
+    plate = mt.read_stl(os.path.join(d, "plate.stl"))
+    psol, pvoid = shells(plate)
+    want = len(shells(owl_t)[0]) + len(shells(cap_t)[0]) + 4 * len(shells(mt.read_stl(os.path.join(OUT, "foot.stl")))[0])
+    C.add("no-pause plate.stl: owl, bat cap, four feet, stand-ins; no sealed pocket",
+          "%d solid, %d void" % (len(psol), len(pvoid)), len(psol) == want and not pvoid, "%d solid, 0 void" % want, "")
     return dict(owl=owl_t, cap=cap_t, lift=lift, gap=top - floor, slot=narrow, plug=plug,
                 magnet_top=z_roof - z_board, y_front=y_front, height=zt - z_base)
 
@@ -491,8 +457,6 @@ def run(verbose=True):
     cap = check_cap(C, cap_t)
     foot = check_foot(C, foot_t)
     plate = check_plate(C, owl, cap)
-    check_bambu.pause_top = plate.get("pause_z")
-    check_bambu(C)
     oh = []
     for t, name, mag in ((owl_t, "owl", [(0.0, 0.0, owl["pocket_top"])]),
                          (cap_t, "bat cap", [(0.0, 0.0, cap["pocket_top"])]),

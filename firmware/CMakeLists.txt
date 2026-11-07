@@ -64,6 +64,9 @@ target_compile_definitions(owlternating PRIVATE
     PICO_STACK_SIZE=0x1000          # core 0: 4 kB (SCRATCH_Y)
     PICO_CORE1_STACK_SIZE=0x1000    # core 1: 4 kB (SCRATCH_X), its 10 kHz interrupts run on it
 )
+if(OWL_DIAG)                                   # cmake -DOWL_DIAG=1: the boot-diagnostic image (main.c)
+    target_compile_definitions(owlternating PRIVATE OWL_DIAG=1)
+endif()
 target_compile_options(owlternating PRIVATE -Wall -Wextra -Wno-unused-parameter -Wdouble-promotion)
 target_link_libraries(owlternating
     pico_stdlib

@@ -137,22 +137,22 @@ static const int8_t LED_OF_CHANNEL[LED_DRIVERS][LED_DRIVER_CHANNELS] = {
 
 /* named groups, in order (the scenes walk these) */
 #define LED_N_PUMPKIN      3
-static const uint8_t LED_GROUP_PUMPKIN[LED_N_PUMPKIN] = {0, 1, 25};
+static const uint8_t LED_GROUP_PUMPKIN[LED_N_PUMPKIN] = {1, 0, 25};
 #define LED_N_WISP         6
-static const uint8_t LED_GROUP_WISP[LED_N_WISP] = {2, 3, 4, 23, 24, 26};
+static const uint8_t LED_GROUP_WISP[LED_N_WISP] = {3, 2, 4, 26, 24, 23};
 #define LED_N_OWLRING      3
-static const uint8_t LED_GROUP_OWLRING[LED_N_OWLRING] = {5, 7, 11};
+static const uint8_t LED_GROUP_OWLRING[LED_N_OWLRING] = {5, 11, 7};
 #define LED_N_STAR         12
-static const uint8_t LED_GROUP_STAR[LED_N_STAR] = {6, 8, 9, 10, 16, 17, 18, 19, 20, 22, 29, 30};
+static const uint8_t LED_GROUP_STAR[LED_N_STAR] = {10, 9, 8, 6, 30, 29, 22, 17, 16, 18, 19, 20};
 #define LED_N_STARX        4
-static const uint8_t LED_GROUP_STARX[LED_N_STARX] = {12, 13, 14, 15};
+static const uint8_t LED_GROUP_STARX[LED_N_STARX] = {13, 14, 12, 15};
 #define LED_N_CATRING      3
-static const uint8_t LED_GROUP_CATRING[LED_N_CATRING] = {21, 27, 28};
+static const uint8_t LED_GROUP_CATRING[LED_N_CATRING] = {27, 28, 21};
 #define LED_N_OWLEYE       6
-static const uint8_t LED_GROUP_OWLEYE[LED_N_OWLEYE] = {31, 34, 35, 42, 43, 48};
+static const uint8_t LED_GROUP_OWLEYE[LED_N_OWLEYE] = {34, 35, 42, 43, 31, 48};
 #define LED_N_TWISP        4
-static const uint8_t LED_GROUP_TWISP[LED_N_TWISP] = {32, 36, 44, 46};
+static const uint8_t LED_GROUP_TWISP[LED_N_TWISP] = {32, 46, 36, 44};
 #define LED_N_TSTAR        6
-static const uint8_t LED_GROUP_TSTAR[LED_N_TSTAR] = {33, 37, 38, 41, 45, 47};
+static const uint8_t LED_GROUP_TSTAR[LED_N_TSTAR] = {37, 41, 38, 33, 45, 47};
 #define LED_N_PERCH_DOWN   2
-static const uint8_t LED_GROUP_PERCH_DOWN[LED_N_PERCH_DOWN] = {39, 40};
+static const uint8_t LED_GROUP_PERCH_DOWN[LED_N_PERCH_DOWN] = {40, 39};

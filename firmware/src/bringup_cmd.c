@@ -208,7 +208,7 @@ static const char *const HELP[] = {
     "help", "id", "rails", "adc", "gpio", "i2c scan", "i2c rd <addr> <reg> <n>", "i2c wr <addr> <reg> <b0> [b1..]",
     "sensors", "led <name|all> <0..1>", "led <drv 0|1> <out 0..35> <0..1>", "led off", "led cap <0|1>",
     "ledwalk [ms]", "coil <pend1|pend2|pend3|lev> <duty -0.5..0.5> <ms 1..500>",
-    "perch <1|2> <freq_hz> <duty 0..0.1> <ms 1..2000>", "sweep <1|2> [f0 f1 steps duty]",
+    "perch <1|2> <freq_hz> <duty 0..0.5> <ms 1..10000>", "sweep <1|2> [f0 f1 steps duty]",
     "tone <hz 100..4000> <ms 1..20000> [amp 0..1]", "audio <level 0..1>|off", "osc [ms]", "reboot", "bootsel",
 };
 
@@ -875,11 +875,11 @@ static void cmd_perch(int argc, char **argv)
     float f, duty;
     if (argc != 5 || !integer(argv[1], 1, 2, &p) || !number(argv[2], &f) || !number(argv[3], &duty) ||
         !integer(argv[4], 1, BU_PERCH_MS_MAX, &ms))
-        return fail("perch", "usage: perch <1|2> <freq_hz 50000..450000> <duty 0..0.1> <ms 1..2000>");
+        return fail("perch", "usage: perch <1|2> <freq_hz 50000..500000> <duty 0..0.5> <ms 1..10000>");
     if (f < BU_PERCH_F_MIN_HZ || f > BU_PERCH_F_MAX_HZ)
-        return fail("perch", "the frequency is 50000..450000 Hz");
+        return fail("perch", "the frequency is 50000..500000 Hz");
     if (duty < 0.0f || duty > BU_PERCH_DUTY_MAX)
-        return fail("perch", "the duty is 0..0.1 in bring-up");
+        return fail("perch", "the duty is 0..0.5 in bring-up");
     rails_t r;
     char m[96];
     if (perch_rails(&r, m, sizeof m))
@@ -892,12 +892,22 @@ static void cmd_perch(int argc, char **argv)
         from = 3000u;                                     /* ... after the 1 ms filter has settled */
     float sum = 0.0f;
     unsigned n = 0;
-    uint32_t polled = t0;
+    uint32_t polled = t0, held_us = 0;
+    bool tripped = false;
     for (;;) {
         uint32_t t = (uint32_t)(ops->now_us() - t0);
+        held_us = t;
         if (t >= (uint32_t)ms * 1000u)
             break;
         float i = isense_A(8);
+        if (i > BU_PERCH_ABORT_A) {                      /* a square wave into a hard-coupled token: stop at once */
+            tripped = true;
+            if (!n) {
+                sum = i;
+                n = 1;
+            }
+            break;
+        }
         if (t >= from) {
             sum += i;
             n++;
@@ -915,6 +925,8 @@ static void cmd_perch(int argc, char **argv)
     jf(&j, "freq_asked_hz", f, 0);
     jf(&j, "duty", duty, 4);
     jb_add(&j, ",\"ms\":%ld", ms);
+    jb_add(&j, ",\"held_ms\":%lu", (unsigned long)(held_us / 1000u));
+    jb_add(&j, ",\"tripped\":%s", tripped ? "true" : "false");
     jf(&j, "isense_base_A", base, 4);
     jf(&j, "isense_on_A", on, 4);
     jf(&j, "isense_net_A", on - base, 4);
@@ -935,7 +947,7 @@ static void cmd_sweep(int argc, char **argv)
         return fail("sweep", "usage: sweep <1|2> [f0 f1 steps 2..200 duty]");
     if (f0 < BU_PERCH_F_MIN_HZ || f1 > BU_PERCH_F_MAX_HZ || !(f1 > f0))
         return fail("sweep", "50000 <= f0 < f1 <= 450000 Hz");
-    if (duty < 0.0f || duty > BU_PERCH_DUTY_MAX)
+    if (duty < 0.0f || duty > BU_SWEEP_DUTY_MAX)
         return fail("sweep", "the duty is 0..0.1 in bring-up");
     rails_t r;
     char m[96];

@@ -38,6 +38,7 @@ extern bool stub_adc_running;
 extern uint16_t *stub_dma_dest;
 extern unsigned stub_dma_count;
 extern bool stub_dma_busy;
+extern bool stub_dma_irq_pending;
 
 /* interrupts */
 typedef void (*irq_handler_t)(void);

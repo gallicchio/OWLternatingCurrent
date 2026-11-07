@@ -17,9 +17,9 @@
 #include <stdbool.h>
 
 #define THEREMIN_CAL_S          1.0f      /* [CHOICE] averaging for the baselines */
-#define THEREMIN_PITCH_SPAN     0.03f     /* [ASSUMED] 3 % lower with a hand at the moon */
-#define THEREMIN_VOL_SPAN       0.03f     /* [ASSUMED] the same at the pumpkin */
-#define THEREMIN_VOL_GATE       0.003f    /* [CHOICE] drops below 0.3 % are noise (and drift) */
+#define THEREMIN_PITCH_SPAN     0.01f     /* [BENCH 2026-11-07] 1 % lower with a hand near the moon (3 % needed fingers almost touching; a touch is 90 %) */
+#define THEREMIN_VOL_SPAN       0.01f     /* [BENCH 2026-11-07] the same at the pumpkin */
+#define THEREMIN_VOL_GATE       0.001f    /* [CHOICE] drops below 0.1 % are noise (and drift); was 0.3 %, a third of the 1 % span */
 #define THEREMIN_F_MIN_OK_HZ    10000.0f  /* below this an oscillator is dead */
 #define THEREMIN_SMOOTH_S       0.03f     /* [CHOICE] frequency smoothing */
 #define THEREMIN_DRIFT_S        10.0f     /* [CHOICE] baseline tracking, while idle */

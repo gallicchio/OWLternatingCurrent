@@ -60,17 +60,21 @@
 #include <stdbool.h>
 
 /* ---- tunables ---------------------------------------------------------------------- */
-#define FAM_SWEEP_N            48         /* [CHOICE] 3 % steps from 100 to 400 kHz */
+#define FAM_SWEEP_N            32         /* [CHOICE] 4.6 % steps from 100 to 400 kHz (48 until 2026-11-07: a put-down token took 4 s to relight) */
 #define FAM_SWEEP_DUTY         0.030f     /* [CHOICE] the sweep's upper level: tokens stay dark ... */
 #define FAM_SWEEP_DUTY_LO      0.010f     /* ... and its lower one */
 #define FAM_BASE_SLACK         1.6f       /* [CHOICE] an empty perch may read up to this x the baseline */
 #define FAM_SETTLE_S           0.004f     /* [ASSUMED] ISENSE's filter settles in 4 ms (tau <= 1 ms) */
 #define FAM_AVG_N              8          /* [CHOICE] samples averaged per level (1 ms each) */
-#define FAM_SWEEP_PERIOD_S     2.0f       /* [CHOICE] an empty perch looks this often */
+#define FAM_SWEEP_PERIOD_S     0.2f       /* [CHOICE] an empty perch looks this often (the sweep itself takes 0.5 s) */
 #define FAM_P_TARGET_W         0.25f      /* [CHOICE] delivered power when lit */
 #define FAM_CAP_MARGIN         0.92f      /* [CHOICE] the cap aims this far under FAM_I_MAX_A */
-#define FAM_RAMP_S             2.5f       /* [CHOICE] dark to lit: orange first, then violet */
-#define FAM_RAMP_DOWN_S        1.5f
+#define FAM_RAMP_S             0.8f       /* [CHOICE] dark to lit: orange first, then violet (2.5 s until 2026-11-07) */
+#define FAM_RAMP_DOWN_S        0.5f
+#define FAM_LIVE_ON_W          0.05f      /* [BENCH 2026-11-07] a token on the perch draws >= 0.15 W beyond empty */
+#define FAM_LIVE_OFF_W         0.025f
+#define FAM_LIVE_ON_S          0.02f      /* debounce, either way */
+#define FAM_LIVE_OFF_S         0.10f
 #define FAM_DITHER             0.01f      /* [CHOICE] +-1 % frequency dither in DRIVE ... */
 #define FAM_DITHER_HALF_S      0.005f     /* ... 5 ms each side: 100 Hz */
 #define FAM_L1_H               30.3e-6f   /* [SIM] gen/coils.py: the perch coil as drawn (familiar.py's
@@ -82,7 +86,7 @@
 
 typedef enum { FAM_NONE = 0, FAM_OWL, FAM_CAT, FAM_UNKNOWN } fam_who;
 typedef enum { FAM_ST_OFF = 0, FAM_ST_IDLE, FAM_ST_SWEEP, FAM_ST_FIT, FAM_ST_RAMP_UP, FAM_ST_DRIVE,
-               FAM_ST_RAMP_DOWN } fam_state;
+               FAM_ST_RAMP_DOWN, FAM_ST_LIVE } fam_state;
 enum { FAM_EV_NONE = 0, FAM_EV_ARRIVED, FAM_EV_LEFT };
 
 typedef struct {
@@ -146,11 +150,23 @@ typedef struct {
     bool slope_ok;
     float t_low;
     float t_prev;
+    /* live mode (FAM_ST_LIVE): the perch drives its own token's tuning all the time */
+    bool live;                   /* asked for (fam_set_live) */
+    bool live_present;           /* a token is drawing power on the perch */
+    float t_live_edge;           /* when the presence reading last crossed a threshold */
+    float p_live_f;              /* the token's power, filtered (W) */
 } fam_perch;
 
 void fam_init(fam_perch *p, int index);
 /* off: a lit token fades out, then the bridge stops */
 void fam_enable(fam_perch *p, bool on);
+/* live: no sweep and no fit.  The perch drives its own token's tuning (perch 0 the owl's,
+ * perch 1 the cat's) at the empty-perch current cap all the time, so the token's glow
+ * follows the hand that brings it in, instantly; "present" (FAM_EV_ARRIVED / LEFT) is the
+ * power the perch delivers beyond an empty perch's, read every millisecond.  Safe at any
+ * coupling: at its tuning a token only raises the perch's impedance.  (Jason, bench
+ * 2026-11-07: the sweep's seconds of lag on a put-down token were "annoyingly long".) */
+void fam_set_live(fam_perch *p, bool live);
 void fam_step(fam_perch *p, float t_s, float isense_A, const fam_cmd *applied, fam_cmd *cmd, fam_event *ev);
 const char *fam_who_name(fam_who w);
 const char *fam_state_name(fam_state s);

@@ -26,12 +26,14 @@
 #define PI_F 3.14159265f
 #define V1_MAX (4.0f / PI_F * FAM_VDRIVE_V)
 #define KP_DUTY_PER_WS 6.0f          /* power loop: duty per (W s) */
-#define FIT_PER_CALL 3               /* candidates per call: ~0.15 ms on the M33 */
-static const float K2C[] = {0.10f, 0.16f, 0.22f, 0.30f, 0.40f};
+#define FIT_PER_CALL 6               /* candidates per call: ~0.3 ms on the M33 */
+#define FAM_OTHER_PERCH_PENALTY 1.5f /* the other perch's token must fit this much better to win there: the owl's
+                                        band (142-225 kHz, k to 0.77) and the cat's 3rd-harmonic image (101-160) overlap */
+static const float K2C[] = {0.10f, 0.16f, 0.22f, 0.30f, 0.40f, 0.50f, 0.60f};   /* to k 0.77: a token lying on the copper (rev A, 2026-11-07) */
 static const float QC[] = {3.0f, 5.0f, 8.0f, 12.0f};
 #define NK2 (int)(sizeof K2C / sizeof K2C[0])
 #define NQ (int)(sizeof QC / sizeof QC[0])
-#define NF_COARSE 12                 /* ft = base x (0.78 .. 1.00), 2 % steps */
+#define NF_COARSE 20                 /* ft = base x (0.62 .. 1.00), 2 % steps: sqrt(1 - 0.6) = 0.63 */
 #define N_COARSE (NF_COARSE * NK2 * NQ)
 #define NF_FINE 13                   /* +-3 % in 0.5 % steps */
 #define N_FINE (NF_FINE * 3 * 3)
@@ -95,8 +97,8 @@ const char *fam_who_name(fam_who w)
 
 const char *fam_state_name(fam_state s)
 {
-    static const char *const n[] = {"off", "idle", "sweep", "fit", "ramp_up", "drive", "ramp_down"};
-    return (unsigned)s < 7 ? n[s] : "?";
+    static const char *const n[] = {"off", "idle", "sweep", "fit", "ramp_up", "drive", "ramp_down", "live"};
+    return (unsigned)s < 8 ? n[s] : "?";
 }
 
 /* the empty perch as the sweep reads it: every harmonic counts nearly fully at these
@@ -122,10 +124,40 @@ void fam_init(fam_perch *p, int index)
     p->t_prev = -1.0f;
 }
 
+static float interp(const fam_perch *p, const float *arr, float f);
+static float duty_cap_at(float f);
+
 static void set_state(fam_perch *p, fam_state s, float t)
 {
     p->state = s;
     p->t_state = t;
+}
+
+static void enter_live(fam_perch *p, float t)
+{
+    p->who = p->index == 0 ? FAM_OWL : FAM_CAT;
+    p->f_token = p->f_drive = p->index == 0 ? FAM_OWL_HZ : FAM_CAT_HZ;
+    p->iq_drive = interp(p, p->iq, p->f_drive);
+    p->live_present = false;
+    p->t_live_edge = -1.0f;
+    p->p_live_f = 0.0f;
+    p->cmd = (fam_cmd){true, p->f_drive, duty_cap_at(p->f_drive)};
+    set_state(p, FAM_ST_LIVE, t);
+}
+
+void fam_set_live(fam_perch *p, bool live)
+{
+    p->live = live;
+    if (live) {
+        if (p->enabled && p->state != FAM_ST_OFF && p->state != FAM_ST_LIVE)
+            enter_live(p, p->t_prev);
+    } else if (p->state == FAM_ST_LIVE) {
+        p->live_present = false;
+        p->who = FAM_NONE;
+        p->cmd = (fam_cmd){false, p->f_drive, 0.0f};
+        set_state(p, p->enabled ? FAM_ST_IDLE : FAM_ST_OFF, p->t_prev);
+        p->t_last_sweep = -1e9f;
+    }
 }
 
 void fam_enable(fam_perch *p, bool on)
@@ -135,7 +167,14 @@ void fam_enable(fam_perch *p, bool on)
         if (p->state == FAM_ST_OFF) {
             p->state = FAM_ST_IDLE;
             p->t_last_sweep = -1e9f;
+            if (p->live)
+                enter_live(p, p->t_prev);
         }
+    } else if (p->state == FAM_ST_LIVE) {
+        p->live_present = false;
+        p->who = FAM_NONE;
+        p->cmd = (fam_cmd){false, p->f_drive, 0.0f};
+        p->state = FAM_ST_OFF;
     } else if (p->state == FAM_ST_RAMP_UP || p->state == FAM_ST_DRIVE) {
         p->ramp_from_W = p->p_target;
         p->ramp_s = FAM_RAMP_DOWN_S;
@@ -224,7 +263,7 @@ static bool fit_begin(fam_perch *p, float *excess_out)
                 fp *= powf(p->f[1] / p->f[0], clampf(0.5f * (a - c) / den, -0.5f, 0.5f));
         }
         p->fit_base[p->n_base++] = fp;
-        if (3.0f * 0.78f * fp <= 1.15f * FAM_F_MAX_HZ)  /* or the 3rd harmonic of a token up there */
+        if (3.0f * 0.62f * fp <= 1.15f * FAM_F_MAX_HZ)  /* or the 3rd harmonic of a token up there */
             p->fit_base[p->n_base++] = 3.0f * fp;
     }
     /* the sums every candidate shares; and how the baseline compares with the model (1 for
@@ -279,6 +318,8 @@ static float fit_eval(const fam_perch *p, float ft, float k2, float q, float *a_
 }
 
 /* a share of the candidates; true when the fit is done */
+static fam_who classify(float ft);
+
 static bool fit_run(fam_perch *p)
 {
     for (int n = 0; n < FIT_PER_CALL; n++) {
@@ -295,7 +336,7 @@ static bool fit_run(fam_perch *p)
             }
             int b = k / N_COARSE, r = k % N_COARSE;
             int iq = r % NQ, ik = (r / NQ) % NK2, jf = r / (NQ * NK2);
-            ft = p->fit_base[b] * (0.78f + 0.02f * (float)jf);
+            ft = p->fit_base[b] * (0.62f + 0.02f * (float)jf);
             k2 = K2C[ik];
             q = QC[iq];
         } else {
@@ -312,6 +353,15 @@ static bool fit_run(fam_perch *p)
             continue;
         float a, sc;
         float e = fit_eval(p, ft, k2, q, &a, &sc);
+        /* only the two tokens this board knows: one bump fixes only the coupled mode
+         * ft / sqrt(1 - k^2), so left free the fit read the bare owl's 214 kHz as the
+         * image of a 441 kHz stranger (rev A, 2026-11-07); a stranger now simply fits
+         * badly and is not driven */
+        fam_who who = classify(ft);
+        if (who == FAM_UNKNOWN)
+            continue;
+        if (who != (p->index == 0 ? FAM_OWL : FAM_CAT))
+            e *= FAM_OTHER_PERCH_PENALTY;
         if (sc > 0.0f && e < p->fit_best) {
             p->fit_best = e;
             p->fit_ft = ft;
@@ -433,9 +483,40 @@ void fam_step(fam_perch *p, float t, float isense, const fam_cmd *applied, fam_c
         p->cmd.duty = 0.0f;
         break;
 
+    case FAM_ST_LIVE: {
+        float cap = duty_cap_at(p->f_drive);
+        p->cmd = (fam_cmd){true, p->f_drive, cap};
+        /* the power beyond an empty perch's at this drive: the drivers' draw, and the
+         * fundamental into the empty perch's conductance (the baseline, as modelled or
+         * learned); the 3rd harmonic adds under a tenth of that here */
+        float d = app.enable ? app.duty : cap;
+        float g_empty = interp(p, p->base, p->f_drive);
+        float i_empty = p->iq_drive + half_sq(vn(1, d)) * g_empty / FAM_VDRIVE_V;
+        float p_tok = FAM_VDRIVE_V * (isense - i_empty);
+        p->p_live_f += 0.3f * (p_tok - p->p_live_f);           /* ~3 ms */
+        bool over = p->p_live_f > (p->live_present ? FAM_LIVE_OFF_W : FAM_LIVE_ON_W);
+        if (over == p->live_present) {
+            p->t_live_edge = -1.0f;
+        } else if (p->t_live_edge < 0.0f) {
+            p->t_live_edge = t;
+        } else if (t - p->t_live_edge >= (over ? FAM_LIVE_ON_S : FAM_LIVE_OFF_S)) {
+            p->live_present = over;
+            p->t_live_edge = -1.0f;
+            ev->kind = over ? FAM_EV_ARRIVED : FAM_EV_LEFT;
+            ev->who = p->who;
+            ev->freq_hz = p->f_token;
+        }
+        p->p_meas_f = p->p_live_f;
+        break;
+    }
+
     case FAM_ST_IDLE:
         p->cmd.enable = false;
         p->cmd.duty = 0.0f;
+        if (p->live && p->enabled) {
+            enter_live(p, t);
+            break;
+        }
         if (p->enabled && t - p->t_last_sweep >= FAM_SWEEP_PERIOD_S) {
             set_state(p, FAM_ST_SWEEP, t);
             p->step = 0;

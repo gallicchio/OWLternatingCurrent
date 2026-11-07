@@ -130,10 +130,25 @@ def main():
     L.append("};")
     L.append("")
 
-    # groups, in the order of their names' numbers (left to right, as gen/leds.py lists them)
+    # groups, in the order of their names' numbers (left to right, as gen/leds.py lists
+    # them).  The table itself is in channel order, and the channels were reassigned for
+    # the routing, so a group must be sorted by the number in each name: in table order
+    # the arc ran STAR3, 2, 1, 0, 8, 7, ... and the theremin's meter filled in that order
+    # (seen on the bench, 2026-11-07).  The owl eyes: by owl letter, then L before R.
+    def member_key(i):
+        n = names[i]
+        m = re.search(r"(\d+)$", n)
+        if m:
+            return (int(m.group(1)), n)
+        m = re.match(r"OWL([A-Z])_([LR])$", n)
+        if m:
+            return (ord(m.group(1)) * 2 + (m.group(2) == "R"), n)
+        return (0, n)
     groups = {}
     for i, n in enumerate(names):
         groups.setdefault(group_of(n), []).append(i)
+    for idx in groups.values():
+        idx.sort(key=member_key)
     L.append("/* named groups, in order (the scenes walk these) */")
     for gname, idx in groups.items():
         L.append("#define LED_N_%-12s %d" % (gname, len(idx)))

@@ -360,7 +360,16 @@ through the tree's connectors.
 
 ## 8. The real firmware
 
-**8.1** `run.py flash --image owlternating`, then `run.py console status`.
+**8.1** `run.py flash owlternating`, then `run.py console status`.
+
+Done on 2026-11-07 (evening). The image as committed that morning crashed three times in
+75 ms and parked in BOOTSEL (the ADC/DMA interrupt race, fixed in `rt.c`; `bringup/REVB.md`
+1.8). If a new image does that again: it is back in BOOTSEL by itself, so `run.py flash
+owl_bringup` restores the bench image, and a build with `-DOWL_DIAG=1` (firmware/README.md,
+"The diagnostic build") says what core 1 was doing. The familiars are in live mode by
+default (`fam sweep` for the sweep-and-fit design); in a lit room the show sleeps
+(`scene night`). The supply's limit for the real firmware: 0.5 A (`run.py limit 0.5`);
+the base draws 55-80 mA at 12 V with both tokens lit.
 
 **8.2** Then firmware/README.md's "Specific things to check on the bench", in its order:
 - USB alone;

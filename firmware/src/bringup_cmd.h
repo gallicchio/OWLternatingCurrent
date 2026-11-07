@@ -28,7 +28,9 @@
 #define BU_COIL_MS_MAX      500u
 #define BU_COIL_I_MAX_A     1.0f     /* refused if |duty| x V12 / R20 would pass this */
 #define BU_COIL_ABORT_A     1.5f     /* the mirror reading this stops the pulse at once */
-#define BU_PERCH_DUTY_MAX   0.1f
+#define BU_PERCH_DUTY_MAX   0.5f     /* `perch`: a square wave, to light a token; `sweep` keeps 0.1 */
+#define BU_SWEEP_DUTY_MAX   0.1f
+#define BU_PERCH_ABORT_A    0.2f     /* ISENSE (the bridge's 4.8 V supply current) this high stops the pulse */
 #define BU_PERCH_MS_MAX     10000u   /* long enough to hold a scope probe on the coil */
 #define BU_PERCH_F_MIN_HZ   50000.0f
 #define BU_PERCH_F_MAX_HZ   500000.0f /* the bring-up build's perch_set clamp (CMakeLists) */

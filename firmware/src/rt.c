@@ -15,6 +15,38 @@
 #include <math.h>
 #include <string.h>
 
+#ifdef OWL_DIAG
+/* the boot-diagnostic build (cmake -DOWL_DIAG=1): where core 1's tick is, and what a hard
+ * fault on either core stacked.  The SDK's default handler is a breakpoint, which with no
+ * debugger attached locks the core up silently; this one records the fault and parks. */
+volatile uint32_t rt_diag_stage, rt_diag_fault_core = 99u, rt_diag_pc, rt_diag_lr, rt_diag_cfsr, rt_diag_hfsr,
+    rt_diag_bfar, rt_diag_mmfar, rt_diag_sp;
+void rt_diag_fault_c(uint32_t *sp)
+{
+    rt_diag_sp = (uint32_t)sp;
+    rt_diag_lr = sp[5];
+    rt_diag_pc = sp[6];
+    rt_diag_cfsr = *(volatile uint32_t *)0xE000ED28u;
+    rt_diag_hfsr = *(volatile uint32_t *)0xE000ED2Cu;
+    rt_diag_mmfar = *(volatile uint32_t *)0xE000ED34u;
+    rt_diag_bfar = *(volatile uint32_t *)0xE000ED38u;
+    rt_diag_fault_core = get_core_num();
+    for (;;)
+        __wfi();
+}
+__attribute__((naked)) void isr_hardfault(void)
+{
+    __asm volatile("tst lr, #4\n"
+                   "ite eq\n"
+                   "mrseq r0, msp\n"
+                   "mrsne r0, psp\n"
+                   "b rt_diag_fault_c\n");
+}
+#define STAGE(n) (rt_diag_stage = (n))
+#else
+#define STAGE(n) ((void)0)
+#endif
+
 rt_shared rt;
 lev_ctrl rt_lev;
 thermal_coil rt_thermal[COIL_COUNT];
@@ -143,8 +175,18 @@ static void align_lev_and_tick(void)
 
 static void tick_isr(void)
 {
+    STAGE(100);
     pwm_clear_irq(PWM_SLICE_TICK);
     if (dma_channel_is_busy((uint)dma_ch)) {
+        rt.overruns++;
+        return;
+    }
+    if (dma_irqn_get_channel_status(1, (uint)dma_ch)) {
+        /* the burst has just finished but adc_done_isr has not run yet: both interrupts
+         * sit at one priority and the PWM's lower number wins the race.  Draining now
+         * would spin on READY for ever (the ADC is still free-running; adc_run(false) is
+         * adc_done_isr's), which locked core 1 after ~200 ticks on rev A (2026-11-07).
+         * Let adc_done_isr run; this tick's burst is skipped. */
         rt.overruns++;
         return;
     }
@@ -161,10 +203,13 @@ static void tick_isr(void)
             resync = 1;
         }
     }
+    STAGE(101);
     adc_fifo_drain();                       /* waits for the last conversion, drops strays */
+    STAGE(102);
     adc_select_input(ADC_RR_FIRST);
     dma_channel_transfer_to_buffer_now((uint)dma_ch, burst, BURST);
     adc_run(true);
+    STAGE(103);
 }
 
 /* ---- the tick's work ------------------------------------------------------------------ */
@@ -213,6 +258,7 @@ static void control(void)
     uint32_t t_start = time_us_32();
     uint32_t now = t_start;
 
+    STAGE(1);
     /* 1. the burst's averages; ADC2 is this tick's multiplexer channel */
     uint32_t sum[3] = {0, 0, 0}, n[3] = {0, 0, 0};
     for (int i = 0; i < BURST; i++) {
@@ -236,6 +282,7 @@ static void control(void)
                  (HALL_MV_PER_MT * 1e-3f);
     rt.i_meas[COIL_LEV] = adc_volts(avg[ADC_SLOT_LEV_IPROPI]) / IPROPI_V_PER_A;
 
+    STAGE(2);
     /* 2. faults and power */
     static uint32_t last_clear, v12_good, nf_ticks, nf_retry_at, nf_window_at;
     static int nf_count;
@@ -275,6 +322,7 @@ static void control(void)
     }
     bool allowed = rt.power_ok && !(rt.faults & RT_FAULT_LATCHED_OFF) && (int32_t)(now - nf_retry_at) >= 0;
 
+    STAGE(3);
     /* 3. what each coil should do */
     float u[COIL_COUNT] = {0.0f, 0.0f, 0.0f, 0.0f};
     bool want[COIL_COUNT] = {false, false, false, false};
@@ -305,7 +353,9 @@ static void control(void)
         .thermal_trip = thermal_derate(&rt_thermal[COIL_LEV]) <= 0.0f,
     };
     lev_output lo;
+    STAGE(31);
     lev_step(&rt_lev, &li, &lo);
+    STAGE(32);
     bool lev_wants = rt_lev.state != LEV_OFF && rt_lev.state != LEV_FAULT;
     if (lo.active) {
         u[COIL_LEV] = lo.u;
@@ -320,6 +370,7 @@ static void control(void)
         }
     }
 
+    STAGE(4);
     /* 4. wake the bridges when needed, put them to sleep when not (or not allowed) */
     bool need = lev_wants || want[0] || want[1] || want[2] || want[3];
     switch (drv) {
@@ -355,6 +406,7 @@ static void control(void)
         break;
     }
 
+    STAGE(5);
     /* 5. the PWM.  The levitation coil always switches both ways a little (every output
      * pulse at least DRV_MIN_PULSE_S: the mean stays linear down to zero); with the
      * carrier, a lot, but never so much that the loop's mean voltage cannot be made:
@@ -375,6 +427,7 @@ static void control(void)
         rt.u[c] = on ? u[c] : 0.0f;
     }
 
+    STAGE(6);
     /* 6. the mirrors against the requests: overcurrent, open coil */
     static uint8_t over[PEND_COILS], open_[PEND_COILS];
     static uint32_t seen[PEND_COILS];
@@ -404,6 +457,7 @@ static void control(void)
                               (float)MUX_CHANNELS / (float)CTRL_TICK_HZ);
     }
 
+    STAGE(7);
     /* 7. the thermal models, at 1 kHz */
     static float i2[COIL_COUNT];
     static int th_n;
@@ -433,6 +487,7 @@ static void control(void)
         th_n = 0;
     }
 
+    STAGE(8);
     rt.ticks++;
     uint32_t dt_us = time_us_32() - t_start;
     if (dt_us > rt.tick_cycles_max)

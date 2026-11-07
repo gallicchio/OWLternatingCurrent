@@ -922,8 +922,15 @@ def step_sweep(ctx, perch=1, f0=90e3, f1=500e3, points=200, duty=0.03):
 
 
 def step_console(ctx, line, timeout=10):
-    """Any one console command, its reply and events printed."""
+    """Any one console command, its reply and events printed. A reboot gets no reply (the
+    bring-up image answers first, the real firmware just goes), so none is waited for."""
     with ctx.board() as bd:
+        if line.split()[:1] in (["reboot"], ["bootsel"]):
+            bd._send(line)
+            time.sleep(0.5)
+            r = {"ok": True, "cmd": line.split()[0], "note": "sent; the board reboots without replying"}
+            ctx.say(f"  {json.dumps(r)}")
+            return r
         r = bd.cmd(line, timeout=timeout, check=False)
         for e in bd.events:
             ctx.say(f"  event: {json.dumps(e)}")

@@ -92,7 +92,7 @@
                                               a count is 0.08 mA.  (0.5 ohm and x20.6 until the review of
                                               2026-10-09: the chip's ground rode the shunt to within its
                                               UVLO of the rail) */
-#define FAM_I_MAX_A           0.2f         /* [SIM] familiar.py: 0.1-0.2 A; the other token stays dark */
+#define FAM_I_MAX_A           0.25f        /* [SIM] familiar.py: 0.1-0.2 A, the other token stays dark; 0.25 since 2026-11-07 for reach (the owl perch's square wave is 0.22 A anyway) */
 #define FAM_F_MIN_HZ          100000.0f    /* [CHOICE] sweep range */
 #define FAM_F_MAX_HZ          400000.0f
 #define FAM_OWL_HZ            142000.0f    /* [SIM] the owl token's tank: 12.5 uH (gen/coils.py) with 100 nF */
@@ -117,8 +117,8 @@
 #define AUDIO_PWM_TOP         1023u        /* [CHOICE] 150 MHz / 1024 = 146 kHz carrier, 10 bits */
 #define AUDIO_SAMPLE_DIV      4u           /* [CHOICE] one sample per 4 carrier periods: 36.6 kHz */
 #define AUDIO_SAMPLE_HZ       (SYS_CLK_HZ / ((AUDIO_PWM_TOP + 1u) * AUDIO_SAMPLE_DIV))
-#define AUDIO_VOLUME_CEILING  0.25f        /* [CHOICE] fraction of full scale: quiet by default */
-#define AUDIO_VOLUME_DEFAULT  0.12f
+#define AUDIO_VOLUME_CEILING  1.0f         /* [CHOICE] fraction of full scale; was 0.25, but this 23 mm speaker is weak below its 1.8 kHz resonance (bench 2026-11-07) */
+#define AUDIO_VOLUME_DEFAULT  0.5f
 
 /* ---- LEDs -------------------------------------------------------------------------------- */
 #define LED_FPS               200u         /* [CHOICE] PLAN.md 3 */

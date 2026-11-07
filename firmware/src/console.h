@@ -22,6 +22,7 @@
  *   pend off|sustain|circle|chaos   the pendulum
  *   pend cal                        the 3-axis Hall sensor's zero (bat away)
  *   theremin on|off|cal             the theremin (cal: hands away)
+ *   fam live|sweep                  the familiars: drive each token's tuning all the time, or sweep and fit
  *   film on|off                     film mode (coil fields for magnetic viewing film)
  *   volume <0..1>                   the theremin's loudness (capped at AUDIO_VOLUME_CEILING)
  *   i2c scan                        who answers on the bus
@@ -58,6 +59,7 @@ typedef struct {
     const char *(*lev)(int op, const char *param, float value);
     const char *(*pend)(int mode);
     const char *(*theremin)(int op);
+    const char *(*fam)(int live);                       /* 1: live mode, 0: sweep and fit */
     const char *(*film)(bool on);
     const char *(*volume)(float v);
     const char *(*clear)(void);

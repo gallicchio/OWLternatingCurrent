@@ -449,6 +449,24 @@ int main(void)
     test_thermal();
     test_lev_cal();
     CHECK(rt.overruns == 0, "%lu overruns", (unsigned long)rt.overruns);
+    /* the race of 2026-11-07: the burst has finished and its DMA interrupt is pending when
+     * the tick's wrap wins the arbitration (same priority, lower IRQ number).  The tick
+     * must not start a burst (and not drain the FIFO: with the ADC still free-running that
+     * spun for ever on rev A); it yields, counting an overrun, and the next tick is normal */
+    {
+        uint32_t before = rt.ticks, over = rt.overruns;
+        stub_dma_irq_pending = true;
+        stub_now_us += 100u;
+        stub_irq_handler[PWM_IRQ_WRAP_1]();
+        CHECK(!stub_dma_busy, "the tick started a burst over a pending completion");
+        CHECK(rt.overruns == over + 1, "the yielded tick was not counted");
+        stub_dma_irq_pending = false;
+        stub_irq_handler[DMA_IRQ_1]();                    /* the pending completion runs */
+        tick();
+        CHECK(rt.ticks == before + 2, "ticks %lu after the race, expected %lu", (unsigned long)rt.ticks,
+              (unsigned long)(before + 2));
+        rt.overruns = 0;
+    }
     printf("%ld ticks (%.0f s of core 1)\n", ticks, (double)ticks / CTRL_TICK_HZ);
     if (failures) {
         printf("test_rt: %d FAILED\n", failures);

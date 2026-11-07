@@ -272,16 +272,18 @@ static void scene_theremin(scenes *s, const scene_inputs *in, float dt, float *f
     ambient(s, f);
     for (int i = 0; i < LED_COUNT; i++)
         f[i] *= 0.45f;
-    /* the arc lights from the moon's end as the pitch rises */
+    /* the arc is a meter of the pitch, filling from the moon's end: each star fully on
+     * in turn, the top one fractional, the rest off (no floor and no twinkle under it,
+     * which read as random dim stars: bench, 2026-11-07) */
     float n = s->pitch_s * (float)LED_N_STAR;
     for (int j = 0; j < LED_N_STAR; j++) {
         int star = SCENE_MOON_STAR >= LED_N_STAR / 2 ? SCENE_MOON_STAR - j : SCENE_MOON_STAR + j;
         if (star < 0 || star >= LED_N_STAR)
             continue;
-        f[LED_GROUP_STAR[star]] = 0.08f + 0.65f * smoothstepf((float)j - 0.3f, (float)j + 0.7f, n);
+        f[LED_GROUP_STAR[star]] = 0.75f * clampf(n - (float)j, 0.0f, 1.0f);
     }
     for (int p = 0; p < LED_N_PUMPKIN; p++)
-        f[LED_GROUP_PUMPKIN[p]] = 0.15f + 0.55f * s->vol_s;
+        f[LED_GROUP_PUMPKIN[p]] = 0.04f + 0.7f * s->vol_s;
     float look = (2.0f * s->pitch_s - 1.0f) * (SCENE_MOON_STAR >= LED_N_STAR / 2 ? 1.0f : -1.0f);
     for (int o = 0; o < 3; o++)
         owl_eyes(f, o, 0.5f, look);

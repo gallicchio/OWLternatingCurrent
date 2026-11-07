@@ -359,11 +359,15 @@ int main(void)
     CHECK(num(r, "isense_on_A") > num(r, "isense_base_A") + 0.005 && near(num(r, "freq_hz"), 160000, 300), "%s", r);
     CHECK(near(num(r, "v5"), 4.8, 0.02) && near(num(r, "isense_base_A"), 0.0008, 0.0005), "%s", r);
     r = run("perch 2 300000 0.02 3", true);                /* short: the filter has not settled, still ok */
-    run("perch 1 160000 0.2 100", false);
+    r = run("perch 1 160000 0.2 100", true);                /* up to a square wave, to light a token ... */
+    CHECK(has(r, "\"tripped\":false") && has(r, "\"held_ms\":100"), "%s", r);
+    run("perch 1 160000 0.6 100", false);
     run("perch 1 30000 0.03 100", false);
-    run("perch 1 500000 0.03 100", false);
+    run("perch 1 500000 0.03 100", true);                   /* the clamp in coils.c decides, not the parser */
+    run("perch 1 500001 0.03 100", false);
     run("perch 3 160000 0.03 100", false);
-    run("perch 1 160000 0.03 3000", false);
+    run("perch 1 160000 0.03 3000", true);                  /* ... and for up to 10 s */
+    run("perch 1 160000 0.03 10001", false);
     run("perch 1 160000 0.03", false);
     sim.no12v = true;
     run("perch 1 160000 0.03 100", false);
@@ -399,8 +403,11 @@ int main(void)
     run("tone 440 200 0.2", true);
     CHECK(near(sim.tone_amp, 0.2, 1e-6), "amp");
     run("tone 50 200", false);
-    run("tone 440 200 0.3", false);
-    run("tone 440 4000", false);
+    run("tone 440 200 0.3", true);                          /* the bench wants it loud: up to full scale ... */
+    run("tone 440 200 1.0", true);
+    run("tone 440 200 1.1", false);
+    run("tone 440 4000", true);                             /* ... and for up to 20 s */
+    run("tone 440 20001", false);
     run("tone", false);
     r = run("osc", true);
     CHECK(near(num(r, "pitch_hz"), 700000, 500) && near(num(r, "volume_hz"), 650000, 500), "%s", r);

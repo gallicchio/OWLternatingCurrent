@@ -78,7 +78,7 @@ def main(argv=None):
     elif s == "rails" and a.args:
         kw = {"dmm_rail": a.args[0]}
     elif s == "flash":
-        kw = {"which": a.image, "uf2": a.uf2}
+        kw = {"which": a.args[0] if a.args else a.image, "uf2": a.uf2}   # `flash owlternating` or --image
     elif s == "logic":
         kw = {"tree": a.tree}
     elif s == "leds":

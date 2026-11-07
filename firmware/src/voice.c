@@ -56,7 +56,7 @@ void voice_render(voice *v, float *out, int n)
     for (int i = 0; i < n; i++) {
         v->amp += (v->target_amp - v->amp) * (v->target_amp > v->amp ? v->k_attack : v->k_release);
         v->freq += (v->target_freq - v->freq) * v->k_glide;
-        if (v->amp < 1e-6f && v->target_amp <= 0.0f) {
+        if (v->amp < 1e-3f && v->target_amp <= 0.0f) {   /* -60 dB: silence (from full, 2.4 s after the release) */
             out[i] = 0.0f;
             continue;
         }

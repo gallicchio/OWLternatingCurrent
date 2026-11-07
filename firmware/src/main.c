@@ -201,9 +201,11 @@ static void status_json(char *buf, size_t n)
            (double)(ps.x_m * 1e3f), (double)(ps.y_m * 1e3f), (double)(ps.amp_m * 1e3f), (double)ps.f_hz, ps.chosen);
     jb_add(&j, "\"familiars\":[");
     for (int p = 0; p < 2; p++)
-        jb_add(&j, "%s{\"perch\":\"fam%d\",\"state\":\"%s\",\"who\":\"%s\",\"f_hz\":%.0f,\"duty\":%.3f,\"isense_A\":%.3f}",
+        jb_add(&j, "%s{\"perch\":\"fam%d\",\"state\":\"%s\",\"who\":\"%s\",\"present\":%s,\"f_hz\":%.0f,\"duty\":%.3f,"
+               "\"isense_A\":%.3f,\"p_W\":%.3f}",
                p ? "," : "", p + 1, fam_state_name(perch[p].state), fam_who_name(perch[p].who),
-               (double)perch_freq(p), (double)perch_duty(p), (double)rt.fam_isense[p]);
+               (perch[p].state == FAM_ST_LIVE ? perch[p].live_present : perch[p].who != FAM_NONE) ? "true" : "false",
+               (double)perch_freq(p), (double)perch_duty(p), (double)rt.fam_isense[p], (double)perch[p].p_meas_f);
     jb_add(&j, "],\"scene\":{\"name\":\"%s\",\"manual\":%s,\"kuramoto_r\":%.2f},",
            scene_name(scenes_current(&show)), scenes_is_manual(&show) ? "true" : "false", (double)show.kuramoto_r);
     jb_add(&j, "\"theremin\":{\"on\":%s,\"ok\":%s,\"active\":%s,\"f_pitch\":%.0f,\"f_vol\":%.0f,\"pitch_hz\":%.0f,"
@@ -400,11 +402,20 @@ static void do_reboot(bool bootsel)
         tight_loop_contents();
 }
 
+static bool familiars_live = true;      /* [CHOICE] live by default since 2026-11-07 (console `fam sweep` for the fit) */
+static const char *a_fam(int live)
+{
+    familiars_live = live != 0;
+    for (int p = 0; p < 2; p++)
+        fam_set_live(&perch[p], familiars_live);
+    return NULL;
+}
 static void a_reboot(bool bootsel) { do_reboot(bootsel); }
 
 static const console_ops OPS = {
     .reply = out_line, .scene = a_scene, .led = a_led, .coil = a_coil, .sweep = a_sweep, .lev = a_lev,
-    .pend = a_pend, .theremin = a_theremin, .film = a_film, .volume = a_volume, .clear = a_clear, .save = a_save,
+    .pend = a_pend, .theremin = a_theremin, .fam = a_fam, .film = a_film, .volume = a_volume, .clear = a_clear,
+    .save = a_save,
     .status_json = status_json, .lev_json = lev_json, .i2c_scan_json = i2c_scan_json,
     .adc_dump_json = adc_dump_json, .reboot = a_reboot,
 };
@@ -686,8 +697,10 @@ int main(void)
     pend_init(&pend, &pp);
     if (cfg.pend_offset_valid)
         pend_set_offset(&pend, cfg.pend_offset_mT[0], cfg.pend_offset_mT[1], cfg.pend_offset_mT[2]);
-    for (int p = 0; p < 2; p++)
+    for (int p = 0; p < 2; p++) {
         fam_init(&perch[p], p);
+        fam_set_live(&perch[p], familiars_live);
+    }
     film_init(&film);
     theremin_init(&thr);
 
@@ -752,8 +765,31 @@ int main(void)
             last_ticks = rt.ticks;
             progress_at = now;
         }
+#ifdef OWL_DIAG
+        /* the diagnostic build (cmake -DOWL_DIAG=1, BRINGUP.md 8.1): feed the watchdog
+         * whatever core 1 does, and say once a second what core 1 is doing, so a board
+         * that resets before USB can enumerate can be asked why */
+        watchdog_update();
+        static uint32_t diag_at;
+        if (now - diag_at >= 1000000u) {
+            diag_at = now;
+            extern volatile uint32_t rt_diag_stage, rt_diag_fault_core, rt_diag_pc, rt_diag_lr, rt_diag_cfsr,
+                rt_diag_hfsr, rt_diag_bfar, rt_diag_mmfar, rt_diag_sp;
+            event("{\"event\":\"diag\",\"ticks\":%lu,\"overruns\":%lu,\"adc_errors\":%lu,\"faults\":%lu,"
+                  "\"tick_cycles_max\":%lu,\"v12\":%.2f,\"v5\":%.2f,\"power_ok\":%s,\"progress_ms_ago\":%lu,"
+                  "\"stage\":%lu,\"fault_core\":%lu,\"pc\":\"0x%08lx\",\"lr\":\"0x%08lx\",\"cfsr\":\"0x%08lx\","
+                  "\"hfsr\":\"0x%08lx\",\"bfar\":\"0x%08lx\",\"mmfar\":\"0x%08lx\",\"sp\":\"0x%08lx\"}",
+                  (unsigned long)rt.ticks, (unsigned long)rt.overruns, (unsigned long)rt.adc_errors,
+                  (unsigned long)rt.faults, (unsigned long)rt.tick_cycles_max, (double)rt.v12, (double)rt.v5,
+                  rt.power_ok ? "true" : "false", (unsigned long)((now - progress_at) / 1000u),
+                  (unsigned long)rt_diag_stage, (unsigned long)rt_diag_fault_core, (unsigned long)rt_diag_pc,
+                  (unsigned long)rt_diag_lr, (unsigned long)rt_diag_cfsr, (unsigned long)rt_diag_hfsr,
+                  (unsigned long)rt_diag_bfar, (unsigned long)rt_diag_mmfar, (unsigned long)rt_diag_sp);
+        }
+#else
         if (now - progress_at < 50000u)
             watchdog_update();
+#endif
         if (watchdog_hw->scratch[0] && time_us_64() - started > 10000000u)
             watchdog_hw->scratch[0] = 0;     /* ran ten seconds: this image is fine */
     }

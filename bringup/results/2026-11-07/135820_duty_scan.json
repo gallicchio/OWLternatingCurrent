@@ -1,0 +1,616 @@
+{
+ "step": "duty_scan",
+ "time": "2026-11-07T13:55:53",
+ "runs": [
+  {
+   "perch": 1,
+   "freq_hz": 142000,
+   "label": "owl at ft",
+   "points": [
+    {
+     "duty": 0.02,
+     "isense_net_A": 0.0009,
+     "isense_on_A": 0.0015,
+     "tripped": false,
+     "held_ms": 1500,
+     "v5": 4.757
+    },
+    {
+     "duty": 0.03,
+     "isense_net_A": 0.0014,
+     "isense_on_A": 0.002,
+     "tripped": false,
+     "held_ms": 1500,
+     "v5": 4.756
+    },
+    {
+     "duty": 0.05,
+     "isense_net_A": 0.0028,
+     "isense_on_A": 0.0034,
+     "tripped": false,
+     "held_ms": 1500,
+     "v5": 4.763
+    },
+    {
+     "duty": 0.07,
+     "isense_net_A": 0.0049,
+     "isense_on_A": 0.0054,
+     "tripped": false,
+     "held_ms": 1500,
+     "v5": 4.764
+    },
+    {
+     "duty": 0.1,
+     "isense_net_A": 0.0086,
+     "isense_on_A": 0.0092,
+     "tripped": false,
+     "held_ms": 1500,
+     "v5": 4.758
+    },
+    {
+     "duty": 0.13,
+     "isense_net_A": 0.0135,
+     "isense_on_A": 0.014,
+     "tripped": false,
+     "held_ms": 1500,
+     "v5": 4.758
+    },
+    {
+     "duty": 0.16,
+     "isense_net_A": 0.0185,
+     "isense_on_A": 0.0191,
+     "tripped": false,
+     "held_ms": 1500,
+     "v5": 4.768
+    },
+    {
+     "duty": 0.2,
+     "isense_net_A": 0.027,
+     "isense_on_A": 0.0276,
+     "tripped": false,
+     "held_ms": 1500,
+     "v5": 4.766
+    },
+    {
+     "duty": 0.25,
+     "isense_net_A": 0.0382,
+     "isense_on_A": 0.0388,
+     "tripped": false,
+     "held_ms": 1500,
+     "v5": 4.754
+    },
+    {
+     "duty": 0.3,
+     "isense_net_A": 0.0494,
+     "isense_on_A": 0.0501,
+     "tripped": false,
+     "held_ms": 1500,
+     "v5": 4.759
+    },
+    {
+     "duty": 0.4,
+     "isense_net_A": 0.0672,
+     "isense_on_A": 0.0678,
+     "tripped": false,
+     "held_ms": 1500,
+     "v5": 4.753
+    },
+    {
+     "duty": 0.5,
+     "isense_net_A": 0.0761,
+     "isense_on_A": 0.0767,
+     "tripped": false,
+     "held_ms": 1500,
+     "v5": 4.754
+    }
+   ]
+  },
+  {
+   "perch": 1,
+   "freq_hz": 178000,
+   "label": "owl at the coupled peak",
+   "points": [
+    {
+     "duty": 0.02,
+     "isense_net_A": 0.0019,
+     "isense_on_A": 0.0024,
+     "tripped": false,
+     "held_ms": 1500,
+     "v5": 4.769
+    },
+    {
+     "duty": 0.03,
+     "isense_net_A": 0.004,
+     "isense_on_A": 0.0045,
+     "tripped": false,
+     "held_ms": 1500,
+     "v5": 4.761
+    },
+    {
+     "duty": 0.05,
+     "isense_net_A": 0.009,
+     "isense_on_A": 0.0096,
+     "tripped": false,
+     "held_ms": 1500,
+     "v5": 4.772
+    },
+    {
+     "duty": 0.07,
+     "isense_net_A": 0.0163,
+     "isense_on_A": 0.0169,
+     "tripped": false,
+     "held_ms": 1500,
+     "v5": 4.747
+    },
+    {
+     "duty": 0.1,
+     "isense_net_A": 0.0319,
+     "isense_on_A": 0.0325,
+     "tripped": false,
+     "held_ms": 1500,
+     "v5": 4.769
+    },
+    {
+     "duty": 0.13,
+     "isense_net_A": 0.0513,
+     "isense_on_A": 0.0518,
+     "tripped": false,
+     "held_ms": 1500,
+     "v5": 4.749
+    },
+    {
+     "duty": 0.16,
+     "isense_net_A": 0.0717,
+     "isense_on_A": 0.0722,
+     "tripped": false,
+     "held_ms": 1500,
+     "v5": 4.753
+    },
+    {
+     "duty": 0.2,
+     "isense_net_A": 0.1039,
+     "isense_on_A": 0.1045,
+     "tripped": false,
+     "held_ms": 1500,
+     "v5": 4.76
+    },
+    {
+     "duty": 0.25,
+     "isense_net_A": 0.1467,
+     "isense_on_A": 0.1473,
+     "tripped": false,
+     "held_ms": 1500,
+     "v5": 4.764
+    },
+    {
+     "duty": 0.3,
+     "isense_net_A": 0.1888,
+     "isense_on_A": 0.1894,
+     "tripped": false,
+     "held_ms": 1500,
+     "v5": 4.771
+    },
+    {
+     "duty": 0.4,
+     "isense_net_A": 0.1998,
+     "isense_on_A": 0.2005,
+     "tripped": true,
+     "held_ms": 1,
+     "v5": 4.77
+    }
+   ]
+  },
+  {
+   "perch": 2,
+   "freq_hz": 303000,
+   "label": "cat at ft",
+   "points": [
+    {
+     "duty": 0.02,
+     "isense_net_A": 0.0007,
+     "isense_on_A": 0.0013,
+     "tripped": false,
+     "held_ms": 1500,
+     "v5": 4.769
+    },
+    {
+     "duty": 0.03,
+     "isense_net_A": 0.0008,
+     "isense_on_A": 0.0013,
+     "tripped": false,
+     "held_ms": 1500,
+     "v5": 4.772
+    },
+    {
+     "duty": 0.05,
+     "isense_net_A": 0.0012,
+     "isense_on_A": 0.0018,
+     "tripped": false,
+     "held_ms": 1500,
+     "v5": 4.77
+    },
+    {
+     "duty": 0.07,
+     "isense_net_A": 0.0019,
+     "isense_on_A": 0.0024,
+     "tripped": false,
+     "held_ms": 1500,
+     "v5": 4.746
+    },
+    {
+     "duty": 0.1,
+     "isense_net_A": 0.0032,
+     "isense_on_A": 0.0038,
+     "tripped": false,
+     "held_ms": 1500,
+     "v5": 4.746
+    },
+    {
+     "duty": 0.13,
+     "isense_net_A": 0.0048,
+     "isense_on_A": 0.0054,
+     "tripped": false,
+     "held_ms": 1500,
+     "v5": 4.744
+    },
+    {
+     "duty": 0.16,
+     "isense_net_A": 0.0073,
+     "isense_on_A": 0.0078,
+     "tripped": false,
+     "held_ms": 1500,
+     "v5": 4.761
+    },
+    {
+     "duty": 0.2,
+     "isense_net_A": 0.011,
+     "isense_on_A": 0.0115,
+     "tripped": false,
+     "held_ms": 1500,
+     "v5": 4.759
+    },
+    {
+     "duty": 0.25,
+     "isense_net_A": 0.016,
+     "isense_on_A": 0.0166,
+     "tripped": false,
+     "held_ms": 1500,
+     "v5": 4.772
+    },
+    {
+     "duty": 0.3,
+     "isense_net_A": 0.0214,
+     "isense_on_A": 0.0219,
+     "tripped": false,
+     "held_ms": 1500,
+     "v5": 4.756
+    },
+    {
+     "duty": 0.4,
+     "isense_net_A": 0.0311,
+     "isense_on_A": 0.0316,
+     "tripped": false,
+     "held_ms": 1500,
+     "v5": 4.745
+    },
+    {
+     "duty": 0.5,
+     "isense_net_A": 0.0359,
+     "isense_on_A": 0.0365,
+     "tripped": false,
+     "held_ms": 1500,
+     "v5": 4.765
+    }
+   ]
+  },
+  {
+   "perch": 2,
+   "freq_hz": 391000,
+   "label": "cat at the coupled peak",
+   "points": [
+    {
+     "duty": 0.02,
+     "isense_net_A": 0.0019,
+     "isense_on_A": 0.0025,
+     "tripped": false,
+     "held_ms": 1500,
+     "v5": 4.754
+    },
+    {
+     "duty": 0.03,
+     "isense_net_A": 0.0034,
+     "isense_on_A": 0.004,
+     "tripped": false,
+     "held_ms": 1500,
+     "v5": 4.743
+    },
+    {
+     "duty": 0.05,
+     "isense_net_A": 0.008,
+     "isense_on_A": 0.0086,
+     "tripped": false,
+     "held_ms": 1500,
+     "v5": 4.752
+    },
+    {
+     "duty": 0.07,
+     "isense_net_A": 0.0124,
+     "isense_on_A": 0.013,
+     "tripped": false,
+     "held_ms": 1500,
+     "v5": 4.758
+    },
+    {
+     "duty": 0.1,
+     "isense_net_A": 0.0232,
+     "isense_on_A": 0.0238,
+     "tripped": false,
+     "held_ms": 1500,
+     "v5": 4.773
+    },
+    {
+     "duty": 0.13,
+     "isense_net_A": 0.0368,
+     "isense_on_A": 0.0373,
+     "tripped": false,
+     "held_ms": 1500,
+     "v5": 4.761
+    },
+    {
+     "duty": 0.16,
+     "isense_net_A": 0.0525,
+     "isense_on_A": 0.053,
+     "tripped": false,
+     "held_ms": 1500,
+     "v5": 4.762
+    },
+    {
+     "duty": 0.2,
+     "isense_net_A": 0.0726,
+     "isense_on_A": 0.0732,
+     "tripped": false,
+     "held_ms": 1500,
+     "v5": 4.762
+    },
+    {
+     "duty": 0.25,
+     "isense_net_A": 0.1034,
+     "isense_on_A": 0.1041,
+     "tripped": false,
+     "held_ms": 1500,
+     "v5": 4.744
+    },
+    {
+     "duty": 0.3,
+     "isense_net_A": 0.1342,
+     "isense_on_A": 0.1348,
+     "tripped": false,
+     "held_ms": 1500,
+     "v5": 4.768
+    },
+    {
+     "duty": 0.4,
+     "isense_net_A": 0.1797,
+     "isense_on_A": 0.1804,
+     "tripped": false,
+     "held_ms": 1500,
+     "v5": 4.753
+    },
+    {
+     "duty": 0.5,
+     "isense_net_A": 0.1873,
+     "isense_on_A": 0.1879,
+     "tripped": false,
+     "held_ms": 1500,
+     "v5": 4.766
+    }
+   ]
+  },
+  {
+   "perch": 1,
+   "freq_hz": 303000,
+   "label": "owl perch at the cat's ft (cross-talk)",
+   "points": [
+    {
+     "duty": 0.02,
+     "isense_net_A": 0.001,
+     "isense_on_A": 0.0016,
+     "tripped": false,
+     "held_ms": 1500,
+     "v5": 4.756
+    },
+    {
+     "duty": 0.03,
+     "isense_net_A": 0.0011,
+     "isense_on_A": 0.0017,
+     "tripped": false,
+     "held_ms": 1500,
+     "v5": 4.755
+    },
+    {
+     "duty": 0.05,
+     "isense_net_A": 0.0017,
+     "isense_on_A": 0.0023,
+     "tripped": false,
+     "held_ms": 1500,
+     "v5": 4.75
+    },
+    {
+     "duty": 0.07,
+     "isense_net_A": 0.0026,
+     "isense_on_A": 0.0031,
+     "tripped": false,
+     "held_ms": 1500,
+     "v5": 4.765
+    },
+    {
+     "duty": 0.1,
+     "isense_net_A": 0.0045,
+     "isense_on_A": 0.0051,
+     "tripped": false,
+     "held_ms": 1500,
+     "v5": 4.761
+    },
+    {
+     "duty": 0.13,
+     "isense_net_A": 0.0068,
+     "isense_on_A": 0.0073,
+     "tripped": false,
+     "held_ms": 1500,
+     "v5": 4.748
+    },
+    {
+     "duty": 0.16,
+     "isense_net_A": 0.0097,
+     "isense_on_A": 0.0102,
+     "tripped": false,
+     "held_ms": 1500,
+     "v5": 4.769
+    },
+    {
+     "duty": 0.2,
+     "isense_net_A": 0.0139,
+     "isense_on_A": 0.0146,
+     "tripped": false,
+     "held_ms": 1500,
+     "v5": 4.745
+    },
+    {
+     "duty": 0.25,
+     "isense_net_A": 0.0198,
+     "isense_on_A": 0.0204,
+     "tripped": false,
+     "held_ms": 1500,
+     "v5": 4.763
+    },
+    {
+     "duty": 0.3,
+     "isense_net_A": 0.0262,
+     "isense_on_A": 0.0267,
+     "tripped": false,
+     "held_ms": 1500,
+     "v5": 4.766
+    },
+    {
+     "duty": 0.4,
+     "isense_net_A": 0.0397,
+     "isense_on_A": 0.0403,
+     "tripped": false,
+     "held_ms": 1500,
+     "v5": 4.773
+    },
+    {
+     "duty": 0.5,
+     "isense_net_A": 0.0514,
+     "isense_on_A": 0.052,
+     "tripped": false,
+     "held_ms": 1500,
+     "v5": 4.767
+    }
+   ]
+  },
+  {
+   "perch": 2,
+   "freq_hz": 142000,
+   "label": "cat perch at the owl's ft (cross-talk)",
+   "points": [
+    {
+     "duty": 0.02,
+     "isense_net_A": 0.0011,
+     "isense_on_A": 0.0017,
+     "tripped": false,
+     "held_ms": 1500,
+     "v5": 4.747
+    },
+    {
+     "duty": 0.03,
+     "isense_net_A": 0.0021,
+     "isense_on_A": 0.0026,
+     "tripped": false,
+     "held_ms": 1500,
+     "v5": 4.757
+    },
+    {
+     "duty": 0.05,
+     "isense_net_A": 0.0047,
+     "isense_on_A": 0.0052,
+     "tripped": false,
+     "held_ms": 1500,
+     "v5": 4.754
+    },
+    {
+     "duty": 0.07,
+     "isense_net_A": 0.0085,
+     "isense_on_A": 0.0091,
+     "tripped": false,
+     "held_ms": 1500,
+     "v5": 4.75
+    },
+    {
+     "duty": 0.1,
+     "isense_net_A": 0.0153,
+     "isense_on_A": 0.0159,
+     "tripped": false,
+     "held_ms": 1500,
+     "v5": 4.767
+    },
+    {
+     "duty": 0.13,
+     "isense_net_A": 0.0218,
+     "isense_on_A": 0.0224,
+     "tripped": false,
+     "held_ms": 1500,
+     "v5": 4.759
+    },
+    {
+     "duty": 0.16,
+     "isense_net_A": 0.0271,
+     "isense_on_A": 0.0276,
+     "tripped": false,
+     "held_ms": 1500,
+     "v5": 4.771
+    },
+    {
+     "duty": 0.2,
+     "isense_net_A": 0.0319,
+     "isense_on_A": 0.0325,
+     "tripped": false,
+     "held_ms": 1500,
+     "v5": 4.772
+    },
+    {
+     "duty": 0.25,
+     "isense_net_A": 0.0339,
+     "isense_on_A": 0.0345,
+     "tripped": false,
+     "held_ms": 1500,
+     "v5": 4.756
+    },
+    {
+     "duty": 0.3,
+     "isense_net_A": 0.0361,
+     "isense_on_A": 0.0366,
+     "tripped": false,
+     "held_ms": 1500,
+     "v5": 4.746
+    },
+    {
+     "duty": 0.4,
+     "isense_net_A": 0.0563,
+     "isense_on_A": 0.0569,
+     "tripped": false,
+     "held_ms": 1500,
+     "v5": 4.75
+    },
+    {
+     "duty": 0.5,
+     "isense_net_A": 0.0866,
+     "isense_on_A": 0.0871,
+     "tripped": false,
+     "held_ms": 1500,
+     "v5": 4.75
+    }
+   ]
+  }
+ ]
+}

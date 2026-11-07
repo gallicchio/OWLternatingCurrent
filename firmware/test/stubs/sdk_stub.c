@@ -61,6 +61,8 @@ void dma_channel_configure(uint ch, const dma_channel_config *c, volatile void *
 void dma_irqn_set_channel_enabled(uint i, uint ch, bool e) { (void)i; (void)ch; (void)e; }
 void dma_irqn_acknowledge_channel(uint i, uint ch) { (void)i; (void)ch; }
 bool dma_channel_is_busy(uint ch) { (void)ch; return stub_dma_busy; }
+bool stub_dma_irq_pending;      /* the burst done, adc_done_isr not yet run (the race of 2026-11-07) */
+bool dma_irqn_get_channel_status(uint i, uint ch) { (void)i; (void)ch; return stub_dma_irq_pending; }
 void dma_channel_transfer_to_buffer_now(uint ch, volatile void *dst, uint32_t n)
 {
     (void)ch;

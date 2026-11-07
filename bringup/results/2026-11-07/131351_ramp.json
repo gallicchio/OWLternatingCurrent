@@ -1,0 +1,11 @@
+{
+ "steps": [],
+ "to": 12.0,
+ "i_zero_A": 0.001024713,
+ "step": "ramp",
+ "time": "2026-11-07T13:13:51",
+ "simulated": false,
+ "warnings": [
+  "a board is on USB (1209:0001): VBUS will power the logic, so the rails before 6.7 V won't read 0 and the currents will be low"
+ ]
+}

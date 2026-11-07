@@ -16,4 +16,5 @@ void dma_channel_configure(uint ch, const dma_channel_config *c, volatile void *
 void dma_irqn_set_channel_enabled(uint irq_index, uint ch, bool enabled);
 void dma_irqn_acknowledge_channel(uint irq_index, uint ch);
 bool dma_channel_is_busy(uint ch);
+bool dma_irqn_get_channel_status(uint irq_index, uint ch);   /* the completion interrupt pending */
 void dma_channel_transfer_to_buffer_now(uint ch, volatile void *dst, uint32_t count);

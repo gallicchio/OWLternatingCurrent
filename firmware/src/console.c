@@ -107,7 +107,7 @@ static const char HELP[] =
     "\"led <name|all> <0..1|off>\",\"coil <pend1|pend2|pend3|lev> <duty -1..1> <ms>\",\"sweep <fam1|fam2>\","
     "\"lev <on|off|status>\",\"lev cal [coil|zero]\",\"lev tune <param> <value>\",\"lev eyes <0..1>\","
     "\"pend <off|sustain|circle|chaos|cal>\","
-    "\"theremin <on|off|cal>\",\"film <on|off>\",\"volume <0..1>\",\"i2c scan\",\"adc dump\",\"clear\",\"save\","
+    "\"theremin <on|off|cal>\",\"fam <live|sweep>\",\"film <on|off>\",\"volume <0..1>\",\"i2c scan\",\"adc dump\",\"clear\",\"save\","
     "\"reboot\",\"reboot bootsel\",\"help\"]";
 
 void console_command(char *line)
@@ -245,6 +245,14 @@ void console_command(char *line)
         }
         snprintf(extra, sizeof extra, "\"theremin\":\"%s\"", OPS[op]);
         done(cmd, ops->theremin(op), extra);
+    } else if (!strcmp(cmd, "fam")) {
+        int live = tok[1] && !strcmp(tok[1], "live") ? 1 : tok[1] && !strcmp(tok[1], "sweep") ? 0 : -1;
+        if (live < 0) {
+            fail(cmd, "fam <live|sweep>");
+            return;
+        }
+        snprintf(extra, sizeof extra, "\"fam\":\"%s\"", live ? "live" : "sweep");
+        done(cmd, ops->fam(live), extra);
     } else if (!strcmp(cmd, "film")) {
         int on = tok[1] && !strcmp(tok[1], "on") ? 1 : tok[1] && !strcmp(tok[1], "off") ? 0 : -1;
         if (on < 0) {

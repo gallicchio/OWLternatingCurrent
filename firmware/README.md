@@ -30,7 +30,12 @@ picotool load -x build/owlternating.uf2 -f   # or copy the .uf2 onto the RP2350 
 - **After that,** `picotool reboot -u -f` reaches BOOTSEL through the reset interface. So do
   the console's `reboot bootsel` and opening the serial port at 1200 baud.
 - **Three watchdog timeouts in a row** restart in BOOTSEL, so a bad image can always be
-  replaced over USB (GPiBridge's rule).
+  replaced over USB (GPiBridge's rule). Seen working on rev A, 2026-11-07.
+- **The diagnostic build**, `cmake -S . -B build-diag -DOWL_DIAG=1`: the same firmware with
+  the watchdog fed whatever core 1 does, a `diag` event every second (core 1's ticks,
+  overruns, faults, stage, rails) and a hard-fault handler that records the fault (PC, LR,
+  CFSR, HFSR, BFAR) instead of the SDK's silent breakpoint. For a board that resets before
+  USB enumerates; it found the ADC/DMA interrupt race of 2026-11-07 (rt.c, `tick_isr`).
 
 ## The bring-up image
 
@@ -68,7 +73,7 @@ parser, limits, sequences) behind `src/bringup_main.c` (the board).
 | `led off`, `led cap <0\|1>` | every output to 0; allow duty above 0.5 (`cap 1`) or not | |
 | `ledwalk [ms]` | each LED alone at 0.2 for ms (400), in `led_map.h` order; any input stops it | events `ledwalk` (`i`, `name`, `driver`, `out`), then `count`, `skipped`, `aborted` |
 | `coil <pend1\|pend2\|pend3\|lev> <duty> <ms>` | wakes the bridges, drives one coil at a fraction of 12 V (-0.5..0.5) for 1-500 ms, reads its current mirror throughout, then everything off. Refused below 10.8 V or if \|duty\| x V12 / R20 > 1 A; stopped at once by nFAULT or a mirror reading 1.5x what was expected (a short) | `v12`, `i_expected_A`, `i_mean_A`, `i_peak_A`, `i_before_A`, `i_off_A` (the mirror's offset), `i_net_A`, `r_loop_ohm`, `r_est_ohm` (less the bridge's 0.2 Ω), `nfault`, `ran_ms`, `pwm` |
-| `perch <1\|2> <freq_hz> <duty> <ms>` | one perch bridge at 50-500 kHz (clamped to 90-500 kHz by `coils.c` in this build; 90-440 in the real one), duty 0-0.1, 1-10000 ms; ISENSE before (bridge off) and over the second half | `freq_hz` (as set), `isense_base_A`, `isense_on_A`, `isense_net_A`, `v5`. Refused below 4.5 V |
+| `perch <1\|2> <freq_hz> <duty> <ms>` | one perch bridge at 50-500 kHz (clamped to 90-500 kHz by `coils.c` in this build; 90-440 in the real one), duty 0-0.5 (0.5 is a square wave: enough to light a token), 1-10000 ms; ISENSE before (bridge off) and over the second half; the pulse stops at once if ISENSE passes 0.2 A | `freq_hz` (as set), `held_ms`, `tripped`, `isense_base_A`, `isense_on_A`, `isense_net_A`, `v5`. Refused below 4.5 V |
 | `sweep <1\|2> [f0 f1 steps duty]` | 100-400 kHz, 48 steps, duty 0.03, 20 ms a step (any range in 50-500 kHz, up to 200 steps); any input stops it | events `sweep_pt` (`f`, `i_A`), then `points`, `base_A`, `peak_f`, `peak_i_A`, `aborted` |
 | `tone <hz> <ms> [amp]` | a sine on the audio PWM (no DMA), 100-4000 Hz, 1-20000 ms, amplitude 0-1 of full scale (0.1; 1.0 is 0.2 W in the speaker, the real firmware stops at 0.25), with slow ramps at each end; the SOUND switch mutes it | `hz`, `ms`, `amp` |
 | `audio <level>`, `audio off` | holds the audio PWM at a steady duty 0-1 (3.3 V x level after the RC filter, for a meter at C30; DC, so the amplifier stays silent) until `audio off` or a `tone` | `level`, `filter_V` |
@@ -327,14 +332,26 @@ mean energy (0.46) is below the wall's top (0.50), and about a third of it tunne
     choose".
   - Pulses of up to 0.3 A, renewed every 2.5 ms; the coils sit 18 mm from the rest point.
     There a coil at 0.5 A holds the bat 11 mm out, a real capture; at 25 mm it would not.
-- **The familiars (`familiar.c`, core 0, 1 kHz).**
-  - Every 2 s an idle perch sweeps 100-400 kHz in 48 steps.
+- **The familiars (`familiar.c`, core 0, 1 kHz).** Two modes, `fam live` (the default
+  since 2026-11-07) and `fam sweep`.
+  - **Live:** each perch drives its own token's tuning (perch 1 the owl's 142 kHz, perch 2
+    the cat's 303 kHz) at the empty-perch current cap, all the time. The token's glow
+    follows the coupling, so it brightens as a hand brings it in; "present" is the power
+    the perch delivers beyond an empty perch's (`FAM_LIVE_ON_W` 50 mW on, 25 mW off, 20 /
+    100 ms debounce), and it raises the same arrived / left events as the fit does. Safe
+    at any coupling: at its tuning a token only raises the perch's impedance. A coin reads
+    as present; the other token stays dark and silent.
+  - **Sweep (the original design):** every 0.2 s an idle perch sweeps 100-400 kHz in 32 steps.
   - Each step is read at two duties so small that a token stays dark (0.010 and 0.030).
     Their difference cancels the drivers' own draw, giving the perch's conductance:
     FAMn_ISENSE is the bridge's 4.8 V supply current, at 10.3 V/A.
-  - A token shows a resonance peak (the coupled mode, ~15 % above its tuning). A fit of the
-    coupled-tank model, third harmonic included, gives the token's own tuning f_t: owl
-    116-168 kHz, cat 248-358 kHz (each 18 % round its own: familiar.c FAM_ID_TOL), else unknown.
+  - A token shows a resonance peak (the coupled mode, 15 % above its tuning at the printed
+    floor's gap, 50 % lying on the copper). A fit of the coupled-tank model, third harmonic
+    included, names the token: owl (116-168 kHz) or cat (248-358 kHz), each 18 % round its
+    own (FAM_ID_TOL), the perch's own preferred. Only those two: one bump fixes only
+    f_t / sqrt(1 − k²), so a free fit read a bare owl as the image of a 441 kHz stranger
+    (rev A, 2026-11-07); a stranger now fits as the nearer token or, with no resonance, not
+    at all. The tuning reported is good to about 12 %.
   - The perch is driven at f_t, never at the peak: there a token only raises the perch's
     impedance, so the empty-perch duty cap (0.92 × 0.2 A into an empty perch) bounds the
     current with or without a token.
@@ -369,6 +386,7 @@ the same lines.
 | `led <name\|all> <0..1\|off>` | set lightness (still slew-limited), or hand back to the scene. Names as in `led_map.h` (`STAR3`, `PUMPKIN0`, `OWLA_L`, ...), case-insensitive |
 | `coil <pend1\|pend2\|pend3\|lev> <duty -1..1> <ms>` | drive a coil at a fraction of 12 V. Refused above 1 A expected, over 2000 ms, without 12 V, when the coil is too warm for that long, or with `lev` while the loop runs |
 | `sweep <fam1\|fam2>` | sweep a perch now; the curve comes back as a `sweep` event (frequencies, measured, empty-perch baseline) |
+| `fam <live\|sweep>` | the familiars' mode: drive each token's tuning all the time (live, the default), or sweep and fit |
 | `lev on\|off\|status` | the levitation loop; `status` gives its full telemetry and every tunable |
 | `lev cal [coil\|zero]` | `coil`: measures the coil's field and polarity at the sensor (bat in its cradle or away; it also runs by itself on the first `lev on`). `zero`: the Hall zero (bat removed) |
 | `lev tune <param> <value>` | a loop parameter (`bw_hz`, `dfilt_hz`, `ki_div`, `zp_rate`, `g0_mm`, `mass_g`, `i_max`, `catch_mm`, `loss_mm`, `ramp_mm_s`, ...; range-checked) |
@@ -418,13 +436,16 @@ exactly as for the board.
 
 ## What is untested on hardware
 
-Everything that touches a pin is unexercised on hardware, though `test_rt` covers its logic
-with the SDK modelled:
-- **Core 1's timing:** the PWM/ADC/DMA sequence, the phase lock and the carrier switch.
-- **Bring-up:** the I2C devices' configuration (written from their datasheets' register
-  maps) and the SDK's initialisation of everything.
-- **Peripherals:** the PIO counter, the audio DMA, USB enumeration, flash settings, and the
-  watchdog.
+Exercised on rev A board 1 on 2026-11-07: boot, USB enumeration and the console, the
+watchdog rule (three resets to BOOTSEL, which is how the ADC/DMA interrupt race in
+`tick_isr` was found and fixed), core 1's PWM/ADC/DMA sequence (running; but the tick's
+work takes 170-310 µs against the 100 µs tick, so one tick in 30 is skipped and the `adc`
+fault latches: `control()` wants trimming or `CTRL_TICK_HZ` lowering), the I2C devices
+(all present), the scenes, the theremin (PIO counting, the voice, the audio DMA) and the
+familiars in both modes. Still unexercised:
+- **Core 1's phase lock and the carrier switch** (needs the levitation).
+- **Flash settings** (`save`).
+- **The levitation and the pendulum** (need the bigger supply, the bat and its magnet).
 
 Specific things to check on the bench, in this order (`status` and `adc dump` show them
 all):

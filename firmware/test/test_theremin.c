@@ -134,7 +134,8 @@ int main(void)
     for (int i = 1; i < n; i++)
         step_off = fmaxf(step_off, fabsf(buf[i] - buf[i - 1]));
     CHECK(step_off <= step_mid * 1.05f, "a click at the release");
-    CHECK(fabsf(buf[n - 1]) < 1e-3f, "not silent after the release: %f", buf[n - 1]);
+    voice_render(&v, buf, (int)fs);                      /* a third second: from full, -60 dB takes 2.4 s */
+    CHECK(buf[(int)fs - 1] == 0.0f, "not silent 3 s after the release: %f", buf[(int)fs - 1]);
 
     if (failures) {
         printf("test_theremin: %d FAILED\n", failures);

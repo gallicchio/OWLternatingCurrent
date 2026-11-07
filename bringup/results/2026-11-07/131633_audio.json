@@ -1,0 +1,50 @@
+{
+ "hz": 440.0,
+ "ms": 6000,
+ "tones": [
+  {
+   "amp": 0.25,
+   "i_during_A": 0.005442675214285713,
+   "i_after_A": 0.003335011666666667,
+   "delta_A": 0.0020899168809523794,
+   "expected_A": 0.0013763796338848039,
+   "verdict": "DRIVING the speaker",
+   "reply": {
+    "ok": true,
+    "cmd": "tone",
+    "hz": 440.0,
+    "ms": 6000,
+    "amp": 0.25,
+    "note": "a sine on the audio PWM; silent if the SOUND slide switch is off"
+   },
+   "n": 14
+  },
+  {
+   "amp": 1.0,
+   "i_during_A": 0.030122210833333333,
+   "i_after_A": 0.003329203333333334,
+   "delta_A": 0.026772356666666667,
+   "expected_A": 0.022022074142156862,
+   "verdict": "DRIVING the speaker",
+   "reply": {
+    "ok": true,
+    "cmd": "tone",
+    "hz": 440.0,
+    "ms": 6000,
+    "amp": 1.0,
+    "note": "a sine on the audio PWM; silent if the SOUND slide switch is off"
+   },
+   "n": 12,
+   "scope_pkpk_V": 0.023666667790773012
+  }
+ ],
+ "idle_A": 0.0033705050000000006,
+ "amp_awake_guess": true,
+ "scope_quiet": {
+  "pkpk_V": 0.002333333444160715
+ },
+ "step": "audio",
+ "time": "2026-11-07T13:16:33",
+ "simulated": false,
+ "warnings": []
+}

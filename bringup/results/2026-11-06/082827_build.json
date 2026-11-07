@@ -1,0 +1,11 @@
+{
+ "dir": "/home/jason/mnt/local4TB/2TBext4/frank/stuff/mudd/pcbs/OWLternatingCurrent/firmware/build-bell",
+ "images": {
+  "owlternating.uf2": 264704,
+  "owl_bringup.uf2": 153600
+ },
+ "step": "build",
+ "time": "2026-11-06T08:28:27",
+ "simulated": false,
+ "warnings": []
+}

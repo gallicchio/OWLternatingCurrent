@@ -1,0 +1,11 @@
+{
+ "where": "TP4",
+ "rail": "VSYS",
+ "board": "1",
+ "ohms": 280000.0,
+ "step": "ohms",
+ "time": "2026-11-06T13:41:30",
+ "simulated": false,
+ "warnings": [],
+ "note": "read by hand off the Fluke 45 front panel by Jason, black lead on the USB-C shell; not via run.py ohms"
+}

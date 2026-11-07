@@ -1,0 +1,72 @@
+{
+ "coils": [
+  {
+   "ok": false,
+   "cmd": "coil",
+   "coil": "pend1",
+   "duty": 0.08,
+   "ms": 200,
+   "ran_ms": 200.0,
+   "v12": 11.702,
+   "i_expected_A": 0.4088,
+   "i_mean_A": 0.2929,
+   "i_peak_A": 0.3265,
+   "i_off_A": 0.004,
+   "i_before_A": 0.0042,
+   "i_net_A": 0.2889,
+   "r_loop_ohm": 3.24,
+   "r_est_ohm": 3.04,
+   "nfault": false,
+   "pwm": "forward/brake, phase-correct, 30000 Hz",
+   "expected_ohm": 2.29
+  },
+  {
+   "ok": false,
+   "cmd": "coil",
+   "coil": "pend2",
+   "duty": 0.08,
+   "ms": 200,
+   "ran_ms": 200.0,
+   "v12": 11.704,
+   "i_expected_A": 0.4089,
+   "i_mean_A": 0.2933,
+   "i_peak_A": 0.325,
+   "i_off_A": 0.004,
+   "i_before_A": 0.0042,
+   "i_net_A": 0.2893,
+   "r_loop_ohm": 3.236,
+   "r_est_ohm": 3.036,
+   "nfault": false,
+   "pwm": "forward/brake, phase-correct, 30000 Hz",
+   "expected_ohm": 2.29
+  },
+  {
+   "ok": false,
+   "cmd": "coil",
+   "coil": "pend3",
+   "duty": 0.08,
+   "ms": 200,
+   "ran_ms": 200.0,
+   "v12": 11.718,
+   "i_expected_A": 0.4093,
+   "i_mean_A": 0.2959,
+   "i_peak_A": 0.3277,
+   "i_off_A": 0.0041,
+   "i_before_A": 0.0042,
+   "i_net_A": 0.2919,
+   "r_loop_ohm": 3.212,
+   "r_est_ohm": 3.012,
+   "nfault": false,
+   "pwm": "forward/brake, phase-correct, 30000 Hz",
+   "expected_ohm": 2.29
+  }
+ ],
+ "step": "coils",
+ "time": "2026-11-06T16:31:45",
+ "simulated": false,
+ "warnings": [
+  "pend1:  coil 3.04 ohm against 2.29, nFAULT False",
+  "pend2:  coil 3.036 ohm against 2.29, nFAULT False",
+  "pend3:  coil 3.012 ohm against 2.29, nFAULT False"
+ ]
+}

@@ -1,0 +1,14 @@
+{
+ "usb": {
+  "2e8a:000c": "Debug Probe (CMSIS-DAP)",
+  "2e8a:000f": "RP2350 Boot"
+ },
+ "supply": {
+  "V": 12.0046,
+  "A_uncorrected": 0.00152033
+ },
+ "step": "usb",
+ "time": "2026-11-06T16:27:00",
+ "simulated": false,
+ "warnings": []
+}

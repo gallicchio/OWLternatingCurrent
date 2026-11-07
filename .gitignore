@@ -54,3 +54,6 @@ reviews/**/.vscode/
 
 # Unison (the file sync) leaves these while it works.
 .unison*
+
+# The bench simulator's state, written while the simulated bench runs.
+bringup/results/sim_state.json

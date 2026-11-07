@@ -181,16 +181,29 @@ class Scope:
     """The SDS2104X Plus: DC levels and ripple from captured waveforms (numpy), so the
     simulated scope feeds the same code."""
 
-    MDEPTH = "10k"     # points per capture: waveform() fetches the whole record, and at
-                       # 10M a capture would be megabytes; 10k covers every view here
+    MDEPTHS = ("10k", "20k")   # points per capture: waveform() fetches the whole record,
+                       # and at 10M a capture would be megabytes; 10k covers every view
+                       # here. The SDS2104X Plus's depth menu depends on how many channels
+                       # are on: 10k/100k/... with three or four, 20k/200k/... with one or
+                       # two (seen 2026-11-06, firmware 1.3.9R12, CH1 alone: 10k refused,
+                       # 20k taken). So try 10k, then 20k.
 
     def __init__(self, sc, probe=10):
         self.sc, self.probe = sc, probe
         self.idn = sc.link.idn
-        self._old_mdepth = None
+        self._old_mdepth = self.mdepth = None
         try:
             self._old_mdepth = sc.q(":ACQuire:MDEPth?")
-            sc.acquire(mdepth=self.MDEPTH)
+            for d in self.MDEPTHS:
+                try:
+                    sc.acquire(mdepth=d)
+                    self.mdepth = d
+                    break
+                except ValueError:
+                    continue
+            if self.mdepth is None:
+                print(f"  (scope: memory depth left at {self._old_mdepth}: none of "
+                      f"{self.MDEPTHS} accepted)")
         except Exception as e:                      # noqa: BLE001 - slower, not wrong
             print(f"  (scope: memory depth left as it was: {e})")
 
@@ -239,7 +252,7 @@ class Scope:
 
     def close(self):
         try:
-            if self._old_mdepth and self._old_mdepth != self.MDEPTH:
+            if self.mdepth and self._old_mdepth and self._old_mdepth != self.mdepth:
                 self.sc.acquire(mdepth=self._old_mdepth)     # a shared scope: put it back
         finally:
             self.sc.close()

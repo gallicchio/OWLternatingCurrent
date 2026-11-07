@@ -1,0 +1,9 @@
+{
+ "uf2": "/home/jason/mnt/local4TB/2TBext4/frank/stuff/mudd/pcbs/OWLternatingCurrent/firmware/build-bell/owl_bringup.uf2",
+ "size": 153600,
+ "picotool": "Family ID 'rp2350-arm-s' can be downloaded in absolute space:\n  00000000->02000000\nLoading into Flash:   [                              ]  0%\nLoading into Flash:   [=                             ]  5%\nLoading into Flash:   [===                           ]  10%\nLoading into Flash:   [====                          ]  16%\nLoading into Flash:   [======                        ]  21%\nLoading into Flash:   [=======                       ]  26%\nLoading into Flash:   [=========                     ]  32%\nLoading into Flash:   [===========                   ]  37%\nLoading into Flash:   [============                  ]  42%\nLoading into Flash:   [==============                ]  48%\nLoading into Flash:   [===============               ]  53%\nLoading into Flash:   [=================             ]  58%\nLoading into Flash:   [===================           ]  64%\nLoading into Flash:   [====================          ]  69%\nLoading into Flash:   [======================        ]  74%\nLoading into Flash:   [========================      ]  80%\nLoading into Flash:   [=========================     ]  85%\nLoading into Flash:   [===========================   ]  90%\nLoading into Flash:   [============================  ]  96%\nLoading into Flash:   [==============================]  100%\n\nThe device was rebooted to start the application.\n",
+ "step": "flash",
+ "time": "2026-11-06T16:27:08",
+ "simulated": false,
+ "warnings": []
+}

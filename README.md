@@ -84,6 +84,8 @@ nothing has to be built to look at the design or to order it.
 | path | what |
 |---|---|
 | [`DESIGN_REVIEW.md`](DESIGN_REVIEW.md) | the design, subsystem by subsystem, with its numbers, its checks and its open questions |
+| [`BRINGUP.md`](BRINGUP.md), [`bringup/`](bringup/) | bringing the boards up at the bench, step by step, with the scripts and each day's results |
+| [`bringup/REVB.md`](bringup/REVB.md) | everything rev B should change, and every question the bench has not yet answered |
 | [`hardware/`](hardware/) | the KiCad project: schematics, the panel, the library, the checks' reports |
 | [`gen/`](gen/) | the generators: parts, schematics, placement, art, coils, routing, the panel |
 | [`mfg/`](mfg/) | the JLCPCB release and its checks |

@@ -223,7 +223,8 @@ def step_ramp(ctx, to=12.0, final_limit=0.15, hold=None):
         with open_bench(ctx.cfg, need=("supply",), want=("scope",), sim=ctx.sim) as b:
             s = b.supply
             if ctx.sim is None:
-                usb = {k for k in usb_devices() if k.startswith(("2e8a:", "1209:"))}
+                usb = {k for k in usb_devices() if k.startswith(("2e8a:", "1209:"))
+                       and k != "2e8a:000c"}    # not the Raspberry Pi Debug Probe
                 if usb:
                     ctx.warn(f"a board is on USB ({', '.join(usb)}): VBUS will power the logic, so "
                              "the rails before 6.7 V won't read 0 and the currents will be low")

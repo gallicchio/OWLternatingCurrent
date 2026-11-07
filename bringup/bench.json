@@ -1,0 +1,4 @@
+{
+  "supply_serial": "/dev/serial/by-id/usb-FTDI_FT232R_USB_UART_A9PUYBUD-if00-port0",
+  "dmm_serial": "/dev/serial/by-id/usb-FTDI_FT232R_USB_UART_A95AME9U-if00-port0"
+}

@@ -1,0 +1,12 @@
+{
+ "ok": true,
+ "cmd": "tone",
+ "hz": 440.0,
+ "ms": 1000,
+ "amp": 0.1,
+ "note": "a sine on the audio PWM; silent if the SOUND slide switch is off",
+ "step": "tone",
+ "time": "2026-11-06T16:34:47",
+ "simulated": false,
+ "warnings": []
+}

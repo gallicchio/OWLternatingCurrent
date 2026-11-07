@@ -1,0 +1,11 @@
+{
+ "ok": true,
+ "cmd": "osc",
+ "pitch_hz": 310837,
+ "volume_hz": 355781,
+ "ms": 200,
+ "step": "osc",
+ "time": "2026-11-06T16:36:51",
+ "simulated": false,
+ "warnings": []
+}

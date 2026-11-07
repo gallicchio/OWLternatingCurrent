@@ -1,0 +1,195 @@
+{
+ "leds": [
+  {
+   "name": "PUMPKIN1",
+   "driver": 0,
+   "out": 0,
+   "delta_A": 0.004836139
+  },
+  {
+   "name": "PUMPKIN0",
+   "driver": 0,
+   "out": 1,
+   "delta_A": 0.004869050999999999
+  },
+  {
+   "name": "WISP1",
+   "driver": 0,
+   "out": 2,
+   "delta_A": 0.004801290999999999
+  },
+  {
+   "name": "WISP0",
+   "driver": 0,
+   "out": 3,
+   "delta_A": 0.004853563
+  },
+  {
+   "name": "WISP2",
+   "driver": 0,
+   "out": 4,
+   "delta_A": 0.004870986999999999
+  },
+  {
+   "name": "OWLRING0",
+   "driver": 0,
+   "out": 5,
+   "delta_A": 0.004812907
+  },
+  {
+   "name": "STAR3",
+   "driver": 0,
+   "out": 6,
+   "delta_A": 0.004870987
+  },
+  {
+   "name": "OWLRING2",
+   "driver": 0,
+   "out": 7,
+   "delta_A": 0.004863243
+  },
+  {
+   "name": "STAR2",
+   "driver": 0,
+   "out": 8,
+   "delta_A": 0.0048090354999999994
+  },
+  {
+   "name": "STAR1",
+   "driver": 0,
+   "out": 9,
+   "delta_A": 0.004824523
+  },
+  {
+   "name": "STAR0",
+   "driver": 0,
+   "out": 10,
+   "delta_A": 0.004828394999999999
+  },
+  {
+   "name": "OWLRING1",
+   "driver": 0,
+   "out": 11,
+   "delta_A": 0.0047993555
+  },
+  {
+   "name": "STARX2",
+   "driver": 0,
+   "out": 12,
+   "delta_A": 0.0048012919999999995
+  },
+  {
+   "name": "STARX0",
+   "driver": 0,
+   "out": 13,
+   "delta_A": 0.0048477550000000005
+  },
+  {
+   "name": "STARX1",
+   "driver": 0,
+   "out": 19,
+   "delta_A": 0.004855499
+  },
+  {
+   "name": "STARX3",
+   "driver": 0,
+   "out": 20,
+   "delta_A": 0.004789675
+  },
+  {
+   "name": "STAR8",
+   "driver": 0,
+   "out": 21,
+   "delta_A": 0.0048090354999999994
+  },
+  {
+   "name": "STAR7",
+   "driver": 0,
+   "out": 22,
+   "delta_A": 0.004801290999999999
+  },
+  {
+   "name": "STAR9",
+   "driver": 0,
+   "out": 23,
+   "delta_A": 0.0047974194999999996
+  },
+  {
+   "name": "STAR10",
+   "driver": 0,
+   "out": 24,
+   "delta_A": 0.0047974194999999996
+  },
+  {
+   "name": "STAR11",
+   "driver": 0,
+   "out": 25,
+   "delta_A": 0.004820651
+  },
+  {
+   "name": "CATRING2",
+   "driver": 0,
+   "out": 26,
+   "delta_A": 0.004807099
+  },
+  {
+   "name": "STAR6",
+   "driver": 0,
+   "out": 27,
+   "delta_A": 0.004836139
+  },
+  {
+   "name": "WISP5",
+   "driver": 0,
+   "out": 28,
+   "delta_A": 0.0048593709999999995
+  },
+  {
+   "name": "WISP4",
+   "driver": 0,
+   "out": 29,
+   "delta_A": 0.004820651
+  },
+  {
+   "name": "PUMPKIN2",
+   "driver": 0,
+   "out": 30,
+   "delta_A": 0.0048322669999999995
+  },
+  {
+   "name": "WISP3",
+   "driver": 0,
+   "out": 31,
+   "delta_A": 0.0048477550000000005
+  },
+  {
+   "name": "CATRING0",
+   "driver": 0,
+   "out": 32,
+   "delta_A": 0.004795483
+  },
+  {
+   "name": "CATRING1",
+   "driver": 0,
+   "out": 33,
+   "delta_A": 0.0047935475
+  },
+  {
+   "name": "STAR5",
+   "driver": 0,
+   "out": 34,
+   "delta_A": 0.004822587
+  },
+  {
+   "name": "STAR4",
+   "driver": 0,
+   "out": 35,
+   "delta_A": 0.0047935475
+  }
+ ],
+ "median_A": 0.004820651,
+ "step": "leds",
+ "time": "2026-11-06T16:28:02",
+ "simulated": false,
+ "warnings": []
+}

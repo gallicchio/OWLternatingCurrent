@@ -1,0 +1,13 @@
+{
+ "instruments": {
+  "supply": "Agilent Technologies,E3646A,0,1.7-5.0-1.0",
+  "scope": "Siglent Technologies,SDS2104X Plus,SDS2PDDX6R0722,5.0.1.3.9R12",
+  "gen": "Siglent Technologies,SDG1032X,SDG1XCAC3R0195,1.01.01.30R1B2",
+  "dmm": null
+ },
+ "usb": {},
+ "step": "find",
+ "time": "2026-11-06T08:29:56",
+ "simulated": false,
+ "warnings": []
+}

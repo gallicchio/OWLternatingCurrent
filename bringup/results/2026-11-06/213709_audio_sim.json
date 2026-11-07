@@ -1,0 +1,50 @@
+{
+ "hz": 440.0,
+ "ms": 6000,
+ "tones": [
+  {
+   "amp": 0.25,
+   "i_during_A": 0.025361484625814796,
+   "i_after_A": 0.025591754638364023,
+   "delta_A": -7.015071290398037e-05,
+   "expected_A": 0.0013763796338848039,
+   "verdict": "no load drawn: no signal reaches the speaker",
+   "reply": {
+    "ok": true,
+    "cmd": "tone",
+    "hz": 440.0,
+    "ms": 6000,
+    "amp": 0.25,
+    "note": "a sine on the audio PWM; silent if the SOUND slide switch is off"
+   },
+   "n": 54
+  },
+  {
+   "amp": 1.0,
+   "i_during_A": 0.025328018058849162,
+   "i_after_A": 0.025341885963361014,
+   "delta_A": 2.131705763188871e-05,
+   "expected_A": 0.022022074142156862,
+   "verdict": "no load drawn: no signal reaches the speaker",
+   "reply": {
+    "ok": true,
+    "cmd": "tone",
+    "hz": 440.0,
+    "ms": 6000,
+    "amp": 1.0,
+    "note": "a sine on the audio PWM; silent if the SOUND slide switch is off"
+   },
+   "n": 54,
+   "scope_pkpk_V": 0.02280917930959081
+  }
+ ],
+ "idle_A": 0.025271516039073533,
+ "amp_awake_guess": true,
+ "scope_quiet": {
+  "pkpk_V": 0.02280917930959081
+ },
+ "step": "audio",
+ "time": "2026-11-06T21:37:09",
+ "simulated": true,
+ "warnings": []
+}

@@ -151,8 +151,30 @@ static void audio_level(float x)
     pwm_set_chan_level(PWM_SLICE_AUDIO, PWM_CHAN_A, (uint16_t)lroundf(x));
 }
 
+static bool audio_pwm_on;
+static void audio_dc(float level)
+{
+    if (level < 0.0f) {
+        pwm_set_chan_level(PWM_SLICE_AUDIO, PWM_CHAN_A, 0);
+        gpio_set_function(PIN_AUDIO, GPIO_FUNC_SIO);
+        gpio_put(PIN_AUDIO, 0);
+        gpio_set_dir(PIN_AUDIO, GPIO_OUT);
+        audio_pwm_on = false;
+        return;
+    }
+    if (!audio_pwm_on) {
+        pwm_config c = pwm_get_default_config();
+        pwm_config_set_wrap(&c, AUDIO_PWM_TOP);
+        pwm_config_set_clkdiv_int(&c, 1);
+        pwm_init(PWM_SLICE_AUDIO, &c, true);
+        gpio_set_function(PIN_AUDIO, GPIO_FUNC_PWM);
+        audio_pwm_on = true;
+    }
+    audio_level(level * (float)(AUDIO_PWM_TOP + 1u));
+}
 static void tone(float hz, uint32_t ms, float amp)
 {
+    audio_pwm_on = false;                      /* tone sets the slice up itself and ends with the pin low */
     pwm_config c = pwm_get_default_config();
     pwm_config_set_wrap(&c, AUDIO_PWM_TOP);
     pwm_config_set_clkdiv_int(&c, 1);
@@ -258,7 +280,8 @@ static const bringup_ops OPS = {
     .out = out_line, .now_us = now_us, .wait_us = wait_us, .poll = poll, .input_pending = input_pending,
     .adc_read = adc_read_input, .mux_select = mux_select, .gpio_get = gpio_level, .i2c_init = i2c_up,
     .i2c_probe = i2c_probe, .i2c_read = i2c_read_reg, .i2c_write = i2c_write_reg, .drv_sleep = drv_sleep,
-    .coil_drive = coil_drive, .bridges_off = bridges_off, .perch_drive = perch_drive, .tone = tone, .osc = osc,
+    .coil_drive = coil_drive, .bridges_off = bridges_off, .perch_drive = perch_drive, .tone = tone,
+    .audio_dc = audio_dc, .osc = osc,
     .chip_id = chip_id, .reboot = do_reboot,
 };
 

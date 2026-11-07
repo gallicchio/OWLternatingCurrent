@@ -281,7 +281,16 @@ That curve is the empty-perch baseline. With a token on the perch, the curve sho
 bump near the token's frequency (stage 6).
 
 **5.3 The audio.** Turn the SOUND switch on, then `run.py tone` plays 440 Hz for a
-second at a tenth of full scale.
+second at a tenth of full scale. That is quiet, and 440 Hz is two octaves under the
+23 mm speaker's resonance (1.8 kHz, measured 2026-11-06), so listen with
+`run.py console tone 1800 3000 1.0` (full scale, 0.2 W) before deciding anything.
+
+`run.py audio` tells whether the amplifier drives the speaker without an ear: the 12 V
+current the amplifier draws awake (SOUND on, ~1.8 mA), then what each tone adds (full
+scale ~22 mA, a speaker's worth; nothing means no signal reaches it). The speaker's
+impedance against frequency, from the same current, shows its mechanical resonance as a
+dip. `run.py console audio 0.5` holds the PWM at a steady level for a meter on C30
+(1.65 V) and `audio off` ends it.
 
 **Don't clip a scope ground to either speaker terminal.** The NS4150B drives both ends
 of the speaker. Probe each end against ground with the probe tip only.
@@ -316,6 +325,15 @@ peak. The script warns at 3 Vpp, and `--vpp 0.3` drives it more gently.
 1`. Then the cat token on perch 2, then `run.py perch 2`. Each curve should show a bump
 inside its perch's window: 116-168 kHz for the owl, 248-358 kHz for the cat
 (`familiar.c`).
+
+**The bump is the coupled mode, not the tank's own frequency:** it sits at
+ft / sqrt(1 - k^2), and a bare token flat on the perch couples hard (k about 0.74,
+measured 2026-11-06: the owl's bump at 214 kHz, the cat's at 452 kHz, with a second
+image of the cat at 150 kHz from the drive's 3rd harmonic). The firmware expects the
+printed figure's 2 mm floor between them (k about 0.47: bumps near 161 and 343 kHz).
+So test the tokens inside their printed figures, or on a 2-3 mm spacer, and use
+`run.py sweep <perch> 90000 500000 200` to see the whole range: `perch` stops at 400 kHz,
+below the bare cat's bump.
 
 ## 7. The tree and the perch
 

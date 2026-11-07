@@ -90,6 +90,9 @@ TOKEN_F = {"owl": 142e3, "cat": 303e3, "bat": 82e3}   # gen/sch_boards.py's note
 TOKEN_F_TOL = 0.12                # 100 nF/22 nF C0G 5 %, the coil's L from a field solver
 PERCH_SWEEP_PEAK = {"owl": (116e3, 168e3), "cat": (248e3, 358e3)}  # familiar.c FAM_ID_TOL
 
+# ---- the audio: the NS4150B awake (SOUND on) adds ~3 mA at 4.8 V, 1.8 mA at 12 V (read 2026-11-06)
+AUDIO_AMP_IDLE_12V_A = 0.0018
+
 # ---- the theremin (firmware/README.md open question 10: 0.5-1 MHz assumed)
 THEREMIN_HZ = (200e3, 2e6)        # wide: anything steady in here works; the firmware adapts
 

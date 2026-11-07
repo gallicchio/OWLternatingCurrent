@@ -209,7 +209,7 @@ static const char *const HELP[] = {
     "sensors", "led <name|all> <0..1>", "led <drv 0|1> <out 0..35> <0..1>", "led off", "led cap <0|1>",
     "ledwalk [ms]", "coil <pend1|pend2|pend3|lev> <duty -0.5..0.5> <ms 1..500>",
     "perch <1|2> <freq_hz> <duty 0..0.1> <ms 1..2000>", "sweep <1|2> [f0 f1 steps duty]",
-    "tone <hz 100..4000> <ms 1..3000> [amp 0..0.25]", "osc [ms]", "reboot", "bootsel",
+    "tone <hz 100..4000> <ms 1..20000> [amp 0..1]", "audio <level 0..1>|off", "osc [ms]", "reboot", "bootsel",
 };
 
 static void cmd_help(void)
@@ -992,19 +992,39 @@ static void cmd_tone(int argc, char **argv)
 {
     float hz, amp = 0.1f;
     long ms;
-    if ((argc != 3 && argc != 4) || !number(argv[1], &hz) || !integer(argv[2], 1, 3000, &ms) ||
+    if ((argc != 3 && argc != 4) || !number(argv[1], &hz) || !integer(argv[2], 1, BU_TONE_MS_MAX, &ms) ||
         (argc == 4 && !number(argv[3], &amp)))
-        return fail("tone", "usage: tone <hz 100..4000> <ms 1..3000> [amp 0..0.25]");
+        return fail("tone", "usage: tone <hz 100..4000> <ms 1..20000> [amp 0..1]");
     if (hz < 100.0f || hz > 4000.0f)
         return fail("tone", "the frequency is 100..4000 Hz");
     if (amp < 0.0f || amp > BU_TONE_AMP_MAX)
-        return fail("tone", "the amplitude is 0..0.25 of full scale");
+        return fail("tone", "the amplitude is 0..1 of full scale");
     ops->tone(hz, (uint32_t)ms, amp);
     jsonbuf j = start(true, "tone");
     jf(&j, "hz", hz, 1);
     jb_add(&j, ",\"ms\":%ld", ms);
     jf(&j, "amp", amp, 3);
     jb_add(&j, ",\"note\":\"a sine on the audio PWM; silent if the SOUND slide switch is off\"");
+    finish(&j);
+}
+
+/* `audio <level>` holds the audio PWM at a steady duty (a DC level of 3.3 V x level after the
+ * RC filter, for a meter at C30/C28: is the pin wired to the filter?); `audio off` ends it.
+ * It outlives the command line, unlike everything else here. */
+static void cmd_audio(int argc, char **argv)
+{
+    float level;
+    if (argc == 2 && ieq(argv[1], "off"))
+        level = -1.0f;
+    else if (argc != 2 || !number(argv[1], &level) || level < 0.0f || level > 1.0f)
+        return fail("audio", "usage: audio <level 0..1> | audio off");
+    if (!ops->audio_dc)
+        return fail("audio", "not on this build");
+    ops->audio_dc(level);
+    jsonbuf j = start(true, "audio");
+    jf(&j, "level", level, 3);
+    jf(&j, "filter_V", level < 0.0f ? 0.0f : 3.3f * level, 3);
+    jb_add(&j, ",\"note\":\"held until 'audio off'; DC, so the amplifier hears nothing\"");
     finish(&j);
 }
 
@@ -1077,6 +1097,8 @@ void bringup_command(char *line)
         cmd_sweep(argc, argv);
     else if (ieq(c, "tone"))
         cmd_tone(argc, argv);
+    else if (ieq(c, "audio"))
+        cmd_audio(argc, argv);
     else if (ieq(c, "osc"))
         cmd_osc(argc, argv);
     else if (ieq(c, "reboot") && argc == 1)

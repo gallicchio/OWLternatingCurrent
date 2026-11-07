@@ -23,34 +23,58 @@ perch) and 8 (the real firmware: pendulum, levitation, scenes) have not.
   CTRL) and on the familiar current senses; see 1.2 and 2.1.
 
 ### 1.2 Audio
-- **The speaker made no sound** at `run.py tone` (440 Hz, amplitude 0.25 of full scale,
-  the image's maximum) in either position of SW3. The amplifier's enable path works: the
-  12 V current steps 1.35 ↔ 3.12 mA as SW3 toggles, which is the NS4150B's quiescent
-  current. What is wrong is still open (section 3.1). Whatever it turns out to be, rev B
-  wants the path probeable without flipping the board: test points at GPIO8's PWM, after
-  the two RC filters, at IN+, and a way to reach the speaker pads with a probe tip.
-- Consider driving the amplifier's CTRL from a GPIO and reading SW3 on a GPIO, so the
+- **Nothing was heard at `run.py tone`** (440 Hz, amplitude 0.25 of full scale) in either
+  position of SW3, and the first reading was a broken path. The evening's measurements
+  (`212529_audio.json`, `213*_speaker_scan.json`) say otherwise: the amplifier wakes with
+  SW3 (+1.8 mA at 12 V), a full-scale tone adds 26 mA at 12 V (0.2 W into about 7 Ω,
+  exactly a speaker), and the current against frequency shows the voice coil's own
+  mechanical resonance as an impedance peak at 1.8 kHz and its inductance above it. The
+  chain GPIO8 → R18/C29 → R19/C30 → C28/R20 → U14 → LS1 is intact and the cone moves. The
+  likely reason nothing was heard: 13 mW at 440 Hz, two octaves under a 23 mm speaker's
+  resonance, in a lab. To confirm by ear: `run.py console tone 1800 3000 1.0`.
+- If that is it, the firmware's ceiling (`AUDIO_VOLUME_CEILING` 0.25) and the voice's
+  pitch range want revisiting against this speaker: it is a tweeter. Rev B could use a
+  larger speaker, or an enclosure/port in the print, for anything under 1 kHz.
+- Still worth having in rev B: test points at GPIO8's PWM, after the RC filters and at
+  INP, and speaker pads a probe tip can reach from the top, so this takes a minute, not
+  an evening. And the amplifier's CTRL from a GPIO with SW3 read by a GPIO, so the
   firmware knows the switch and can mute by itself.
 
 ### 1.3 The tokens
-- **Both tokens resonate far from their design frequency** on their own perches (stage
-  6.2, `172647_perch.json`), while the perch numbering is verified right from the
-  netlist (U9 → L6 at the left, the owl; U10 → L7 at the right, the cat):
+- **The tokens are almost certainly right; the first reading (wrong capacitors) was
+  not.** The bump a sweep sees is the coupled mode at ft / sqrt(1 − k²), and a bare token
+  lying on its perch couples far harder than the 3 mm gap the model assumed (k 0.47,
+  `sim/physics/README.md`). The evening's 90-500 kHz sweeps (`212627`, `212631_sweep.json`)
+  with the perch numbering verified from the netlist (U9 → L6 left, owl; U10 → L7 right,
+  cat):
 
-  | token, on its own coil | bump | design | off by |
+  | token, bare on its coil | bump | design ft | k² = 1 − (ft/f)² |
   |---|---|---|---|
-  | owl (C401 100 nF, L401) | 208 kHz | 142 kHz | +46 % |
-  | cat (C501 22 nF, L501) | 145 kHz | 303 kHz | −52 % |
+  | owl (C401 100 nF) | 214 kHz | 142 kHz | 0.56 |
+  | cat (C501 22 nF) | 452 kHz, and an image at 150 kHz | 303 kHz | 0.55 |
 
-  145 kHz is what 100 nF gives on 12.5 µH; 208 kHz is 47 nF on 12.5 µH. The BOM has the
-  right values (C97946 100 nF, C77069 22 nF), so either the capacitors were swapped or
-  mis-placed at assembly, or the coils are not 12.5 µH. Settle it with stage 6.1 (`run.py
-  tank owl`, then `cat`: each token alone with the generator and the pickup loop) and a
-  look at C401/C501.
-- Rev B: measure the coil's inductance on rev A before choosing the tank capacitors;
-  give each token two capacitor footprints so it can be tuned; and keep the owl and cat
-  frequencies far enough apart that a 30 % error cannot swap them (the firmware's
-  windows, 116-168 and 248-358 kHz, are ±18 %).
+  One coupling (k ≈ 0.75) explains both, where the wrong-capacitor story needed two
+  unrelated wrong values (44 nF and 10 nF). The cat's 150 kHz bump is the drive's 3rd
+  harmonic reaching 450 kHz: the sweep's narrow pulses carry it almost fully
+  (`familiar.c`'s w3 ≈ 0.97), which is why `run.py perch`, stopping at 400 kHz, saw only
+  the image and called the cat 145 kHz. The 3rd-harmonic image is sharper than the
+  fundamental's bump because the frequency axis is compressed by 3.
+- **To settle it with hands** (section 3.2): a 2-3 mm non-metallic spacer, or the
+  printed figure, under each token and `run.py sweep` again; the bumps should move down
+  toward 161 and 343 kHz (k 0.47). Stage 6.1 (`run.py tank`) gives each tank's own ft.
+- **Firmware, not copper:** `familiar.c` fits k² only up to 0.40 and ft from 78 % of the
+  peak (k ≤ 0.63). A bare token (k² 0.55, ft at 67 % of the peak) is outside the fit, so
+  the real firmware would misname or miss tokens without their printed floor. Extend
+  `K2C` to 0.6 and the ft range to 0.62, or keep the floor and say so in the print. The
+  sweep's 400 kHz ceiling also hides a hard-coupled cat; the 3rd-harmonic path in
+  `familiar.c` (line 227) is what finds it.
+- **The sweep's duty is quantised:** at 200-500 kHz the PWM period is 150-375 counts, so
+  duty 0.03 jumps by 10-20 % between adjacent frequencies and the curves show steps
+  (`212626_sweep1.png`). `perch_set` could keep the commanded duty by rounding the
+  period, or the reading could be normalised by the duty actually set (`fduty`).
+- Rev B: still worth measuring the coils' inductance on rev A before rev B's capacitors
+  are chosen, and keeping the two frequencies far enough apart that coupling cannot swap
+  them; but rev A's tanks do not need changing on this evidence.
 
 ### 1.4 The coils
 - **Pendulum coils read 3.0 Ω, not 2.29 Ω** (all three, +31-33 %, from the DRV8874's
@@ -132,18 +156,21 @@ perch) and 8 (the real firmware: pendulum, levitation, scenes) have not.
 
 ## 3. Open questions
 
-### 3.1 Why is the audio silent?
-Amp enable is fine (section 1.2). Next, non-invasively: with SW3 on, play a 4 s tone
-while logging the 12 V current. A rise of about 1 mA means the amplifier is driving a
-load, so the fault is the speaker or its joints (LS1 is through-hole; JLCPCB asked about
-its orientation and it was right). No rise means no signal reaches the amplifier: GPIO8's
-PWM (146 kHz, 10-bit), the two 1k/10n RC stages, the 22n/220k coupling, or the NS4150B's
-input. Then the probe tip, never a ground clip, on each speaker pad against ground.
+### 3.1 Why was the audio silent?
+The electrical chain is proven (section 1.2): a full-scale tone draws a speaker's worth
+of current and the voice coil shows its mechanical resonance at 1.8 kHz. What is left is
+the ear: was 13 mW at 440 Hz simply inaudible in the lab from this 23 mm speaker? Listen
+to `run.py console tone 1800 3000 1.0`. If that too is silent with the current rising
+(`run.py audio`), the cone moves but the sound does not get out: look at how LS1 sits
+(its grille up, nothing over it) and at the speaker itself.
 
-### 3.2 Which token part is wrong?
-Swap the tokens (cat on the left coil, owl on the right) and `run.py perch`: if the bumps
-follow the tokens, the tokens are off; if they stay with the perches, the perches are.
-Then stage 6.1 for each token's own frequency and Q, and a look at C401 and C501.
+### 3.2 Is the token story really coupling?
+With a 2-3 mm spacer (or the printed figure) under each token, `run.py sweep 1 90000
+500000 200` and `run.py sweep 2 ...`: the owl's bump should move from 214 toward about
+161 kHz and the cat's from 452 toward about 343 kHz, and the cat's 150 kHz image toward
+114 kHz. Lifting further moves them further toward 142 and 303. If the bumps do not move
+with the gap, the coupling story is wrong and stage 6.1 (`run.py tank owl`, `cat`) with
+the generator and the pickup loop measures each tank alone.
 
 ### 3.3 Are the coils really 3.0 Ω?
 Fluke across a pendulum coil's pads with the power off (and across L6/L7 for
@@ -152,7 +179,8 @@ Fluke across a pendulum coil's pads with the power off (and across L6/L7 for
 ### 3.4 Not yet measured
 - Board 2 (still sealed, the reference): its TP1-TP6 resistances against board 1's
   800 k / 10 k / 2 M / 280 k / 105 k / 20 k to the USB shell.
-- Stage 6.1 tanks: owl, cat and bat frequency and Q.
+- Stage 6.1 tanks: owl, cat and bat frequency and Q (the bare-perch sweeps say the owl
+  and cat tanks are near design; 6.1 is the direct check).
 - Stage 7: the tree's LP5036 at 0x32 and its LEDs; the perch's DRV5055 and the levitation
   coil's current step (`kcs` vs 2.9 mT/A, the 100 kHz residue).
 - Stage 8: IMU axis signs by tilting; the light sensor against the board's own LEDs; the

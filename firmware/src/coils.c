@@ -104,6 +104,9 @@ void coil_lev_frequency(bool carrier)
 }
 
 /* ---- the familiar perches ----------------------------------------------------------- */
+#ifndef PERCH_F_CLAMP_MAX_HZ
+#define PERCH_F_CLAMP_MAX_HZ (FAM_F_MAX_HZ * 1.1f)   /* the bring-up build goes to 500 kHz (CMakeLists) */
+#endif
 static const uint8_t FSLICE[2] = {PWM_SLICE_FAM1, PWM_SLICE_FAM2};
 static const uint8_t FPIN_A[2] = {PIN_FAM1_A, PIN_FAM2_A};
 static const uint8_t FPIN_B[2] = {PIN_FAM1_B, PIN_FAM2_B};
@@ -149,8 +152,8 @@ float perch_set(int perch, bool on, float freq_hz, float duty)
     }
     if (freq_hz < FAM_F_MIN_HZ * 0.9f)
         freq_hz = FAM_F_MIN_HZ * 0.9f;
-    if (freq_hz > FAM_F_MAX_HZ * 1.1f)
-        freq_hz = FAM_F_MAX_HZ * 1.1f;
+    if (freq_hz > PERCH_F_CLAMP_MAX_HZ)
+        freq_hz = PERCH_F_CLAMP_MAX_HZ;
     uint32_t P = (uint32_t)lroundf((float)SYS_CLK_HZ / (2.0f * freq_hz));
     if (!(duty > 0.0f))
         duty = 0.0f;

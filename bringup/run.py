@@ -29,7 +29,8 @@ def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("step", choices=sorted(steps.STEPS))
     ap.add_argument("args", nargs="*", help="console: the command line; tank: owl|cat|bat; "
-                    "coils: coil names; leds: LED names; rails: a rail for the DMM (e.g. +3V3)")
+                    "coils: coil names; leds: LED names; rails: a rail for the DMM (e.g. +3V3); "
+                    "audio: tone amplitudes; sweep: perch f0 f1 points")
     ap.add_argument("--config", help="bench.json to use")
     ap.add_argument("--supply", dest="supply_serial", help="the E3646A's serial port")
     ap.add_argument("--output", dest="supply_output", type=int, help="the E3646A output with the board (default 2)")
@@ -41,8 +42,9 @@ def main(argv=None):
     ap.add_argument("--limit", type=float, default=0.15, help="ramp/capture: the current limit left set (A)")
     ap.add_argument("--hold", type=float, help="ramp: seconds to hold at the top")
     ap.add_argument("--tree", action="store_true", help="logic/leds: the tree is plugged in")
-    ap.add_argument("--duty", type=float, help="coils/leds: the duty")
-    ap.add_argument("--ms", type=int, help="coils: pulse length")
+    ap.add_argument("--duty", type=float, help="coils/leds/sweep: the duty")
+    ap.add_argument("--hz", type=float, default=440.0, help="audio: the tone")
+    ap.add_argument("--ms", type=int, help="coils: pulse length; audio: each tone's length")
     ap.add_argument("--vpp", type=float, default=1.0, help="tank: the generator's amplitude")
     ap.add_argument("--image", default="owl_bringup", help="flash: owl_bringup or owlternating")
     ap.add_argument("--uf2", help="flash: a .uf2 file to flash instead")
@@ -87,6 +89,22 @@ def main(argv=None):
         kw = {"which": a.args or ("pend1", "pend2", "pend3"), "duty": a.duty, "ms": a.ms}
     elif s == "perch":
         kw = {"which": [int(x) for x in a.args] or (1, 2), "token": a.token}
+    elif s == "audio":
+        kw = {"hz": a.hz, "amps": tuple(float(x) for x in a.args) or (0.25, 1.0)}
+        if a.ms is not None:
+            kw["ms"] = a.ms
+    elif s == "speaker" and a.args:
+        kw = {"amp": float(a.args[0])}
+    elif s == "sweep":
+        # sweep [perch [f0 f1 [points]]] --duty D
+        if a.args:
+            kw["perch"] = int(a.args[0])
+        if len(a.args) >= 3:
+            kw["f0"], kw["f1"] = float(a.args[1]), float(a.args[2])
+        if len(a.args) >= 4:
+            kw["points"] = int(a.args[3])
+        if a.duty is not None:
+            kw["duty"] = a.duty
     elif s == "tank":
         if not a.args:
             ap.error("tank needs owl, cat or bat")

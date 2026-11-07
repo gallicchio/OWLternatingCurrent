@@ -755,6 +755,172 @@ def step_tone(ctx, hz=440, ms=1000, amp=0.1):
     return r
 
 
+def _reply(bd, deadline):
+    """The command's reply (a JSON object with "ok"), events before it kept in bd.events."""
+    while True:
+        m = bd.read_json(deadline)
+        if m is None or ("ok" in m and "event" not in m):
+            return m
+        bd.events.append(m)
+
+
+def _tone_cost_12v_A(amp):
+    """The 12 V current a tone should add: full scale 3.3 Vpp x 1.1 into 8 ohm, the NS4150B
+    at 90 %, the buck at 85 %."""
+    vpk = amp * 1.65 * 1.09
+    return (vpk * vpk / 2.0 / 8.0) / 0.9 / 0.85 / 12.0
+
+
+def step_audio(ctx, hz=440, ms=6000, amps=(0.25, 1.0)):
+    """Is the amplifier driving the speaker? Each tone's extra 12 V current (the supply's
+    readback) against what it should cost (amp 0.25: ~1.3 mA; 1.0: ~20 mA at 12 V), with
+    the amplifier's own 1.8 mA (SOUND on) read first. With the scope, the +4.8V channel
+    AC-coupled during the loudest tone: the amplifier's ~400 kHz switching when awake, a
+    440 Hz envelope when it drives the speaker."""
+    rec = {"hz": hz, "ms": ms, "tones": []}
+    with open_bench(ctx.cfg, need=("supply",), want=("scope",), sim=ctx.sim) as b:
+        if not b.supply.is_on():
+            raise AbortStep("the supply is off: run 'ramp' first")
+        b.supply.keep_on()
+
+        def current(n=8, dt=0.15):
+            xs = []
+            for _ in range(n):
+                xs.append(b.supply.measure()[1])
+                time.sleep(dt)
+            return float(np.mean(xs)), float(np.std(xs))
+
+        i0, s0 = current(12)
+        rec["idle_A"] = i0
+        amp_on = i0 > E.AUDIO_AMP_IDLE_12V_A * 0.6
+        ctx.say(f"  12 V idle {i0 * 1000:.2f} mA (+-{s0 * 1000:.2f}): the amplifier looks "
+                f"{'AWAKE (SOUND on)' if amp_on else 'asleep (SOUND off, or no 4.8 V)'} "
+                f"against its ~{E.AUDIO_AMP_IDLE_12V_A * 1000:.1f} mA")
+        rec["amp_awake_guess"] = amp_on
+        sc = b.scope
+        ch48 = [c for c, r in E.SCOPE_RAILS.items() if r == "+4.8V"][0] if sc else None
+        if sc:
+            sc.setup(ch48, scale=0.01, offset=0.0, coupling="AC", bwlimit="20M")
+            sc.timebase(1e-3)
+            t, v = sc.capture([ch48])[ch48]
+            rec["scope_quiet"] = {"pkpk_V": float(v.max() - v.min())}
+            quiet = (t, v)
+        with ctx.board() as bd:
+            for amp in amps:
+                bd._send(f"tone {hz} {ms} {amp}")
+                time.sleep(0.4)                       # the 100 ms ramp up, the readback's lag
+                during = []
+                cap = None
+                t0 = time.time()
+                while time.time() - t0 < ms / 1000 - 0.6:
+                    during.append(b.supply.measure()[1])
+                    if sc and amp == max(amps) and cap is None and time.time() - t0 > 0.8:
+                        tt, vv = sc.capture([ch48])[ch48]
+                        cap = (tt, vv)
+                    time.sleep(0.1)
+                r = _reply(bd, time.time() + ms / 1000 + 5)
+                time.sleep(0.5)
+                i_after, _ = current(6)
+                i_on = float(np.mean(during))
+                want = _tone_cost_12v_A(amp)
+                d = i_on - (i0 + i_after) / 2
+                verdict = ("DRIVING the speaker" if d > 0.5 * want else
+                           "no load drawn: no signal reaches the speaker" if d < 0.15 * want else "partial")
+                ctx.say(f"  tone {hz} Hz amp {amp}: 12 V {i_on * 1000:.2f} mA during, {i_after * 1000:.2f} after: "
+                        f"+{d * 1000:.2f} mA against ~{want * 1000:.1f} expected: {verdict}")
+                tone = dict(amp=amp, i_during_A=i_on, i_after_A=i_after, delta_A=d, expected_A=want,
+                            verdict=verdict, reply=r, n=len(during))
+                if cap is not None:
+                    tt, vv = cap
+                    pp = float(vv.max() - vv.min())
+                    tone["scope_pkpk_V"] = pp
+                    ctx.say(f"  +4.8V during the tone: {pp * 1000:.1f} mVpp (quiet: "
+                            f"{rec['scope_quiet']['pkpk_V'] * 1000:.1f})")
+                    png = ctx.out_dir() / f"{datetime.now():%H%M%S}_audio_4v8{'_sim' if ctx.sim else ''}.png"
+                    _plot(png, f"+4.8V (AC) quiet and during a {hz} Hz tone at {amp}",
+                          [("quiet", quiet[0] * 1e3, quiet[1] * 1e3), ("tone", tt * 1e3, vv * 1e3)], "ms", "mV")
+                    ctx.say(f"  plot: {png}")
+                rec["tones"].append(tone)
+        if sc:
+            sc.setup(ch48, scale=_nice(4.8 * 1.25 / 8), offset=-4 * _nice(4.8 * 1.25 / 8), coupling="DC")
+            sc.timebase(1e-3)
+            sc.run()
+    if not amp_on:
+        ctx.warn("the amplifier looked asleep: flip SOUND and run again")
+    ctx.save("audio", rec)
+    return rec
+
+
+SPEAKER_SCAN_HZ = (200, 300, 400, 500, 700, 900, 1100, 1300, 1500, 1600, 1700, 1800, 1900, 2000, 2200,
+                   2500, 3000, 3500, 4000)
+
+
+def step_speaker(ctx, amp=1.0, hz=SPEAKER_SCAN_HZ):
+    """The speaker's impedance against frequency, from the 12 V current a full-scale tone
+    adds (6 s tones, the readback taken 1.2-4.5 s in). A moving cone shows its mechanical
+    resonance as a dip in current (an impedance peak: 1.8 kHz on board 1, 2026-11-06),
+    and the voice coil's inductance as the slow fall above it. A flat, resistive curve
+    means the coil is not moving."""
+    rec = {"amp": amp, "scan": []}
+    with open_bench(ctx.cfg, need=("supply",), want=(), sim=ctx.sim) as b:
+        if not b.supply.is_on():
+            raise AbortStep("the supply is off: run 'ramp' first")
+        b.supply.keep_on()
+        idle = float(np.mean([b.supply.measure()[1] for _ in range(6)]))
+        rec["idle_A"] = idle
+        with ctx.board() as bd:
+            for f in hz:
+                bd._send(f"tone {f} 6000 {amp}")
+                time.sleep(1.2)
+                xs = [b.supply.measure()[1] for _ in range(6)]     # ~3.3 s, inside the tone
+                r = _reply(bd, time.time() + 8)
+                if not (r and r.get("ok")):
+                    raise AbortStep(f"tone {f}: {r}")
+                d = float(np.mean(xs)) - idle
+                vpk = amp * 1.65 * 1.09
+                z = (vpk * vpk / 2.0) / (d * 12.0 * 0.9 * 0.85) if d > 0 else float("inf")
+                rec["scan"].append((f, d, z))
+                ctx.say(f"  {f:5d} Hz  +{d * 1000:6.2f} mA  ({z:5.1f} ohm equivalent)")
+                time.sleep(0.3)
+    if rec["scan"]:
+        f, d, z = np.array(rec["scan"]).T
+        k = int(np.argmin(d))
+        ctx.say(f"  least current (highest impedance) at {f[k]:.0f} Hz: a moving cone's resonance if it is a "
+                f"dip, not the top of a slope")
+        png = ctx.out_dir() / f"{datetime.now():%H%M%S}_speaker{'_sim' if ctx.sim else ''}.png"
+        _plot(png, f"12 V current added by a tone at {amp} of full scale", [("tone", f, d * 1000)], "Hz", "mA",
+              logx=True)
+        ctx.say(f"  plot: {png}")
+    ctx.save("speaker", rec)
+    return rec
+
+
+def step_sweep(ctx, perch=1, f0=90e3, f1=500e3, points=200, duty=0.03):
+    """One perch's bridge-current sweep over any range (the image's `sweep` with its
+    arguments): finer, wider or harder than `perch`. The peaks are listed."""
+    pts = []
+    with ctx.board() as bd:
+        r = bd.cmd(f"sweep {perch} {f0:.0f} {f1:.0f} {points} {duty}", timeout=points * 0.05 + 20,
+                   on_event=lambda e: pts.append((e["f"], e["i_A"])) if e.get("event") == "sweep_pt" else None)
+        bd.events = [e for e in bd.events if e.get("event") != "sweep_pt"]
+    pts.sort()
+    rec = {"perch": perch, "duty": duty, "reply": r, "sweep": pts}
+    if pts:
+        f, i = np.array(pts).T
+        med = float(np.median(i))
+        peaks = [k for k in range(1, len(i) - 1) if i[k] >= i[k - 1] and i[k] > i[k + 1] and i[k] > med * 1.5]
+        rec["peaks"] = [(float(f[k]), float(i[k])) for k in peaks]
+        ctx.say(f"  perch {perch}: {len(pts)} points {f[0] / 1e3:.0f}-{f[-1] / 1e3:.0f} kHz at duty {duty}: "
+                f"{i.min() * 1e3:.2f}-{i.max() * 1e3:.2f} mA, median {med * 1e3:.2f}; peaks over 1.5 x median: "
+                + (", ".join(f"{f[k] / 1e3:.0f} kHz ({i[k] * 1e3:.2f} mA)" for k in peaks) or "none"))
+        png = ctx.out_dir() / f"{datetime.now():%H%M%S}_sweep{perch}{'_sim' if ctx.sim else ''}.png"
+        _plot(png, f"Perch {perch} sweep, duty {duty}", [(f"perch {perch}", f / 1e3, i * 1e3)], "kHz", "mA",
+              marks=[(E.TOKEN_F[t] / 1e3, t) for t in ("owl", "cat")])
+        ctx.say(f"  plot: {png}")
+    ctx.save("sweep", rec)
+    return rec
+
+
 def step_console(ctx, line, timeout=10):
     """Any one console command, its reply and events printed."""
     with ctx.board() as bd:
@@ -770,5 +936,5 @@ STEPS = {
     "rails": step_rails, "capture": step_capture, "usb": step_usb, "flash": step_flash,
     "logic": step_logic, "leds": step_leds, "ledwalk": step_ledwalk, "coils": step_coils,
     "perch": step_perch, "tank": step_tank, "osc": step_osc, "tone": step_tone,
-    "console": step_console,
+    "audio": step_audio, "speaker": step_speaker, "sweep": step_sweep, "console": step_console,
 }

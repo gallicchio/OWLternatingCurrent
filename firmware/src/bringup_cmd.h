@@ -29,11 +29,13 @@
 #define BU_COIL_I_MAX_A     1.0f     /* refused if |duty| x V12 / R20 would pass this */
 #define BU_COIL_ABORT_A     1.5f     /* the mirror reading this stops the pulse at once */
 #define BU_PERCH_DUTY_MAX   0.1f
-#define BU_PERCH_MS_MAX     2000u
+#define BU_PERCH_MS_MAX     10000u   /* long enough to hold a scope probe on the coil */
 #define BU_PERCH_F_MIN_HZ   50000.0f
-#define BU_PERCH_F_MAX_HZ   450000.0f
+#define BU_PERCH_F_MAX_HZ   500000.0f /* the bring-up build's perch_set clamp (CMakeLists) */
 #define BU_PERCH_V5_MIN_V   4.5f
-#define BU_TONE_AMP_MAX     0.25f
+#define BU_TONE_AMP_MAX     1.0f     /* full scale: 3.3 Vpp x 1.1 into 8 ohm, 0.2 W (the real
+                                        firmware's ceiling is 0.25; the bench wants it loud) */
+#define BU_TONE_MS_MAX      20000u
 
 typedef struct {
     void (*out)(const char *json);                       /* one JSON object: one line out */
@@ -55,6 +57,8 @@ typedef struct {
     void (*bridges_off)(void);                           /* every bridge low, DRV8874s asleep, FAM_EN low */
     float (*perch_drive)(int perch, float freq_hz, float duty);   /* 0 or 1; FAM_EN on; the frequency set */
     void (*tone)(float hz, uint32_t ms, float amp);      /* blocks for ms (USB serviced), then silent */
+    void (*audio_dc)(float level);                       /* the audio PWM held at level 0..1 of full
+                                                            scale until the next call; < 0: off, pin low */
     bool (*osc)(uint32_t ms, float *pitch_hz, float *vol_hz);     /* false: an oscillator gave no edges */
     void (*chip_id)(char *buf, size_t n);                /* the unique ID, hex */
     void (*reboot)(bool bootsel);                        /* does not return on the board */

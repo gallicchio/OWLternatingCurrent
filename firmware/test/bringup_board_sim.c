@@ -282,6 +282,8 @@ static float s_perch_drive(int p, float f, float duty)
     return sim.perch_f;
 }
 
+static float sim_audio_dc = -1.0f;
+static void s_audio_dc(float level) { sim_audio_dc = level; }
 static void s_tone(float hz, uint32_t ms, float amp)
 {
     sim.tone_hz = hz;
@@ -315,6 +317,7 @@ const bringup_ops SIM_OPS = {
     .adc_read = s_adc_read, .mux_select = s_mux_select, .gpio_get = s_gpio_get, .i2c_init = s_i2c_init,
     .i2c_probe = s_i2c_probe, .i2c_read = s_i2c_read, .i2c_write = s_i2c_write, .drv_sleep = s_drv_sleep,
     .coil_drive = s_coil_drive, .bridges_off = s_bridges_off, .perch_drive = s_perch_drive, .tone = s_tone,
+    .audio_dc = s_audio_dc,
     .osc = s_osc, .chip_id = s_chip_id, .reboot = s_reboot,
 };
 

@@ -1,0 +1,21 @@
+{
+ "leds": [
+  {
+   "name": "PERCH_DOWN1",
+   "driver": 1,
+   "out": 15,
+   "delta_A": 0.0048574355
+  },
+  {
+   "name": "PERCH_DOWN0",
+   "driver": 1,
+   "out": 16,
+   "delta_A": 0.004894218999999998
+  }
+ ],
+ "median_A": 0.004875827249999999,
+ "step": "leds",
+ "time": "2026-11-08T21:58:24",
+ "simulated": false,
+ "warnings": []
+}

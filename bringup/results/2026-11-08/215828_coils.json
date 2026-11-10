@@ -1,0 +1,30 @@
+{
+ "coils": [
+  {
+   "ok": false,
+   "cmd": "coil",
+   "coil": "lev",
+   "duty": 0.08,
+   "ms": 200,
+   "ran_ms": 200.0,
+   "v12": 11.715,
+   "i_expected_A": 0.3661,
+   "i_mean_A": 0.1333,
+   "i_peak_A": 0.1643,
+   "i_off_A": 0.0041,
+   "i_before_A": 0.004,
+   "i_net_A": 0.1293,
+   "r_loop_ohm": 7.249,
+   "r_est_ohm": 7.049,
+   "nfault": false,
+   "pwm": "forward/brake, phase-correct, 100000 Hz",
+   "expected_ohm": 2.56
+  }
+ ],
+ "step": "coils",
+ "time": "2026-11-08T21:58:28",
+ "simulated": false,
+ "warnings": [
+  "lev:  coil 7.049 ohm against 2.56, nFAULT False"
+ ]
+}

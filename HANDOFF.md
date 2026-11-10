@@ -1,9 +1,114 @@
-# Handoff: what the next agent needs to know (written 2026-11-05, evening)
+# Handoff: what the next agent needs to know (written 2026-11-05, evening; updated 2026-11-08)
 
-This is for the agent who runs the bring-up with Jason on the morning of 2026-11-06.
-It records what the conversation established that isn't obvious from the code. Read
-[`BRINGUP.md`](BRINGUP.md) first: it's the procedure. This file holds the context
-around it.
+This is for the agent who runs the bring-up with Jason. It records what the conversations
+established that isn't obvious from the code. Read [`BRINGUP.md`](BRINGUP.md) first: it's
+the procedure. This file holds the context around it.
+
+**Keep it here, not in an agent's private memory.** Jason wants the bench state, the
+machine setup and every decision in the repo, where he and any agent can read it (Jason,
+2026-11-08). Update "Where the bench stands" at the end of each session.
+
+## Where the bench stands (2026-11-09, morning)
+
+Board 1 is on the bench PC `bell`, with the tree and the perch; board 2 is still
+sealed. Everything below up to 2026-11-09 16:45 is committed (Jason pushes).
+**Every number measured on the bench (masses, coil ohms, sense gain, thermal fits, IR
+readings, what worked and what failed) is in `bringup/MEASUREMENTS.md`.** Add new ones there.
+- **State now (12:10, 2026-11-09):** board 1 on, from the BK 9130's channel 1 set **by hand**
+  (12 V, 3 A; no serial cable yet). It runs `firmware/build-bell-next/owlternating.uf2`
+  (12:08), which starts in **`play`**: the demo mode for Friday, where every input lights its
+  own LEDs at once (`firmware/src/scenes.h`; `scene auto` gives the old show).
+  - The levitation loop is on and waiting. `g0_mm` is 9.5 by default now (`LEV_G0_BENCH_MM`).
+    `zp_range_mm` was set to 1.5 by hand so the bat floats at 8 mm or more; a reboot puts it
+    back to 2.0. The bat's eyes are on by default (`LEV_EYES_DEFAULT` 0.3): untested by eye.
+  - The thermal cutoff is on. The levitation coil's model now uses the bench-fitted
+    constants (`LEV_THERMAL_*`, REVB.md 1.11 finding 5).
+  - The SPELL button cycles three spells: ghost, wake, chirp. Tap threshold 0.19 g.
+  - The perch is still **turned round** (REVB.md 1.9).
+- **The eyes are OFF by default** (`LEV_EYES_DEFAULT` 0, flashed at 15:05). An IR reading
+  of 67 °C under the owl came while the model said under 50 (REVB.md 1.11 finding 9).
+  `lev eyes 0.3` turns them on by hand, only while someone watches with the IR camera.
+  The loop was left off.
+- **The new owl (2026-11-09, 14:40):** `gen/mech.py` `OWL_LIFT` is now 12.5 mm (was 14). The
+  bat weighs 4.70 g with its cap, 4.23 g without; 3.6 g was assumed. `print/out/owl.stl`
+  is rebuilt (`check.py` all OK). Built with the venv's Python and `--no-render`; this PC
+  has no display for OpenSCAD's renders, so `parts.png`, `foot.png` and `assembly.png` are
+  older renders (the two matplotlib cut-throughs were redrawn). When Jason has printed it,
+  glued its magnet and dropped the bat's cap (magnet taped to the PCB):
+  1. Regenerate the levitation tables: `python3 firmware/tools/gen_lev_tables.py`, then
+     rebuild and run the tests.
+  2. With the bat away: `lev cal zero`, then `save`.
+  3. `lev tune mass_g` to the bat's weight on a non-magnetic stand, then hover. The
+     model says it should float near 8.9 mm with no current.
+  4. Build's README line "bat floats 10.1 mm" assumes 3.6 g: ignore it.
+- **Only the no-pause prints exist now (2026-11-09, 16:30).** Jason printed `out/owl.stl`,
+  which was then the pause version (a sealed pocket, no slot), by mistake. The sealed
+  version is gone from the OpenSCAD source, `build.py` and `check.py`; `out/owl.stl`,
+  `out/bat_cap.stl` and `out/plate.stl` are now the slotted owl and the floorless cap
+  (byte-identical to the old `out/no_pause/` files), and `out/no_pause/` is deleted. Every
+  owl STL in the repo has the slot in its back.
+- **Next, with Jason at the bench:**
+  1. The Fluke settles the current question (REVB.md 1.11, findings 2 and 4): its ohms
+     across the levitation coil with the power and USB off, then its DC volts across
+     the coil during `run.py console coil lev 0.158 2000`.
+     - **Where:** the perch's socket J201, measured on its solder joints on the top.
+       Look down on the perch with PERCH upright, so the socket's two rows run across
+       below the word.
+     - As seen from above, PERCH upright:
+       ```
+       upper row:  15     13     11   9    7    5    3    1 (square)
+                   DOWN1  DOWN0  GND  GND  GND  GND  GND  HALL
+       lower row:  16     14     12   10    8     6    4    2
+                   LEV_A  LEV_A  GND  LEV_B LEV_B GND  5V   3.3V
+       ```
+     - Measured on 2026-11-09, pin 10 to 14: 3.24 Ω, against 2.56 designed (REVB.md 1.11, finding 5).
+  2. The 5-minute hover with the IR camera on the perch: `run.py console lev tune g0_mm
+     9.5`, `run.py console lev tune thermal_cut 0` (Jason asked for the cutoff off; it is
+     back on at reboot), then `python3 bringup/lev_watch.py 600 "..."`, which logs
+     `lev_thermo` once a second.
+  3. Then fix the model's constants from the fits (REVB.md 1.11 finding 4), and decide
+     what the levitation coil's limit should act on: the thermometer's reading, once its
+     absolute anchor is settled.
+- **Tools added today:**
+  - `bringup/coil_thermo.py sweep|heat|cool` drives the levitation coil from the console
+    and records the thermometer against the model.
+  - `lev tune thermal_cut 0|1`.
+  - `status` → `lev_thermo` gains `copper_C`, `ref_ohm`, `ref_C` and `cut`.
+- **Works:** the rails, all 47 LEDs (base, tree, the perch's downlights: 4.8-4.9 mA each
+  at duty 0.5), every I2C device, the speaker, the theremin, both tokens lighting
+  live, the levitation Hall sensor, the levitation coil (2.51 Ω), and **the bat hovers**
+  (201 s at most, at 7.5 mm and 0.33 A; each hover ends in the levitation coil's thermal
+  model, never in the loop; REVB.md 1.11). All eleven host test suites pass.
+- **Firmware changed tonight** (REVB.md 1.8, 1.11, 3.3): both cores from RAM (worst tick
+  322 µs to 20 µs), the `adc` fault as a rate, the ADC burst overlapping the control step,
+  64-bit coil deadlines (the loop was locked out from 2147.5 s of uptime), the bridge's
+  0.5 µs pulse loss compensated, the levitation coil's thermal limits (copper 80 °C,
+  board 50 °C), a constant-power speaker table (under 0.2 dB: the speaker's loudness
+  change is acoustic).
+- **Demo notes:** in a lit room the show sleeps (`scene night` forces it on). `fam live`
+  is the default. For the bat: `lev tune g0_mm 9.5`, `lev on`, bring it up from below
+  under the coil and let it go when it pulls.
+
+What's next, in order:
+1. **The bat floats too near the perch.** The zero-power gap is about 6.6 mm against the
+   8.5 mm designed: weigh the bat (3.6 g assumed); a second magnet in the owl, or a
+   lighter bat. Then make `g0_mm` the default, or let the firmware find the zero-power
+   gap itself.
+2. **The thermal model of the levitation coil ended every hover after 2-3 minutes,**
+   while Jason found the perch "warm, but not at all hot". The levitation coil now has
+   the copper-resistance thermometer (REVB.md 1.11; in the build above, not yet on the
+   board). Check on the board that `lev_thermo.calibrated` turns true early in a hover
+   and that `t_meas_C` agrees with an IR thermometer on the perch. Rev B: a temperature
+   sensor on the perch (a TMAG5273 instead of the DRV5055 gives one).
+3. **The bat's tilt and spin:** its centre of mass off its magnet (rev B); the pendulum
+   coils might damp the swing. Then the eyes (`lev eyes 0.3`) and the pendulum.
+4. **The BK 9130s' serial cables** (IT-E131, ordered by Jason), then `bk/test_bk.py`
+   against the 1.5 Ω resistors on channels 1 and 3.
+5. **Token reach** (after Friday): a series capacitor in each perch coil (REVB.md 1.8).
+6. **Theremin hand distance** and **the speaker's acoustic table**, after the owl and
+   bat, with Jason's free-text feedback.
+7. **A coin reads as a token in live mode;** **`main.c`'s float clock** loses resolution
+   over hours (8 ms at 18 h; the familiars' dither is 5 ms).
 
 ## The plan for the morning
 
@@ -23,7 +128,7 @@ around it.
 - **Records:** every step writes to `bringup/results/<date>/`. Commit them with the
   findings. Jason pushes himself; commit only when he asks.
 
-## The laptop (`feynman`)
+## The laptop (`feynman`), the original plan
 
 - **Network:** on 2026-11-05 it was on WiFi, 192.168.4.x. The instruments' addresses in
   lab-instrument-control's `AGENTS.md` are the *teaching bench's* (bench PC `bell`, LAN
@@ -58,6 +163,35 @@ around it.
   - pytest runs `bringup/test_bringup.py`; shapely is for `print/build.py`.
 - **lab-instrument-control** is at `~/mudd/lab-instrument-control` (or `$OWL_LAB`). Its
   rules apply: shared instruments, put back what you change, leave outputs off.
+
+## The bench PC (`bell`), where the bring-up actually runs
+
+Set up on 2026-11-06; the instruments' default addresses in `bench.py` are right here
+(LAN 192.168.8.x).
+- **Build:** `PATH=/usr/bin:$PATH python3 bringup/run.py build`, into
+  `firmware/build-bell/`. Xilinx Vitis's old cmake 3.3 and gcc 11 come first in the
+  login PATH and break `cmake --install`; apt's cmake 4.2 and gcc-arm-none-eabi 14.2 are
+  in `/usr/bin`.
+- **The diagnostic build:** `firmware/build-bell-diag/`, with `-DOWL_DIAG=1`
+  (firmware/README.md).
+- **Tools, called by full path** (`~/.local/bin` may not be on an agent shell's PATH):
+  - `~/.local/bin/picotool` v2.3.2 with libusb (`load`, `info`, `reboot` work), built in
+    `~/.local/build/picotool` from `firmware/build-bell/_deps/picotool-src`. It can't
+    open the running app's reset interface (no udev rule for 1209:0001): reach BOOTSEL
+    with the console's `reboot bootsel` instead.
+  - `~/.local/bin/probe-rs` 0.32.0, for SWD through the Debug Probe (serial
+    E66548545752B026, flashed to debugprobe v2.3.1 on 2026-11-06; probe-rs refuses the
+    1.0.x it shipped with). SWD and the UART aren't wired to the board yet.
+- **Python:** the venv `~/.local/venvs/owl` (system site packages plus pytest and
+  shapely).
+- **Ports:** the board's USB is `/dev/ttyACM1`; `/dev/ttyACM0` is the Debug Probe.
+- **Git:** an agent's shell here has no SSH agent, so it can commit but not push. Jason
+  pushes.
+- **Supplies:** `run.py --psu E3632A` drives an E3632A (15 V range, OCP at `--ocp`, default
+  3.5 A) for the levitation; the default is the E3646A's output 2. The BK 9130 is by hand
+  until its IT-E131 cables come.
+- **Levitation runs:** `python3 bringup/lev_watch.py SECONDS "what"` turns the loop on and
+  records it (`results/<date>/*_lev_try.json`).
 
 ## What has been tested, and what hasn't
 
@@ -117,11 +251,13 @@ around it.
 - **Jason has printed both plates** through 3DPrinterOS.
   - The pause version printed with no pause, so its owl's and cap's pockets are sealed
     with nothing inside: those two parts can't take magnets.
+  - (Since 2026-11-09 the pause version is gone from the repo: only the no-pause parts
+    are built, at `print/out/*.stl`.)
   - **The no-pause version looks fine; use it.** As of 2026-11-06 its stand-ins (the grey
     slab and pedestal) are still on and the magnets aren't in yet. The next steps are
     `print/README.md`'s "After printing", then "Magnets in" (two-part epoxy). After that,
     check the polarity before the epoxy cures.
-  - In `out/no_pause/magnets_in.png`, "bat" is the bat **circuit board**. The grey
+  - In `print/out/magnets_in.png`, "bat" is the bat **circuit board**. The grey
     pedestal under the printed cap is thrown away.
 
 ## Who's who

@@ -28,4 +28,8 @@ typedef struct {
 void voice_init(voice *v, float sample_hz);
 void voice_set(voice *v, float freq_hz, float amp);     /* amp is capped at AUDIO_VOLUME_CEILING */
 void voice_render(voice *v, float *out, int n);
+/* the speaker's equalisation: the amplitude factor that makes the electrical power into
+ * LS1 the same at freq_hz as at 1 kHz (bench, 2026-11-07).  voice_render applies it,
+ * after which the amplitude is still capped at AUDIO_VOLUME_CEILING */
+float voice_eq_gain(float freq_hz);
 float voice_sine(float cycles);                         /* the table, for the test */

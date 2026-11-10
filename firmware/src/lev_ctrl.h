@@ -112,6 +112,11 @@ typedef struct {
     float integ;                         /* N (the integral term's force) */
     float gref, gzp;                     /* m */
     float i_cmd, i_est, i_model;         /* A, lifting: asked for, believed now, what the last u makes */
+    float i_model_prev;                  /* what the u before it makes */
+    int u_lag;                           /* the bursts lev_step sees ran under the u from this many steps
+                                            before the last: 0 if each u is in force for the next
+                                            step's burst; 1 on the board since 2026-11-08 (rt.h: the
+                                            burst overlaps the step, the u applies after the burst) */
     float mean_i, ms_i, peak_i;
     float bbat;                          /* mT */
     uint32_t steady_ticks, sat_ticks, bad_ticks, flip_ticks, mirror_ticks;

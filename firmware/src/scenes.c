@@ -18,7 +18,7 @@
 static const char *const NAMES[SCENE_COUNT] = {
     [SCENE_ASLEEP] = "asleep", [SCENE_DUSK] = "dusk", [SCENE_NIGHT] = "night",
     [SCENE_FIREFLY] = "firefly", [SCENE_QUANTUM] = "quantum", [SCENE_FAMILIAR] = "familiar",
-    [SCENE_DAWN] = "dawn", [SCENE_THEREMIN] = "theremin",
+    [SCENE_DAWN] = "dawn", [SCENE_THEREMIN] = "theremin", [SCENE_PLAY] = "play",
 };
 
 const char *scene_name(scene_id id) { return (unsigned)id < SCENE_COUNT ? NAMES[id] : "?"; }
@@ -289,6 +289,192 @@ static void scene_theremin(scenes *s, const scene_inputs *in, float dt, float *f
         owl_eyes(f, o, 0.5f, look);
 }
 
+/* ---- play: every input lights its own LEDs at once (scenes.h) ------------------------ */
+#define PLAY_LOCK_MM   0.5f    /* locked: the gap within this of the set-point */
+#define PLAY_CATCH_MM  1.5f    /* catching: further off than this, or in the hold's first second */
+#define PLAY_LEV_WAIT 2
+#define PLAY_LEV_HOLD 3
+#define PLAY_LEV_LOST 4
+#define PLAY_LEV_FAULT 6
+
+static float approach(float x, float target, float rate_per_s, float dt)
+{
+    return x + clampf(target - x, -rate_per_s * dt, rate_per_s * dt);
+}
+
+static void scene_play(scenes *s, const scene_inputs *in, float dt, float *f)
+{
+    memset(f, 0, LED_COUNT * sizeof *f);
+    float t = s->t;
+    /* alive: the pumpkins glow like candles, bright enough to see in daylight */
+    for (int p = 0; p < LED_N_PUMPKIN; p++) {
+        int led = LED_GROUP_PUMPKIN[p];
+        f[led] = 0.5f + 0.1f * noise_fractal(s->seed[led], t * 0.7f, 3, 0.7f);
+    }
+    for (int o = 0; o < 3; o++)
+        owl_eyes(f, o, 0.25f, 0.0f);
+
+    /* the theremin: the arc fills from the moon with the pitch, the pumpkins rise with
+     * the volume, owls B and C look toward the moon or away */
+    s->th_level = approach(s->th_level, in->theremin_active ? 1.0f : 0.0f, in->theremin_active ? 6.0f : 2.0f, dt);
+    if (in->theremin_active) {
+        float k = clampf(dt / 0.06f, 0.0f, 1.0f);
+        s->pitch_s += (clampf(in->pitch01, 0.0f, 1.0f) - s->pitch_s) * k;
+        s->vol_s += (clampf(in->volume01, 0.0f, 1.0f) - s->vol_s) * k;
+    }
+    if (s->th_level > 0.0f) {
+        float n = s->pitch_s * (float)LED_N_STAR;
+        for (int j = 0; j < LED_N_STAR; j++) {
+            int star = SCENE_MOON_STAR >= LED_N_STAR / 2 ? SCENE_MOON_STAR - j : SCENE_MOON_STAR + j;
+            if (star >= 0 && star < LED_N_STAR)
+                f[LED_GROUP_STAR[star]] = s->th_level * clampf(n - (float)j, 0.0f, 1.0f);
+        }
+        for (int p = 0; p < LED_N_PUMPKIN; p++) {
+            int led = LED_GROUP_PUMPKIN[p];
+            f[led] += s->th_level * s->vol_s * (1.0f - f[led]);
+        }
+        float look = (2.0f * s->pitch_s - 1.0f) * (SCENE_MOON_STAR >= LED_N_STAR / 2 ? 1.0f : -1.0f);
+        for (int o = 1; o < 3; o++)
+            owl_eyes(f, o, 0.25f + 0.75f * s->th_level, look);
+    }
+
+    /* shading the light sensor (a hand over it): owls B and C wake, the tree's stars come
+     * out.  Against a slow mean, with hysteresis; the mean holds while shaded, so the
+     * tree's own light near the sensor cannot end it */
+    if (in->lux >= 0.0f) {
+        if (s->lux_slow <= 0.0f)
+            s->lux_slow = in->lux;
+        if (!s->shaded)
+            s->lux_slow += (in->lux - s->lux_slow) * clampf(dt / 8.0f, 0.0f, 1.0f);
+        if (!s->shaded && s->lux_slow > 2.0f && in->lux < 0.4f * s->lux_slow)
+            s->shaded = true;
+        else if (s->shaded && (in->lux > 0.7f * s->lux_slow || s->lux_slow <= 2.0f))
+            s->shaded = false;
+    } else {
+        s->shaded = false;
+    }
+    s->shade = approach(s->shade, s->shaded ? 1.0f : 0.0f, 4.0f, dt);
+    if (s->shade > 0.0f) {
+        for (int o = 1; o < 3; o++) {
+            f[LED_GROUP_OWLEYE[2 * o]] = fmaxf(f[LED_GROUP_OWLEYE[2 * o]], s->shade);
+            f[LED_GROUP_OWLEYE[2 * o + 1]] = fmaxf(f[LED_GROUP_OWLEYE[2 * o + 1]], s->shade);
+        }
+        for (int k = 0; k < LED_N_TSTAR; k++)
+            f[LED_GROUP_TSTAR[k]] = fmaxf(f[LED_GROUP_TSTAR[k]], s->shade);
+        for (int k = 0; k < LED_N_TWISP; k++)
+            f[LED_GROUP_TWISP[k]] = fmaxf(f[LED_GROUP_TWISP[k]], 0.8f * s->shade);
+    }
+
+    /* a tap (or the third spell): a twinkle, each star flashing once at its own moment
+     * over 0.9 s (each flash 0.6 s, as fast as the no-step slew allows); a double tap
+     * twinkles the hill's and the tree's wisps too */
+    if (in->tap || in->double_tap || in->spell == 3) {
+        s->twinkle_t = 0.0f;
+        s->twinkle_wisps = in->double_tap ? 1.0f : 0.0f;
+    }
+    if (s->twinkle_t >= 0.0f) {
+        for (int k = 0; k < N_STARS_ALL + LED_N_WISP + LED_N_TWISP; k++) {
+            int led = k < N_STARS_ALL ? star_led(k)
+                    : k < N_STARS_ALL + LED_N_WISP ? LED_GROUP_WISP[k - N_STARS_ALL]
+                    : LED_GROUP_TWISP[k - N_STARS_ALL - LED_N_WISP];
+            if (k >= N_STARS_ALL && s->twinkle_wisps <= 0.0f)
+                break;
+            float delay = 0.9f * (float)(noise_hash(s->seed[led] + 77u) & 1023u) / 1023.0f;
+            float tau = s->twinkle_t - delay;
+            float l = clampf(1.0f - fabsf(tau - 0.3f) / 0.3f, 0.0f, 1.0f);
+            f[led] = fmaxf(f[led], l);
+        }
+        s->twinkle_t += dt;
+        if (s->twinkle_t > 1.6f)
+            s->twinkle_t = -1.0f;
+    }
+
+    /* the first spell: the quantum ghost runs along the arc, meets the wall and partly
+     * tunnels (quantum.h), for 6 s; the owls watch it */
+    if (in->spell == 1) {
+        quantum_params qp = quantum_default_params();
+        quantum_init(&s->q, &qp);
+        s->ghost_t = 0.0f;
+    }
+    if (s->ghost_t >= 0.0f) {
+        int steps = (int)(dt * (float)LED_FPS + 0.5f);
+        for (int i = 0; i < steps; i++)
+            quantum_step(&s->q);
+        float cells[QG_CELLS];
+        quantum_cells(&s->q, cells);
+        float env = smoothstepf(0.0f, 0.5f, s->ghost_t) * (1.0f - smoothstepf(5.0f, 6.0f, s->ghost_t));
+        for (int c = 0; c < QG_CELLS && c < LED_N_STAR; c++) {
+            float l = powf(clampf(cells[c] / 0.30f, 0.0f, 1.0f), 0.6f) * env;
+            f[LED_GROUP_STAR[c]] = fmaxf(f[LED_GROUP_STAR[c]], l);
+        }
+        float look = 2.0f * quantum_mean_x(&s->q) / (float)(QG_N - 1) - 1.0f;
+        for (int o = 1; o < 3; o++)
+            owl_eyes(f, o, fmaxf(0.25f, env), clampf(look, -1.0f, 1.0f));
+        s->ghost_t += dt;
+        if (s->ghost_t > 6.0f)
+            s->ghost_t = -1.0f;
+    }
+
+    /* the second spell: everything wakes at once and fades over two seconds */
+    if (in->spell == 2)
+        s->wake_t = 0.0f;
+    if (s->wake_t >= 0.0f) {
+        float env = s->wake_t < 0.3f ? s->wake_t / 0.3f : 1.0f - smoothstepf(0.5f, 2.5f, s->wake_t);
+        for (int i = 0; i < LED_COUNT; i++)
+            f[i] = fmaxf(f[i], env);
+        s->wake_t += dt;
+        if (s->wake_t > 2.5f)
+            s->wake_t = -1.0f;
+    }
+
+    /* the familiars' perches: each ring glows softly, turning slowly, to say "put a token
+     * here", dim enough that a token's own LEDs are the brightest thing there, and it
+     * shines through the token's board (its coil in silhouette).  A perch in live mode
+     * drives all the time and cannot tell whether a token is on it (familiar[] stays
+     * set), so the ring does not change with it (2026-11-09) */
+    static const uint8_t *const RING[2] = {LED_GROUP_OWLRING, LED_GROUP_CATRING};
+    for (int p = 0; p < 2; p++) {
+        s->ring_idle[p] = approach(s->ring_idle[p], 1.0f, 2.0f, dt);
+        for (int i = 0; i < 3; i++) {
+            float c = 0.5f + 0.5f * cosf(2.0f * PI * 0.25f * t - 2.0f * PI * (float)i / 3.0f);
+            f[RING[p][i]] = s->ring_idle[p] * (0.12f + 0.2f * c * c);
+        }
+    }
+
+    /* the bat: the perch's downlights show the loop, owl A's eyes the height */
+    if (in->lev_state != s->lev_prev) {
+        s->lev_prev = in->lev_state;
+        s->lev_t = 0.0f;
+    }
+    s->lev_t += dt;
+    float down = 0.0f;
+    switch (in->lev_state) {
+    case PLAY_LEV_WAIT:                                    /* breathing: ready for the bat */
+        down = 0.35f + 0.35f * (0.5f - 0.5f * cosf(2.0f * PI * s->lev_t / 2.0f));
+        break;
+    case PLAY_LEV_HOLD: {
+        float e = in->lev_err_mm;
+        bool catching = s->lev_t < 1.0f || fabsf(e) > PLAY_CATCH_MM;
+        /* catching: a quick pulse (2.5 Hz, inside the engine's no-step slew); locked: steady */
+        down = catching ? 0.8f + 0.2f * cosf(2.0f * PI * 2.5f * s->lev_t) : 1.0f;
+        float off = clampf((fabsf(e) - PLAY_LOCK_MM) / 1.5f, 0.0f, 1.0f);
+        float l = fabsf(e) <= PLAY_LOCK_MM ? 0.35f : 0.35f + 0.65f * off;
+        f[LED_GROUP_OWLEYE[0]] = e < -PLAY_LOCK_MM || fabsf(e) <= PLAY_LOCK_MM ? l : 0.0f;   /* too close: left */
+        f[LED_GROUP_OWLEYE[1]] = e > PLAY_LOCK_MM || fabsf(e) <= PLAY_LOCK_MM ? l : 0.0f;    /* too far: right */
+        break;
+    }
+    case PLAY_LEV_LOST:
+    case PLAY_LEV_FAULT:                                   /* three pulses, then dark */
+        if (s->lev_t < 2.0f)
+            down = 0.5f - 0.5f * cosf(2.0f * PI * 1.5f * s->lev_t);
+        break;
+    default:
+        break;
+    }
+    for (int k = 0; k < LED_N_PERCH_DOWN; k++)
+        f[LED_GROUP_PERCH_DOWN[k]] = fmaxf(f[LED_GROUP_PERCH_DOWN[k]], down);
+}
+
 static void render(scenes *s, scene_id id, float t, const scene_inputs *in, float *f)
 {
     float dt = in->dt_s;
@@ -301,6 +487,7 @@ static void render(scenes *s, scene_id id, float t, const scene_inputs *in, floa
     case SCENE_FAMILIAR: ambient(s, f); break;          /* the rings are an overlay */
     case SCENE_DAWN: scene_dawn(s, t, f); break;
     case SCENE_THEREMIN: scene_theremin(s, in, dt, f); break;
+    case SCENE_PLAY: scene_play(s, in, dt, f); break;
     default: memset(f, 0, LED_COUNT * sizeof *f); break;
     }
 }
@@ -365,6 +552,7 @@ void scenes_init(scenes *s, uint32_t seed)
     s->twisp.u = 1.5f;
     s->twisp.seed = rng_next(&s->rng);
     s->ring_t[0] = s->ring_t[1] = -1.0f;
+    s->twinkle_t = s->ghost_t = s->wake_t = -1.0f;
     s->choice = -1;
     s->dark = false;
     s->cur = s->prev = SCENE_ASLEEP;
@@ -465,7 +653,7 @@ static void overlays(scenes *s, const scene_inputs *in, float *f)
     float dt = in->dt_s;
     /* a familiar on a perch: its ring swirls, then glows */
     static const uint8_t *const RING[2] = {LED_GROUP_OWLRING, LED_GROUP_CATRING};
-    for (int p = 0; p < 2; p++) {
+    for (int p = 0; p < 2 && s->cur != SCENE_PLAY; p++) {   /* play draws its own rings */
         bool present = in->familiar[p] != FAMILIAR_NONE || s->cur == SCENE_FAMILIAR;
         if (present)
             s->ring_t[p] = s->ring_t[p] < 0.0f ? 0.0f : s->ring_t[p] + dt;
@@ -500,8 +688,8 @@ static void overlays(scenes *s, const scene_inputs *in, float *f)
         if (0.85f * env > f[led])
             f[led] = 0.85f * env;
     }
-    /* the floating bat's downlights, faded over a second */
-    float want = in->lev_holding ? (s->cur == SCENE_ASLEEP ? 0.12f : 0.3f) : 0.0f;
+    /* the floating bat's downlights, faded over a second (play draws its own) */
+    float want = in->lev_holding && s->cur != SCENE_PLAY ? (s->cur == SCENE_ASLEEP ? 0.12f : 0.3f) : 0.0f;
     s->downlight += clampf(want - s->downlight, -0.3f * dt, 0.3f * dt);
     for (int k = 0; k < LED_N_PERCH_DOWN; k++)
         if (s->downlight > f[LED_GROUP_PERCH_DOWN[k]])

@@ -2,18 +2,29 @@
  *
  * A 10 kHz tick (CTRL_TICK_HZ) from PWM slice PWM_SLICE_TICK, phase-locked to the
  * levitation coil's PWM (both started together through the PWM block's EN register,
- * the tick's period a whole number of the coil's).  Each tick:
- *   1. the tick's wrap interrupt starts an ADC burst: round robin over ADC0 (the
- *      Hall sensor), ADC1 (the levitation coil's IPROPI) and ADC2 (the multiplexer),
- *      ADC_OVERSAMPLE times each, 24 conversions in 48 us, collected by DMA.  It
- *      starts at the same point of the coil's PWM period every time (the period's
- *      start: the centre of the forward pulse), so the PWM ripple lands in the
- *      averages the same way every tick;
- *   2. the DMA's completion interrupt: the averages; the multiplexer moves on to its
- *      next channel (each of the eight is read every 0.8 ms, settling for 50 us);
- *      the rails and the safety checks; the levitation controller (lev_ctrl.h); the
- *      pendulum coils' requests from core 0; the coils' PWM; at 1 kHz the coils'
- *      thermal models.
+ * the tick's period a whole number of the coil's).  Each tick's wrap interrupt:
+ *   1. starts an ADC burst: round robin over ADC0 (the Hall sensor), ADC1 (the
+ *      levitation coil's IPROPI) and ADC2 (the multiplexer), ADC_OVERSAMPLE times each,
+ *      24 conversions in 48 us, collected by DMA into one of two buffers.  It starts at
+ *      the same point of the coil's PWM period every time (the period's start: the
+ *      centre of the forward pulse), so the PWM ripple lands in the averages the same
+ *      way every tick;
+ *   2. then, while that burst converts, does the tick's work on the previous burst (the
+ *      other buffer): the averages; the rails and the safety checks; the levitation
+ *      controller (lev_ctrl.h); the pendulum coils' requests from core 0; the coils'
+ *      PWM; at 1 kHz the coils' thermal models.  So the work has the whole 100 us
+ *      period, not the 52 us the burst leaves (until 2026-11-08 it ran after the burst).
+ * The burst's DMA completion (a higher priority, and short) stops the ADC, moves the
+ * multiplexer on to its next channel, which then settles for the rest of the period (each
+ * of the eight is read every 0.8 ms), and applies the PWM the work computed: so each burst
+ * runs under one u, the one from the tick before the work that reads it (lev_ctrl.u_lag).
+ * From a burst's middle to its PWM the delay is about 125 us (40-75 us before): 1.2 degrees
+ * more phase lag at 40 Hz, 0.3 at the levitation's 10 Hz.
+ *
+ * Skipped ticks ("overruns": the tick handled so late that wraps went by) are counted;
+ * RT_FAULT_ADC is their rate (RT_ADC_FAULT_FRACTION over a second), not their number.
+ * A pause longer than RT_PAUSE_US is core 1 parked by a flash write, counted apart.
+ * The whole image runs from RAM (copy_to_ram): no flash cache misses in the tick.
  *
  * Safety, here because it must not wait for core 0:
  *   - no coil runs without 12 V (V12_PRESENT_V to start, V12_BROWNOUT_V stops all
@@ -48,6 +59,9 @@ enum {
 };
 #define RT_FAULT_NAMES {"nfault", "brownout", "overcurrent", "thermal", "open_coil", "adc", "watchdog_reset", "latched_off"}
 
+#define RT_ADC_FAULT_FRACTION 0.01f  /* [CHOICE] more than 1 % of a second's ticks skipped (or conversions failed) */
+#define RT_PAUSE_US         5000u   /* [CHOICE] a gap between ticks this long is a pause, not an overrun */
+
 enum { RT_OWNER_NONE = 0, RT_OWNER_PEND, RT_OWNER_FILM, RT_OWNER_CONSOLE };
 
 #define LEV_EYES_MAX 0.8f   /* [CHOICE] the carrier's share of each period at most (0.4 each way).
@@ -69,7 +83,13 @@ typedef struct {
     volatile bool carrier_on;
     volatile uint16_t raw_adc[3], raw_mux[8];  /* the last averages, ADC counts (raw_adc by ADC_SLOT_*) */
     volatile uint32_t nfault_events;
-    volatile uint32_t tick_cycles_max;         /* the longest tick's work, in clk_sys cycles */
+    volatile uint32_t tick_cycles_max;         /* the longest tick's work (control()), in us */
+    volatile uint32_t skipped_last_s;          /* overruns in the last whole second */
+    volatile uint32_t pauses;                  /* core 1 parked (a flash write) */
+    volatile float lev_r_meas_ohm;             /* the levitation coil's last V/I reading (rt.c 6b) */
+    volatile uint32_t lev_r_readings;
+    volatile bool thermal_cut_off;             /* `lev tune thermal_cut 0`: no thermal derate or
+                                                  fault on any coil until reboot (bench only) */          /* how many it has taken */
     /* written by core 0 */
     volatile float ambient_C;                  /* the board's temperature, for the thermal models */
     volatile float lev_eyes;                   /* 0..1: the 80 kHz carrier for the bat's eyes */

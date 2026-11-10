@@ -44,6 +44,10 @@ DEFAULTS = {
     # which only asks *IDN?). Give the /dev/serial/by-id/... path to skip the search.
     "supply_serial": None,
     "supply_output": 2,
+    # Which supply: "E3646A" (output 2, its 20 V range: 1.5 A at most) or "E3632A" (one
+    # output, its 15 V range: 7 A, with OCP at supply_ocp). The levitation needs the E3632A.
+    "supply_model": "E3646A",
+    "supply_ocp": 3.5,
     # The scope: an IP address, or "usb" for USBTMC.
     "scope": "192.168.8.203",
     "scope_probe": 10,          # the attenuation of the probes on the rails (x10)
@@ -88,14 +92,18 @@ class AbortStep(RuntimeError):
 # ---- the supply ------------------------------------------------------------------------
 class Supply:
     """The board's 12 V: one output of an E3646A (`ps`, lab-instrument-control's
-    AgilentE36xxA), on its 20 V range (1.5 A at most)."""
+    AgilentE36xxA) on its 20 V range (1.5 A at most), or an E3632A's on its 15 V range
+    (7 A, with over-current protection at `ocp`)."""
 
-    def __init__(self, ps, out=2):
+    def __init__(self, ps, out=2, ocp=None):
         self.ps, self.out = ps, out
         self.other = 1 if out == 2 else 2
         self.idn = ps.idn
         self.i_zero = 0.0
         self._keep_on = False
+        self.ocp = ocp
+        # the range used and the most current it gives
+        self.range, self.i_max = ("LOW", 7.0) if ps.model == "E3632A" else ("HIGH", 1.5)
 
     def prepare(self, ovp=None):
         """Output off; both outputs at 0 V; ours on the high range with OVP at `ovp`; the
@@ -104,11 +112,13 @@ class Supply:
         if self.ps.outputs > 1:
             self.ps.set_range("LOW", out=self.other)
             self.ps.set(0.0, 0.02, out=self.other)
-        self.ps.set_range("HIGH", out=self.out)
+        self.ps.set_range(self.range, out=self.out)
         self.ps.set(0.0, 0.02, out=self.out)
         if ovp is not None:
             self.ps.clear_trips(out=self.out)
             self.ps.set_ovp(ovp, True, out=self.out)
+        if self.ps.has_ocp and self.ocp is not None:
+            self.ps.set_ocp(self.ocp, True)
 
     def set(self, volts, amps):
         return self.ps.set(volts, amps, out=self.out)
@@ -158,22 +168,28 @@ class Supply:
             self.ps.close()
 
 
-def find_e3646a():
-    """The /dev/serial/by-id path of the first E3646A among the RS-232 adapters."""
+def find_e3646a(model="E3646A"):
+    """The /dev/serial/by-id path of the first supply of this model among the RS-232
+    adapters."""
     _lab(".")
     import scpi_link
     for r in scpi_link.identify_serial_ports(listen=0.5, sweep=False):
-        if r.get("idn") and "E3646A" in r["idn"]:
+        if r.get("idn") and model in r["idn"]:
             return r["port"]
-    raise IOError("no E3646A answered on any RS-232 adapter (is it set to RS-232, 9600 8N? "
+    raise IOError(f"no {model} answered on any RS-232 adapter (is it set to RS-232, 9600 8N? "
                   "lab-instrument-control/hp/hp.md)")
 
 
 def open_supply(cfg):
     _lab("hp")
     from agilent_E36xxA import AgilentE36xxA
-    port = cfg["supply_serial"] or find_e3646a()
-    return Supply(AgilentE36xxA(serial=port), out=int(cfg["supply_output"]))
+    model = cfg.get("supply_model") or "E3646A"
+    port = cfg["supply_serial"] or find_e3646a(model)
+    ps = AgilentE36xxA(serial=port)
+    if model not in ps.idn:
+        raise IOError(f"{port} is {ps.idn!r}, not the {model} asked for")
+    out = 1 if ps.outputs == 1 else int(cfg["supply_output"])
+    return Supply(ps, out=out, ocp=cfg.get("supply_ocp"))
 
 
 # ---- the scope -------------------------------------------------------------------------

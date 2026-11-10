@@ -4,12 +4,12 @@
   1. out/params.scad, out/shapes.scad   - numbers (gen/mech.py + design.py) and shapes
   2. OpenSCAD -> the parts' meshes        - owl, cap, foot, and the two breakaway stand-ins
   3. out/owl.stl, out/bat_cap.stl, out/foot.stl   - print-ready, one part each
-     out/plate.stl                                - the whole plate as one STL (add the pause)
+     out/plate.stl                                - the whole plate as one STL
      out/assembled/*_frame.stl                    - the bare parts in their boards' frames
-     out/no_pause/                                - the same plate with no pause: the owl's
-                                                    pocket opens out of its back, the cap's
-                                                    has no floor; magnets glued in afterwards
-  4. out/*.png, out/no_pause/*.png        - renders, sections, the pause layer
+     No pause: the owl's pocket opens out of its back as a slot, the cap's has no floor,
+     and both magnets are glued in after printing.  (The sealed, pause-printed version
+     was removed on 2026-11-09, so that every owl.stl here has the slot.)
+  4. out/*.png                            - renders and sections
   5. check.py                             - re-measures the meshes against mech.py
   6. README.md's numbers block            - from the same numbers
 
@@ -32,7 +32,6 @@ import mech as M            # noqa: E402
 import meshtools as mt      # noqa: E402
 
 OUT = os.path.join(HERE, "out")
-OPEN_OUT = os.path.join(OUT, "no_pause")
 REF = os.path.join(OUT, "assembled")
 BUILD = os.path.join(HERE, "build")
 SCAD = os.path.join(HERE, "owlternating.scad")
@@ -147,9 +146,7 @@ def build_meshes(parallel):
             (os.path.join(BUILD, "owl_standin.stl"), "owl_standin", []),
             (os.path.join(REF, "bat_cap_in_bat_frame.stl"), "cap", []),
             (os.path.join(BUILD, "cap_pedestal.stl"), "cap_pedestal", []),
-            (os.path.join(BUILD, "foot.stl"), "foot", []),
-            (os.path.join(BUILD, "owl_open.stl"), "owl", ["-D", "OPEN=true"]),
-            (os.path.join(BUILD, "cap_open.stl"), "cap", ["-D", "OPEN=true"])]
+            (os.path.join(BUILD, "foot.stl"), "foot", [])]
     openscad_jobs(jobs, parallel)
 
 
@@ -167,11 +164,6 @@ def compose():
     cap_p = mt.translate(cap, (0, 0, D.CAP_Z0))
     mt.write_stl(os.path.join(OUT, "foot.stl"), foot, "foot (print four)")
     plate = write_plate(OUT, owl_p, cap_p, slab, ped, foot)
-    # the no-pause version: the same plate, the owl and cap with open pockets
-    owl_open = mt.read_stl(os.path.join(BUILD, "owl_open.stl"))
-    cap_open = mt.read_stl(os.path.join(BUILD, "cap_open.stl"))
-    write_plate(OPEN_OUT, mt.translate(owl_open, (0, 0, D.OWL_Z0)), mt.translate(cap_open, (0, 0, D.CAP_Z0)),
-                slab, ped, foot)
     # render helpers (not committed)
     feet = np.concatenate([mt.translate(foot, D.PLATE["foot%d" % i] + (0.0,)) for i in range(1, 5)])
     mt.write_stl(os.path.join(BUILD, "plate_feet.stl"), feet)
@@ -180,8 +172,7 @@ def compose():
     mt.write_stl(os.path.join(BUILD, "plate_standins.stl"),
                  np.concatenate([mt.translate(slab, D.PLATE["owl"] + (0.0,)),
                                  mt.translate(ped, D.PLATE["bat_cap"] + (0.0,))]))
-    return dict(owl=owl, cap=cap, slab=slab, ped=ped, foot=foot, plate=plate,
-                owl_open=owl_open, cap_open=cap_open)
+    return dict(owl=owl, cap=cap, slab=slab, ped=ped, foot=foot, plate=plate)
 
 
 def write_plate(out, owl_p, cap_p, slab, ped, foot):
@@ -213,15 +204,13 @@ VIEWS = [  # (file, PART, camera eye+centre, size, fit to view)
     ("build/v_foot_q.png", "view_foot", (-24, -30, 26, 0, 0, 4), (900, 900), True),
     ("build/v_foot_low.png", "view_foot", (-28, -34, 4, 0, 0, 4.5), (900, 900), True),
     ("build/v_plate.png", "view_plate", (-55, -190, 150, 0, -4, 6), (1600, 1200), False),
-    ("build/v_plate_paused.png", "view_plate_paused", (-45, -165, 140, 0, -2, 6), (1600, 1200), False),
     ("build/v_levitation.png", "view_levitation", (-75, -110, 40, 0, 0, 2), (1200, 1300), True),
     ("build/v_owl_on_perch.png", "view_owl_on_perch", (-60, -95, 55, 0, 6, 6), (1200, 1300), True),
     ("build/v_cap_on_bat.png", "view_cap_on_bat", (-45, -70, 55, 0, 0, 0), (1200, 1300), True),
-    ("build/v_open_owl_back.png", "view_owl_open", (40, 85, 28, 0, 0, 13), (900, 900), True),
-    ("build/v_open_cap_below.png", "view_cap_open", (-20, -26, -34, 0, 0, 0), (900, 900), True),
+    ("build/v_open_owl_back.png", "view_owl", (40, 85, 28, 0, 0, 13), (900, 900), True),
+    ("build/v_open_cap_below.png", "view_cap", (-20, -26, -34, 0, 0, 0), (900, 900), True),
 ]
-CUTS = [("build/owl_cut.stl", "owl_cut"), ("build/cap_cut.stl", "cap_cut"),
-        ("build/paused_owl.stl", "paused_owl"), ("build/paused_cap.stl", "paused_cap")]
+CUTS = [("build/owl_cut.stl", "owl_cut"), ("build/cap_cut.stl", "cap_cut")]
 
 
 def render_views(parallel):
@@ -336,7 +325,7 @@ def sections(meshes):
     ax.annotate("wing-arm flexes\n%.1f mm out to snap on\n(%.1f %% strain)" % (D.owl_arm_snap()["deflection"],
                 100 * D.owl_arm_snap()["strain"]), xy=(D.OWL_ARM_IN + 0.5, 4.5), xytext=(21, 9),
                 fontsize=8, arrowprops=dict(arrowstyle="->", lw=0.7))
-    ax.annotate("sealed pocket %.2f x %.1f\nclosed at the pause" % (M.POCKET_D, D.POCKET_DEPTH),
+    ax.annotate("pocket %.2f x %.1f, a slot\nout through the owl's back" % (M.POCKET_D, D.OPEN_GAP_T),
                 xy=(-4, D.OWL_FLOOR + D.POCKET_DEPTH - 0.1), xytext=(-27, 22), fontsize=8,
                 arrowprops=dict(arrowstyle="->", lw=0.7))
     ax.annotate("hollow base: only a rim\nsits on the coil", xy=(-6, 2.5), xytext=(-29, 8), fontsize=8,
@@ -368,7 +357,8 @@ def sections(meshes):
     ax = fig.add_subplot(gs[1, :2])
     fill_section(ax, meshes["cap"], 0, 0.0, fc=C["cap"], ec="#4a2a80", lw=0.6)
     ax.add_patch(Rectangle((M.BAT_HEAD_Y, -M.PCB_T), M.BAT_TAIL_Y - M.BAT_HEAD_Y, M.PCB_T, fc=C["board"], ec="none"))
-    ax.add_patch(Rectangle((-M.MAGNET_D / 2, D.CAP_FLOOR_T), M.MAGNET_D, M.MAGNET_T, fc=C["mag"], ec="#555"))
+    ax.add_patch(Rectangle((-M.MAGNET_D / 2, D.CAP_OPEN_DEPTH - M.MAGNET_T), M.MAGNET_D, M.MAGNET_T,
+                           fc=C["mag"], ec="#555"))
     ax.text(0, -0.8, "bat, %.1f mm: head edge y = %g, tail edge y = %g" % (M.PCB_T, M.BAT_HEAD_Y, M.BAT_TAIL_Y),
             color="white", fontsize=8, ha="center", va="center")
     for yt, ye in ((D.CAP_HEAD_LIP_TIP, M.BAT_HEAD_Y), (D.CAP_TAIL_LIP_TIP, M.BAT_TAIL_Y)):
@@ -380,7 +370,7 @@ def sections(meshes):
                    100 * max(hk["tail"]["strain_arm"], hk["head"]["strain_arm"])),
                 xy=(-9.5, D.CAP_ARM_RAISE + D.CAP_ARM_T), xytext=(-16, 7.2), fontsize=8,
                 arrowprops=dict(arrowstyle="->", lw=0.7))
-    ax.annotate("magnet on a %.1f floor,\nsealed in at the pause" % D.CAP_FLOOR_T, xy=(3.5, 1.4),
+    ax.annotate("no floor: the magnet sits\nagainst the roof, glued", xy=(3.5, 1.4),
                 xytext=(7.5, 6.6), fontsize=8, arrowprops=dict(arrowstyle="->", lw=0.7))
     ax.set_title("Bat cap on the bat, cut along the body (x = 0); head to the left", fontsize=11)
     ax.set_xlim(-18, 18); ax.set_ylim(-4.5, 9); ax.set_aspect("equal"); ax.grid(alpha=0.25)
@@ -395,43 +385,6 @@ def sections(meshes):
     plt.close(fig)
 
 
-def pause_picture(meshes):
-    """out/pause_layer.png: the last layer before the pause, seen from above."""
-    import numpy as np
-    import matplotlib
-    matplotlib.use("Agg")
-    import matplotlib.pyplot as plt
-    plate = meshes["plate"]
-    z = D.PAUSE_Z - D.LAYER / 2
-    xs = np.arange(-70, 70, 0.1)
-    ys = np.arange(-45, 40, 0.1)
-    g = mt.raster(mt.plane_segments(plate, 2, z), xs, ys)
-    g2 = mt.raster(mt.plane_segments(plate, 2, z + D.LAYER), xs, ys)
-    foot = np.zeros_like(g)
-    for zz in (0.1, 1.1, 2.9, 5.0, 8.0, 12.0, 15.0):          # the plate's footprint, for context
-        foot |= mt.raster(mt.plane_segments(plate, 2, zz), xs, ys)
-    img = np.ones(g.shape + (3,))
-    img[foot] = (0.86, 0.86, 0.88)
-    img[g] = (0.82, 0.54, 0.24)
-    img[g & ~g2] = (0.95, 0.80, 0.55)
-    fig, ax = plt.subplots(figsize=(11, 7))
-    ax.imshow(img, origin="lower", extent=(xs[0], xs[-1], ys[0], ys[-1]))
-    for name in ("owl", "bat_cap"):
-        cx, cy = D.PLATE[name]
-        ax.add_patch(plt.Circle((cx, cy), M.MAGNET_D / 2, fc=(0.6, 0.63, 0.7), ec="k", lw=0.8))
-        ax.text(cx, cy, "magnet\nhere", ha="center", va="center", fontsize=8)
-    ax.set_title("Pause before layer %d (%.2f mm): this is layer %d (%.2f mm), the last one printed with the "
-                 "pockets open.\nDrop one magnet in each pocket, same face up (see README), then resume."
-                 % (D.PAUSE_LAYER, D.PAUSE_LAYER_TOP, D.PAUSE_LAYER - 1, D.PAUSE_Z), fontsize=10)
-    ax.set_xlabel("bed x (mm, from the plate's centre)"); ax.set_ylabel("bed y (mm)")
-    ax.text(D.PLATE["owl"][0], D.PLATE["owl"][1] - 20, "owl", ha="center", fontsize=10)
-    ax.text(D.PLATE["bat_cap"][0], D.PLATE["bat_cap"][1] - 22, "bat cap\n(on its pedestal)", ha="center", fontsize=10)
-    ax.text(0, D.PLATE["foot1"][1] - 9, "feet (finished long before the pause; grey: lower parts)", ha="center",
-            fontsize=9, color="#555")
-    fig.savefig(os.path.join(OUT, "pause_layer.png"), dpi=110, bbox_inches="tight")
-    plt.close(fig)
-
-
 def pictures(parallel, meshes):
     render_views(parallel)
     montage(os.path.join(OUT, "owl.png"),
@@ -441,14 +394,13 @@ def pictures(parallel, meshes):
     montage(os.path.join(OUT, "bat_cap.png"),
             ["build/v_cap_q.png", "build/v_cap_front.png", "build/v_cap_below.png"],
             ["three-quarter", "front (ears toward the head)", "below: floor, lips"], cols=3,
-            title="The bat cap: seals the bat's magnet and hooks under its head and tail")
+            title="The bat cap: holds the bat's magnet and hooks under its head and tail")
     montage(os.path.join(OUT, "foot.png"), ["build/v_foot_q.png", "build/v_foot_low.png"],
             ["pumpkin foot", "split, barbed peg"], cols=2,
             title="A foot (print four): snaps into a %.1f mm hole in the base" % M.FOOT_HOLE_D)
-    montage(os.path.join(OUT, "plate.png"), ["build/v_plate.png", "build/v_plate_paused.png"],
-            ["the plate as printed (grey: breakaway stand-ins)",
-             "at the pause (%.2f mm): both pockets open" % D.PAUSE_Z], cols=2,
-            title="One plate, PLA, no supports, one pause before layer %d (%.2f mm)" % (D.PAUSE_LAYER, D.PAUSE_LAYER_TOP))
+    montage(os.path.join(OUT, "plate.png"), ["build/v_plate.png"],
+            ["the plate as printed (grey: breakaway stand-ins)"], cols=1,
+            title="One plate, PLA, no supports, no pause")
     montage(os.path.join(OUT, "assembly.png"),
             ["build/v_levitation.png", "build/v_owl_on_perch.png", "build/v_cap_on_bat.png"],
             ["cut away: both magnets red (north) up; the bat floats %.1f mm under the perch"
@@ -456,17 +408,16 @@ def pictures(parallel, meshes):
              "the cap hooks under the bat's head and tail"], cols=3,
             title="Assembly check (boards drawn from gen/mech.py; the bat's outline is schematic)")
     sections(meshes)
-    pause_picture(meshes)
     open_sections(meshes)
-    montage(os.path.join(OPEN_OUT, "parts.png"),
+    montage(os.path.join(OUT, "parts.png"),
             ["build/v_open_owl_back.png", "build/v_open_cap_below.png"],
             ["owl from behind: the magnet slides in flat through the slot",
              "bat cap from below: no floor; the bat closes the pocket"], cols=2,
-            title="No pause: the magnets go in after printing, glued in with epoxy")
+            title="The magnets go in after printing, glued in with epoxy")
 
 
 def open_sections(meshes):
-    """out/no_pause/magnets_in.png: where each magnet and the epoxy go, cut through."""
+    """out/magnets_in.png: where each magnet and the epoxy go, cut through."""
     import matplotlib
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
@@ -481,7 +432,7 @@ def open_sections(meshes):
                            fc=C["sil"], ec="none"))
     ax.add_patch(Rectangle((y_mag, D.OWL_FLOOR + M.MAGNET_T), M.MAGNET_D, D.OPEN_GAP_T - M.MAGNET_T,
                            fc=C["sil"], ec="none"))
-    fill_section(ax, meshes["owl_open"], 0, 0.0, fc=C["owl"], ec="#7a4a12", lw=0.6)
+    fill_section(ax, meshes["owl"], 0, 0.0, fc=C["owl"], ec="#7a4a12", lw=0.6)
     ax.add_patch(Rectangle((-14, -M.PCB_T), 28, M.PCB_T, fc=C["board"], ec="none"))
     ax.add_patch(Rectangle((y_mag, D.OWL_FLOOR), M.MAGNET_D, M.MAGNET_T, fc=C["mag"], ec="#555"))
     ax.text(y_mag + M.MAGNET_D / 2, D.OWL_FLOOR + 1.0, "magnet, dot up", ha="center", va="center", fontsize=8)
@@ -499,7 +450,7 @@ def open_sections(meshes):
     # the cap on the bat, cut along its body (x = 0)
     ax = axs[1]
     ax.add_patch(Rectangle((-D.POCKET_R, 0), 2 * D.POCKET_R, D.CAP_OPEN_DEPTH - M.MAGNET_T, fc=C["sil"], ec="none"))
-    fill_section(ax, meshes["cap_open"], 0, 0.0, fc=C["cap"], ec="#4a2a80", lw=0.6)
+    fill_section(ax, meshes["cap"], 0, 0.0, fc=C["cap"], ec="#4a2a80", lw=0.6)
     ax.add_patch(Rectangle((M.BAT_HEAD_Y, -M.PCB_T), M.BAT_TAIL_Y - M.BAT_HEAD_Y, M.PCB_T, fc=C["board"], ec="none"))
     ax.add_patch(Rectangle((-M.MAGNET_D / 2, D.CAP_OPEN_DEPTH - M.MAGNET_T), M.MAGNET_D, M.MAGNET_T,
                            fc=C["mag"], ec="#555"))
@@ -511,8 +462,8 @@ def open_sections(meshes):
     ax.set_title("Bat cap on the bat, cut along the body; head to the left", fontsize=11)
     ax.set_xlim(-16, 16); ax.set_ylim(-8, 8); ax.set_aspect("equal"); ax.grid(alpha=0.25)
     ax.set_xlabel("y (mm)"); ax.set_ylabel("z above the bat's top surface (mm)")
-    fig.suptitle("No pause: where the magnets and the epoxy (light blue) go", fontsize=12)
-    fig.savefig(os.path.join(OPEN_OUT, "magnets_in.png"), dpi=110, bbox_inches="tight")
+    fig.suptitle("Where the magnets and the epoxy (light blue) go", fontsize=12)
+    fig.savefig(os.path.join(OUT, "magnets_in.png"), dpi=110, bbox_inches="tight")
     plt.close(fig)
 
 

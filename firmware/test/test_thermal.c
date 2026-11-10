@@ -160,8 +160,44 @@ static void test_predictions(void)
     CHECK(i2 > 1.0f, "a cool coil should take 1 A for 2 s (got %.3f A)", i2);
 }
 
+/* The levitation coil's two limits (config.h): a second at a catch's 2.6 A spikes the
+ * copper but must not derate (the old single 45 C limit did, on the bench 2026-11-08);
+ * a steady load that warms the board past LEV_COIL_BOARD_LIMIT_C must stop the coil. */
+static void test_board_limit(void)
+{
+    thermal_params p;
+    thermal_default_params(&p);
+    p.r20_ohm = LEV_COIL_R20_OHM;
+    p.limit_C = LEV_COIL_SURFACE_LIMIT_C;
+    p.derate_from_C = LEV_COIL_DERATE_FROM_C;
+    p.board_limit_C = LEV_COIL_BOARD_LIMIT_C;
+    p.board_derate_from_C = LEV_COIL_BOARD_DERATE_C;
+    thermal_coil c;
+    thermal_init(&c, &p, AMB);
+    float min_d = 1.0f;
+    for (int k = 0; k < (int)(1.0f / DT); k++) {          /* one second at 2.6 A */
+        thermal_update(&c, DT, 2.6f * 2.6f, AMB);
+        float d = thermal_derate(&c);
+        if (d < min_d)
+            min_d = d;
+    }
+    printf("lev coil: 1 s at 2.6 A: copper %.1f C, board %.1f C, least derate %.2f\n", c.t_cu_C, c.t_board_C, min_d);
+    CHECK(min_d == 1.0f, "a 1 s catch at 2.6 A derated the lev coil (%.2f)", min_d);
+    thermal_init(&c, &p, AMB);
+    float t_stop = -1.0f;
+    for (int k = 0; k < (int)(600.0f / DT); k++) {       /* 0.8 A for up to 10 min */
+        thermal_update(&c, DT, (thermal_derate(&c) > 0.0f ? 0.8f * 0.8f : 0.0f), AMB);
+        if (thermal_derate(&c) <= 0.0f && t_stop < 0.0f)
+            t_stop = k * DT;
+    }
+    printf("lev coil: 0.8 A steady: board %.1f C, stopped at %.0f s\n", c.t_board_C, t_stop);
+    CHECK(t_stop > 0.0f, "0.8 A steady never stopped the lev coil (board %.1f C)", c.t_board_C);
+    CHECK(c.t_board_C <= LEV_COIL_BOARD_LIMIT_C + 0.5f, "the board passed its limit: %.1f C", c.t_board_C);
+}
+
 int main(void)
 {
+    test_board_limit();
     test_steady_state();
     test_derated_pulse_train();
     test_resistance_thermometer();

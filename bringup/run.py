@@ -33,6 +33,8 @@ def main(argv=None):
                     "audio: tone amplitudes; sweep: perch f0 f1 points")
     ap.add_argument("--config", help="bench.json to use")
     ap.add_argument("--supply", dest="supply_serial", help="the E3646A's serial port")
+    ap.add_argument("--psu", dest="supply_model", help="the supply: E3646A (default) or E3632A (the levitation's)")
+    ap.add_argument("--ocp", dest="supply_ocp", type=float, help="E3632A: over-current protection, A (default 3.5)")
     ap.add_argument("--output", dest="supply_output", type=int, help="the E3646A output with the board (default 2)")
     ap.add_argument("--scope", help="scope IP, or 'usb'")
     ap.add_argument("--gen", help="sdg:IP | 33220a:IP | 33120a:gpib:N | 33120a:serial:PORT | none")
@@ -56,7 +58,8 @@ def main(argv=None):
 
     gen = None if a.gen is None else (None if a.gen.lower() == "none" else a.gen)
     cfg = bench.load_config(a.config, supply_serial=a.supply_serial, supply_output=a.supply_output,
-                            scope=a.scope, dmm_serial=a.dmm_serial, board_port=a.board_port)
+                            scope=a.scope, dmm_serial=a.dmm_serial, board_port=a.board_port,
+                            supply_model=a.supply_model, supply_ocp=a.supply_ocp)
     if a.gen is not None:
         cfg["gen"] = gen
     simboard = None

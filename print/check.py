@@ -21,8 +21,8 @@ import meshtools as mt      # noqa: E402
 
 OUT = os.path.join(HERE, "out")
 EPS = 1e-3
-OPEN_BRIDGE_REACH = 5.5   # no-pause parts: the roof over an empty pocket is a ~10.5 mm bridge,
-                          # which PLA spans well; its middle is ~5.3 mm from any wall
+OPEN_BRIDGE_REACH = 5.5   # the roof over an empty pocket is a ~10.5 mm bridge, which PLA
+                          # spans well; its middle is ~5.3 mm from any wall
 
 
 class Checks:
@@ -80,24 +80,12 @@ def roof(body, c, d, top):
     return min(t)
 
 
-def pocket_of(void):
-    """Centre, flat-to-flat diameter, floor and top of a cylindrical sealed pocket."""
-    lo, hi = mt.bbox(void)
-    c = (lo + hi) / 2
-    zm = (lo[2] + hi[2]) / 2
-    r = []
-    for t in np.linspace(0, 2 * np.pi, 180, endpoint=False):
-        h = first_hit(void, (c[0], c[1], zm), (np.cos(t), np.sin(t), 0))
-        r.append(h)
-    return c, 2 * min(r), lo[2], hi[2]
-
-
 # ------------------------------------------------------------------ the owl
 def check_owl(C, tris):
     solids, voids = shells(tris)
-    C.add("owl: closed, one body + its stand-in + one sealed pocket",
+    C.add("owl: closed, one body + its stand-in, no sealed pocket",
           "%d solid, %d void" % (len(solids), len(voids)),
-          mt.is_closed(tris) and len(solids) == 2 and len(voids) == 1, "2 solid, 1 void", "")
+          mt.is_closed(tris) and len(solids) == 2 and not voids, "2 solid, 0 void", "")
     body = solids[0] if mt.bbox(solids[0])[1][2] > mt.bbox(solids[1])[1][2] else solids[1]
     standin = solids[1] if body is solids[0] else solids[0]
     lo, hi = mt.bbox(body)
@@ -140,15 +128,8 @@ def check_owl(C, tris):
     C.within("owl: arm fits the notch (y %.2f..%.2f in %.1f..%.1f)" % (y0, y1, ny0, ny1),
              min(y0 - ny0, ny1 - y1), 0.1, 0.5)
     coil_y = 0.5 * (y0 + y1) - 0.5 * (ny0 + ny1)      # coil centre from the notch centre
-    # the magnet pocket
-    c, d, floor, top = pocket_of(voids[0])
-    C.near("owl: pocket diameter (flat to flat)", d, M.POCKET_D, 0.02)
-    C.within("owl: pocket depth (magnet %.1f)" % M.MAGNET_T, top - floor, M.MAGNET_T + 0.1, M.POCKET_T + EPS)
-    C.near("owl: pocket centred over the coil (x)", c[0] - centre_x, 0.0, 0.05)
-    C.near("owl: pocket centred over the coil (y)", c[1] - coil_y, 0.0, 0.05)
-    lift = floor - z_base + M.COPPER_TO_SURFACE
-    C.near("owl: MAGNET'S BOTTOM ABOVE THE PERCH'S TOP COPPER (OWL_LIFT)", lift, M.OWL_LIFT, 0.1)
-    C.within("owl: thinnest plastic over the magnet", roof(body, c, d, top), 1.0, None)
+    C.near("owl: arms centred on the coil (x)", centre_x, 0.0, 0.05)
+    C.near("owl: arms centred on the coil (y)", coil_y, 0.0, 0.05)
     # free arm: from the lip to where it joins the body (top of the slit)
     iv = along(body, (xs_in[1] - 0.25, 0, -1), (0, 0, 1))
     z_root = [a for a, b in iv if a > z_base][0]
@@ -165,26 +146,21 @@ def check_owl(C, tris):
     C.near("owl: stand-in top one layer under the base", z_base - shi[2], D.GAP_Z, 0.01)
     C.within("owl: height above the perch (tufts)", zt - z_base, 25, 31)
     C.within("owl: width incl. wings and talons", hi[0] - lo[0], None, M.PERCH_W + 4.5)
-    vol = mt.volume(body) + mt.volume(voids[0])
-    return dict(z_base=z_base, pocket_top=top, pocket_floor=floor, lift=lift, slot=slot,
-                strain=strain_owl, mass_g=vol / 1000 * D.PLA_DENSITY, height=zt - z_base,
+    return dict(z_base=z_base, slot=slot, body=body,
+                strain=strain_owl, mass_g=mt.volume(body) / 1000 * D.PLA_DENSITY, height=zt - z_base,
                 standin_g=mt.volume(standin) / 1000 * D.PLA_DENSITY)
 
 
 # ------------------------------------------------------------------ the cap
 def check_cap(C, tris):
     solids, voids = shells(tris)
-    C.add("cap: closed, one body + its pedestal + one sealed pocket",
+    C.add("cap: closed, one body + its pedestal, no sealed pocket",
           "%d solid, %d void" % (len(solids), len(voids)),
-          mt.is_closed(tris) and len(solids) == 2 and len(voids) == 1, "2 solid, 1 void", "")
+          mt.is_closed(tris) and len(solids) == 2 and not voids, "2 solid, 0 void", "")
     body = solids[0] if mt.bbox(solids[0])[1][2] > mt.bbox(solids[1])[1][2] else solids[1]
     ped = solids[1] if body is solids[0] else solids[0]
-    c, d, floor, top = pocket_of(voids[0])
-    z_board = first_hit(body, (c[0], c[1], -1), (0, 0, 1)) - 1        # floor's underside
-    C.near("cap: pocket diameter (flat to flat)", d, M.POCKET_D, 0.02)
-    C.within("cap: pocket depth (magnet %.1f)" % M.MAGNET_T, top - floor, M.MAGNET_T + 0.1, M.POCKET_T + EPS)
-    C.within("cap: floor under the magnet", floor - z_board, D.LAYER, 3 * D.LAYER)
-    C.within("cap: thinnest plastic over the magnet", roof(body, c, d, top), 0.8, None)
+    c = (0.0, 0.0)            # the pocket's axis is the cap's frame origin (x, y kept in print)
+    z_board = first_hit(body, (M.POCKET_D / 2 + 0.3, 0, -1), (0, 0, 1)) - 1    # the dome's foot
     # lips: catch height, tips, drops (rays along y from the magnet's axis)
     hy = c[1] + M.BAT_HEAD_Y + 0.3
     iv = along(body, (c[0], hy, 60), (0, 0, -1))           # (top, bottom) pairs going down
@@ -227,12 +203,11 @@ def check_cap(C, tris):
         worst = max(worst, ea)
         C.within("cap %s: snap strain (arm %.1f long, lever %.1f, lip out %.2f)" % (name, La, Ld, delta),
                  100 * ea, None, 100 * D.STRAIN_OK, "%", "%.2f")
-    # the outer shell encloses the pocket; the pocket's (negative) shell takes it back out
-    mass = (mt.volume(body) + sum(mt.volume(v) for v in voids)) / 1000 * D.PLA_DENSITY
+    mass = mt.volume(body) / 1000 * D.PLA_DENSITY
     C.within("cap: mass of plastic (100 %% solid, PLA %.2f g/cm3)" % D.PLA_DENSITY, mass, None, 1.0, "g", "%.2f")
     plo, phi = mt.bbox(ped)
     C.near("cap: pedestal top one layer under the floor", z_board - phi[2], D.GAP_Z, 0.01)
-    return dict(z_board=z_board, pocket_top=top, pocket_floor=floor, mass_g=mass, strain=worst,
+    return dict(z_board=z_board, body=body, mass_g=mass, strain=worst,
                 slot=z_board - z_catch, tips=tips, drops=drops)
 
 
@@ -318,44 +293,24 @@ def overhangs(tris, name, magnet_top=None, res=0.05):
 
 
 # ------------------------------------------------------------------ the plate
-def check_plate(C, owl_info, cap_info):
+def check_plate(C):
     plate = mt.read_stl(os.path.join(OUT, "plate.stl"))
     parts = [mt.read_stl(os.path.join(OUT, f)) for f in ("owl.stl", "bat_cap.stl", "foot.stl", "foot.stl",
                                                          "foot.stl", "foot.stl")]
     want = sum(len(shells(t)[0]) for t in parts)
-    C.add("plate.stl: owl, bat cap, four feet and two stand-ins", "%d solids" % len(shells(plate)[0]),
-          len(shells(plate)[0]) == want and len(plate) == sum(len(t) for t in parts), "%d solids" % want, "")
+    psol, pvoid = shells(plate)
+    C.add("plate.stl: owl, bat cap, four feet and two stand-ins; no sealed pocket",
+          "%d solid, %d void" % (len(psol), len(pvoid)),
+          len(psol) == want and not pvoid and len(plate) == sum(len(t) for t in parts),
+          "%d solid, 0 void" % want, "")
     lo, hi = mt.bbox(plate)
     C.within("plate: footprint x", hi[0] - lo[0], None, D.BED[0] - 20)
     C.within("plate: footprint y", hi[1] - lo[1], None, D.BED[1] - 20)
     C.near("plate: on the bed", lo[2], 0.0, EPS)
-    objs = [("plate.stl", plate)]
-    tops, centres = [], []
-    for name, t in objs:
-        for v in shells(t)[1]:
-            c, d, floor, top = pocket_of(v)
-            tops.append((name, floor, top))
-            centres.append(c[:2])
-    C.add("plate: two magnet pockets", len(tops), len(tops) == 2, "2", "", "%d")
-    if len(tops) == 2:
-        C.near("plate: both pockets close on the same layer (ONE pause)", tops[0][2] - tops[1][2], 0, 0.001)
-        C.near("plate: both pocket floors at the same height", tops[0][1] - tops[1][1], 0, 0.001)
-        sep = float(np.linalg.norm(np.subtract(*centres)))
-        C.within("plate: magnets far enough apart not to tug", sep, 40, None)
-        top = tops[0][2]
-        layer = int(round(top / D.LAYER)) + 1
-        C.add("plate: pause before layer %d (z %.2f), magnets in at %.2f" % (layer, layer * D.LAYER, top),
-              layer, abs(top / D.LAYER - round(top / D.LAYER)) < 1e-4, "pocket top on the layer grid", "", "%d")
-        # polarity: both parts print the way they are assembled (pocket floor toward the board)
-        C.add("plate: owl upright (pocket above its base, head above the pocket)",
-              "yes", owl_info["pocket_floor"] > owl_info["z_base"] + 10, "", "")
-        C.add("plate: cap upright (floor on the bat side, under the magnet)",
-              "yes", cap_info["pocket_floor"] > cap_info["z_board"], "", "")
-        return dict(pause_z=top, pause_layer=layer, separation=sep)
     return {}
 
 
-# ------------------------------------------------------------------ the no-pause version
+# ------------------------------------------------------------------ the magnets' pockets
 def z_base_of(body):
     """The owl's base: the first surface above a point on its rim (as in check_owl)."""
     for x in np.arange(13.9, 9.0, -0.1):
@@ -365,20 +320,13 @@ def z_base_of(body):
     return None
 
 
-def check_open(C, owl_info, cap_info):
-    """out/no_pause/: the owl's pocket opens out of its back (+y) as a slot the magnet
-    slides along; the cap's pocket has no floor.  Each magnet must end up where the pause
-    version holds it, and must be able to get in."""
-    d = os.path.join(OUT, "no_pause")
-    owl_t = mt.read_stl(os.path.join(d, "owl.stl"))
-    cap_t = mt.read_stl(os.path.join(d, "bat_cap.stl"))
+def check_pockets(C, owl_info, cap_info):
+    """The owl's pocket opens out of its back (+y) as a slot the magnet slides along; the
+    cap's pocket has no floor.  Each magnet must end up where mech.py puts it, and must
+    be able to get in."""
     # --- the owl
-    solids, voids = shells(owl_t)
-    C.add("no-pause owl: closed, body + stand-in, no sealed pocket", "%d solid, %d void" % (len(solids), len(voids)),
-          mt.is_closed(owl_t) and len(solids) == 2 and not voids, "2 solid, 0 void", "")
-    body = max(solids, key=lambda s: mt.bbox(s)[1][2])
-    z_base = z_base_of(body)
-    zt = mt.bbox(body)[1][2]
+    body = owl_info["body"]
+    z_base = owl_info["z_base"]
     # the channel: heights where a ray from behind the owl runs in past the coil's axis
     front = {}
     for z in np.arange(z_base + 5, z_base + 25, D.LAYER / 4):
@@ -392,13 +340,13 @@ def check_open(C, owl_info, cap_info):
     yc = y_front + M.POCKET_D / 2
     floor = zm - first_hit(body, (0, yc, zm), (0, 0, -1))
     top = zm + first_hit(body, (0, yc, zm), (0, 0, 1))
-    C.add("no-pause owl: one channel from the back to the pocket",
+    C.add("owl: one channel from the back to the pocket",
           "z %.2f..%.2f" % (floor - z_base, top - z_base),
           all(abs(b - a - D.LAYER / 4) < 1e-6 for a, b in zip(zs, zs[1:])), "unbroken", "")
-    C.within("no-pause owl: channel height (magnet %.1f)" % M.MAGNET_T, top - floor, M.MAGNET_T + 0.4,
+    C.within("owl: channel height (magnet %.1f)" % M.MAGNET_T, top - floor, M.MAGNET_T + 0.15,   # snug since 2026-11-09 (Jason)
              M.MAGNET_T + 1.0)
     lift = floor - z_base + M.COPPER_TO_SURFACE
-    C.near("no-pause owl: MAGNET'S BOTTOM ABOVE THE PERCH'S TOP COPPER", lift, owl_info["lift"], 0.001)
+    C.near("owl: MAGNET'S BOTTOM ABOVE THE PERCH'S TOP COPPER (OWL_LIFT)", lift, M.OWL_LIFT, 0.1)
     # the channel's width all the way out, and its middle
     narrow, mid = 99.0, []
     for y in np.arange(y_front + 0.5, 15.0, 0.25):
@@ -410,42 +358,30 @@ def check_open(C, owl_info, cap_info):
         if y > y_front + M.MAGNET_D / 2:            # past the round end: the straight slot
             narrow = min(narrow, g[1] - g[0])
             mid.append((g[0] + g[1]) / 2)
-    C.within("no-pause owl: slot width all the way out (magnet %.0f)" % M.MAGNET_D, narrow, M.MAGNET_D + 0.3,
+    C.within("owl: slot width all the way out (magnet %.0f)" % M.MAGNET_D, narrow, M.MAGNET_D + 0.2,   # snug since 2026-11-09 (Jason)
              M.MAGNET_D + 0.8)
-    C.near("no-pause owl: slot centred on the coil (x)", float(np.mean(mid)), 0.0, 0.05)
-    C.near("no-pause owl: seated magnet centred on the coil (y)", y_front + M.MAGNET_D / 2, 0.0, 0.2)
+    C.near("owl: slot centred on the coil (x)", float(np.mean(mid)), 0.0, 0.05)
+    C.near("owl: seated magnet centred on the coil (y)", y_front + M.MAGNET_D / 2, 0.0, 0.2)
     back = first_hit(body, (0, 40, top + 1.0), (0, -1, 0))
-    C.add("no-pause owl: the slot opens out of the owl's back", "yes",
+    C.add("owl: the slot opens out of the owl's back", "yes",
           first_hit(body, (0, y_front + 1, zm), (0, 1, 0)) is None, "", "")
     plug = 40 - back - (y_front + M.MAGNET_D)
-    C.within("no-pause owl: epoxy plug behind the magnet", plug, 3.0, None)
-    C.within("no-pause owl: thinnest plastic over the pocket", roof(body, (0, y_front + M.POCKET_D / 2), M.POCKET_D,
+    C.within("owl: epoxy plug behind the magnet", plug, 3.0, None)
+    C.within("owl: thinnest plastic over the pocket", roof(body, (0, y_front + M.POCKET_D / 2), M.POCKET_D,
                                                                     top), 1.0, None)
     # --- the cap
-    solids, voids = shells(cap_t)
-    C.add("no-pause cap: closed, body + pedestal, no sealed pocket", "%d solid, %d void" % (len(solids), len(voids)),
-          mt.is_closed(cap_t) and len(solids) == 2 and not voids, "2 solid, 0 void", "")
-    cbody = max(solids, key=lambda s: mt.bbox(s)[1][2])
-    # the pocket's axis is the cap's frame origin (the sealed cap's pocket sits there too)
-    z_board = first_hit(cbody, (M.POCKET_D / 2 + 0.3, 0, -1), (0, 0, 1)) - 1    # the dome's foot
+    cbody = cap_info["body"]
+    z_board = cap_info["z_board"]
     z_roof = first_hit(cbody, (0, 0, -1), (0, 0, 1)) - 1
-    C.add("no-pause cap: pocket open to the bat (no floor)", "yes", z_roof > z_board + M.MAGNET_T, "", "")
-    C.near("no-pause cap: MAGNET'S TOP ABOVE THE BAT, against the roof", z_roof - z_board,
-           cap_info["pocket_top"] - cap_info["z_board"], 0.001)
+    C.add("cap: pocket open to the bat (no floor)", "yes", z_roof > z_board + M.MAGNET_T, "", "")
+    C.within("cap: MAGNET'S TOP ABOVE THE BAT, against the roof", z_roof - z_board,
+             M.MAGNET_T + 0.1 + D.LAYER, M.POCKET_T + 3 * D.LAYER)
     dia = 2 * min(first_hit(cbody, (0, 0, z_board + 1.0), (np.cos(t), np.sin(t), 0))
                   for t in np.linspace(0, 2 * np.pi, 180, endpoint=False))
-    C.near("no-pause cap: pocket diameter (flat to flat)", dia, M.POCKET_D, 0.02)
-    C.within("no-pause cap: thinnest plastic over the magnet", roof(cbody, (0, 0), M.POCKET_D, z_roof), 0.8, None)
-    plo, phi = mt.bbox(min(solids, key=lambda s: mt.bbox(s)[1][2]))
-    C.near("no-pause cap: pedestal top one layer under the dome's foot", z_board - phi[2], D.GAP_Z, 0.01)
-    # --- the plate
-    plate = mt.read_stl(os.path.join(d, "plate.stl"))
-    psol, pvoid = shells(plate)
-    want = len(shells(owl_t)[0]) + len(shells(cap_t)[0]) + 4 * len(shells(mt.read_stl(os.path.join(OUT, "foot.stl")))[0])
-    C.add("no-pause plate.stl: owl, bat cap, four feet, stand-ins; no sealed pocket",
-          "%d solid, %d void" % (len(psol), len(pvoid)), len(psol) == want and not pvoid, "%d solid, 0 void" % want, "")
-    return dict(owl=owl_t, cap=cap_t, lift=lift, gap=top - floor, slot=narrow, plug=plug,
-                magnet_top=z_roof - z_board, y_front=y_front, height=zt - z_base)
+    C.near("cap: pocket diameter (flat to flat)", dia, M.POCKET_D, 0.02)
+    C.within("cap: thinnest plastic over the magnet", roof(cbody, (0, 0), M.POCKET_D, z_roof), 0.8, None)
+    return dict(lift=lift, gap=top - floor, slot=narrow, plug=plug, magnet_top=z_roof - z_board,
+                y_front=y_front, pocket_floor=floor, pocket_top=top)
 
 
 def run(verbose=True):
@@ -456,35 +392,27 @@ def run(verbose=True):
     owl = check_owl(C, owl_t)
     cap = check_cap(C, cap_t)
     foot = check_foot(C, foot_t)
-    plate = check_plate(C, owl, cap)
+    plate = check_plate(C)
+    opn = check_pockets(C, owl, cap)
     oh = []
-    for t, name, mag in ((owl_t, "owl", [(0.0, 0.0, owl["pocket_top"])]),
-                         (cap_t, "bat cap", [(0.0, 0.0, cap["pocket_top"])]),
-                         (foot_t, "foot", None)):
-        r = overhangs(t, name, mag)
-        oh.append(r)
-        C.add("%s: no floating islands when sliced" % name, len(r["floating"]), not r["floating"], "0", "", "%d")
-        far = r["worst"][0][0] if r["worst"] else 0.0
-        C.within("%s: farthest unsupported spot from the layer below" % name, far, None, 5.0)
-    opn = check_open(C, owl, cap)
     # the roofs over the empty pockets are bridges ~10.4 mm across: halfway is ~5.2 mm out
-    for t, name in ((opn["owl"], "no-pause owl"), (opn["cap"], "no-pause bat cap")):
+    for t, name, reach in ((owl_t, "owl", OPEN_BRIDGE_REACH), (cap_t, "bat cap", OPEN_BRIDGE_REACH),
+                           (foot_t, "foot", 5.0)):
         r = overhangs(t, name)
         oh.append(r)
         C.add("%s: no floating islands when sliced" % name, len(r["floating"]), not r["floating"], "0", "", "%d")
         far = r["worst"][0][0] if r["worst"] else 0.0
-        C.within("%s: farthest unsupported spot (the pocket's roof, a bridge)" % name, far, None,
-                 OPEN_BRIDGE_REACH)
+        C.within("%s: farthest unsupported spot from the layer below" % name, far, None, reach)
     # summary for the README and the pictures
     hk = D.cap_hook_snap()
     s = [
         "magnet bottom above the perch's top copper  %.2f mm  (OWL_LIFT %.1f; on the 0.2 mm layer grid)"
-        % (owl["lift"], M.OWL_LIFT),
-        "both pockets  %.2f mm across, %.1f deep  (magnet %g x %g)" % (M.POCKET_D, owl["pocket_top"] - owl["pocket_floor"],
-                                                                  M.MAGNET_D, M.MAGNET_T),
-        "ONE pause: before layer %d (%.2f mm); pockets open at %.2f mm" % (plate.get("pause_layer", 0),
-                                                                          plate.get("pause_layer", 0) * D.LAYER,
-                                                                          plate.get("pause_z", 0)),
+        % (opn["lift"], M.OWL_LIFT),
+        "no pause: both magnets go in after printing, glued with epoxy (magnet %g x %g)" % (M.MAGNET_D, M.MAGNET_T),
+        "owl  slot %.2f x %.1f out through its back; %.1f mm of epoxy behind the magnet"
+        % (opn["slot"], opn["gap"], opn["plug"]),
+        "cap  no floor; pocket %.2f across, magnet top %.1f mm above the bat, against the roof"
+        % (M.POCKET_D, opn["magnet_top"]),
         "owl hooks  %.1f mm under the perch, slot %.1f for a %.1f board" % (M.OWL_HOOK, owl["slot"], M.PCB_T),
         "cap hooks  %.1f under the head (y %g) and tail (y %g), slot %.2f" % (M.CAP_HOOK, M.BAT_HEAD_Y, M.BAT_TAIL_Y,
                                                                          cap["slot"]),
@@ -495,13 +423,9 @@ def run(verbose=True):
                                     hk["tail"]["preload"][0.1]["stress_MPa"], hk["tail"]["preload"][0.2]["stress_MPa"]),
         "cap mass  %.2f g of PLA (it prints solid; %.2f g/cm3)" % (cap["mass_g"], D.PLA_DENSITY),
         "owl  %.1f mm tall above the perch; bat floats %.1f mm below the perch (sim/physics)"
-        % (owl["height"], D.float_gap(owl["lift"]) or float("nan")),
-        "overhangs  no floating islands; farthest unsupported spot %s"
-        % ", ".join("%s %.1f mm" % (r["name"], r["worst"][0][0] if r["worst"] else 0) for r in oh[:3]),
-        "no-pause owl  slot %.1f x %.1f; magnet %.2f mm above the top copper, %.1f mm of epoxy behind it"
-        % (opn["slot"], opn["gap"], opn["lift"], opn["plug"]),
-        "no-pause cap  no floor; magnet top %.1f mm above the bat; pocket roofs bridged (%s mm out)"
-        % (opn["magnet_top"], " / ".join("%.1f" % (r["worst"][0][0] if r["worst"] else 0) for r in oh[3:])),
+        % (owl["height"], D.float_gap(opn["lift"]) or float("nan")),
+        "overhangs  no floating islands; farthest unsupported spot %s (the pockets' roofs are bridges)"
+        % ", ".join("%s %.1f mm" % (r["name"], r["worst"][0][0] if r["worst"] else 0) for r in oh),
     ]
     if verbose:
         w = max(len(r[1]) for r in C.rows)
@@ -513,7 +437,8 @@ def run(verbose=True):
                 print("      %.2f at z %.1f (%.1f, %.1f)" % wv)
         print("\n".join("  " + x for x in s))
         print("check.py: %s (%d checks)" % ("ALL OK" if C.ok else "FAILED", len(C.rows)))
-    return dict(ok=C.ok, rows=C.rows, summary=s, owl=owl, cap=cap, foot=foot, plate=plate, overhangs=oh)
+    return dict(ok=C.ok, rows=C.rows, summary=s, owl=owl, cap=cap, foot=foot, plate=plate, pockets=opn,
+                overhangs=oh)
 
 
 if __name__ == "__main__":

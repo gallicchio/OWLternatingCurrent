@@ -44,6 +44,12 @@
 #define THERMAL_COLD_BAND_K          0.3f    /* "cold": the copper within this of ambient ... */
 #define THERMAL_COLD_S               60.0f   /* ... for this long: a reading then calibrates R */
 #define THERMAL_CAL_READINGS         5       /* readings averaged into the calibration */
+#define THERMAL_CAL_BAND_K           30.0f   /* [CHOICE 2026-11-09, was 5 K: a catch heats the model past 5 K before the hold steadies] once cold that long, readings
+                                                calibrate until the copper is this far above the
+                                                room (each corrected by the model's small rise):
+                                                at 0.5 A the copper leaves the 0.3 K band in
+                                                0.15 s, before the levitation coil's first 50 ms
+                                                reading (bench 2026-11-08) */
 
 typedef struct {
     float c_cu_J_per_K, c_board_J_per_K;
@@ -51,6 +57,13 @@ typedef struct {
     float r20_ohm;                 /* nominal resistance at 20 degC (COIL_R20_OHM) */
     float limit_C;                 /* COIL_SURFACE_LIMIT_C */
     float derate_from_C;           /* COIL_DERATE_FROM_C */
+    /* a second limit on the board node (the patch round the coil), for a coil whose copper
+     * may run hotter than a hand-safe surface because nothing touches it directly but
+     * something slow sits on it (the levitation coil: the printed owl).  Equal to the
+     * copper's by default, which never binds: the board is never hotter than the copper. */
+    float board_limit_C, board_derate_from_C;
+    bool uncal_up_only;           /* uncalibrated readings may pull the model up (the pendulum's
+                                     IPROPI); false: reported only (the levitation coil, 2026-11-09) */
 } thermal_params;
 
 typedef struct {
@@ -58,9 +71,15 @@ typedef struct {
     float t_cu_C, t_board_C, t_amb_C;
     float comp_cu, comp_board;     /* Kahan compensation: at 1 kHz a step's increment is below
                                       float's resolution near equilibrium (it stalled 0.4 K short) */
-    float r_ref_ohm, t_ref_C;      /* R(T) = r_ref (1 + alpha (T - t_ref)) */
+    float r_ref_ohm, t_ref_C;      /* R(T) = r_ref (1 + alpha (T - t_ref)): the coil's own,
+                                      for the power and the drives (nominal, never recalibrated) */
+    float rm_ref_ohm, tm_ref_C;    /* the thermometer's reference, in the reading's own units:
+                                      the bridge's and the current sense's errors are in it
+                                      (2026-11-09: the levitation coil reads 4.4 ohm V/I for
+                                      2.5 ohm), so it calibrates only the ratio, never R(T) */
     bool r_calibrated;
     float cold_s;                  /* how long the copper has been within the cold band */
+    bool cal_open;                 /* cold long enough: readings now calibrate (THERMAL_CAL_BAND_K) */
     float cal_sum_ohm;             /* readings taken while cold, being averaged */
     int cal_n;
     float t_meas_C;                /* the last resistance-thermometer reading (or -273 if none) */

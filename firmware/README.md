@@ -166,22 +166,37 @@ realtime loops run on core 1; the scenes and the console run on core 0.
 
 1. **The tick slice's wrap.** PWM slice 0 (`PWM_SLICE_TICK`) drives no pin. It runs in phase-locked step with
    the levitation coil's slice: both are started together through the PWM block's EN
-   register, and the tick's period is exactly 4 of the coil's 40 kHz periods (8 of its
+   register, and the tick's period is exactly 10 of the coil's 100 kHz periods (8 of its
    80 kHz ones with the carrier on). The wrap's interrupt starts the ADC burst, so every
    burst begins at the same point of the coil's PWM period: the centre of the forward
    pulse.
 2. **The burst.** The ADC free-runs in round robin over ADC0 (Hall), ADC1 (the levitation
    IPROPI) and ADC2 (the multiplexer), eight times each: 24 conversions in 48 µs, taken by
-   DMA.
-3. **The DMA's completion interrupt** does the tick's work:
+   DMA into one of two buffers.
+3. **The same interrupt, while the burst converts, does the tick's work on the previous
+   burst** (the other buffer; since 2026-11-08, so the work has the whole 100 µs, not the
+   52 µs the burst leaves):
    - averages the burst;
-   - moves the multiplexer to its next channel, which gets at least 30 µs to settle (the
-     designer asks for 10 µs);
    - updates the rails and checks the faults;
    - runs the levitation loop;
    - applies the pendulum, film and console requests;
-   - writes the coil PWM;
+   - computes the coil PWM;
    - every millisecond, updates the thermal models.
+4. **The DMA's completion interrupt** (a higher priority, and short) stops the ADC, moves
+   the multiplexer to its next channel (it then settles for the rest of the period: the
+   designer asks for 10 µs), and applies the PWM the work computed, once the burst is
+   over. So every burst runs under one u, the one from the tick before the work that
+   reads it: the levitation's current model allows for that step (`lev_ctrl.u_lag`;
+   without it, `test_lev` chatters at 1.4 A rms). From a burst's middle to its PWM the
+   delay grows from 40-75 µs to about 125 µs: 1.2° more phase lag at 40 Hz, 0.3° at the
+   loop's 10 Hz.
+5. **Skipped ticks** (`overruns`: the work ran so late that PWM wraps went by) are
+   counted, and `skipped_last_s` gives the last second's. The `adc` fault is a rate: more
+   than 1 % of a second's ticks skipped, or of its conversions failing. A gap over 5 ms is
+   core 1 parked by a flash write (`pauses`), not an overrun.
+6. **The whole image runs from RAM** (`copy_to_ram`, 182 kB of the 512 kB), so no tick
+   waits on the 16 kB flash cache that core 0 shares. From flash, the worst tick was
+   322 µs (2026-11-08).
 
 ### Coil drive (DRV8874, PMODE high = PWM mode)
 
@@ -192,6 +207,10 @@ coil sees a mean of (f_fwd − f_rev) × 12 V. This scheme has three properties:
 - **IPROPI keeps working:** the current mirror reads in drive and brake, but not in coast.
 - **Linear down to zero:** a little of both directions keeps every output pulse at least
   300 ns long, so the mean stays linear.
+- **The bridge's loss is put back:** on rev A the DRV8874 took about 0.5 µs off every
+  output pulse (`bringup/REVB.md` 3.3), so `coil_set_fractions()` lengthens every pulse
+  asked for by `DRV_PULSE_LOSS_S` (500 ns) at that coil's PWM frequency. That is 0.05 of
+  the period at 100 kHz and 0.015 at 30 kHz. A fraction of zero stays zero.
 
 The levitation coil's 80 kHz carrier for the bat's eyes is the same scheme with a lot of
 both directions (`lev eyes`). It only runs while the bat floats, and it always gives way
@@ -226,12 +245,30 @@ to the loop when the loop needs the voltage.
 
 - **Thermal limits.**
   - Every limit is multiplied by the coil's thermal derating: 1 below 40 °C, falling to
-    0 at 45 °C (the child-safety surface limit).
+    0 at 45 °C (the child-safety surface limit). The levitation coil, in the perch under
+    the printed owl, has two limits instead (since 2026-11-08): its copper 80 °C and its
+    board node, under the owl's PLA, 50 °C (`config.h`, `LEV_COIL_*`).
   - The models are two-node (copper/surface and board), with the board's temperature
     (IMU, else TMAG5273) as ambient.
   - The resistance thermometer: V/I from the current mirror corrects the model
     (copper +0.39 %/°C). In `test_thermal` it holds a coil that cools worse than modelled
     to 43 °C, where the model alone let it reach 50 °C.
+    - The pendulum coils read it from steady pulses; the levitation coil (since
+      2026-11-08) from 50 ms means, mean(u V12) / mean(I), while it holds the bat
+      (`rt.c` step 6b; `status` → `lev_thermo`), from one second into a steady hold (not
+      during a catch). In `test_rt` a levitation coil that cools three times better than
+      modelled ends within 2 K of the truth, where the model alone read 17 K high and
+      derated it.
+    - The thermometer's reference calibrates on its first five readings once the coil has
+      been cold a minute (within a 30 K band, `THERMAL_CAL_BAND_K`, each reading corrected
+      by the model's rise). It is kept in the reading's own units (`rm_ref_ohm`): only
+      the ratio hot/cold is a temperature, and the coil's R(T) for power and drive stays
+      nominal. On the bench the levitation coil's V/I reads 4.4 Ω for its 2.5 Ω
+      (bringup/REVB.md 1.11).
+    - Uncalibrated, a pendulum coil's reading may only push its model up; the levitation
+      coil's is only reported (a catch's window once read "213 °C").
+    - `lev tune thermal_cut 0` turns every coil's thermal derate and fault off until
+      reboot. It is a bench switch, for hovering under an IR camera.
 - **Mirror checks.**
   - A mirror reading 1.5× more than asked (a short) stops that coil.
   - No current when 0.25 A was asked (an open coil) stops it too.
@@ -432,15 +469,16 @@ exactly as for the board.
 | `test_console` | Every command, malformed input, the coil limits, the volume cap, JSON well-formedness (quotes escaped) | 61 replies, all well-formed |
 | `test_theremin` | Calibration, drift tracking, the exponential pitch map, the volume gate, a dead oscillator; the voice's pitch, ceiling, clickless onset and release | 200 → 1000 Hz; 440 Hz asked, 442 Hz measured with vibrato; peak under the ceiling |
 | `test_bringup` | The bring-up image's console (`bringup_cmd.c`) on a simulated board: every command and its reply's values, every refusal and limit (no 12 V, over 1 A, the LED cap, ranges, malformed and over-long lines), a short and nFAULT stopping a pulse, walks and sweeps interrupted, the boot lines, and after every command every bridge off and asleep | 469 checks; one reply per command; every line well-formed JSON with no NaN |
-| `test_rt` | Core 1 with the SDK modelled (`test/stubs/`), driven like the hardware: the safe pin state, the PWM's meaning against the DRV8874's truth table, no coil without 12 V, deadlines, owner limits, brown-out, nFAULT (retry, latch, clear), shorted and open coils, ten minutes of 1 A asked for, the levitation CAL through the glue | PWM within 1 count; current 1.4 ms after a request; brown-out off in 0.4 ms; nFAULT off in 1.0 ms; 1 A for 10 min derated to 0.45 A at 42.7 °C (plant 43.3 °C); CAL 3.18 mT/A (plant 3.11) |
+| `test_rt` | Core 1 with the SDK modelled (`test/stubs/`), driven like the hardware: the safe pin state, the PWM's meaning against the DRV8874's truth table, no coil without 12 V, deadlines (64-bit: the clock run across 2^31 and 2^32 µs), the bridge's 0.5 µs loss a pulse, owner limits, brown-out, nFAULT (retry, latch, clear), shorted and open coils, ten minutes of 1 A asked for, the levitation CAL through the glue | PWM within 1 count; current 1.4 ms after a request; brown-out off in 0.6 ms (0.4 before the overlapped burst); nFAULT off in 1.0 ms; 1 A for 10 min derated to 0.45 A at 42.7 °C (plant 43.3 °C); CAL 3.18 mT/A (plant 3.11) |
 
 ## What is untested on hardware
 
 Exercised on rev A board 1 on 2026-11-07: boot, USB enumeration and the console, the
 watchdog rule (three resets to BOOTSEL, which is how the ADC/DMA interrupt race in
-`tick_isr` was found and fixed), core 1's PWM/ADC/DMA sequence (running; but the tick's
-work takes 170-310 µs against the 100 µs tick, so one tick in 30 is skipped and the `adc`
-fault latches: `control()` wants trimming or `CTRL_TICK_HZ` lowering), the I2C devices
+`tick_isr` was found and fixed), core 1's PWM/ADC/DMA sequence (running from flash, 3.3 %
+of ticks were skipped and the worst tick's work took 322 µs, so the `adc` fault latched at
+every boot; the RAM image, the overlapped burst and the rate-based fault of 2026-11-08 are
+not yet tried on the board), the I2C devices
 (all present), the scenes, the theremin (PIO counting, the voice, the audio DMA) and the
 familiars in both modes. Still unexercised:
 - **Core 1's phase lock and the carrier switch** (needs the levitation).

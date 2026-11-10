@@ -33,6 +33,7 @@ typedef struct {
 extern adc_hw_t stub_adc;
 #define adc_hw (&stub_adc)
 extern bool stub_adc_running;
+extern int stub_drain_while_running;
 
 /* DMA (one channel is enough) */
 extern uint16_t *stub_dma_dest;
@@ -45,4 +46,4 @@ typedef void (*irq_handler_t)(void);
 extern irq_handler_t stub_irq_handler[64];
 
 /* time */
-extern uint32_t stub_now_us;
+extern uint64_t stub_now_us;          /* 64-bit, as the RP2350 timer; time_us_32 is its low word */

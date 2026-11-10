@@ -1,0 +1,16 @@
+{
+ "coils": [
+  {
+   "ok": false,
+   "cmd": "coil",
+   "error": "1.14 A expected: over the bring-up limit of 1.0 A",
+   "expected_ohm": 2.56
+  }
+ ],
+ "step": "coils",
+ "time": "2026-11-08T21:58:52",
+ "simulated": false,
+ "warnings": [
+  "lev: refused: 1.14 A expected: over the bring-up limit of 1.0 A"
+ ]
+}

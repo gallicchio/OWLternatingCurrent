@@ -1,0 +1,4705 @@
+{
+ "what": "familiar perch currents (live mode) while Jason lifts the owl token off ~5 s and back, then the cat token; bat hovering with eyes 0.3",
+ "samples": [
+  {
+   "t": 0.21,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "hold",
+   "gap": 8.454,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 44.7,
+    "calibrated": false,
+    "copper_C": 66.4,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 0.47,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "hold",
+   "gap": 8.0,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 44.8,
+    "calibrated": false,
+    "copper_C": 64.7,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 0.72,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "hold",
+   "gap": 7.662,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 44.9,
+    "calibrated": false,
+    "copper_C": 65.7,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 0.98,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "hold",
+   "gap": 8.263,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 45.0,
+    "calibrated": false,
+    "copper_C": 66.6,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 1.23,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "hold",
+   "gap": 8.247,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 45.0,
+    "calibrated": false,
+    "copper_C": 64.8,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 1.49,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "hold",
+   "gap": 7.685,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 45.1,
+    "calibrated": false,
+    "copper_C": 65.9,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 1.74,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "hold",
+   "gap": 8.038,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 45.2,
+    "calibrated": false,
+    "copper_C": 66.9,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 2.0,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "hold",
+   "gap": 8.411,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 45.2,
+    "calibrated": false,
+    "copper_C": 65.1,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 2.26,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "hold",
+   "gap": 7.655,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 45.3,
+    "calibrated": false,
+    "copper_C": 66.1,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 2.51,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "hold",
+   "gap": 7.923,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 45.4,
+    "calibrated": false,
+    "copper_C": 67.2,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 2.77,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "hold",
+   "gap": 8.701,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 45.4,
+    "calibrated": false,
+    "copper_C": 65.6,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 3.02,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "hold",
+   "gap": 7.524,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 45.5,
+    "calibrated": false,
+    "copper_C": 66.4,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 3.28,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "hold",
+   "gap": 7.738,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 45.6,
+    "calibrated": false,
+    "copper_C": 67.4,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 3.54,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "hold",
+   "gap": 8.858,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 45.6,
+    "calibrated": false,
+    "copper_C": 65.9,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 3.79,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "hold",
+   "gap": 7.448,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 45.7,
+    "calibrated": false,
+    "copper_C": 66.4,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 4.05,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "hold",
+   "gap": 7.645,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 45.8,
+    "calibrated": false,
+    "copper_C": 67.5,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 4.3,
+   "i1": 0.065,
+   "p1": 0.192,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "hold",
+   "gap": 9.152,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 45.8,
+    "calibrated": false,
+    "copper_C": 66.6,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 4.56,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "hold",
+   "gap": 7.38,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 45.9,
+    "calibrated": false,
+    "copper_C": 66.6,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 4.82,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "hold",
+   "gap": 7.505,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 46.0,
+    "calibrated": false,
+    "copper_C": 67.6,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 5.07,
+   "i1": 0.066,
+   "p1": 0.192,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "hold",
+   "gap": 9.27,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 46.0,
+    "calibrated": false,
+    "copper_C": 67.0,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 5.33,
+   "i1": 0.065,
+   "p1": 0.192,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "hold",
+   "gap": 7.319,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 46.1,
+    "calibrated": false,
+    "copper_C": 66.6,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 5.59,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "hold",
+   "gap": 7.472,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 46.2,
+    "calibrated": false,
+    "copper_C": 67.7,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 5.85,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.124,
+   "lev": "hold",
+   "gap": 9.138,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 46.2,
+    "calibrated": false,
+    "copper_C": 68.0,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 6.1,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "hold",
+   "gap": 7.417,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 46.3,
+    "calibrated": false,
+    "copper_C": 67.0,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 6.36,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "hold",
+   "gap": 7.533,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 46.4,
+    "calibrated": false,
+    "copper_C": 68.0,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 6.61,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "hold",
+   "gap": 8.941,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 46.5,
+    "calibrated": false,
+    "copper_C": 68.3,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 6.87,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "hold",
+   "gap": 7.516,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 46.5,
+    "calibrated": false,
+    "copper_C": 67.0,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 7.13,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "hold",
+   "gap": 7.592,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 46.6,
+    "calibrated": false,
+    "copper_C": 68.0,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 7.38,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "hold",
+   "gap": 8.776,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 46.7,
+    "calibrated": false,
+    "copper_C": 68.7,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 7.64,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "hold",
+   "gap": 7.722,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 46.7,
+    "calibrated": false,
+    "copper_C": 67.2,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 7.89,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "hold",
+   "gap": 7.633,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 46.8,
+    "calibrated": false,
+    "copper_C": 68.4,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 8.15,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "hold",
+   "gap": 8.429,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 46.9,
+    "calibrated": false,
+    "copper_C": 69.2,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 8.41,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "hold",
+   "gap": 7.974,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 46.9,
+    "calibrated": false,
+    "copper_C": 67.4,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 8.66,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "hold",
+   "gap": 7.673,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 47.0,
+    "calibrated": false,
+    "copper_C": 68.3,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 8.92,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "hold",
+   "gap": 8.346,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 47.1,
+    "calibrated": false,
+    "copper_C": 69.2,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 9.17,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "hold",
+   "gap": 8.2,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 47.1,
+    "calibrated": false,
+    "copper_C": 67.4,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 9.43,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "hold",
+   "gap": 7.657,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 47.2,
+    "calibrated": false,
+    "copper_C": 68.7,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 9.68,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "hold",
+   "gap": 8.025,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 47.3,
+    "calibrated": false,
+    "copper_C": 69.7,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 9.94,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "hold",
+   "gap": 8.39,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 47.3,
+    "calibrated": false,
+    "copper_C": 67.8,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 10.19,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "hold",
+   "gap": 7.655,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 47.4,
+    "calibrated": false,
+    "copper_C": 68.5,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 10.45,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "hold",
+   "gap": 8.003,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 47.5,
+    "calibrated": false,
+    "copper_C": 69.4,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 10.71,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "hold",
+   "gap": 8.609,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 47.6,
+    "calibrated": false,
+    "copper_C": 67.7,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 10.96,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "hold",
+   "gap": 7.478,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 47.6,
+    "calibrated": false,
+    "copper_C": 68.7,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 11.22,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "hold",
+   "gap": 7.725,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 47.7,
+    "calibrated": false,
+    "copper_C": 70.0,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 11.48,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "hold",
+   "gap": 8.939,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 47.8,
+    "calibrated": false,
+    "copper_C": 68.5,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 11.73,
+   "i1": 0.065,
+   "p1": 0.19,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "hold",
+   "gap": 7.471,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 47.8,
+    "calibrated": false,
+    "copper_C": 69.0,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 11.99,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "hold",
+   "gap": 7.64,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 47.9,
+    "calibrated": false,
+    "copper_C": 69.8,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 12.24,
+   "i1": 0.066,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "hold",
+   "gap": 9.088,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 48.0,
+    "calibrated": false,
+    "copper_C": 68.7,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 12.5,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "hold",
+   "gap": 7.32,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 48.0,
+    "calibrated": false,
+    "copper_C": 68.8,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 12.76,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "hold",
+   "gap": 7.407,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 48.1,
+    "calibrated": false,
+    "copper_C": 70.0,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 13.01,
+   "i1": 0.065,
+   "p1": 0.192,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "hold",
+   "gap": 9.144,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 48.2,
+    "calibrated": false,
+    "copper_C": 69.7,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 13.27,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "hold",
+   "gap": 7.355,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 48.2,
+    "calibrated": false,
+    "copper_C": 69.2,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 13.53,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "hold",
+   "gap": 7.532,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 48.3,
+    "calibrated": false,
+    "copper_C": 70.1,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 13.78,
+   "i1": 0.066,
+   "p1": 0.192,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "hold",
+   "gap": 9.042,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 48.4,
+    "calibrated": false,
+    "copper_C": 70.1,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 14.04,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "hold",
+   "gap": 7.373,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 48.4,
+    "calibrated": false,
+    "copper_C": 69.2,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 14.3,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "hold",
+   "gap": 7.521,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 48.5,
+    "calibrated": false,
+    "copper_C": 70.4,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 14.55,
+   "i1": 0.065,
+   "p1": 0.192,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "hold",
+   "gap": 8.923,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 48.6,
+    "calibrated": false,
+    "copper_C": 70.9,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 14.81,
+   "i1": 0.065,
+   "p1": 0.192,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "hold",
+   "gap": 7.508,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 48.6,
+    "calibrated": false,
+    "copper_C": 69.6,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 15.06,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "hold",
+   "gap": 7.578,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 48.7,
+    "calibrated": false,
+    "copper_C": 70.6,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 15.32,
+   "i1": 0.065,
+   "p1": 0.192,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "hold",
+   "gap": 8.727,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 48.8,
+    "calibrated": false,
+    "copper_C": 71.2,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 15.58,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "hold",
+   "gap": 7.691,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 48.8,
+    "calibrated": false,
+    "copper_C": 69.6,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 15.84,
+   "i1": 0.065,
+   "p1": 0.192,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "hold",
+   "gap": 7.608,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 48.9,
+    "calibrated": false,
+    "copper_C": 70.6,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 16.09,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "hold",
+   "gap": 8.376,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 49.0,
+    "calibrated": false,
+    "copper_C": 71.6,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 16.35,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "hold",
+   "gap": 8.027,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 49.1,
+    "calibrated": false,
+    "copper_C": 69.8,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 16.6,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "hold",
+   "gap": 7.709,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 49.1,
+    "calibrated": false,
+    "copper_C": 70.8,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 16.86,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "hold",
+   "gap": 8.281,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 49.2,
+    "calibrated": false,
+    "copper_C": 71.7,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 17.11,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "hold",
+   "gap": 8.11,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 49.3,
+    "calibrated": false,
+    "copper_C": 69.9,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 17.37,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "hold",
+   "gap": 7.609,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 49.3,
+    "calibrated": false,
+    "copper_C": 71.0,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 17.63,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "hold",
+   "gap": 8.108,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 49.4,
+    "calibrated": false,
+    "copper_C": 72.2,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 17.88,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "hold",
+   "gap": 8.376,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 49.5,
+    "calibrated": false,
+    "copper_C": 70.4,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 18.14,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "hold",
+   "gap": 7.653,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 49.5,
+    "calibrated": false,
+    "copper_C": 71.4,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 18.39,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "hold",
+   "gap": 7.945,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 49.6,
+    "calibrated": false,
+    "copper_C": 72.5,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 18.65,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "hold",
+   "gap": 8.587,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 49.7,
+    "calibrated": false,
+    "copper_C": 70.6,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 18.9,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "hold",
+   "gap": 7.568,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 49.7,
+    "calibrated": false,
+    "copper_C": 71.4,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 19.16,
+   "i1": 0.065,
+   "p1": 0.192,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "hold",
+   "gap": 7.821,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 49.8,
+    "calibrated": false,
+    "copper_C": 72.6,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 19.42,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "hold",
+   "gap": 8.888,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 49.9,
+    "calibrated": false,
+    "copper_C": 71.1,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 19.67,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "hold",
+   "gap": 7.492,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 49.9,
+    "calibrated": false,
+    "copper_C": 71.7,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 19.93,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 14.123,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 50.0,
+    "calibrated": false,
+    "copper_C": 72.5,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 20.18,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 50.1,
+    "calibrated": false,
+    "copper_C": 70.1,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 20.44,
+   "i1": 0.065,
+   "p1": 0.19,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 50.1,
+    "calibrated": false,
+    "copper_C": 67.9,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 20.7,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 50.2,
+    "calibrated": false,
+    "copper_C": 66.0,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 20.95,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 50.2,
+    "calibrated": false,
+    "copper_C": 64.3,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 21.21,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 50.3,
+    "calibrated": false,
+    "copper_C": 62.8,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 21.47,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 50.3,
+    "calibrated": false,
+    "copper_C": 61.5,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 21.72,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.122,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 50.3,
+    "calibrated": false,
+    "copper_C": 60.2,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 21.98,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 50.3,
+    "calibrated": false,
+    "copper_C": 59.2,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 22.24,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 50.3,
+    "calibrated": false,
+    "copper_C": 58.2,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 22.49,
+   "i1": 0.065,
+   "p1": 0.19,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 50.3,
+    "calibrated": false,
+    "copper_C": 57.4,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 22.75,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 50.3,
+    "calibrated": false,
+    "copper_C": 56.6,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 23.0,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 50.3,
+    "calibrated": false,
+    "copper_C": 55.9,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 23.26,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 50.3,
+    "calibrated": false,
+    "copper_C": 55.3,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 23.52,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 50.3,
+    "calibrated": false,
+    "copper_C": 54.8,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 23.77,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 50.3,
+    "calibrated": false,
+    "copper_C": 54.3,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 24.03,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 50.3,
+    "calibrated": false,
+    "copper_C": 53.9,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 24.28,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 50.3,
+    "calibrated": false,
+    "copper_C": 53.5,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 24.54,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 50.3,
+    "calibrated": false,
+    "copper_C": 53.2,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 24.8,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 50.3,
+    "calibrated": false,
+    "copper_C": 52.9,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 25.05,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 50.3,
+    "calibrated": false,
+    "copper_C": 52.6,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 25.31,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 50.2,
+    "calibrated": false,
+    "copper_C": 52.3,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 25.56,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 50.2,
+    "calibrated": false,
+    "copper_C": 52.1,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 25.82,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 50.2,
+    "calibrated": false,
+    "copper_C": 51.9,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 26.07,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 50.2,
+    "calibrated": false,
+    "copper_C": 51.7,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 26.33,
+   "i1": 0.065,
+   "p1": 0.19,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 50.2,
+    "calibrated": false,
+    "copper_C": 51.6,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 26.59,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 50.2,
+    "calibrated": false,
+    "copper_C": 51.4,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 26.84,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 50.1,
+    "calibrated": false,
+    "copper_C": 51.3,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 27.1,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 50.1,
+    "calibrated": false,
+    "copper_C": 51.1,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 27.35,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 50.1,
+    "calibrated": false,
+    "copper_C": 51.0,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 27.61,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 50.1,
+    "calibrated": false,
+    "copper_C": 50.9,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 27.86,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 50.1,
+    "calibrated": false,
+    "copper_C": 50.8,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 28.12,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 50.0,
+    "calibrated": false,
+    "copper_C": 50.8,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 28.37,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 50.0,
+    "calibrated": false,
+    "copper_C": 50.7,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 28.63,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 50.0,
+    "calibrated": false,
+    "copper_C": 50.6,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 28.89,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 50.0,
+    "calibrated": false,
+    "copper_C": 50.5,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 29.14,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 49.9,
+    "calibrated": false,
+    "copper_C": 50.5,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 29.4,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 49.9,
+    "calibrated": false,
+    "copper_C": 50.4,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 29.65,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 49.9,
+    "calibrated": false,
+    "copper_C": 50.4,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 29.91,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 49.9,
+    "calibrated": false,
+    "copper_C": 50.3,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 30.16,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 49.9,
+    "calibrated": false,
+    "copper_C": 50.3,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 30.42,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 49.8,
+    "calibrated": false,
+    "copper_C": 50.2,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 30.68,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 49.8,
+    "calibrated": false,
+    "copper_C": 50.2,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 30.93,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 49.8,
+    "calibrated": false,
+    "copper_C": 50.1,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 31.19,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 49.8,
+    "calibrated": false,
+    "copper_C": 50.1,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 31.44,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 49.7,
+    "calibrated": false,
+    "copper_C": 50.1,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 31.7,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 49.7,
+    "calibrated": false,
+    "copper_C": 50.0,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 31.95,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 49.7,
+    "calibrated": false,
+    "copper_C": 50.0,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 32.21,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 49.7,
+    "calibrated": false,
+    "copper_C": 50.0,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 32.46,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 49.6,
+    "calibrated": false,
+    "copper_C": 49.9,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 32.72,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 49.6,
+    "calibrated": false,
+    "copper_C": 49.9,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 32.98,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 49.6,
+    "calibrated": false,
+    "copper_C": 49.9,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 33.23,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 49.6,
+    "calibrated": false,
+    "copper_C": 49.8,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 33.48,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 49.6,
+    "calibrated": false,
+    "copper_C": 49.8,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 33.74,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 49.5,
+    "calibrated": false,
+    "copper_C": 49.8,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 34.0,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 49.5,
+    "calibrated": false,
+    "copper_C": 49.7,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 34.25,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 49.5,
+    "calibrated": false,
+    "copper_C": 49.7,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 34.51,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 49.5,
+    "calibrated": false,
+    "copper_C": 49.7,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 34.76,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 49.4,
+    "calibrated": false,
+    "copper_C": 49.7,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 35.02,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 49.4,
+    "calibrated": false,
+    "copper_C": 49.6,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 35.27,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 49.4,
+    "calibrated": false,
+    "copper_C": 49.6,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 35.53,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 49.4,
+    "calibrated": false,
+    "copper_C": 49.6,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 35.79,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 49.3,
+    "calibrated": false,
+    "copper_C": 49.6,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 36.04,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 49.3,
+    "calibrated": false,
+    "copper_C": 49.5,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 36.3,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 49.3,
+    "calibrated": false,
+    "copper_C": 49.5,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 36.55,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 49.3,
+    "calibrated": false,
+    "copper_C": 49.5,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 36.81,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 49.2,
+    "calibrated": false,
+    "copper_C": 49.5,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 37.07,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 49.2,
+    "calibrated": false,
+    "copper_C": 49.4,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 37.32,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 49.2,
+    "calibrated": false,
+    "copper_C": 49.4,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 37.58,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 49.2,
+    "calibrated": false,
+    "copper_C": 49.4,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 37.83,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 49.2,
+    "calibrated": false,
+    "copper_C": 49.4,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 38.09,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 49.1,
+    "calibrated": false,
+    "copper_C": 49.3,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 38.34,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 49.1,
+    "calibrated": false,
+    "copper_C": 49.3,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 38.6,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 49.1,
+    "calibrated": false,
+    "copper_C": 49.3,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 38.86,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 49.1,
+    "calibrated": false,
+    "copper_C": 49.3,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 39.11,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 49.0,
+    "calibrated": false,
+    "copper_C": 49.2,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 39.37,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 49.0,
+    "calibrated": false,
+    "copper_C": 49.2,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 39.62,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 49.0,
+    "calibrated": false,
+    "copper_C": 49.2,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 39.88,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 49.0,
+    "calibrated": false,
+    "copper_C": 49.2,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 40.13,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 48.9,
+    "calibrated": false,
+    "copper_C": 49.2,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 40.39,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 48.9,
+    "calibrated": false,
+    "copper_C": 49.1,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 40.64,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 48.9,
+    "calibrated": false,
+    "copper_C": 49.1,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 40.9,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 48.9,
+    "calibrated": false,
+    "copper_C": 49.1,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 41.15,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 48.9,
+    "calibrated": false,
+    "copper_C": 49.1,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 41.41,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 48.8,
+    "calibrated": false,
+    "copper_C": 49.0,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 41.67,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 48.8,
+    "calibrated": false,
+    "copper_C": 49.0,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 41.92,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 48.8,
+    "calibrated": false,
+    "copper_C": 49.0,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 42.18,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 48.8,
+    "calibrated": false,
+    "copper_C": 49.0,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 42.43,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 48.7,
+    "calibrated": false,
+    "copper_C": 48.9,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 42.69,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 48.7,
+    "calibrated": false,
+    "copper_C": 48.9,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 42.95,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 48.7,
+    "calibrated": false,
+    "copper_C": 48.9,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 43.2,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 48.7,
+    "calibrated": false,
+    "copper_C": 48.9,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 43.46,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 48.6,
+    "calibrated": false,
+    "copper_C": 48.8,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 43.71,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 48.6,
+    "calibrated": false,
+    "copper_C": 48.8,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 43.97,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 48.6,
+    "calibrated": false,
+    "copper_C": 48.8,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 44.23,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 48.6,
+    "calibrated": false,
+    "copper_C": 48.8,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 44.48,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 48.6,
+    "calibrated": false,
+    "copper_C": 48.8,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 44.74,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 48.5,
+    "calibrated": false,
+    "copper_C": 48.7,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 44.99,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 48.5,
+    "calibrated": false,
+    "copper_C": 48.7,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 45.25,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 48.5,
+    "calibrated": false,
+    "copper_C": 48.7,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 45.51,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 48.5,
+    "calibrated": false,
+    "copper_C": 48.7,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 45.76,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 48.4,
+    "calibrated": false,
+    "copper_C": 48.6,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 46.02,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 48.4,
+    "calibrated": false,
+    "copper_C": 48.6,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 46.27,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 48.4,
+    "calibrated": false,
+    "copper_C": 48.6,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 46.53,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 48.4,
+    "calibrated": false,
+    "copper_C": 48.6,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 46.79,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 48.4,
+    "calibrated": false,
+    "copper_C": 48.6,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 47.04,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 48.3,
+    "calibrated": false,
+    "copper_C": 48.5,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 47.3,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 48.3,
+    "calibrated": false,
+    "copper_C": 48.5,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 47.55,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 48.3,
+    "calibrated": false,
+    "copper_C": 48.5,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 47.81,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 48.3,
+    "calibrated": false,
+    "copper_C": 48.5,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 48.07,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 48.2,
+    "calibrated": false,
+    "copper_C": 48.4,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 48.32,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 48.2,
+    "calibrated": false,
+    "copper_C": 48.4,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 48.58,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.122,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 48.2,
+    "calibrated": false,
+    "copper_C": 48.4,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 48.83,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 48.2,
+    "calibrated": false,
+    "copper_C": 48.4,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 49.09,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 48.1,
+    "calibrated": false,
+    "copper_C": 48.3,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 49.34,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 48.1,
+    "calibrated": false,
+    "copper_C": 48.3,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 49.6,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 48.1,
+    "calibrated": false,
+    "copper_C": 48.3,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 49.85,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 48.1,
+    "calibrated": false,
+    "copper_C": 48.3,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 50.11,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 48.1,
+    "calibrated": false,
+    "copper_C": 48.3,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 50.36,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 48.0,
+    "calibrated": false,
+    "copper_C": 48.2,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 50.62,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 48.0,
+    "calibrated": false,
+    "copper_C": 48.2,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 50.88,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 48.0,
+    "calibrated": false,
+    "copper_C": 48.2,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 51.13,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 48.0,
+    "calibrated": false,
+    "copper_C": 48.2,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 51.39,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 47.9,
+    "calibrated": false,
+    "copper_C": 48.1,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 51.64,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 47.9,
+    "calibrated": false,
+    "copper_C": 48.1,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 51.9,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 47.9,
+    "calibrated": false,
+    "copper_C": 48.1,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 52.15,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 47.9,
+    "calibrated": false,
+    "copper_C": 48.1,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 52.41,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 47.9,
+    "calibrated": false,
+    "copper_C": 48.1,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 52.66,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 47.8,
+    "calibrated": false,
+    "copper_C": 48.0,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 52.92,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 47.8,
+    "calibrated": false,
+    "copper_C": 48.0,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 53.18,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 47.8,
+    "calibrated": false,
+    "copper_C": 48.0,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 53.43,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 47.8,
+    "calibrated": false,
+    "copper_C": 48.0,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 53.69,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 47.7,
+    "calibrated": false,
+    "copper_C": 47.9,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 53.94,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 47.7,
+    "calibrated": false,
+    "copper_C": 47.9,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 54.2,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 47.7,
+    "calibrated": false,
+    "copper_C": 47.9,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 54.45,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 47.7,
+    "calibrated": false,
+    "copper_C": 47.9,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 54.71,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 47.7,
+    "calibrated": false,
+    "copper_C": 47.9,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 54.96,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 47.6,
+    "calibrated": false,
+    "copper_C": 47.8,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 55.22,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 47.6,
+    "calibrated": false,
+    "copper_C": 47.8,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 55.47,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 47.6,
+    "calibrated": false,
+    "copper_C": 47.8,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 55.73,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 47.6,
+    "calibrated": false,
+    "copper_C": 47.8,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 55.99,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 47.5,
+    "calibrated": false,
+    "copper_C": 47.7,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 56.24,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 47.5,
+    "calibrated": false,
+    "copper_C": 47.7,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 56.5,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 47.5,
+    "calibrated": false,
+    "copper_C": 47.7,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 56.75,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 47.5,
+    "calibrated": false,
+    "copper_C": 47.7,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 57.01,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 47.5,
+    "calibrated": false,
+    "copper_C": 47.7,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 57.27,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 47.4,
+    "calibrated": false,
+    "copper_C": 47.6,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 57.52,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 47.4,
+    "calibrated": false,
+    "copper_C": 47.6,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 57.78,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 47.4,
+    "calibrated": false,
+    "copper_C": 47.6,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 58.03,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 47.4,
+    "calibrated": false,
+    "copper_C": 47.6,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 58.29,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 47.4,
+    "calibrated": false,
+    "copper_C": 47.5,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 58.54,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.122,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 47.3,
+    "calibrated": false,
+    "copper_C": 47.5,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 58.8,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 47.3,
+    "calibrated": false,
+    "copper_C": 47.5,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 59.06,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 47.3,
+    "calibrated": false,
+    "copper_C": 47.5,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 59.31,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 47.3,
+    "calibrated": false,
+    "copper_C": 47.5,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 59.57,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 47.2,
+    "calibrated": false,
+    "copper_C": 47.4,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 59.82,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 47.2,
+    "calibrated": false,
+    "copper_C": 47.4,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  },
+  {
+   "t": 60.08,
+   "i1": 0.065,
+   "p1": 0.191,
+   "i2": 0.031,
+   "p2": 0.123,
+   "lev": "fault",
+   "gap": 24.9,
+   "thermo": {
+    "r_meas_ohm": 0.0,
+    "readings": 0,
+    "t_meas_C": -273.0,
+    "board_C": 47.2,
+    "calibrated": false,
+    "copper_C": 47.4,
+    "ref_ohm": 2.56,
+    "ref_C": 20.0,
+    "cut": true
+   }
+  }
+ ]
+}

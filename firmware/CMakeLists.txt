@@ -84,6 +84,11 @@ target_link_libraries(owlternating
     tinyusb_device
     tinyusb_board
 )
+# The whole image runs from RAM (copied there at boot): 134 kB of code and constants in
+# 520 kB.  Core 1's tick then never waits on a flash-cache miss; on 2026-11-08, from flash,
+# its worst tick was 322 us against 100 (BRINGUP.md 8.1; the XIP cache is 16 kB, shared
+# with core 0).  Flash stays mapped for the settings sector (settings.c).
+pico_set_binary_type(owlternating copy_to_ram)
 pico_enable_stdio_uart(owlternating 1)
 pico_enable_stdio_usb(owlternating 0)
 pico_add_extra_outputs(owlternating)

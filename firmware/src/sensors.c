@@ -32,7 +32,8 @@ bool imu_init(imu_state *s)
               i2c_write_reg8(a, LSM_CTRL1_XL, 0x60) &&         /* 416 Hz, +-2 g (taps need >= 416 Hz) */
               i2c_write_reg8(a, LSM_CTRL2_G, 0x00) &&          /* gyroscope off */
               i2c_write_reg8(a, LSM_TAP_CFG, 0x8F) &&          /* interrupts, taps on X Y Z, latched */
-              i2c_write_reg8(a, LSM_TAP_THS_6D, 0x0C) &&       /* tap threshold 12 x FS/32 = 0.75 g */
+              i2c_write_reg8(a, LSM_TAP_THS_6D, 0x03) &&       /* tap threshold 3 x FS/32 = 0.19 g (0.75 g never
+                                                                  fired on the bench; 0.31 g wanted firm taps, 2026-11-09) */
               i2c_write_reg8(a, LSM_INT_DUR2, 0x7F) &&         /* DUR 7, QUIET 3, SHOCK 3 (ST's AN5130 values) */
               i2c_write_reg8(a, LSM_WAKE_UP_THS, 0x80) &&      /* single and double taps */
               i2c_write_reg8(a, LSM_MD1_CFG, 0x48);            /* both on INT1 */

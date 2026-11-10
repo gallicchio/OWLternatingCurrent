@@ -1,0 +1,452 @@
+{
+ "what": "new image (build-bell-next: copy_to_ram, rate-based adc fault, overlapped burst), USB only, coils off",
+ "reads": [
+  {
+   "t": 1794200365.810666,
+   "status": {
+    "version": "0.1.0",
+    "board": "OWLternating Current rev A",
+    "uptime_s": 31,
+    "rails": {
+     "v12": 0.14,
+     "v5": 0.04,
+     "vbus": 5.13,
+     "coils_powered": false,
+     "usb_only": true
+    },
+    "i2c": {
+     "led_base": true,
+     "led_tree": false,
+     "imu": true,
+     "als": true,
+     "tmag": true,
+     "errors": 0
+    },
+    "faults": [],
+    "temps_C": {
+     "pend1": 23.2,
+     "pend2": 23.2,
+     "pend3": 23.2,
+     "lev": 23.2,
+     "imu": 17.7,
+     "tmag": 26.0
+    },
+    "coils": {
+     "awake": false,
+     "i_meas_A": [
+      0.004,
+      0.003,
+      0.004,
+      0.004
+     ],
+     "u": [
+      0.0,
+      0.0,
+      0.0,
+      0.0
+     ],
+     "r_ohm": [
+      2.32,
+      2.32,
+      2.32,
+      2.59
+     ]
+    },
+    "hall_mT": -134.85,
+    "tmag_mT": [
+     -0.041,
+     0.016,
+     0.097
+    ],
+    "lev": {
+     "state": "off",
+     "gap_mm": 24.9,
+     "mean_I_mA": 0.0,
+     "reason": ""
+    },
+    "pend": {
+     "mode": "off",
+     "stage": "run",
+     "present": false,
+     "x_mm": 0.0,
+     "y_mm": 0.0,
+     "amp_mm": 0.0,
+     "f_hz": 1.445,
+     "chosen": -1
+    },
+    "familiars": [
+     {
+      "perch": "fam1",
+      "state": "off",
+      "who": "none",
+      "present": false,
+      "f_hz": 0,
+      "duty": 0.0,
+      "isense_A": 0.0,
+      "p_W": 0.0
+     },
+     {
+      "perch": "fam2",
+      "state": "off",
+      "who": "none",
+      "present": false,
+      "f_hz": 0,
+      "duty": 0.0,
+      "isense_A": 0.0,
+      "p_W": 0.0
+     }
+    ],
+    "scene": {
+     "name": "asleep",
+     "manual": false,
+     "kuramoto_r": 0.0
+    },
+    "theremin": {
+     "on": true,
+     "ok": true,
+     "active": false,
+     "f_pitch": 310557,
+     "f_vol": 355803,
+     "pitch_hz": 213,
+     "volume": 0.0,
+     "loudness": 0.5
+    },
+    "film": {
+     "on": false,
+     "phase": "off"
+    },
+    "light": {
+     "lux": 293.29
+    },
+    "imu": {
+     "g": [
+      -0.003,
+      -0.008,
+      0.973
+     ],
+     "taps": 0,
+     "double_taps": 0
+    },
+    "rt": {
+     "ticks": 314401,
+     "overruns": 0,
+     "skipped_last_s": 0,
+     "pauses": 0,
+     "adc_errors": 0,
+     "tick_us_max": 19
+    },
+    "leds": {
+     "frames": 6287,
+     "errors": [
+      0,
+      0
+     ]
+    },
+    "lines_dropped": {
+     "uart": 0,
+     "usb": 0
+    }
+   }
+  },
+  {
+   "t": 1794200385.9138515,
+   "status": {
+    "version": "0.1.0",
+    "board": "OWLternating Current rev A",
+    "uptime_s": 51,
+    "rails": {
+     "v12": 0.14,
+     "v5": 0.04,
+     "vbus": 5.13,
+     "coils_powered": false,
+     "usb_only": true
+    },
+    "i2c": {
+     "led_base": true,
+     "led_tree": false,
+     "imu": true,
+     "als": true,
+     "tmag": true,
+     "errors": 0
+    },
+    "faults": [],
+    "temps_C": {
+     "pend1": 22.3,
+     "pend2": 22.3,
+     "pend3": 22.3,
+     "lev": 22.3,
+     "imu": 17.7,
+     "tmag": 25.9
+    },
+    "coils": {
+     "awake": false,
+     "i_meas_A": [
+      0.003,
+      0.003,
+      0.004,
+      0.003
+     ],
+     "u": [
+      0.0,
+      0.0,
+      0.0,
+      0.0
+     ],
+     "r_ohm": [
+      2.31,
+      2.31,
+      2.31,
+      2.58
+     ]
+    },
+    "hall_mT": -133.49,
+    "tmag_mT": [
+     -0.081,
+     0.081,
+     0.097
+    ],
+    "lev": {
+     "state": "off",
+     "gap_mm": 24.9,
+     "mean_I_mA": 0.0,
+     "reason": ""
+    },
+    "pend": {
+     "mode": "off",
+     "stage": "run",
+     "present": false,
+     "x_mm": 0.0,
+     "y_mm": 0.0,
+     "amp_mm": 0.0,
+     "f_hz": 1.445,
+     "chosen": -1
+    },
+    "familiars": [
+     {
+      "perch": "fam1",
+      "state": "off",
+      "who": "none",
+      "present": false,
+      "f_hz": 0,
+      "duty": 0.0,
+      "isense_A": 0.0,
+      "p_W": 0.0
+     },
+     {
+      "perch": "fam2",
+      "state": "off",
+      "who": "none",
+      "present": false,
+      "f_hz": 0,
+      "duty": 0.0,
+      "isense_A": 0.0,
+      "p_W": 0.0
+     }
+    ],
+    "scene": {
+     "name": "asleep",
+     "manual": false,
+     "kuramoto_r": 0.0
+    },
+    "theremin": {
+     "on": true,
+     "ok": true,
+     "active": false,
+     "f_pitch": 310550,
+     "f_vol": 355805,
+     "pitch_hz": 207,
+     "volume": 0.0,
+     "loudness": 0.5
+    },
+    "film": {
+     "on": false,
+     "phase": "off"
+    },
+    "light": {
+     "lux": 296.1
+    },
+    "imu": {
+     "g": [
+      -0.004,
+      -0.008,
+      0.975
+     ],
+     "taps": 0,
+     "double_taps": 0
+    },
+    "rt": {
+     "ticks": 515433,
+     "overruns": 0,
+     "skipped_last_s": 0,
+     "pauses": 0,
+     "adc_errors": 0,
+     "tick_us_max": 19
+    },
+    "leds": {
+     "frames": 10308,
+     "errors": [
+      0,
+      0
+     ]
+    },
+    "lines_dropped": {
+     "uart": 0,
+     "usb": 0
+    }
+   }
+  },
+  {
+   "t": 1794200406.01753,
+   "status": {
+    "version": "0.1.0",
+    "board": "OWLternating Current rev A",
+    "uptime_s": 71,
+    "rails": {
+     "v12": 0.13,
+     "v5": 0.03,
+     "vbus": 5.13,
+     "coils_powered": false,
+     "usb_only": true
+    },
+    "i2c": {
+     "led_base": true,
+     "led_tree": false,
+     "imu": true,
+     "als": true,
+     "tmag": true,
+     "errors": 0
+    },
+    "faults": [],
+    "temps_C": {
+     "pend1": 21.6,
+     "pend2": 21.6,
+     "pend3": 21.6,
+     "lev": 21.6,
+     "imu": 17.6,
+     "tmag": 26.1
+    },
+    "coils": {
+     "awake": false,
+     "i_meas_A": [
+      0.003,
+      0.003,
+      0.004,
+      0.004
+     ],
+     "u": [
+      0.0,
+      0.0,
+      0.0,
+      0.0
+     ],
+     "r_ohm": [
+      2.3,
+      2.3,
+      2.3,
+      2.58
+     ]
+    },
+    "hall_mT": -127.68,
+    "tmag_mT": [
+     -0.032,
+     0.024,
+     0.081
+    ],
+    "lev": {
+     "state": "off",
+     "gap_mm": 24.9,
+     "mean_I_mA": 0.0,
+     "reason": ""
+    },
+    "pend": {
+     "mode": "off",
+     "stage": "run",
+     "present": false,
+     "x_mm": 0.0,
+     "y_mm": 0.0,
+     "amp_mm": 0.0,
+     "f_hz": 1.445,
+     "chosen": -1
+    },
+    "familiars": [
+     {
+      "perch": "fam1",
+      "state": "off",
+      "who": "none",
+      "present": false,
+      "f_hz": 0,
+      "duty": 0.0,
+      "isense_A": 0.0,
+      "p_W": 0.0
+     },
+     {
+      "perch": "fam2",
+      "state": "off",
+      "who": "none",
+      "present": false,
+      "f_hz": 0,
+      "duty": 0.0,
+      "isense_A": 0.0,
+      "p_W": 0.0
+     }
+    ],
+    "scene": {
+     "name": "theremin",
+     "manual": false,
+     "kuramoto_r": 0.0
+    },
+    "theremin": {
+     "on": true,
+     "ok": true,
+     "active": false,
+     "f_pitch": 310542,
+     "f_vol": 355793,
+     "pitch_hz": 210,
+     "volume": 0.0,
+     "loudness": 0.5
+    },
+    "film": {
+     "on": false,
+     "phase": "off"
+    },
+    "light": {
+     "lux": 298.45
+    },
+    "imu": {
+     "g": [
+      -0.004,
+      -0.008,
+      0.977
+     ],
+     "taps": 0,
+     "double_taps": 0
+    },
+    "rt": {
+     "ticks": 716472,
+     "overruns": 0,
+     "skipped_last_s": 0,
+     "pauses": 0,
+     "adc_errors": 0,
+     "tick_us_max": 19
+    },
+    "leds": {
+     "frames": 14329,
+     "errors": [
+      0,
+      0
+     ]
+    },
+    "lines_dropped": {
+     "uart": 0,
+     "usb": 0
+    }
+   }
+  }
+ ],
+ "summary": {
+  "ticks_per_s": 10051.775,
+  "overruns_per_s": 0.0,
+  "tick_us_max": 19,
+  "faults": []
+ }
+}

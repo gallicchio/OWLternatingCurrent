@@ -80,6 +80,7 @@ static run_stats run(float seconds, bool chaos, uint32_t seed, bool auto_lux)
     }
     for (int f = 0; f < frames; f++) {
         in.tap = in.double_tap = in.button = false;
+        in.spell = 0;
         if (chaos) {
             float u = rng_uniform(&r);
             if (u < 0.002f)
@@ -103,6 +104,16 @@ static run_stats run(float seconds, bool chaos, uint32_t seed, bool auto_lux)
                 in.theremin_active = !in.theremin_active;
             if (rng_uniform(&r) < 0.002f)
                 in.lev_holding = !in.lev_holding;
+            if (rng_uniform(&r) < 0.002f) {               /* the loop: wait, hold, lost, fault, off */
+                static const uint8_t ST[5] = {0, 2, 3, 4, 6};
+                in.lev_state = ST[rng_next(&r) % 5u];
+            }
+            if (rng_uniform(&r) < 0.02f)                  /* the bat bobbing */
+                in.lev_err_mm = rng_range(&r, -3.0f, 3.0f);
+            if (rng_uniform(&r) < 0.001f)                 /* a spell */
+                in.spell = (uint8_t)(1u + rng_next(&r) % 3u);
+            if (!auto_lux && rng_uniform(&r) < 0.002f)    /* a hand over the light sensor, or not */
+                in.lux = rng_uniform(&r) < 0.5f ? rng_range(&r, 1.0f, 30.0f) : rng_range(&r, 100.0f, 800.0f);
             if (rng_uniform(&r) < 0.002f)
                 in.pendulum_choice = (int8_t)((int)(rng_next(&r) % 4u) - 1);
             if (rng_uniform(&r) < 0.001f)                 /* the 12 V adapter unplugged / back */
@@ -236,8 +247,167 @@ static void test_dither(void)
     CHECK(longest <= (int)(1.0f / LED_DITHER_DEADBAND) + 1, "a dither pattern %d frames long", longest);
 }
 
+/* play: each input lights its own LEDs, at full, within a second */
+static void play_frames(scene_inputs *in, float secs, float *out)
+{
+    int n = (int)(secs * (float)LED_FPS);
+    for (int k = 0; k < n; k++) {
+        scenes_render(&S, in, out);
+        in->tap = in->double_tap = in->button = false;
+        in->spell = 0;
+    }
+}
+
+static void test_play(void)
+{
+    float f[LED_COUNT];
+    scene_inputs in;
+    memset(&in, 0, sizeof in);
+    in.dt_s = 1.0f / (float)LED_FPS;
+    in.lux = 300.0f;
+    in.pendulum_choice = -1;
+    scenes_init(&S, 5u);
+    scenes_select(&S, SCENE_PLAY);
+    play_frames(&in, 3.0f, f);
+    CHECK(f[LED_GROUP_PUMPKIN[0]] > 0.35f, "PLAY: idle pumpkins dark (%.2f)", f[LED_GROUP_PUMPKIN[0]]);
+    CHECK(f[LED_GROUP_STAR[5]] == 0.0f && f[LED_GROUP_PERCH_DOWN[0]] == 0.0f, "PLAY: idle, something lit that should not be");
+    {
+        float lo = 1.0f, hi = 0.0f;
+        for (int k = 0; k < 4 * (int)LED_FPS; k++) {
+            play_frames(&in, 1.0f / (float)LED_FPS, f);
+            lo = fminf(lo, f[LED_GROUP_OWLRING[0]]);
+            hi = fmaxf(hi, f[LED_GROUP_OWLRING[0]]);
+        }
+        CHECK(lo > 0.08f && hi < 0.4f && hi - lo > 0.1f, "PLAY: a ring should turn softly (%.2f..%.2f)", lo, hi);
+    }
+    CHECK(scenes_current(&S) == SCENE_PLAY, "PLAY: left play in daylight");
+
+    in.theremin_active = true; in.pitch01 = 1.0f; in.volume01 = 1.0f;
+    play_frames(&in, 1.0f, f);
+    CHECK(f[LED_GROUP_STAR[0]] > 0.95f && f[LED_GROUP_STAR[11]] > 0.95f, "PLAY: theremin at top pitch, arc not full (%.2f, %.2f)",
+          f[LED_GROUP_STAR[0]], f[LED_GROUP_STAR[11]]);
+    CHECK(f[LED_GROUP_PUMPKIN[1]] > 0.95f, "PLAY: theremin at full volume, pumpkin %.2f", f[LED_GROUP_PUMPKIN[1]]);
+    in.pitch01 = 0.25f;
+    play_frames(&in, 1.0f, f);
+    CHECK(f[LED_GROUP_STAR[0]] > 0.95f && f[LED_GROUP_STAR[11]] < 0.05f, "PLAY: a low pitch should fill from the moon only");
+    in.theremin_active = false;
+    play_frames(&in, 1.5f, f);
+    CHECK(f[LED_GROUP_STAR[0]] < 0.05f, "PLAY: the arc stays after the hand leaves (%.2f)", f[LED_GROUP_STAR[0]]);
+
+    in.familiar[0] = FAMILIAR_OWL;
+    play_frames(&in, 2.0f, f);
+    CHECK(f[LED_GROUP_OWLRING[0]] < 0.4f, "PLAY: owl token, its ring too bright (%.2f)", f[LED_GROUP_OWLRING[0]]);
+    in.familiar[0] = FAMILIAR_NONE; in.familiar[1] = FAMILIAR_CAT;
+    play_frames(&in, 2.0f, f);
+    CHECK(f[LED_GROUP_CATRING[2]] < 0.4f, "PLAY: cat token, its ring too bright (%.2f)", f[LED_GROUP_CATRING[2]]);
+    in.familiar[1] = FAMILIAR_NONE;
+
+    /* the bat */
+    float lo = 1.0f, hi = 0.0f;
+    in.lev_state = 2;                                       /* waiting: breathing */
+    for (int k = 0; k < 2 * (int)LED_FPS; k++) {
+        play_frames(&in, 1.0f / (float)LED_FPS, f);
+        lo = fminf(lo, f[LED_GROUP_PERCH_DOWN[0]]); hi = fmaxf(hi, f[LED_GROUP_PERCH_DOWN[0]]);
+    }
+    CHECK(lo < 0.4f && hi > 0.65f, "PLAY: waiting, the downlights should breathe (%.2f..%.2f)", lo, hi);
+    in.lev_state = 3; in.lev_err_mm = 0.1f;                 /* caught, then locked */
+    lo = 1.0f;
+    for (int k = 0; k < (int)LED_FPS / 2; k++) {
+        play_frames(&in, 1.0f / (float)LED_FPS, f);
+        lo = fminf(lo, f[LED_GROUP_PERCH_DOWN[1]]);
+    }
+    CHECK(lo < 0.7f, "PLAY: catching, the downlights should pulse (low %.2f)", lo);
+    play_frames(&in, 1.0f, f);
+    CHECK(f[LED_GROUP_PERCH_DOWN[1]] > 0.99f, "PLAY: locked, downlights %.2f", f[LED_GROUP_PERCH_DOWN[1]]);
+    CHECK(fabsf(f[LED_GROUP_OWLEYE[0]] - 0.35f) < 0.01f && fabsf(f[LED_GROUP_OWLEYE[1]] - 0.35f) < 0.01f,
+          "PLAY: locked, owl A's eyes %.2f %.2f", f[LED_GROUP_OWLEYE[0]], f[LED_GROUP_OWLEYE[1]]);
+    in.lev_err_mm = -2.0f;                                  /* too close */
+    play_frames(&in, 0.1f, f);
+    CHECK(f[LED_GROUP_OWLEYE[0]] > 0.95f && f[LED_GROUP_OWLEYE[1]] == 0.0f, "PLAY: too close, eyes %.2f %.2f",
+          f[LED_GROUP_OWLEYE[0]], f[LED_GROUP_OWLEYE[1]]);
+    in.lev_err_mm = 1.2f;                                   /* too far */
+    play_frames(&in, 0.1f, f);
+    CHECK(f[LED_GROUP_OWLEYE[1]] > 0.6f && f[LED_GROUP_OWLEYE[0]] == 0.0f, "PLAY: too far, eyes %.2f %.2f",
+          f[LED_GROUP_OWLEYE[0]], f[LED_GROUP_OWLEYE[1]]);
+    in.lev_state = 4;                                       /* lost: pulses, then dark */
+    play_frames(&in, 2.5f, f);
+    CHECK(f[LED_GROUP_PERCH_DOWN[0]] == 0.0f, "PLAY: lost, the downlights stay on");
+    in.lev_state = 0;
+
+    /* a hand over the light sensor */
+    in.lux = 30.0f;
+    play_frames(&in, 1.0f, f);
+    CHECK(f[LED_GROUP_TSTAR[0]] > 0.95f && f[LED_GROUP_OWLEYE[2]] > 0.95f, "PLAY: shaded, tree star %.2f, owl B %.2f",
+          f[LED_GROUP_TSTAR[0]], f[LED_GROUP_OWLEYE[2]]);
+    in.lux = 300.0f;
+    play_frames(&in, 1.0f, f);
+    CHECK(f[LED_GROUP_TSTAR[0]] < 0.05f, "PLAY: the shade stays after the hand leaves (%.2f)", f[LED_GROUP_TSTAR[0]]);
+
+    /* a tap: every star flashes once, at its own moment, within 1.5 s */
+    float peak[LED_COUNT] = {0};
+    in.tap = true;
+    for (int k = 0; k < (int)(1.6f * (float)LED_FPS); k++) {
+        play_frames(&in, 1.0f / (float)LED_FPS, f);
+        for (int i = 0; i < LED_COUNT; i++)
+            peak[i] = fmaxf(peak[i], f[i]);
+    }
+    int lit = 0;
+    for (int k = 0; k < LED_N_STAR; k++)
+        lit += peak[LED_GROUP_STAR[k]] > 0.9f;
+    CHECK(lit == LED_N_STAR && peak[LED_GROUP_TSTAR[3]] > 0.9f && peak[LED_GROUP_WISP[0]] < 0.01f,
+          "PLAY: a tap: %d of %d arc stars flashed; a wisp %.2f", lit, LED_N_STAR, peak[LED_GROUP_WISP[0]]);
+    play_frames(&in, 0.5f, f);
+    CHECK(f[LED_GROUP_STARX[0]] == 0.0f, "PLAY: the twinkle stays");
+    in.double_tap = true;
+    memset(peak, 0, sizeof peak);
+    for (int k = 0; k < (int)(1.6f * (float)LED_FPS); k++) {
+        play_frames(&in, 1.0f / (float)LED_FPS, f);
+        for (int i = 0; i < LED_COUNT; i++)
+            peak[i] = fmaxf(peak[i], f[i]);
+    }
+    CHECK(peak[LED_GROUP_WISP[3]] > 0.9f && peak[LED_GROUP_TWISP[1]] > 0.9f, "PLAY: a double tap, the wisps %.2f %.2f",
+          peak[LED_GROUP_WISP[3]], peak[LED_GROUP_TWISP[1]]);
+
+    /* the spells */
+    in.spell = 1;                                           /* the ghost on the arc */
+    memset(peak, 0, sizeof peak);
+    for (int k = 0; k < 3 * (int)LED_FPS; k++) {
+        play_frames(&in, 1.0f / (float)LED_FPS, f);
+        in.spell = 0;
+        for (int j = 0; j < LED_N_STAR; j++)
+            peak[LED_GROUP_STAR[j]] = fmaxf(peak[LED_GROUP_STAR[j]], f[LED_GROUP_STAR[j]]);
+    }
+    lit = 0;
+    for (int j = 0; j < LED_N_STAR; j++)
+        lit += peak[LED_GROUP_STAR[j]] > 0.3f;
+    CHECK(lit >= 3, "PLAY: the ghost lit only %d arc stars", lit);
+    play_frames(&in, 3.5f, f);
+    CHECK(f[LED_GROUP_STAR[6]] == 0.0f, "PLAY: the ghost stays");
+    in.spell = 2;                                           /* everything wakes */
+    play_frames(&in, 0.4f, f);
+    CHECK(f[LED_GROUP_WISP[2]] > 0.95f && f[LED_GROUP_OWLEYE[4]] > 0.95f && f[LED_GROUP_STARX[1]] > 0.95f,
+          "PLAY: wake: wisp %.2f, owl C %.2f, star %.2f", f[LED_GROUP_WISP[2]], f[LED_GROUP_OWLEYE[4]], f[LED_GROUP_STARX[1]]);
+    play_frames(&in, 2.5f, f);
+    CHECK(f[LED_GROUP_WISP[2]] == 0.0f, "PLAY: the wake stays");
+    in.spell = 3;                                           /* a twinkle (and main's chirp) */
+    float pk = 0.0f;
+    for (int k = 0; k < (int)(1.6f * (float)LED_FPS); k++) {
+        play_frames(&in, 1.0f / (float)LED_FPS, f);
+        in.spell = 0;
+        pk = fmaxf(pk, f[LED_GROUP_STAR[4]]);
+    }
+    CHECK(pk > 0.9f, "PLAY: the third spell's twinkle %.2f", pk);
+
+    /* the pendulum's choice */
+    in.pendulum_choice = 2;
+    play_frames(&in, 1.0f, f);
+    CHECK(f[LED_GROUP_PUMPKIN[2]] > 0.8f, "PLAY: chosen pumpkin %.2f", f[LED_GROUP_PUMPKIN[2]]);
+    printf("play: every input lights its LEDs\n");
+}
+
 int main(void)
 {
+    test_play();
     test_cie();
     test_dither();
 

@@ -216,7 +216,7 @@ void lev_init(lev_ctrl *c)
     c->dfilt_hz = 50.0f;         /* the sim's 80 Hz doubles the noise current with the A4's coarser 7.5 mV/mT */
     c->zp_rate = 4.0f;           /* mm/s per A: ~1 s to find the float point */
     c->zp_range_mm = 2.0f;
-    c->g0_mm = LEV_G0_MM;
+    c->g0_mm = LEV_G0_BENCH_MM;
     c->mass_g = LEV_MASS_KG * 1e3f;
     c->i_max = LEV_I_MAX_A;
     c->catch_mm = 7.0f;          /* a bat 3 mm off, plus the DRV5055's VQ tolerance until `lev cal zero`
@@ -419,8 +419,11 @@ static void engage(lev_ctrl *c)
     c->catches++;
     c->peak_i = 0.0f;
     c->mean_i = c->ms_i = 0.0f;
-    if (c->gzp < 1e-4f)
-        c->gzp = c->g0_mm * 1e-3f;
+    /* every catch starts from g0: a walk that a hand drove (pushing the bat up into the
+     * coil, which the loop answers by pushing down) must not carry over.  Before
+     * 2026-11-09 it did, and nine catches in a row started at the walk's top, 11.5 mm,
+     * where the magnets cannot carry the bat */
+    c->gzp = c->g0_mm * 1e-3f;
     c->ramping = c->ramp_mm_s > 0.0f;
     c->gref = c->ramping ? c->gap : c->gzp;
     /* the integral starts out holding the bat's weight where it is */
@@ -448,7 +451,8 @@ void lev_step(lev_ctrl *c, const lev_input *in, lev_output *out)
     /* 2. the measurement */
     float R = (in->coil_R_ohm > 0.5f ? in->coil_R_ohm : COIL_R20_OHM) + DRV_RDSON_OHM;
     float v12 = in->v12_V > 1.0f ? in->v12_V : 1.0f;
-    float i_mod = c->i_model;                            /* the lifting current last tick's u makes */
+    float i_mod = c->u_lag ? c->i_model_prev : c->i_model;   /* the lifting current the u in force
+                                                                during this burst makes */
     float i_mir = sgnf(i_mod) * in->iprop_A;
     float w = clampf((fabsf(i_mod) - MIRROR_LO_A) / (MIRROR_HI_A - MIRROR_LO_A), 0.0f, 1.0f);
     float i_now = w * i_mir + (1.0f - w) * i_mod;        /* believed to flow during this burst */
@@ -607,6 +611,7 @@ void lev_step(lev_ctrl *c, const lev_input *in, lev_output *out)
     out->i_fwd_A = u * v12 / R;
     out->active = active;
     /* the lifting current this u will make: next tick's model current */
+    c->i_model_prev = c->i_model;
     c->i_model = c->coil_pol * out->i_fwd_A;
     if (c->state != LEV_HOLD)
         c->i_cmd = c->coil_pol * out->i_fwd_A;

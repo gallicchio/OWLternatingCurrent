@@ -1,4 +1,5 @@
-// OWLternating Current: the printed parts (one plate, PLA, no supports, one pause).
+// OWLternating Current: the printed parts (one plate, PLA, no supports, no pause; the
+// magnets are glued in after printing).
 //
 //   owl      - the perch's bias-magnet holder; snaps onto the perch's notches
 //   cap      - the floating bat's magnet cap; hooks under the bat's head and tail
@@ -17,7 +18,6 @@ include <out/params.scad>
 include <out/shapes.scad>
 
 PART = "plate";
-OPEN = false;      // true: the no-pause version (build.py passes -D OPEN=true)
 FN = 72;
 
 // ---------------------------------------------------------------- helpers
@@ -117,17 +117,17 @@ module owl_recess()            // hollow under the base: only a rim touches the 
         for (s = [-1, 1]) translate([s * OWL_RECESS_RIDGE[0], 0, OWL_RECESS_RIDGE[1]]) cube(0.02, center = true);
     }
 
-// OPEN: the no-pause version.  The owl's pocket runs out of its back as a slot (with a
-// groove up each side wall for the epoxy to key into); the cap's pocket has no floor.
+// The owl's pocket runs out of its back as a slot the magnet slides along (with a groove
+// up each side wall for the epoxy to key into); the cap's pocket has no floor.  The
+// sealed, pause-printed pockets are gone (Jason, 2026-11-09: keep only the no-pause parts).
 module owl_pocket()
     translate([0, 0, OWL_FLOOR])
-        if (OPEN) linear_extrude(OPEN_GAP_T) {
+        linear_extrude(OPEN_GAP_T) {
             circle_c(POCKET_R);
             translate([-OPEN_SLOT_W / 2, 0]) square([OPEN_SLOT_W, OPEN_SLOT_END]);
             for (s = [-1, 1]) translate([s * (OPEN_SLOT_W + OPEN_KEY_D) / 2, OPEN_KEY_Y])
                 square([OPEN_KEY_D + 0.02, OPEN_KEY_W], center = true);
         }
-        else linear_extrude(POCKET_DEPTH) circle_c(POCKET_R);
 
 module owl() {
     difference() {
@@ -185,14 +185,13 @@ module cap() {
             }
             cap_ears();
         }
-        if (OPEN) translate([0, 0, -0.01]) linear_extrude(CAP_OPEN_DEPTH + 0.01) circle_c(POCKET_R);
-        else translate([0, 0, CAP_FLOOR_T]) linear_extrude(POCKET_DEPTH) circle_c(POCKET_R);
+        translate([0, 0, -0.01]) linear_extrude(CAP_OPEN_DEPTH + 0.01) circle_c(POCKET_R);
     }
 }
 
-module cap_pedestal() {        // breakaway pedestal: the bat's place, and the height that
-    y0 = CAP_HEAD_DROP_IN - CAP_DROP_T - CAP_FOOT - 0.8;   // closes the cap's pocket on the
-    y1 = CAP_TAIL_DROP_IN + CAP_DROP_T + CAP_FOOT + 0.8;   // owl's layer: one pause
+module cap_pedestal() {        // breakaway pedestal: the bat's place while printing
+    y0 = CAP_HEAD_DROP_IN - CAP_DROP_T - CAP_FOOT - 0.8;
+    y1 = CAP_TAIL_DROP_IN + CAP_DROP_T + CAP_FOOT + 0.8;
     translate([-CAP_PED_HALF_X, y0, 0]) cube([2 * CAP_PED_HALF_X, y1 - y0, CAP_PLATFORM_TOP]);
     translate([0, 0, CAP_PLATFORM_TOP - 0.01])
         cylinder(r = CAP_DOME_R + 0.3, h = CAP_PLATEAU_TOP - CAP_PLATFORM_TOP + 0.01, $fn = FN);
@@ -303,17 +302,6 @@ module view_plate() {
     color(C_SCRAP) import("build/plate_standins.stl", convexity = 10);
 }
 
-module view_plate_paused() {   // the plate at the pause: everything cut at the pause height
-    color("#30343a") translate([0, 0, -0.6]) linear_extrude(0.6)
-        offset(r = 4, $fn = 24) offset(delta = -4) square(BED, center = true);
-    color(C_OWL) import("build/paused_owl.stl", convexity = 10);
-    color(C_CAP) import("build/paused_cap.stl", convexity = 10);
-    color(C_FOOT) import("build/plate_feet.stl", convexity = 10);
-    color(C_SCRAP) import("build/plate_standins.stl", convexity = 10);
-    for (p = [PLATE_OWL, PLATE_BAT_CAP]) translate([p[0], p[1], POCKET_FLOOR_Z]) magnet();
-}
-
-module cut_below(z) intersection() { children(); translate([-200, -200, -1]) cube([400, 400, z + 1]); }
 module cut_quarter() difference() { children(); translate([-60, -60, -60]) cube([60, 60, 120]); }
 
 // ================================================================= what to make
@@ -329,18 +317,13 @@ else if (PART == "bat") bat();
 // meshes for the pictures (CGAL cuts, so the cut faces keep the part's colour)
 else if (PART == "owl_cut") cut_quarter() owl();
 else if (PART == "cap_cut") cut_quarter() cap();
-else if (PART == "paused_owl") translate([PLATE_OWL[0], PLATE_OWL[1], 0]) cut_below(PAUSE_Z - 0.01) translate([0, 0, OWL_Z0]) owl();
-else if (PART == "paused_cap") translate([PLATE_BAT_CAP[0], PLATE_BAT_CAP[1], 0]) cut_below(PAUSE_Z - 0.01) translate([0, 0, CAP_Z0]) cap();
 // the views
 else if (PART == "view_levitation") view_levitation();
 else if (PART == "view_assembly") view_assembly();
 else if (PART == "view_plate") view_plate();
-else if (PART == "view_plate_paused") view_plate_paused();
 else if (PART == "view_owl") color(C_OWL) import("out/assembled/owl_in_perch_frame.stl", convexity = 10);
 else if (PART == "view_cap") color(C_CAP) import("out/assembled/bat_cap_in_bat_frame.stl", convexity = 10);
 else if (PART == "view_foot") color(C_FOOT) import("build/foot.stl", convexity = 10);
-else if (PART == "view_owl_open") color(C_OWL) import("build/owl_open.stl", convexity = 10);
-else if (PART == "view_cap_open") color(C_CAP) import("build/cap_open.stl", convexity = 10);
 else if (PART == "view_owl_on_perch") {
     perch();
     color(C_OWL) import("out/assembled/owl_in_perch_frame.stl", convexity = 10);

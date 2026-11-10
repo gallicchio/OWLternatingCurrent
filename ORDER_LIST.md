@@ -13,7 +13,7 @@ order them all on the same day.
 | 5 | **Thread for the pendulum**: clear nylon monofilament (fishing line, 4-8 lb, about 0.2-0.3 mm) or black sewing thread | what you have | 30 cm | |
 | 1a | **Three connectors to solder at home** (`mfg/release/hand_solder_bom.csv`): 2 x PZ254-2-08-W-8.5 right-angle 2x8 headers (LCSC C2894988) and 1 x PM254-2-08-Z-8.5 2x8 socket (C2897409) | LCSC, in the JLCPCB order | 2 + 1 (buy 4 + 2: a spare set) | $2 |
 | 6 | **A drop of cyanoacrylate glue** for the bat's cap | what you have | | |
-| 7 | *Only for the no-pause print* (`print/README.md`): **two-part epoxy**, a slow-setting one | what you have | a few drops | |
+| 7 | **Two-part epoxy**, a slow-setting one, to glue the magnets into the prints (`print/README.md`) | what you have | a few drops | |
 
 ## 1. The boards (JLCPCB)
 
@@ -63,7 +63,7 @@ the board makes from it).
 ## 3. The magnets
 
 Two go into the 3D prints, one in the owl and one in the bat's cap (`print/README.md`
-explains the one pause in the print where they drop in). They must be **N52, 10.0 x
+explains how they are glued in after printing). They must be **N52, 10.0 x
 2.0 mm, axially magnetised**: the levitation is computed for that magnet's strength and the
 prints' pockets are drawn for that size. N35 magnets of the same size are a sixth weaker;
 the bat would float lower, or not at all. Any seller's 10 x 2 mm N52 discs will do if the
@@ -71,8 +71,9 @@ AMF ones are out of stock.
 
 **They are a swallowing hazard.** A 10 x 2 mm N52 disc is a "hazardous magnet" in the toy
 rules (its flux index is ten times the limit), and the bat's cap, which holds one, is
-small enough to swallow if it comes off. So: the prints seal both magnets in during the
-print (no magnet is ever loose), the owl is too big to swallow, and the bat's cap is
+small enough to swallow if it comes off. So: both magnets are epoxied in (the cap's
+enclosed by the plastic and the bat, the owl's behind an epoxy plug keyed into its slot),
+the owl is too big to swallow, and the bat's cap is
 **glued to the bat** once it has clicked on (a drop of cyanoacrylate at each hook,
 `print/README.md`), so it cannot be pried off. Keep the eight spare magnets where a child
 cannot get them.
@@ -81,8 +82,8 @@ cannot get them.
 
 About 13 g of PLA for one plate: the owl, the bat's cap, and the four feet (they snap into
 the base's corner holes and lift it 6 mm, so the through-hole pins underneath don't
-scratch the table). Purple or black looks right; any colour works. Print settings, the
-pause, and how to drop the magnets in are in `print/README.md`.
+scratch the table). Purple or black looks right; any colour works. Print settings and how
+to glue the magnets in are in `print/README.md`.
 
 ## 5. The thread
 

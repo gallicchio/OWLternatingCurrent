@@ -54,7 +54,8 @@ static const uint8_t PIN_IN1[COIL_COUNT] = {PIN_PEND1_IN1, PIN_PEND2_IN1, PIN_PE
 /* ---- the world -------------------------------------------------------------------------- */
 static float v12 = 0.0f, v5 = 0.0f, vbus = 5.0f;
 static float coil_r[COIL_COUNT] = {COIL_R20_OHM, COIL_R20_OHM, COIL_R20_OHM, COIL_R20_OHM};   /* the real coils at 25 C */
-static float coil_t[COIL_COUNT] = {25.0f, 25.0f, 25.0f, 25.0f}; /* their temperature: one node, 2.8 J/K, 43 K/W */
+static float coil_t[COIL_COUNT] = {25.0f, 25.0f, 25.0f, 25.0f}; /* their temperature: one node, 2.8 J/K, ... */
+static float coil_rth[COIL_COUNT] = {43.0f, 43.0f, 43.0f, 43.0f}; /* ... and this many K/W to the room */
 static float hall_bias_mT = 6.36f;                             /* the owl's magnet at the sensor */
 static float hall_coil_mT_per_A = LEV_BCOIL_MT_PER_A;           /* the coil at the sensor, per forward amp */
 static long ticks;
@@ -77,6 +78,14 @@ static void bridge(unsigned s, float *fwd, float *rev, float *brake, float *coas
     *brake = (float)n[3] / P;
 }
 
+/* what the coil really sees: the bridge takes DRV_PULSE_LOSS_S off each output pulse
+ * (rev A, bringup/REVB.md 3.3), one forward and one reverse pulse a period */
+static float seen(float frac, unsigned s)
+{
+    float loss = DRV_PULSE_LOSS_S * (float)SYS_CLK_HZ / (2.0f * (float)(stub_pwm.slice[s].top + 1u));
+    return frac > loss ? frac - loss : 0.0f;
+}
+
 /* the coil's mean current: nothing asleep or with the pins not on the PWM */
 static float coil_current(int c)
 {
@@ -85,7 +94,7 @@ static float coil_current(int c)
     float f, r, b, k;
     bridge(SLICE[c], &f, &r, &b, &k);
     float rc = coil_r[c] * (1.0f + COPPER_TEMPCO * (coil_t[c] - 25.0f));
-    return (f - r) * v12 / (rc + DRV_RDSON_OHM);
+    return (seen(f, SLICE[c]) - seen(r, SLICE[c])) * v12 / (rc + DRV_RDSON_OHM);
 }
 
 static uint16_t code(float volts)
@@ -123,11 +132,12 @@ static void tick(void)
         stub_dma_dest[3 * i + ADC_SLOT_MUX_OUT] = code(mux_volts(mux));
     }
     stub_dma_busy = false;
+    stub_dma_irq_pending = true;
     stub_irq_handler[DMA_IRQ_1]();
     for (int c = 0; c < COIL_COUNT; c++) {           /* the plant's coils warm and cool */
         float i = coil_current(c);
         float rc = coil_r[c] * (1.0f + COPPER_TEMPCO * (coil_t[c] - 25.0f));
-        coil_t[c] += (i * i * rc - (coil_t[c] - 25.0f) / 43.0f) * 1e-4f / 2.8f;
+        coil_t[c] += (i * i * rc - (coil_t[c] - 25.0f) / coil_rth[c]) * 1e-4f / 2.8f;
     }
     ticks++;
 }
@@ -180,15 +190,49 @@ static void test_pwm_math(void)
             coil_set_u(COIL_LEV, US[k], ALT[a]);
             float f, r, b, c;
             bridge(PWM_SLICE_LEV, &f, &r, &b, &c);
-            float lim = 1.0f - 2.0f * ALT[a];
+            float loss = DRV_PULSE_LOSS_S * coil_pwm_hz(COIL_LEV);
+            float lim = ALT[a] > 0.0f ? 1.0f - 2.0f * (ALT[a] + loss) : 1.0f - loss;   /* coils.c's room */
             float want = fmaxf(-lim, fminf(lim, US[k]));
             float P = (float)(coil_top(COIL_LEV) + 1u);
-            worst = fmaxf(worst, fabsf((f - r) - want));
-            CHECK(fabsf((f - r) - want) <= 1.0f / P + 1e-6f, "PWM: u %.3f alt %.3f gave %.4f", (double)US[k],
-                  (double)ALT[a], (double)(f - r));
+            float got = seen(f, PWM_SLICE_LEV) - seen(r, PWM_SLICE_LEV);   /* after the bridge's loss */
+            worst = fmaxf(worst, fabsf(got - want));
+            CHECK(fabsf(got - want) <= 1.0f / P + 1e-6f, "PWM: u %.3f alt %.3f gave %.4f at the coil", (double)US[k],
+                  (double)ALT[a], (double)got);
             CHECK(c == 0.0f, "PWM: coasts %.3f of the period while driving", (double)c);
-            CHECK(f + 1.0f / P >= ALT[a] && r + 1.0f / P >= ALT[a], "PWM: alternation below %.3f", (double)ALT[a]);
+            CHECK(seen(f, PWM_SLICE_LEV) + 1.0f / P >= ALT[a] && seen(r, PWM_SLICE_LEV) + 1.0f / P >= ALT[a],
+                  "PWM: alternation below %.3f at the coil", (double)ALT[a]);
+            if (ALT[a] == 0.0f && US[k] == 0.0f)
+                CHECK(f == 0.0f && r == 0.0f && c == 0.0f, "PWM: nothing asked for drives %.4f / %.4f", (double)f,
+                      (double)r);
         }
+    /* the compensation itself: each pulse asked for comes out DRV_PULSE_LOSS_S longer */
+    {
+        float f, r, b, c;
+        coil_set_u(COIL_LEV, 0.05f, 0.0f);
+        bridge(PWM_SLICE_LEV, &f, &r, &b, &c);
+        float loss = DRV_PULSE_LOSS_S * coil_pwm_hz(COIL_LEV), P = (float)(coil_top(COIL_LEV) + 1u);
+        CHECK(fabsf(f - (0.05f + loss)) <= 1.0f / P + 1e-6f && r == 0.0f, "PWM: lev fwd %.4f, not %.4f", (double)f,
+              (double)(0.05f + loss));
+        coil_set_u(COIL_PEND1, -0.2f, 0.0f);
+        bridge(PWM_SLICE_PEND1, &f, &r, &b, &c);
+        loss = DRV_PULSE_LOSS_S * coil_pwm_hz(COIL_PEND1);
+        P = (float)(coil_top(COIL_PEND1) + 1u);
+        CHECK(fabsf(r - (0.2f + loss)) <= 1.0f / P + 1e-6f && f == 0.0f, "PWM: pend1 rev %.4f, not %.4f", (double)r,
+              (double)(0.2f + loss));
+        coil_set_u(COIL_LEV, 0.0f, DRV_MIN_PULSE_S * coil_pwm_hz(COIL_LEV));   /* rt.c's min_alt */
+        bridge(PWM_SLICE_LEV, &f, &r, &b, &c);
+        CHECK(seen(f, PWM_SLICE_LEV) > 0.0f && seen(r, PWM_SLICE_LEV) > 0.0f, "PWM: the min_alt pulses vanish");
+        coil_set_u(COIL_LEV, 0.99f, 0.0f);                                     /* saturated: all forward */
+        bridge(PWM_SLICE_LEV, &f, &r, &b, &c);
+        CHECK(f == 1.0f && r == 0.0f, "PWM: full forward %.4f / %.4f", (double)f, (double)r);
+        coil_set_fractions(COIL_LEV, 0.7f, 0.4f);              /* too much of both: the mean kept */
+        bridge(PWM_SLICE_LEV, &f, &r, &b, &c);
+        CHECK(fabsf((f - r) - 0.3f) <= 2.0f / (float)(coil_top(COIL_LEV) + 1u) && f + r <= 1.0f + 1e-6f,
+              "PWM: an overfull request lost its mean: %.4f / %.4f", (double)f, (double)r);
+        coil_coast(COIL_PEND1);
+        printf("PWM: every pulse %.0f ns longer than asked (the bridge's loss); min_alt survives it\n",
+               (double)(DRV_PULSE_LOSS_S * 1e9f));
+    }
     coil_coast(COIL_LEV);
     float f, r, b, c;
     bridge(PWM_SLICE_LEV, &f, &r, &b, &c);
@@ -433,6 +477,105 @@ static void test_lev_cal(void)
            (double)t.kcs_mT_per_A, (double)hall_coil_mT_per_A);
 }
 
+/* THE LEVITATION COIL'S THERMOMETER (bench 2026-11-08): its model alone stopped every hover
+ * after 2-3 minutes while the perch felt only warm.  Here the plant's coil loses heat three
+ * times better than the model assumes (15 K/W, not 43) and its resistance is the pendulum
+ * coils' 2.29 ohm, not the 2.56 the model starts from.  0.5 A for 150 s: the model
+ * alone would read over 20 K of rise and derate near its 50 C board limit; with the V/I
+ * readings it must follow the plant. */
+static void test_lev_thermometer(void)
+{
+    rt.clear_req++;
+    coil_rth[COIL_LEV] = 15.0f;
+    run_ms(65000);                                    /* cold for a minute: the reference calibrates */
+    uint32_t n0 = rt.lev_r_readings;
+    float worst = 0.0f;
+    for (int s = 0; s < 150; s++) {
+        rt_coil_request(COIL_LEV, 0.5f, 2000, RT_OWNER_CONSOLE);
+        run_ms(1000);
+        if (s >= 60)
+            worst = fmaxf(worst, fabsf(rt.temp_C[COIL_LEV] - coil_t[COIL_LEV]));
+    }
+    float model = rt.temp_C[COIL_LEV], plant = coil_t[COIL_LEV], i = coil_current(COIL_LEV);
+    rt_coil_release_owner(RT_OWNER_CONSOLE);
+    run_ms(1200);
+    printf("lev thermometer: 0.5 A for 150 s: plant %.1f C, model %.1f C (worst %.1f K off after the first minute), "
+           "%lu readings, last %.3f ohm, calibrated %d, %.3f A at the end\n",
+           (double)plant, (double)model, (double)worst, (unsigned long)(rt.lev_r_readings - n0),
+           (double)rt.lev_r_meas_ohm, (int)rt_thermal[COIL_LEV].r_calibrated, (double)i);
+    CHECK(rt.lev_r_readings - n0 > 1000, "LEV THERMOMETER: only %lu readings", (unsigned long)(rt.lev_r_readings - n0));
+    CHECK(rt_thermal[COIL_LEV].r_calibrated, "LEV THERMOMETER: the reference never calibrated");
+    CHECK(worst < 4.0f, "LEV THERMOMETER: the model was %.1f K off the plant", (double)worst);
+    CHECK(i > 0.45f, "LEV THERMOMETER: derated to %.3f A although the coil is only %.1f C", (double)i, (double)plant);
+    coil_rth[COIL_LEV] = 43.0f;
+}
+
+/* CLOCK WRAP (bench 2026-11-08): with 32-bit deadlines and a signed difference, every coil
+ * was forbidden from 2147.5 s of uptime (2^31 us) for the next 35.8 min, and an expired
+ * request would have come back 2^31 us after its deadline.  The deadlines are 64-bit now:
+ * jump the clock across 2^31 and 2^32 us and check both, and an nFAULT retry armed just
+ * before time_us_32 wraps. */
+static void test_clock_wrap(void)
+{
+    v12 = 12.0f;
+    v5 = 5.0f;
+    rt.clear_req++;
+    run_ms(600);
+    CHECK(rt.power_ok && rt.faults == 0, "WRAP: not ready (faults %#lx)", (unsigned long)rt.faults);
+    /* a request that expires, then the clock 2^31 us + 1 s on: it must stay expired */
+    rt_coil_request(COIL_PEND1, 0.3f, 50, RT_OWNER_CONSOLE);
+    run_ms(20);
+    CHECK(fabsf(coil_current(COIL_PEND1) - 0.3f) < 0.02f, "WRAP: the request did not drive");
+    run_ms(1200);
+    CHECK(asleep(), "WRAP: not asleep after the request");
+    stub_now_us += (1ull << 31) + 1000000u;
+    run_ms(1200);
+    CHECK(asleep() && coil_current(COIL_PEND1) == 0.0f, "WRAP: an expired request came back after 2^31 us");
+    CHECK(rt_coil_owner(COIL_PEND1) == RT_OWNER_NONE, "WRAP: core 0 sees the expired request's owner again");
+    /* past 2^31 us of uptime: coils still allowed (a fresh request drives) */
+    CHECK(stub_now_us > (1ull << 31), "WRAP: the clock is not past 2^31 us");
+    rt_coil_request(COIL_PEND2, 0.3f, 100, RT_OWNER_PEND);
+    run_ms(20);
+    CHECK(fabsf(coil_current(COIL_PEND2) - 0.3f) < 0.02f, "WRAP: past 2^31 us a fresh request does not drive (%.3f A)",
+          (double)coil_current(COIL_PEND2));
+    CHECK(rt_coil_owner(COIL_PEND2) == RT_OWNER_PEND, "WRAP: core 0 does not see the fresh request");
+    run_ms(1200);
+    /* across time_us_32's wrap (2^32 us), with a request running through it */
+    stub_now_us = (1ull << 32) - 30000u;
+    run_ms(10);
+    rt_coil_request(COIL_PEND1, 0.3f, 100, RT_OWNER_CONSOLE);
+    run_ms(50);                                        /* across the wrap */
+    CHECK(fabsf(coil_current(COIL_PEND1) - 0.3f) < 0.02f, "WRAP: a request across 2^32 us stopped (%.3f A)",
+          (double)coil_current(COIL_PEND1));
+    run_ms(60);
+    CHECK(coil_current(COIL_PEND1) == 0.0f, "WRAP: a request across 2^32 us outlived its 100 ms");
+    run_ms(1200);
+    /* an nFAULT just before the wrap: asleep for 100 ms across it, then the retry */
+    stub_now_us = (1ull << 33) - 60000u;
+    rt.clear_req++;
+    run_ms(5);
+    rt_coil_request(COIL_PEND3, 0.3f, 2000, RT_OWNER_FILM);
+    run_ms(20);
+    CHECK(fabsf(coil_current(COIL_PEND3) - 0.3f) < 0.02f, "WRAP: not driving before the nFAULT");
+    stub_gpio_in[PIN_DRV_nFAULT] = false;
+    for (int k = 0; k < 100 && !asleep(); k++)
+        tick();
+    CHECK(asleep() && (rt.faults & RT_FAULT_NFAULT), "WRAP: the nFAULT did not stop the bridges");
+    stub_gpio_in[PIN_DRV_nFAULT] = true;
+    run_ms(50);                                        /* the retry deadline lies past the wrap */
+    CHECK(asleep(), "WRAP: retried before 100 ms across the wrap");
+    run_ms(60);
+    CHECK(!asleep() && fabsf(coil_current(COIL_PEND3) - 0.3f) < 0.02f, "WRAP: no retry after the wrap");
+    rt_coil_release_owner(RT_OWNER_FILM);
+    rt_coil_release_owner(RT_OWNER_CONSOLE);
+    rt_coil_release_owner(RT_OWNER_PEND);
+    rt.clear_req++;
+    run_ms(1200);
+    CHECK(asleep(), "WRAP: not asleep at the end");
+    printf("clock wrap: past 2^31 us coils run, an expired request stays expired; across 2^32 us a request "
+           "keeps its length and an nFAULT retry its 100 ms\n");
+}
+
 int main(void)
 {
     test_safe();
@@ -448,25 +591,74 @@ int main(void)
     test_mirrors();
     test_thermal();
     test_lev_cal();
+    test_lev_thermometer();
     CHECK(rt.overruns == 0, "%lu overruns", (unsigned long)rt.overruns);
+    CHECK(!(rt.faults & RT_FAULT_ADC), "ADC fault after the ordinary tests");
+    CHECK(stub_drain_while_running == 0, "the FIFO was drained %d times with the ADC running",
+          stub_drain_while_running);
     /* the race of 2026-11-07: the burst has finished and its DMA interrupt is pending when
-     * the tick's wrap wins the arbitration (same priority, lower IRQ number).  The tick
-     * must not start a burst (and not drain the FIFO: with the ADC still free-running that
-     * spun for ever on rev A); it yields, counting an overrun, and the next tick is normal */
+     * the tick runs.  The tick must not drain the FIFO with the ADC still free-running (that
+     * spun for ever on rev A).  Since 2026-11-08 it does the completion's work itself (stop
+     * the ADC, take the buffer), starts the next burst and runs the work; the completion
+     * interrupt, when it then runs, does nothing (and above all does not stop the new burst) */
     {
+        stub_now_us += 100u;
+        stub_irq_handler[PWM_IRQ_WRAP_1]();               /* a burst starts */
+        stub_adc_running = true;                          /* the ADC free-runs past the burst */
+        stub_dma_busy = false;
+        stub_dma_irq_pending = true;                      /* ... its completion not yet run */
         uint32_t before = rt.ticks, over = rt.overruns;
-        stub_dma_irq_pending = true;
         stub_now_us += 100u;
         stub_irq_handler[PWM_IRQ_WRAP_1]();
-        CHECK(!stub_dma_busy, "the tick started a burst over a pending completion");
-        CHECK(rt.overruns == over + 1, "the yielded tick was not counted");
-        stub_dma_irq_pending = false;
-        stub_irq_handler[DMA_IRQ_1]();                    /* the pending completion runs */
-        tick();
-        CHECK(rt.ticks == before + 2, "ticks %lu after the race, expected %lu", (unsigned long)rt.ticks,
-              (unsigned long)(before + 2));
-        rt.overruns = 0;
+        CHECK(stub_drain_while_running == 0, "RACE: drained the FIFO with the ADC running");
+        CHECK(stub_dma_busy && stub_adc_running, "RACE: no new burst after a pending completion");
+        CHECK(rt.ticks == before + 1, "RACE: the work did not run on the completed burst");
+        CHECK(rt.overruns == over, "RACE: counted as an overrun");
+        stub_irq_handler[DMA_IRQ_1]();                    /* the stale completion interrupt */
+        CHECK(stub_adc_running, "RACE: the stale completion stopped the new burst");
+        stub_dma_busy = false;
+        stub_dma_irq_pending = true;
+        stub_irq_handler[DMA_IRQ_1]();
+        run_ms(10);
+        CHECK(rt.ticks == before + 101, "ticks %lu after the race, expected %lu", (unsigned long)rt.ticks,
+              (unsigned long)(before + 101));
     }
+    /* ADC FAULT: a rate, not a count.  0.5 % of ticks lost for three seconds: no fault;
+     * a flash write's 200 ms pause: a pause, no fault; 5 % lost: the fault */
+    {
+        run_ms(1100);
+        rt.clear_req++;
+        run_ms(1100);
+        CHECK(!(rt.faults & RT_FAULT_ADC), "ADC: latched before anything was lost (%lu overruns)",
+              (unsigned long)rt.overruns);
+        for (int k = 0; k < 30000; k++) {
+            tick();
+            if (k % 200 == 0)
+                stub_now_us += 100u;                      /* a wrap swallowed: one tick late */
+        }
+        CHECK(!(rt.faults & RT_FAULT_ADC), "ADC: latched at 0.5 %% lost (%lu in the last second)",
+              (unsigned long)rt.skipped_last_s);
+        unsigned long low_rate = (unsigned long)rt.skipped_last_s;
+        CHECK(low_rate >= 40 && low_rate <= 60, "ADC: %lu skipped in a second at 0.5 %%", low_rate);
+        uint32_t pauses = rt.pauses;
+        stub_now_us += 200000u;                           /* core 1 parked by a flash write */
+        run_ms(2100);
+        CHECK(rt.pauses == pauses + 1, "ADC: the pause was not counted as one");
+        CHECK(!(rt.faults & RT_FAULT_ADC), "ADC: latched by a flash write's pause");
+        for (int k = 0; k < 30000; k++) {
+            tick();
+            if (k % 20 == 0)
+                stub_now_us += 100u;
+        }
+        CHECK(rt.faults & RT_FAULT_ADC, "ADC: not latched at 5 %% lost (%lu in the last second)",
+              (unsigned long)rt.skipped_last_s);
+        rt.clear_req++;
+        run_ms(2100);
+        CHECK(!(rt.faults & RT_FAULT_ADC), "ADC: back after clear");
+        printf("adc fault: a rate (0.5 %% lost: none, %lu a second; a 200 ms pause: none; 5 %%: latched)\n",
+               low_rate);
+    }
+    test_clock_wrap();
     printf("%ld ticks (%.0f s of core 1)\n", ticks, (double)ticks / CTRL_TICK_HZ);
     if (failures) {
         printf("test_rt: %d FAILED\n", failures);

@@ -131,8 +131,9 @@ CAP_TAIL_DROP_IN = M.BAT_TAIL_Y + CAP_DROP_CLEAR
 CAP_HEAD_LIP_TIP = M.BAT_HEAD_Y + M.CAP_HOOK
 CAP_TAIL_LIP_TIP = M.BAT_TAIL_Y - M.CAP_HOOK
 
-# One pause for both magnets: the cap prints on a pedestal tall enough that its pocket
-# closes on the same layer as the owl's.
+# The cap's print height.  It once let one pause close both pockets on the same layer; the
+# pause version is gone (2026-11-09), but the names and the height stay, so the cap still
+# prints exactly as the no-pause plate always did.  Nothing pauses.
 PAUSE_Z = OWL_Z0 + OWL_FLOOR + POCKET_DEPTH     # top of the last layer before the pause
 PAUSE_LAYER = int(round(PAUSE_Z / LAYER)) + 1   # the first layer printed over the magnets
 PAUSE_LAYER_TOP = PAUSE_LAYER * LAYER
@@ -142,15 +143,15 @@ CAP_PLATFORM_TOP = CAP_Z0 + CAP_Z_BOTTOM - GAP_Z   # under the lips
 CAP_PLATEAU_TOP = CAP_Z0 - GAP_Z                    # under the floor and arms
 CAP_PED_HALF_X = CAP_DOME_R + 1.0
 
-# --- the no-pause version (out/no_pause/): the magnets go in after printing ---------------
+# --- the pockets: the magnets go in after printing (the only version since 2026-11-09) ------
 # The owl's pocket opens out of its back through a slot the magnet slides along, flat; the
 # cap's pocket has no floor, so its magnet goes in from below before the cap goes on, and
-# the bat closes it.  Two-part epoxy fills what's left.  Both magnets end up where the pause
-# version puts them: the owl's on its pocket floor (OWL_FLOOR), the cap's against its roof
-# (where the pause version's magnet is pulled when the bat floats).
-OPEN_GAP_T = 13 * LAYER       # the owl's pocket and slot, for a 2.0 mm magnet: room for the
-                              # bridged roof to sag a little, and for the epoxy
-OPEN_SLOT_W = 10.5            # the slot (magnet 10.0); the pocket's round front end centres it
+# the bat closes it.  Two-part epoxy fills what's left.  The owl's magnet rests on its
+# pocket floor (OWL_FLOOR), the cap's against its roof (where the bat's pull puts it).
+OPEN_GAP_T = 11 * LAYER       # the owl's pocket and slot, for a 2.0 mm magnet: 2.2 mm (was 2.6,
+                              # Jason 2026-11-09: a snug slot needs only a drop of epoxy; if the
+                              # bridged roof sags, the magnet is pushed in with a stick)
+OPEN_SLOT_W = 10.25           # the slot (magnet 10.0; was 10.5); the pocket's round front end centres it
 OPEN_SLOT_END = OWL_B + 1.0   # the slot runs out through the owl's back
 OPEN_KEY_Y = 7.4              # a groove up each of the slot's side walls, behind the magnet:
 OPEN_KEY_W = 1.2              # the epoxy plug keys into them
@@ -531,8 +532,8 @@ def check_invariants():
     assert OWL_SLAB_HALF_X <= OWL_LIP_TIP - GAP_XY, "owl's stand-in touches its lips"
     assert CAP_PLATFORM_TOP > 0
     assert OWL_ARM_HALF_W * 2 < OWL_NOTCH_LEN
-    assert on_grid(OPEN_GAP_T) and OPEN_GAP_T >= M.MAGNET_T + 0.4
-    assert OPEN_SLOT_W > M.MAGNET_D + 0.3
+    assert on_grid(OPEN_GAP_T) and OPEN_GAP_T >= M.MAGNET_T + 0.2   # was + 0.4; a sagged roof is pushed past (Jason)
+    assert OPEN_SLOT_W > M.MAGNET_D + 0.2   # was + 0.3; snug, the magnet pushed in (Jason)
     z = OWL_FLOOR + OPEN_GAP_T
     assert OPEN_SLOT_END > owl_profile(OWL_FLOOR)[1], "slot doesn't reach the owl's back"
     assert M.MAGNET_D - POCKET_R < OPEN_KEY_Y - OPEN_KEY_W / 2, "groove over the seated magnet"

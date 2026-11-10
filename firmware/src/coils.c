@@ -68,10 +68,29 @@ void coil_set_fractions(int coil, float f_fwd, float f_rev)
         f_fwd = 0.0f;
     if (!(f_rev > 0.0f))
         f_rev = 0.0f;
+    /* The bridge takes DRV_PULSE_LOSS_S off every output pulse (measured on rev A): put it
+     * back on each pulse asked for, so what the coil sees is what was asked.  Without it a
+     * pulse under 0.5 us vanished (the levitation coil's min_alt, 0.3 us) and the mean
+     * voltage had a dead zone of about +-0.05 x 12 V round zero at 100 kHz.  Nothing asked
+     * for stays nothing: a zero fraction is brake all period. */
+    float loss = DRV_PULSE_LOSS_S * coil_pwm_hz(coil);
+    if (f_fwd > 0.0f)
+        f_fwd += loss;
+    if (f_rev > 0.0f)
+        f_rev += loss;
     float s = f_fwd + f_rev;
-    if (s > 1.0f) {
-        f_fwd /= s;
-        f_rev /= s;
+    if (s > 1.0f) {                         /* no room: keep the difference (the mean) */
+        float d = f_fwd - f_rev;
+        if (d >= 1.0f) {
+            f_fwd = 1.0f;
+            f_rev = 0.0f;
+        } else if (d <= -1.0f) {
+            f_fwd = 0.0f;
+            f_rev = 1.0f;
+        } else {
+            f_fwd = 0.5f * (1.0f + d);
+            f_rev = 0.5f * (1.0f - d);
+        }
     }
     uint32_t P = top[coil] + 1u;
     uint32_t ccB = (uint32_t)lroundf(f_fwd * (float)P);
@@ -85,9 +104,11 @@ void coil_set_u(int coil, float u, float min_alt)
 {
     if (!(min_alt > 0.0f))
         min_alt = 0.0f;
-    if (min_alt > 0.5f)
-        min_alt = 0.5f;
-    float lim = 1.0f - 2.0f * min_alt;
+    float loss = DRV_PULSE_LOSS_S * coil_pwm_hz(coil);   /* each pulse's, put back below */
+    if (min_alt > 0.5f - loss)
+        min_alt = 0.5f - loss;
+    /* the room for u: both pulses, each with its loss added, inside one period */
+    float lim = min_alt > 0.0f ? 1.0f - 2.0f * (min_alt + loss) : 1.0f - loss;
     if (!(u == u))
         u = 0.0f;                                         /* NaN: nothing */
     if (u > lim)

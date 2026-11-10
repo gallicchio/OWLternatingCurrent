@@ -1,0 +1,151 @@
+{
+ "what": "save after lev cal; core 1 pause check",
+ "save": {
+  "ok": true,
+  "cmd": "save"
+ },
+ "status_after": {
+  "version": "0.1.0",
+  "board": "OWLternating Current rev A",
+  "uptime_s": 275,
+  "rails": {
+   "v12": 11.72,
+   "v5": 4.74,
+   "vbus": 5.13,
+   "coils_powered": true,
+   "usb_only": false
+  },
+  "i2c": {
+   "led_base": true,
+   "led_tree": true,
+   "imu": true,
+   "als": true,
+   "tmag": true,
+   "errors": 0
+  },
+  "faults": [],
+  "temps_C": {
+   "pend1": 19.2,
+   "pend2": 19.2,
+   "pend3": 19.2,
+   "lev": 19.2,
+   "imu": 18.8,
+   "tmag": 26.8
+  },
+  "coils": {
+   "awake": false,
+   "i_meas_A": [
+    0.004,
+    0.004,
+    0.005,
+    0.004
+   ],
+   "u": [
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "r_ohm": [
+    2.28,
+    2.28,
+    2.28,
+    2.55
+   ]
+  },
+  "hall_mT": 7.65,
+  "tmag_mT": [
+   -0.057,
+   0.073,
+   0.065
+  ],
+  "lev": {
+   "state": "off",
+   "gap_mm": 24.9,
+   "mean_I_mA": 0.0,
+   "reason": ""
+  },
+  "pend": {
+   "mode": "off",
+   "stage": "run",
+   "present": false,
+   "x_mm": 0.0,
+   "y_mm": 0.0,
+   "amp_mm": 0.0,
+   "f_hz": 1.445,
+   "chosen": -1
+  },
+  "familiars": [
+   {
+    "perch": "fam1",
+    "state": "live",
+    "who": "owl",
+    "present": true,
+    "f_hz": 142045,
+    "duty": 0.5,
+    "isense_A": 0.063,
+    "p_W": 0.181
+   },
+   {
+    "perch": "fam2",
+    "state": "live",
+    "who": "cat",
+    "present": true,
+    "f_hz": 302419,
+    "duty": 0.5,
+    "isense_A": 0.025,
+    "p_W": 0.093
+   }
+  ],
+  "scene": {
+   "name": "asleep",
+   "manual": false,
+   "kuramoto_r": 0.0
+  },
+  "theremin": {
+   "on": true,
+   "ok": true,
+   "active": false,
+   "f_pitch": 311455,
+   "f_vol": 356100,
+   "pitch_hz": 200,
+   "volume": 0.0,
+   "loudness": 0.5
+  },
+  "film": {
+   "on": false,
+   "phase": "off"
+  },
+  "light": {
+   "lux": 281.4
+  },
+  "imu": {
+   "g": [
+    -0.005,
+    -0.008,
+    0.972
+   ],
+   "taps": 0,
+   "double_taps": 0
+  },
+  "rt": {
+   "ticks": 2756273,
+   "overruns": 1,
+   "skipped_last_s": 0,
+   "pauses": 1,
+   "adc_errors": 0,
+   "tick_us_max": 21
+  },
+  "leds": {
+   "frames": 55131,
+   "errors": [
+    0,
+    0
+   ]
+  },
+  "lines_dropped": {
+   "uart": 0,
+   "usb": 0
+  }
+ }
+}

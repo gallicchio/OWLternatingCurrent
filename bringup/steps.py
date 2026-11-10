@@ -162,8 +162,12 @@ def step_limit(ctx, amps):
         s = b.supply
         if not s.is_on():
             raise AbortStep("the supply is off: run 'ramp' first")
-        if amps > 1.5:
-            raise AbortStep("the E3646A's 20 V range gives 1.5 A at most: use the E3632A or the brick")
+        i_max = getattr(s, "i_max", 1.5)
+        if amps > i_max:
+            raise AbortStep(f"this supply's range gives {i_max} A at most: use the E3632A "
+                            "(--psu E3632A) or the brick")
+        if getattr(s, "ocp", None) and getattr(s.ps, "has_ocp", False) and amps > s.ocp:
+            raise AbortStep(f"{amps} A is above the OCP of {s.ocp} A")
         v = s.setting()["volts"]
         s.set(v, amps)
         s.keep_on()

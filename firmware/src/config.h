@@ -35,6 +35,10 @@
 #define DRV_WAKE_US           1000u        /* [DS] tWAKE <= 1 ms after nSLEEP rises */
 #define DRV_MIN_PULSE_S       300e-9f      /* [CHOICE] shorter output pulses are not reproduced
                                               (tPD 400 ns, rise/fall 150 ns, dead time 100 ns) */
+#define DRV_PULSE_LOSS_S      500e-9f      /* [BENCH 2026-11-08] what the DRV8874 takes off every
+                                              output pulse (bringup/REVB.md 3.3: two duties on the
+                                              levitation coil, 2.51 ohm and 0.501 us); coils.c adds
+                                              it back to every pulse asked for */
 #define PEND_PWM_HZ           30000u       /* [CHOICE] pendulum and film drive: above hearing */
 #define LEV_PWM_HZ            100000u      /* [CHOICE] levitation, carrier off: 10 periods per tick.
                                               The DRV8874's limit (fPWM 0-100 kHz).  At 40 kHz the
@@ -59,6 +63,31 @@
 #define COPPER_TEMPCO         0.0039f      /* copper: +0.39 %/degC; the coil is its own thermometer */
 #define COIL_SURFACE_LIMIT_C  45.0f        /* [CHOICE] PLAN.md 7: nothing a hand reaches passes ~45 C */
 #define COIL_DERATE_FROM_C    40.0f        /* [CHOICE] current limits shrink from here to the limit */
+/* The levitation coil (in the perch, under the printed owl, out of reach): two limits.
+ * [BENCH 2026-11-08] the copper node, with its 0.3 J/K, jumps 20 K in a second at the
+ * catch's 2.6 A and tripped the old 45 C limit (then 55 C) again and again while Jason
+ * never found the perch more than warm (bringup/REVB.md 1.8).  So the copper may reach
+ * 80 C for the seconds a catch takes (FR4 is good to 130 C), and the board node, the
+ * patch the printed owl (PLA, soft from ~60 C) sits on, must stay under 50 C.  Check with
+ * an IR thermometer, then fix the model's constants (thermal.h). */
+#define LEV_COIL_SURFACE_LIMIT_C 80.0f
+#define LEV_COIL_DERATE_FROM_C   75.0f
+#define LEV_COIL_BOARD_LIMIT_C   50.0f
+#define LEV_COIL_BOARD_DERATE_C  45.0f
+/* the levitation coil's thermal model, fitted to its heating and cooling on the bench
+ * (2026-11-09, bringup/REVB.md 1.11 finding 5: 0.82 W true, 1.6 K rms); the copper node
+ * keeps the generic value, which the readings could not pin down */
+#define LEV_THERMAL_C_BOARD_J_PER_K    8.0f   /* was 2.5 (thermal.h) */
+#define LEV_THERMAL_R_CU_BOARD_K_PER_W 7.5f   /* was 3 */
+#define LEV_THERMAL_R_BOARD_AMB_K_PER_W 38.0f /* was 40 */
+#define LEV_EYE_PERIOD_TICKS  20000u      /* [Jason 2026-11-09] the bat blinks every 2 s: */
+#define LEV_EYE_FADE_TICKS    2000u       /* closing and opening over 0.2 s each, */
+#define LEV_EYE_OFF_TICKS     5000u       /* closed 0.5 s (the thermometer's windows) */
+#define LEV_EYES_DEFAULT      0.0f         /* [2026-11-09, 15:00] OFF: with 0.3 the owl's underside reached
+                                              67 C (IR) while the model said < 50 (REVB.md 1.11 finding 9).
+                                              Was 0.3: the bat's eyes on whenever it is held
+                                              (rt.lev_eyes; `lev eyes 0` turns them off) */
+#define LEV_RMEAS_TICKS          500u      /* [CHOICE] the lev coil's V/I window: 50 ms (rt.c 6b) */
 #define AMBIENT_DEFAULT_C     25.0f        /* until a board temperature sensor has answered */
 
 /* firmware current limits, below the hardware's DRV_ITRIP_A */
@@ -67,6 +96,10 @@
 #define FILM_ON_MAX_MS        2000u        /* ... for at most 2 s at a time */
 #define CONSOLE_I_MAX_A       1.0f         /* the console's `coil` command */
 #define CONSOLE_ON_MAX_MS     2000u
+#define LEV_G0_BENCH_MM       9.5f         /* [BENCH 2026-11-08/09] the zero-power walk's centre (lev tune
+                                              g0_mm): the real bat floats nearer than the model's 8.54 mm
+                                              (LEV_G0_MM), and the walk's lower bound, g0 - zp_range = 7.5 mm,
+                                              is what kept it off the perch (bringup/REVB.md 1.11) */
 #define LEV_I_MAX_A           2.6f         /* [SIM] catches from +-3 mm peak at 2.4 A; 2.6 A of mean
                                               current plus half the 1 A ripple at 100 kHz stays under
                                               the DRV8874's 3.3 A chopper (review 2026-10-09) */

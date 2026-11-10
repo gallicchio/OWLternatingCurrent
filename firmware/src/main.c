@@ -182,6 +182,13 @@ static void status_json(char *buf, size_t n)
     jb_add(&j, ",\"temps_C\":{\"pend1\":%.1f,\"pend2\":%.1f,\"pend3\":%.1f,\"lev\":%.1f,\"imu\":%.1f,\"tmag\":%.1f},",
            (double)rt.temp_C[0], (double)rt.temp_C[1], (double)rt.temp_C[2], (double)rt.temp_C[3],
            (double)(imu.present ? imu.temp_C : NAN), (double)(tmag.present ? tmag.temp_C : NAN));
+    /* the levitation coil's thermometer (rt.c 6b): its last V/I, what that says, the model's
+     * board node (the 50 C limit) and whether the reference resistance is calibrated */
+    jb_add(&j, "\"lev_thermo\":{\"r_meas_ohm\":%.3f,\"readings\":%lu,\"t_meas_C\":%.1f,\"board_C\":%.1f,\"calibrated\":%s,\"copper_C\":%.1f,\"ref_ohm\":%.3f,\"ref_C\":%.1f,\"cut\":%s},",
+           (double)rt.lev_r_meas_ohm, (unsigned long)rt.lev_r_readings, (double)rt_thermal[COIL_LEV].t_meas_C,
+           (double)rt_thermal[COIL_LEV].t_board_C, rt_thermal[COIL_LEV].r_calibrated ? "true" : "false",
+           (double)rt_thermal[COIL_LEV].t_cu_C, (double)rt_thermal[COIL_LEV].rm_ref_ohm,
+           (double)rt_thermal[COIL_LEV].tm_ref_C, rt.thermal_cut_off ? "false" : "true");
     jb_add(&j, "\"coils\":{\"awake\":%s,\"i_meas_A\":[%.3f,%.3f,%.3f,%.3f],\"u\":[%.3f,%.3f,%.3f,%.3f],"
                "\"r_ohm\":[%.2f,%.2f,%.2f,%.2f]},",
            rt.drv_awake ? "true" : "false", (double)rt.i_meas[0], (double)rt.i_meas[1], (double)rt.i_meas[2],
@@ -217,9 +224,9 @@ static void status_json(char *buf, size_t n)
     jb_add(&j, "\"light\":{\"lux\":%.2f},\"imu\":{\"g\":[%.3f,%.3f,%.3f],\"taps\":%lu,\"double_taps\":%lu},",
            (double)als.lux, (double)imu.g[0], (double)imu.g[1], (double)imu.g[2], (unsigned long)imu.taps,
            (unsigned long)imu.double_taps);
-    jb_add(&j, "\"rt\":{\"ticks\":%lu,\"overruns\":%lu,\"adc_errors\":%lu,\"tick_us_max\":%lu},",
-           (unsigned long)rt.ticks, (unsigned long)rt.overruns, (unsigned long)rt.adc_errors,
-           (unsigned long)rt.tick_cycles_max);
+    jb_add(&j, "\"rt\":{\"ticks\":%lu,\"overruns\":%lu,\"skipped_last_s\":%lu,\"pauses\":%lu,\"adc_errors\":%lu,\"tick_us_max\":%lu},",
+           (unsigned long)rt.ticks, (unsigned long)rt.overruns, (unsigned long)rt.skipped_last_s,
+           (unsigned long)rt.pauses, (unsigned long)rt.adc_errors, (unsigned long)rt.tick_cycles_max);
     jb_add(&j, "\"leds\":{\"frames\":%lu,\"errors\":[%lu,%lu]},\"lines_dropped\":{\"uart\":%lu,\"usb\":%lu}}",
            (unsigned long)leds.frames, (unsigned long)drv[0].errors, (unsigned long)drv[1].errors,
            (unsigned long)ulog_dropped, (unsigned long)usb_dropped);
@@ -307,6 +314,10 @@ static const char *a_lev(int op, const char *param, float v)
             return "refused while the bat floats (lev off first)";
         return NULL;
     case LEV_OP_TUNE:
+        if (param && !strcmp(param, "thermal_cut")) {   /* bench only: 0 = no thermal cutoff until reboot */
+            rt.thermal_cut_off = v == 0.0f;
+            return NULL;
+        }
         return lev_set_param(&rt_lev, param, v) ? NULL : "unknown parameter or out of range (lev status lists them)";
     case LEV_OP_EYES:
         rt.lev_eyes = v;
@@ -428,15 +439,36 @@ void tud_cdc_line_coding_cb(uint8_t itf, cdc_line_coding_t const *coding)
 }
 
 /* ---- the slots' work ----------------------------------------------------------------------- */
+_Static_assert(LEV_WAIT == 2 && LEV_HOLD == 3 && LEV_LOST == 4 && LEV_FAULT == 6,
+               "scenes.c's play draws the loop's states by these numbers (scene_inputs.lev_state)");
+
+static uint8_t spell_n;                     /* the last spell cast (1-3) */
+static float chirp_at = -10.0f;            /* the third spell's chirp began (now_s) */
+
 static void leds_frame(void)
 {
     led_engine_set_ceiling(&leds, rt.power_ok ? 1.0f : LED_USB_ONLY_CEILING);
     float target[LED_COUNT];
     sin_.dt_s = 1.0f / (float)LED_FPS;
     sin_.lev_holding = rt_lev.state == LEV_HOLD;
+    {
+        lev_telemetry lt;
+        lev_get_telemetry(&rt_lev, &lt);
+        sin_.lev_state = (uint8_t)lt.state;
+        sin_.lev_err_mm = lt.gap_mm - lt.gref_mm;
+    }
+    if (sin_.button) {                       /* the SPELL button casts the next spell (scenes.h) */
+        spell_n = (uint8_t)(spell_n % 3u + 1u);
+        sin_.spell = spell_n;
+        if (spell_n == 3)
+            chirp_at = now_s();
+        event("{\"event\":\"spell\",\"n\":%d,\"name\":\"%s\"}", spell_n,
+              spell_n == 1 ? "ghost" : spell_n == 2 ? "wake" : "chirp");
+    }
     scenes_render(&show, &sin_, target);
     led_engine_frame(&leds, target);
     sin_.tap = sin_.double_tap = sin_.button = false;   /* consumed */
+    sin_.spell = 0;
 }
 
 static void leds_write(int d)
@@ -513,7 +545,11 @@ static void theremin_tick(void)
         theremin_update(&thr, fp, fv, THEREMIN_WINDOW_MS * 1e-3f);
     }
     bool play = theremin_on && thr.ok && thr.active;
-    audio_set(thr.pitch_hz, play ? thr.volume * cfg.volume : 0.0f);
+    float tc = now_s() - chirp_at;           /* the third spell: a 0.6 s chirp, 500 Hz to 3 kHz */
+    if (!play && tc >= 0.0f && tc < 0.6f)
+        audio_set(500.0f * expf(logf(6.0f) * tc / 0.6f), 0.6f * cfg.volume * sinf(3.14159f * tc / 0.6f));
+    else
+        audio_set(thr.pitch_hz, play ? thr.volume * cfg.volume : 0.0f);
     sin_.theremin_active = play;
     sin_.pitch01 = thr.near_pitch;
     sin_.volume01 = thr.near_vol;
@@ -692,6 +728,7 @@ int main(void)
     sin_.gravity[2] = -1.0f;
     sin_.lux = als.present ? SCENE_LUX_PENDING : -1.0f;
     sin_.pendulum_choice = -1;
+    scenes_select(&show, SCENE_PLAY);       /* the demo: everything reacts at once (scenes.h) */
     pend_params pp;
     pend_default_params(&pp);
     pend_init(&pend, &pp);
@@ -705,6 +742,8 @@ int main(void)
     theremin_init(&thr);
 
     rt_start(!warm, &cfg.lev);           /* core 1: the tick, the ADC, the safety, the coils */
+    rt.lev_eyes = LEV_EYES_DEFAULT;          /* the bat's eyes whenever it is held (after rt_start, which
+                                                clears rt) */
     if (wd)
         rt.faults |= RT_FAULT_WATCHDOG;
     perch_init();

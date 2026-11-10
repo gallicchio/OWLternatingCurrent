@@ -1,0 +1,96 @@
+{
+ "id": {
+  "ok": true,
+  "cmd": "id",
+  "image": "bringup",
+  "version": "0.1.0",
+  "board": "OWLternating Current rev A",
+  "uptime_ms": 90761,
+  "chip_id": "F7B22082918FFAEE"
+ },
+ "rails": {
+  "ok": true,
+  "cmd": "rails",
+  "v12": 11.718,
+  "v5": 4.763,
+  "vbus": 5.144,
+  "usb_only": false,
+  "raw": {
+   "v12": 2622.8,
+   "v5": 2956.2,
+   "vbus": 3192.1
+  }
+ },
+ "i2c": {
+  "ok": true,
+  "cmd": "i2c scan",
+  "found": [
+   "0x1C",
+   "0x29",
+   "0x30",
+   "0x32",
+   "0x35",
+   "0x6A"
+  ],
+  "names": {
+   "0x1C": "LP5036 broadcast",
+   "0x29": "LTR-303ALS",
+   "0x30": "LP5036 base",
+   "0x32": "LP5036 tree",
+   "0x35": "TMAG5273A2",
+   "0x6A": "LSM6DS3TR-C"
+  },
+  "missing": []
+ },
+ "sensors": {
+  "ok": true,
+  "cmd": "sensors",
+  "imu": {
+   "present": true,
+   "whoami": "0x6A",
+   "accel_g": [
+    -0.008,
+    0.006,
+    -0.958
+   ],
+   "accel_board_g": [
+    -0.008,
+    -0.006,
+    0.958
+   ],
+   "temp_C": 17.6
+  },
+  "als": {
+   "present": true,
+   "lux": 181.07,
+   "ch0": 3630,
+   "ch1": 2035
+  },
+  "tmag": {
+   "present": true,
+   "device_id": "0x06",
+   "mT": [
+    0.01,
+    0.06,
+    0.08
+   ],
+   "temp_C": 26.1
+  },
+  "hall_lev_V": 0.0028,
+  "hall_lev_mT": -219.63
+ },
+ "gpio": {
+  "ok": true,
+  "cmd": "gpio",
+  "nfault": false,
+  "button": false,
+  "imu_int": false,
+  "nsleep": false,
+  "fam_en": false
+ },
+ "events": [],
+ "step": "logic",
+ "time": "2026-11-08T21:44:02",
+ "simulated": false,
+ "warnings": []
+}

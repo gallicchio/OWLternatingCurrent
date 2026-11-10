@@ -7,7 +7,9 @@
  *     make equal musical intervals);
  *   - a hand at the pumpkin opens the volume; a dead oscillator silences it;
  *   - the voice sings at the asked pitch, never louder than AUDIO_VOLUME_CEILING,
- *     and starts and stops without a click.
+ *     and starts and stops without a click;
+ *   - the voice's speaker equalisation keeps the electrical power into LS1 the same
+ *     across the pitch range (the bench's measurement), still under the ceiling.
  */
 #include "config.h"
 #include "theremin.h"
@@ -136,6 +138,39 @@ int main(void)
     CHECK(step_off <= step_mid * 1.05f, "a click at the release");
     voice_render(&v, buf, (int)fs);                      /* a third second: from full, -60 dB takes 2.4 s */
     CHECK(buf[(int)fs - 1] == 0.0f, "not silent 3 s after the release: %f", buf[(int)fs - 1]);
+
+    /* the speaker's equalisation (voice.c: constant electrical power, from the bench's
+     * 131913_speaker.json): the power is the 12 V current a full-scale tone added there,
+     * d(f), times the amplitude squared, and must come out the same at 200 Hz, 1 kHz and
+     * 4 kHz; at full volume the 4 kHz boost still stops at the ceiling */
+    {
+        const float hz[3] = {200.0f, 1000.0f, 4000.0f}, d_mA[3] = {26.37f, 25.33f, 18.68f};
+        float p[3];
+        for (int k = 0; k < 3; k++) {
+            voice_init(&v, fs);
+            voice_set(&v, hz[k], 0.5f);
+            voice_render(&v, buf, 2 * (int)fs);
+            double ss = 0.0;
+            for (int i = (int)fs; i < 2 * (int)fs; i++)
+                ss += (double)buf[i] * (double)buf[i];
+            p[k] = (float)(ss / fs) * d_mA[k];
+        }
+        printf("voice eq: gain %.3f at 200 Hz, %.3f at 1 kHz, %.3f at 4 kHz; power 200 Hz / 1 kHz %.3f, "
+               "4 kHz / 1 kHz %.3f\n", voice_eq_gain(200.0f), voice_eq_gain(1000.0f), voice_eq_gain(4000.0f),
+               p[0] / p[1], p[2] / p[1]);
+        CHECK(fabsf(p[0] / p[1] - 1.0f) < 0.02f && fabsf(p[2] / p[1] - 1.0f) < 0.02f,
+              "EQ: unequal power %.3f %.3f", p[0] / p[1], p[2] / p[1]);
+        CHECK(fabsf(voice_eq_gain(1000.0f) - 1.0f) < 0.005f, "EQ: 1 kHz is not the reference");
+        CHECK(voice_eq_gain(50.0f) == voice_eq_gain(200.0f) && voice_eq_gain(9000.0f) == voice_eq_gain(4000.0f),
+              "EQ: not held flat outside the measured range");
+        voice_init(&v, fs);
+        voice_set(&v, 4000.0f, 1.0f);
+        voice_render(&v, buf, (int)fs);
+        float pk = 0.0f;
+        for (int i = 0; i < (int)fs; i++)
+            pk = fmaxf(pk, fabsf(buf[i]));
+        CHECK(pk <= AUDIO_VOLUME_CEILING + 1e-4f, "EQ: 4 kHz at full exceeds the ceiling: %f", pk);
+    }
 
     if (failures) {
         printf("test_theremin: %d FAILED\n", failures);

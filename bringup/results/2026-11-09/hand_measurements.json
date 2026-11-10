@@ -1,0 +1,35 @@
+{
+  "what": "Hand measurements by Jason on 2026-11-09 (meters, scale, IR camera); summarised in bringup/MEASUREMENTS.md",
+  "scale": {
+    "method": "kitchen scale; a tall cardboard box on the pan, tared, so no magnet pulls toward the scale's metal",
+    "magnet_10x2_N52_g": 1.23,
+    "bat_pcb_g": 3.00,
+    "bat_cap_print_glue_magnet_g": 1.72,
+    "bat_as_flown_g": 4.70,
+    "discarded": {"value_g": 5.26, "why": "weighed on the pan: the magnet pulled toward the table"}
+  },
+  "magnet": {"diameter_mm": 10.0, "thickness_mm": 2.0, "grade": "N52", "magnetised": "axially", "source": "AMF 20053A pack"},
+  "lev_coil_resistance": {
+    "where": "perch off the tree, its J201 header: pins 10-14, and 8-16 (same range)",
+    "fluke_ohm": 3.38, "fluke_leads_ohm": 0.14, "fluke_coil_ohm": 3.24,
+    "astron_dm6000ar_ohm": [3.5, 3.6], "astron_leads_ohm": 0.3,
+    "note": "contact resistance varies with how hard the probes press into the connector",
+    "design_ohm": 2.56
+  },
+  "ir_camera_C": {
+    "room_perch_before": 24.5,
+    "pendulum_coils_centre_before": 25.0,
+    "hover_10min_no_eyes": {"pcb_above_bat_at_320s": 40, "other_angle": [41, 42], "end": 44,
+                             "record": "112012_lev_try.json"},
+    "after_eyes_hover_floor_8mm": {"under_perch_hottest": 44, "record": "141657_lev_try.json"},
+    "after_eyes_hover_0p3": {"owl_underside": 67, "later": 52,
+                             "record": "none: no script was logging; the model's board node read 45 C at the stop"}
+  },
+  "observations": [
+    "The bat cap turned round (ears away from the eyes): flatter hover, magnet off the coil centre toward the eyes, harder to catch",
+    "The bat turns, sways and bobs; stopped by a finger, it starts again",
+    "Loop off at 7.5-8 mm: the bat is pulled up to the perch, not dropped",
+    "The theremin pad fires when fingers wrap round the owl token's edges",
+    "Owl and cat tokens lifted and replaced: the familiar perches' currents did not change (125924_fam_presence.json)"
+  ]
+}

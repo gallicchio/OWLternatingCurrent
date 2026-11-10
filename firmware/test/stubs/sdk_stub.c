@@ -20,7 +20,7 @@ uint16_t *stub_dma_dest;
 unsigned stub_dma_count;
 bool stub_dma_busy;
 irq_handler_t stub_irq_handler[64];
-uint32_t stub_now_us;
+uint64_t stub_now_us;
 
 /* GPIO: a pin's level is its output when driven, else what the test puts on it */
 void gpio_init(uint p) { stub_gpio_func[p] = GPIO_FUNC_SIO; stub_gpio_oe[p] = false; stub_gpio_out[p] = false; }
@@ -43,7 +43,8 @@ void adc_set_round_robin(uint m) { (void)m; }
 void adc_fifo_setup(bool a, bool b, uint16_t c, bool d, bool e) { (void)a; (void)b; (void)c; (void)d; (void)e; }
 void adc_set_clkdiv(float d) { (void)d; }
 void adc_run(bool r) { stub_adc_running = r; }
-void adc_fifo_drain(void) {}
+int stub_drain_while_running;   /* on the chip that drain spins for ever (2026-11-07) */
+void adc_fifo_drain(void) { if (stub_adc_running) stub_drain_while_running++; }
 
 /* DMA */
 int dma_claim_unused_channel(bool r) { (void)r; return 3; }
@@ -59,7 +60,7 @@ void dma_channel_configure(uint ch, const dma_channel_config *c, volatile void *
     stub_dma_count = n;
 }
 void dma_irqn_set_channel_enabled(uint i, uint ch, bool e) { (void)i; (void)ch; (void)e; }
-void dma_irqn_acknowledge_channel(uint i, uint ch) { (void)i; (void)ch; }
+void dma_irqn_acknowledge_channel(uint i, uint ch) { (void)i; (void)ch; stub_dma_irq_pending = false; }
 bool dma_channel_is_busy(uint ch) { (void)ch; return stub_dma_busy; }
 bool stub_dma_irq_pending;      /* the burst done, adc_done_isr not yet run (the race of 2026-11-07) */
 bool dma_irqn_get_channel_status(uint i, uint ch) { (void)i; (void)ch; return stub_dma_irq_pending; }

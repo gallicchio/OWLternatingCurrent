@@ -33,6 +33,9 @@ void thermal_default_params(thermal_params *p)
     p->r20_ohm = COIL_R20_OHM;
     p->limit_C = COIL_SURFACE_LIMIT_C;
     p->derate_from_C = COIL_DERATE_FROM_C;
+    p->board_limit_C = COIL_SURFACE_LIMIT_C;
+    p->board_derate_from_C = COIL_DERATE_FROM_C;
+    p->uncal_up_only = true;
 }
 
 void thermal_init(thermal_coil *c, const thermal_params *p, float ambient_C)
@@ -42,8 +45,11 @@ void thermal_init(thermal_coil *c, const thermal_params *p, float ambient_C)
     c->comp_cu = c->comp_board = 0.0f;
     c->r_ref_ohm = p->r20_ohm;
     c->t_ref_C = 20.0f;
+    c->rm_ref_ohm = p->r20_ohm;
+    c->tm_ref_C = 20.0f;
     c->r_calibrated = false;
     c->cold_s = 0.0f;
+    c->cal_open = false;
     c->cal_sum_ohm = 0.0f;
     c->cal_n = 0;
     c->t_meas_C = -273.0f;
@@ -57,6 +63,7 @@ void thermal_assume_cold(thermal_coil *c)
     c->comp_cu = c->comp_board = 0.0f;
     if (c->cold_s < THERMAL_COLD_S)
         c->cold_s = THERMAL_COLD_S;
+    c->cal_open = true;
 }
 
 static float r_at(const thermal_coil *c, float t_C)
@@ -102,14 +109,22 @@ void thermal_update(thermal_coil *c, float dt_s, float i2_mean_A2, float ambient
     }
     if (fabsf(c->t_cu_C - c->t_amb_C) < THERMAL_COLD_BAND_K) {
         c->cold_s += dt_s;
+        if (c->cold_s >= THERMAL_COLD_S)
+            c->cal_open = true;
     } else {
-        /* no longer cold: finish a calibration that has enough readings */
-        if (!c->r_calibrated && c->cal_n >= THERMAL_CAL_READINGS) {
-            c->r_ref_ohm = c->cal_sum_ohm / (float)c->cal_n;
-            c->t_ref_C = c->t_amb_C;
+        c->cold_s = 0.0f;
+    }
+    /* a calibration ends once the copper is THERMAL_CAL_BAND_K above the room, or after
+     * four times the readings it needs: kept if it has enough, else dropped (the next cold
+     * minute opens another) */
+    if (c->cal_open && !c->r_calibrated &&
+        (c->t_cu_C - c->t_amb_C >= THERMAL_CAL_BAND_K || c->cal_n >= THERMAL_CAL_READINGS)) {
+        if (c->cal_n >= THERMAL_CAL_READINGS) {
+            c->rm_ref_ohm = c->cal_sum_ohm / (float)c->cal_n;
+            c->tm_ref_C = c->t_amb_C;
             c->r_calibrated = true;
         }
-        c->cold_s = 0.0f;
+        c->cal_open = false;
         c->cal_n = 0;
         c->cal_sum_ohm = 0.0f;
     }
@@ -122,7 +137,7 @@ void thermal_measure_r(thermal_coil *c, float r_meas_ohm, float dt_s)
     /* plausible: from a quarter to three times nominal (-150 .. +530 degC) */
     if (!(r_meas_ohm > 0.25f * c->p.r20_ohm && r_meas_ohm < 3.0f * c->p.r20_ohm) || !(dt_s > 0.0f))
         return;
-    if (!c->r_calibrated && c->cold_s >= THERMAL_COLD_S) {
+    if (!c->r_calibrated && c->cal_open) {
         /* the coil is at ambient: this reading, whatever IPROPI's gain error, is R(ambient).
          * The pulse heats the copper only ~7 K/s at 1 A, so the first ~40 ms of readings
          * of a pulse that starts cold are taken here. */
@@ -130,11 +145,14 @@ void thermal_measure_r(thermal_coil *c, float r_meas_ohm, float dt_s)
         c->cal_n++;
         return;
     }
-    float t_meas = c->t_ref_C + (r_meas_ohm / c->r_ref_ohm - 1.0f) / COPPER_TEMPCO;
+    float t_meas = c->tm_ref_C + (r_meas_ohm / c->rm_ref_ohm - 1.0f) / COPPER_TEMPCO;
     c->t_meas_C = t_meas;
     float err = t_meas - c->t_cu_C;
-    if (!c->r_calibrated && err < 0.0f)
-        return;                 /* not calibrated: a reading may only make us more careful */
+    if (!c->r_calibrated && (!c->p.uncal_up_only || err < 0.0f))
+        return;                 /* not calibrated: may only make us more careful, or (the
+                                   levitation coil) reported only.  Against the nominal R, the
+                                   mirror's gain error alone reads tens of K (2026-11-09: a
+                                   catch read 4.49 ohm, "213 C", and tripped a cool coil) */
     float g = dt_s / (THERMAL_CORR_TAU_S + dt_s);
     /* Shift both nodes: the fast copper-to-board part is fixed by geometry and the
      * measured power; what is least certain is the slow part (convection, spreading),
@@ -149,11 +167,18 @@ float thermal_surface_C(const thermal_coil *c) { return c->t_cu_C; }
 
 float thermal_r_ohm(const thermal_coil *c) { return r_at(c, c->t_cu_C); }
 
+static float derate_on(float t, float limit, float from)
+{
+    float span = limit - from;
+    float f = span > 0.0f ? (limit - t) / span : (t < limit ? 1.0f : 0.0f);
+    return f < 0.0f ? 0.0f : (f > 1.0f ? 1.0f : f);
+}
+
 float thermal_derate(const thermal_coil *c)
 {
-    float span = c->p.limit_C - c->p.derate_from_C;
-    float f = span > 0.0f ? (c->p.limit_C - c->t_cu_C) / span : (c->t_cu_C < c->p.limit_C ? 1.0f : 0.0f);
-    return f < 0.0f ? 0.0f : (f > 1.0f ? 1.0f : f);
+    float f_cu = derate_on(c->t_cu_C, c->p.limit_C, c->p.derate_from_C);
+    float f_board = derate_on(c->t_board_C, c->p.board_limit_C, c->p.board_derate_from_C);
+    return f_cu < f_board ? f_cu : f_board;
 }
 
 /* the surface temperature after on_s at i_A (the copper is hottest when the current stops) */

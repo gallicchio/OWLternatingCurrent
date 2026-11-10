@@ -9,8 +9,10 @@
  * and cannot pass the Hall sensor's package (1 mm).
  * The board around it, as the firmware will see it:
  *   - each 100 us tick, 8 samples of the Hall sensor and of IPROPI in the tick's
- *     first ~40 us; the controller runs at 50 us; its u takes effect at the PWM
- *     wrap 75 us into the tick (so the current settles before the next burst);
+ *     first ~40 us; as on the board since 2026-11-08 (rt.h), the controller runs at
+ *     the tick's start on the PREVIOUS tick's burst, while this tick's converts, and
+ *     its u takes effect at the PWM wrap after this burst (50 us): each burst runs
+ *     under the u of two steps before the one that reads it (lev_ctrl.u_lag = 1);
  *   - DRV5055A4 at 7.5 mV/mT, 0.03 mT rms of its own noise, its VQ off by
  *     vq_err_mT, clipped to 0.2..3.1 V; 12-bit ADC at 3.3 V with 1.5 LSB rms of
  *     noise per sample; the glue's conversion with the nominal VQ;
@@ -154,6 +156,8 @@ typedef struct {
     lev_output out;
     double t;
     double u_next;
+    double hall_prev, ip_prev;  /* the last tick's burst, for this tick's controller */
+    int have_prev;
     int engaged;            /* the controller has been in HOLD */
     double t_engage;
     int release_after;      /* ticks after the engage a held bat is let go (-1: never) */
@@ -177,6 +181,7 @@ static void run_init(run *r, double gap, double cradle_gap, int held)
     r->p.cradle = cradle_gap;
     r->p.held = held;
     lev_init(&r->c);
+    r->c.u_lag = 1;
     r->release_after = -1;
     r->win_from = r->win_to = -1;
 }
@@ -189,11 +194,11 @@ static void tick(run *r)
             hall += hall_code(&r->p);
             ip += iprop_code(&r->p);
         }
-        if (s == 10) {          /* the burst is in: run the controller (the glue's arithmetic) */
+        if (s == 0 && r->have_prev) {   /* the last tick's burst: run the controller (the glue's arithmetic) */
             lev_input in = {
-                .hall_mT = (float)(HALL_POLARITY * ((hall / 8) * ADC_VREF_V / ADC_COUNTS -
+                .hall_mT = (float)(HALL_POLARITY * ((r->hall_prev / 8) * ADC_VREF_V / ADC_COUNTS -
                                                     ADC_VREF_V * HALL_VQ_FRACTION) / (HALL_MV_PER_MT * 1e-3)),
-                .iprop_A = (float)((ip / 8) * ADC_VREF_V / ADC_COUNTS / IPROPI_V_PER_A),
+                .iprop_A = (float)((r->ip_prev / 8) * ADC_VREF_V / ADC_COUNTS / IPROPI_V_PER_A),
                 .v12_V = (float)V12,
                 .coil_R_ohm = COIL_R20_OHM,
                 .coil_allowed = true,
@@ -206,12 +211,15 @@ static void tick(run *r)
             if (fabs(r->out.u) > r->max_u)
                 r->max_u = fabs(r->out.u);
         }
-        if (s == 15)            /* the next PWM wrap */
+        if (s == 10)            /* the PWM wrap after this tick's burst */
             r->p.u = r->u_next;
         plant_step(&r->p);
         if (fabs(r->p.I) > r->max_I)
             r->max_I = fabs(r->p.I);
     }
+    r->hall_prev = hall;
+    r->ip_prev = ip;
+    r->have_prev = 1;
     r->t += 1.0 / TICK_HZ;
     if (r->c.state == LEV_HOLD && !r->engaged) {
         r->engaged = 1;

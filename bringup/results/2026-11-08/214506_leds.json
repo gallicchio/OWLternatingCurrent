@@ -1,0 +1,306 @@
+{
+ "leds": [
+  {
+   "name": "PUMPKIN1",
+   "driver": 0,
+   "out": 0,
+   "delta_A": 0.004842592333333335
+  },
+  {
+   "name": "PUMPKIN0",
+   "driver": 0,
+   "out": 1,
+   "delta_A": 0.004873568833333335
+  },
+  {
+   "name": "WISP1",
+   "driver": 0,
+   "out": 2,
+   "delta_A": 0.004792257333333334
+  },
+  {
+   "name": "WISP0",
+   "driver": 0,
+   "out": 3,
+   "delta_A": 0.004854208333333334
+  },
+  {
+   "name": "WISP2",
+   "driver": 0,
+   "out": 4,
+   "delta_A": 0.004869696333333333
+  },
+  {
+   "name": "OWLRING0",
+   "driver": 0,
+   "out": 5,
+   "delta_A": 0.004811616833333334
+  },
+  {
+   "name": "STAR3",
+   "driver": 0,
+   "out": 6,
+   "delta_A": 0.004856144333333333
+  },
+  {
+   "name": "OWLRING2",
+   "driver": 0,
+   "out": 7,
+   "delta_A": 0.004865824333333334
+  },
+  {
+   "name": "STAR2",
+   "driver": 0,
+   "out": 8,
+   "delta_A": 0.004800000833333335
+  },
+  {
+   "name": "STAR1",
+   "driver": 0,
+   "out": 9,
+   "delta_A": 0.004819361333333334
+  },
+  {
+   "name": "STAR0",
+   "driver": 0,
+   "out": 10,
+   "delta_A": 0.004823233333333333
+  },
+  {
+   "name": "OWLRING1",
+   "driver": 0,
+   "out": 11,
+   "delta_A": 0.004794192333333334
+  },
+  {
+   "name": "STARX2",
+   "driver": 0,
+   "out": 12,
+   "delta_A": 0.004800001333333335
+  },
+  {
+   "name": "STARX0",
+   "driver": 0,
+   "out": 13,
+   "delta_A": 0.004838720833333334
+  },
+  {
+   "name": "STARX1",
+   "driver": 0,
+   "out": 19,
+   "delta_A": 0.004856144333333333
+  },
+  {
+   "name": "STARX3",
+   "driver": 0,
+   "out": 20,
+   "delta_A": 0.004788385333333334
+  },
+  {
+   "name": "STAR8",
+   "driver": 0,
+   "out": 21,
+   "delta_A": 0.004819361333333334
+  },
+  {
+   "name": "STAR7",
+   "driver": 0,
+   "out": 22,
+   "delta_A": 0.004786448333333334
+  },
+  {
+   "name": "STAR9",
+   "driver": 0,
+   "out": 23,
+   "delta_A": 0.004780640833333334
+  },
+  {
+   "name": "STAR10",
+   "driver": 0,
+   "out": 24,
+   "delta_A": 0.004825168833333334
+  },
+  {
+   "name": "STAR11",
+   "driver": 0,
+   "out": 25,
+   "delta_A": 0.004830977333333333
+  },
+  {
+   "name": "CATRING2",
+   "driver": 0,
+   "out": 26,
+   "delta_A": 0.004800000833333335
+  },
+  {
+   "name": "STAR6",
+   "driver": 0,
+   "out": 27,
+   "delta_A": 0.004819361333333334
+  },
+  {
+   "name": "WISP5",
+   "driver": 0,
+   "out": 28,
+   "delta_A": 0.004861952333333334
+  },
+  {
+   "name": "WISP4",
+   "driver": 0,
+   "out": 29,
+   "delta_A": 0.004805808833333335
+  },
+  {
+   "name": "PUMPKIN2",
+   "driver": 0,
+   "out": 30,
+   "delta_A": 0.004819360833333335
+  },
+  {
+   "name": "WISP3",
+   "driver": 0,
+   "out": 31,
+   "delta_A": 0.004821296833333334
+  },
+  {
+   "name": "CATRING0",
+   "driver": 0,
+   "out": 32,
+   "delta_A": 0.004786448833333335
+  },
+  {
+   "name": "CATRING1",
+   "driver": 0,
+   "out": 33,
+   "delta_A": 0.004798064833333334
+  },
+  {
+   "name": "STAR5",
+   "driver": 0,
+   "out": 34,
+   "delta_A": 0.004815489333333334
+  },
+  {
+   "name": "STAR4",
+   "driver": 0,
+   "out": 35,
+   "delta_A": 0.004788385333333334
+  },
+  {
+   "name": "OWLC_L",
+   "driver": 1,
+   "out": 0,
+   "delta_A": 0.004769024333333333
+  },
+  {
+   "name": "TWISP0",
+   "driver": 1,
+   "out": 1,
+   "delta_A": 0.004854208333333334
+  },
+  {
+   "name": "TSTAR3",
+   "driver": 1,
+   "out": 2,
+   "delta_A": 0.004881313333333333
+  },
+  {
+   "name": "OWLA_L",
+   "driver": 1,
+   "out": 10,
+   "delta_A": 0.004823233333333333
+  },
+  {
+   "name": "OWLA_R",
+   "driver": 1,
+   "out": 11,
+   "delta_A": 0.004830976833333334
+  },
+  {
+   "name": "TWISP2",
+   "driver": 1,
+   "out": 12,
+   "delta_A": 0.004807744833333334
+  },
+  {
+   "name": "TSTAR0",
+   "driver": 1,
+   "out": 13,
+   "delta_A": 0.004840656833333335
+  },
+  {
+   "name": "TSTAR2",
+   "driver": 1,
+   "out": 14,
+   "delta_A": 0.004861952333333334
+  },
+  {
+   "name": "PERCH_DOWN1",
+   "driver": 1,
+   "out": 15,
+   "delta_A": -4.775416666666626e-05
+  },
+  {
+   "name": "PERCH_DOWN0",
+   "driver": 1,
+   "out": 16,
+   "delta_A": -5.162616666666651e-05
+  },
+  {
+   "name": "TSTAR1",
+   "driver": 1,
+   "out": 21,
+   "delta_A": 0.004815489333333334
+  },
+  {
+   "name": "OWLB_L",
+   "driver": 1,
+   "out": 22,
+   "delta_A": 0.004825168833333334
+  },
+  {
+   "name": "OWLB_R",
+   "driver": 1,
+   "out": 23,
+   "delta_A": 0.004881313333333333
+  },
+  {
+   "name": "TWISP3",
+   "driver": 1,
+   "out": 24,
+   "delta_A": 0.004836784833333333
+  },
+  {
+   "name": "TSTAR4",
+   "driver": 1,
+   "out": 31,
+   "delta_A": 0.004865824333333334
+  },
+  {
+   "name": "TWISP1",
+   "driver": 1,
+   "out": 33,
+   "delta_A": 0.004829040333333335
+  },
+  {
+   "name": "TSTAR5",
+   "driver": 1,
+   "out": 34,
+   "delta_A": 0.004840656333333334
+  },
+  {
+   "name": "OWLC_R",
+   "driver": 1,
+   "out": 35,
+   "delta_A": 0.004854208333333334
+  }
+ ],
+ "median_A": 0.004823233333333333,
+ "step": "leds",
+ "time": "2026-11-08T21:45:06",
+ "simulated": false,
+ "warnings": [
+  "PERCH_DOWN1 added only -0.0 mA: open, reversed, or not soldered (the pumpkins' 5050s draw more, as three dice)",
+  "PERCH_DOWN0 added only -0.1 mA: open, reversed, or not soldered (the pumpkins' 5050s draw more, as three dice)"
+ ]
+}

@@ -1,0 +1,16 @@
+{
+ "instruments": {
+  "supply": "Agilent Technologies,E3646A,0,1.7-5.0-1.0",
+  "scope": "Siglent Technologies,SDS2104X Plus,SDS2PDDX6R0722,5.0.1.3.9R12",
+  "gen": "not found: [Errno 113] No route to host",
+  "dmm": "Fluke 45"
+ },
+ "usb": {
+  "2e8a:000c": "Debug Probe (CMSIS-DAP)",
+  "1209:0001": "OWLternating Current"
+ },
+ "step": "find",
+ "time": "2026-11-08T20:41:55",
+ "simulated": false,
+ "warnings": []
+}

@@ -1,0 +1,141 @@
+{
+ "what": "levitation calibration, bat away (>30 cm), owl on the perch, E3646A out 2 12 V 0.5 A",
+ "replies": [
+  {
+   "ok": true,
+   "cmd": "lev",
+   "cal": "zero"
+  },
+  {
+   "ok": true,
+   "cmd": "lev",
+   "lev": {
+    "state": "off",
+    "gap_mm": 24.9,
+    "gref_mm": 8.537,
+    "gzp_mm": 8.537,
+    "bbat_mT": 0.0,
+    "i_cmd_A": 0.0,
+    "i_est_A": 0.0,
+    "mean_I_mA": 0.0,
+    "rms_I_mA": 0.0,
+    "peak_I_A": 0.0,
+    "catches": 0,
+    "losses": 0,
+    "trips": 0,
+    "reason": "",
+    "cal": "zero ok",
+    "bat_sign": 1,
+    "coil_pol": 1,
+    "kcs_mT_per_A": 2.89,
+    "hall_offset_mT": 1.12,
+    "eyes": 0.0,
+    "carrier": false,
+    "params": {
+     "bw_hz": 10.0,
+     "zeta": 0.7,
+     "ki_div": 8.0,
+     "dfilt_hz": 50.0,
+     "zp_rate": 4.0,
+     "zp_range_mm": 2.0,
+     "g0_mm": 8.537,
+     "mass_g": 3.6,
+     "i_max": 2.6,
+     "catch_mm": 7.0,
+     "loss_mm": 5.0,
+     "ramp_mm_s": 6.0,
+     "steady_s": 0.15,
+     "lost_s": 2.0,
+     "i_cal": 0.3,
+     "sched": 1.0,
+     "auto_cal": 1.0,
+     "coil_pol": 1.0,
+     "bat_sign": 1.0,
+     "kcs": 2.89,
+     "offset_mT": 1.12464
+    }
+   }
+  },
+  {
+   "ok": true,
+   "cmd": "lev",
+   "cal": "coil"
+  },
+  {
+   "ok": true,
+   "cmd": "lev",
+   "lev": {
+    "state": "off",
+    "gap_mm": 24.9,
+    "gref_mm": 8.537,
+    "gzp_mm": 8.537,
+    "bbat_mT": 0.06,
+    "i_cmd_A": 0.0,
+    "i_est_A": 0.0,
+    "mean_I_mA": 0.0,
+    "rms_I_mA": 0.0,
+    "peak_I_A": 0.0,
+    "catches": 0,
+    "losses": 0,
+    "trips": 0,
+    "reason": "",
+    "cal": "coil ok",
+    "bat_sign": 1,
+    "coil_pol": -1,
+    "kcs_mT_per_A": 3.643,
+    "hall_offset_mT": 1.12,
+    "eyes": 0.0,
+    "carrier": false,
+    "params": {
+     "bw_hz": 10.0,
+     "zeta": 0.7,
+     "ki_div": 8.0,
+     "dfilt_hz": 50.0,
+     "zp_rate": 4.0,
+     "zp_range_mm": 2.0,
+     "g0_mm": 8.537,
+     "mass_g": 3.6,
+     "i_max": 2.6,
+     "catch_mm": 7.0,
+     "loss_mm": 5.0,
+     "ramp_mm_s": 6.0,
+     "steady_s": 0.15,
+     "lost_s": 2.0,
+     "i_cal": 0.3,
+     "sched": 1.0,
+     "auto_cal": 1.0,
+     "coil_pol": -1.0,
+     "bat_sign": 1.0,
+     "kcs": 3.64321,
+     "offset_mT": 1.12464
+    }
+   }
+  }
+ ],
+ "events": [
+  {
+   "event": "lev",
+   "state": "cal",
+   "reason": "",
+   "gap_mm": 24.9
+  },
+  {
+   "event": "lev",
+   "state": "off",
+   "reason": "",
+   "gap_mm": 24.9
+  },
+  {
+   "event": "lev",
+   "state": "cal",
+   "reason": "",
+   "gap_mm": 24.9
+  },
+  {
+   "event": "lev",
+   "state": "off",
+   "reason": "",
+   "gap_mm": 24.9
+  }
+ ]
+}

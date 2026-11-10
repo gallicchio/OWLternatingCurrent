@@ -15,12 +15,26 @@
  *   dawn      the reverse of dusk: the owls close their eyes and go to sleep
  *   theremin  while a hand plays: the moon-side stars brighten with the pitch, the
  *             pumpkins with the volume
+ *   play      the default since 2026-11-09 (Friday's outdoor demo): no show and no
+ *             sleeping in daylight; every input lights its own LEDs at once, at full
+ *             (the colour ceilings cap them).  The theremin fills the star arc and
+ *             lifts the pumpkins; each perch's ring turns softly, dim enough that a
+ *             token's own LEDs are the brightest thing there (Jason, 2026-11-09); the
+ *             bat lights the
+ *             perch's downlights (breathing while the loop waits, a quick pulse while
+ *             catching, steady when locked) and owl A's eyes say too close (left) or
+ *             too far (right); shading the light sensor wakes owls B and C and the
+ *             tree's stars; a tap twinkles the stars (a double tap the wisps too);
+ *             the SPELL button casts, in turn, the quantum ghost along the arc,
+ *             a wake of everything, and a chirp with a twinkle; the
+ *             pendulum's chosen pumpkin flares.  The pumpkins glow so it looks alive.
  *
  * Automatic sequencing (scenes_auto): the light sensor drives asleep <-> dusk ->
  * night and night -> dawn -> asleep with hysteresis (ALS_DARK_LUX, ALS_LIGHT_LUX,
  * ALS_HOLD_S); every few minutes the night becomes a firefly synchrony; a tap or the
  * SPELL button moves to the next scene; a double tap calls the quantum ghost.  The
- * console's `scene <name>` holds a scene until `scene auto`.
+ * console's `scene <name>` holds a scene until `scene auto`.  The board starts in
+ * `play`, held; `scene auto` gives the show.
  *
  * Changes of scene cross-fade over SCENE_XFADE_S, and the LED engine's slew limit
  * stands behind everything: no LED steps.
@@ -43,6 +57,7 @@ typedef enum {
     SCENE_FAMILIAR,
     SCENE_DAWN,
     SCENE_THEREMIN,
+    SCENE_PLAY,
     SCENE_COUNT
 } scene_id;
 
@@ -69,6 +84,10 @@ typedef struct {
     bool theremin_active;          /* theremin on and a hand near */
     float pitch01, volume01;       /* the theremin's hand, 0..1 */
     bool lev_holding;              /* the bat floats under the perch */
+    uint8_t lev_state;             /* lev_state (lev_ctrl.h): 0 off, 2 wait, 3 hold, 4 lost, 6 fault */
+    float lev_err_mm;              /* gap - set-point: < 0 the bat is too close */
+    uint8_t spell;                 /* the SPELL button's spell this frame: 0 none, 1 the ghost,
+                                      2 wake everything, 3 a chirp and a twinkle (main cycles them) */
     int8_t pendulum_choice;        /* the chaos pendulum's pumpkin (0-2), or -1 */
 } scene_inputs;
 
@@ -123,6 +142,16 @@ typedef struct {
     float choice_t;
     int8_t choice;
     float downlight;
+
+    /* play */
+    uint8_t lev_prev;
+    float lev_t;                   /* in the loop's present state */
+    float th_level;                /* the theremin's presence, 0..1 */
+    float twinkle_t, twinkle_wisps;/* since a tap's twinkle began (< 0: none); a double tap's wisps */
+    float ghost_t, wake_t;         /* since a spell began (< 0: none) */
+    float lux_slow, shade;         /* the light sensor's slow mean; shaded, 0..1 */
+    bool shaded;
+    float ring_idle[2];            /* an empty perch's ring, 0..1 (a token dims it) */
 
     float frame[LED_COUNT];        /* scratch */
     float frame_prev[LED_COUNT];

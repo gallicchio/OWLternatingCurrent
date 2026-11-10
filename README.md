@@ -5,10 +5,15 @@ six-year-old witch who wants to be an owl: owls, bats and a little witch on her 
 across a gold moon, in orange and purple light that fades but never blinks, with magnets
 and coils doing things that look like magic.*
 
+| The base board's LEDs fading on the bench | The bat caught under the owl's perch, then hovering |
+|:---:|:---:|
+| [![Rev A base board on the bench, its LEDs fading in purple](docs/video/led_test.gif)](docs/video/led_test.mp4) | [![The bat being captured under the owl's perch, then hovering on its own](docs/video/bat_capture_hover.gif)](docs/video/bat_capture_hover.mp4) |
+
+*The rev A boards working on the bench, November 2026 (quick phone clips; click for the MP4).*
+
 ![The set, assembled: the base with its scene, the tree of owls standing in it, the perch on top with the printed owl, the bat floating underneath, and the owl and cat tokens on their perches](docs/images/3d_set.png)
 
-*Rendered from the design files (KiCad and Blender, `tools/render_3d.py`). The boards have
-not been made yet.*
+*Rendered from the design files (KiCad and Blender, `tools/render_3d.py`).*
 
 **Status (2026-10-09):** designed, every net routed on all six boards, KiCad's DRC clean,
 reviewed by five readers before the first order ([`DESIGN_REVIEW.md`](DESIGN_REVIEW.md),

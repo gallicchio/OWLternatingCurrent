@@ -579,6 +579,36 @@ hand at 12 V with a 3 A limit; the bat brought up by hand from below. Records:
 - **The bat's eyes flicker** while the current swings: the 100 kHz levitation PWM excites
   its 82 kHz tank. The eyes' carrier (`lev eyes`) is still untested.
 
+### 1.12 The second owl, the set-points, the eyes and the tokens (2026-11-10)
+
+The numbers are in `MEASUREMENTS.md` ("The second owl"). What they mean:
+1. **The 12.45 mm owl works.** The 4.70 g bat (cap on, magnet flipped, flatter) floats at
+   7.40-7.44 mm with no steady current and a gap sd of 0.015-0.03 mm, far steadier than
+   on the first owl (0.23 mm). Gap + lift is 19.85 mm, 0.9 mm under the model's 20.75. Jason:
+   "So much better already!"
+2. **Lower costs current: 0.36 A per mm.** The mean-current trip (0.6 A) ends any hover
+   past about 9.3 mm. Jason wants the bat as low as is stable at a moderate temperature,
+   so the walk now aims at 0.2 A (`LEV_ZP_I_A`, a new tunable `zp_i`), about 0.55 mm under
+   the natural float. The third owl (`OWL_LIFT` 11.4) moves the natural float to about
+   8.4 mm, and 0.2 A to about 8.9. Rev B: the owl's height is the cheapest knob; choose
+   it from gap + lift = 19.85 mm for the bat as built.
+3. **Eyes at 0.1 are enough** (Jason: "dim, but visible"), for a few kelvin by IR. At 0.15
+   the gap's spread doubles. One eye is slightly brighter than the other: rev B, match
+   the two LEDs or their resistors. The eyes now breathe (a 2 s raised cosine) instead of
+   switching, which the loop never sees as a step.
+4. **`lev cal coil` is wrong on this owl** ("IPROPI disagrees", `kcs` 2.2 against the 3.64
+   that flies). `lev tune kcs` now writes the calibration, so `save` keeps a hand value.
+   The routine still needs a look.
+5. **Live mode cannot see a token** (1.3): the perch current moved 0.2 mA at most at
+   63 mA. Sweep mode sees each token at its bump (owl 147.6 kHz, cat 353.8 kHz) but is
+   slow to see it go: more than 30 s for the owl, about 10 s for the cat. Planned for rev A:
+   live drive, with a short probe at the token's bump every 0.5 s; then the ring round a
+   target can fade out when its token is on (Jason's wish). Rev B: a sense that sees the
+   load (a series capacitor or a phase measure, 1.3, 1.8).
+6. **The rings round the targets** now breathe round once a second: two neighbouring LEDs
+   trade their brightness, then the brighter trades with the next (Jason, 2026-11-10).
+   Before, all three glowed at once, and Jason saw them "always on".
+
 ## 2. Changes for rev B, known before the bench
 
 ### 2.1 Documentation and generator fixes (cheap, do first)

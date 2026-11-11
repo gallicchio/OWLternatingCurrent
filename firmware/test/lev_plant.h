@@ -1,6 +1,6 @@
 /* lev_plant.h: the levitating bat's vertical axis, for test/test_lev.c.
  * WRITTEN BY firmware/tools/gen_lev_tables.py FROM sim/physics/ AND gen/mech.py: rerun that.
- * one-magnet design: two 10 x 2 mm N52 discs, bias 14.0 mm above the perch, bat 3.60 g.
+ * one-magnet design: two 10 x 2 mm N52 discs, bias 12.5 mm above the perch, bat 3.60 g.
  *
  * The simulations' frame: z up, gap from the perch's bottom copper to the bat's magnet,
  * force positive upward, B_z in tesla at the Hall sensor, coil current positive in
@@ -11,12 +11,15 @@
 #define PLANT_GAP0_M       1.0000000e-03
 #define PLANT_STEP_M       1.0000000e-04
 #define PLANT_MASS_KG      3.6000000e-03
-#define PLANT_G0_M         8.5369827e-03   /* the float point */
-#define PLANT_BBIAS_T      -6.3638224e-03   /* the bias magnet's field at the sensor */
+#define PLANT_G0_M         1.0036983e-02   /* the float point */
+#define PLANT_BBIAS_T      -8.1951847e-03   /* the bias magnet's field at the sensor */
 #define PLANT_BCOIL_T_PER_A 2.8899625e-03  /* the coil's field at the sensor per amp */
 
 /* the bias magnet's force on the bat (N, + up) */
 static const double PLANT_FBIAS_N[241] = {
+    1.6014600e-01, 1.5700904e-01, 1.5394619e-01, 1.5095543e-01, 1.4803479e-01,
+    1.4518237e-01, 1.4239632e-01, 1.3967484e-01, 1.3701621e-01, 1.3441873e-01,
+    1.3188078e-01, 1.2940076e-01, 1.2697716e-01, 1.2460846e-01, 1.2229324e-01,
     1.2003009e-01, 1.1781763e-01, 1.1565457e-01, 1.1353960e-01, 1.1147150e-01,
     1.0944904e-01, 1.0747107e-01, 1.0553643e-01, 1.0364403e-01, 1.0179278e-01,
     9.9981657e-02, 9.8209636e-02, 9.6475735e-02, 9.4778999e-02, 9.3118500e-02,
@@ -62,10 +65,7 @@ static const double PLANT_FBIAS_N[241] = {
     7.2935686e-03, 7.2227661e-03, 7.1528146e-03, 7.0837019e-03, 7.0154161e-03,
     6.9479454e-03, 6.8812782e-03, 6.8154032e-03, 6.7503092e-03, 6.6859851e-03,
     6.6224202e-03, 6.5596038e-03, 6.4975254e-03, 6.4361746e-03, 6.3755415e-03,
-    6.3156159e-03, 6.2563880e-03, 6.1978483e-03, 6.1399871e-03, 6.0827952e-03,
-    6.0262633e-03, 5.9703823e-03, 5.9151434e-03, 5.8605378e-03, 5.8065568e-03,
-    5.7531919e-03, 5.7004348e-03, 5.6482773e-03, 5.5967112e-03, 5.5457285e-03,
-    5.4953214e-03,
+    6.3156159e-03,
 };
 
 /* the coil's force on the bat per amp (N/A, + up) */

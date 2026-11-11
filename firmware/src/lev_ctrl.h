@@ -97,7 +97,7 @@ typedef struct {
 
 typedef struct {
     /* tunables (lev_set_param) */
-    float bw_hz, zeta, ki_div, dfilt_hz, zp_rate, zp_range_mm, g0_mm, mass_g;
+    float bw_hz, zeta, ki_div, dfilt_hz, zp_rate, zp_range_mm, zp_i, g0_mm, mass_g;
     float i_max, catch_mm, loss_mm, ramp_mm_s, steady_s, lost_s, i_cal, sched, auto_cal;
     float coil_pol, bat_sign, kcs, offset_mT;
     /* derived gains (force units: N/m, N s/m, N/(m s)) */

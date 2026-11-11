@@ -1,0 +1,154 @@
+{
+ "what": "2026-11-10: eyes ladder 0.05-0.3, 30 s on / 20 s off, at a fixed 8.6 mm set-point (about 0.33 A, so the coil thermometer reads between bursts); new owl, bat 4.70 g with cap; kcs 3.64 by hand; mass 3.6; cutoff on",
+ "setpoint_mm": 8.6,
+ "strengths": [
+  0.05,
+  0.1,
+  0.15,
+  0.2,
+  0.25,
+  0.3
+ ],
+ "on_s": 30.0,
+ "off_s": 20.0,
+ "samples": [
+  {
+   "t": 0.312,
+   "phase": "start",
+   "state": "hold",
+   "gap_mm": 7.508,
+   "i_est_A": 0.204,
+   "mean_I_mA": 11.5,
+   "rms_I_mA": 95.1,
+   "eyes": 0.0,
+   "carrier": false,
+   "v12": 11.73,
+   "faults": [],
+   "t_meas_C": 28.7,
+   "readings": 1218,
+   "r_meas_ohm": 4.386,
+   "board_C": 21.5,
+   "copper_C": 21.8
+  },
+  {
+   "t": 0.824,
+   "phase": "baseline",
+   "state": "lost",
+   "gap_mm": 24.9,
+   "i_est_A": 0.0,
+   "mean_I_mA": 104.0,
+   "rms_I_mA": 404.0,
+   "eyes": 0.0,
+   "carrier": false,
+   "v12": 11.74,
+   "faults": [],
+   "t_meas_C": 54.2,
+   "readings": 1219,
+   "r_meas_ohm": 4.807,
+   "board_C": 22.9,
+   "copper_C": 27.1
+  },
+  {
+   "t": 1.062,
+   "phase": "baseline",
+   "state": "lost",
+   "gap_mm": 24.9,
+   "i_est_A": 0.0,
+   "mean_I_mA": 104.0,
+   "rms_I_mA": 404.0,
+   "eyes": 0.0,
+   "carrier": false
+  },
+  {
+   "t": 1.195,
+   "phase": "baseline",
+   "state": "lost",
+   "gap_mm": 24.9,
+   "i_est_A": 0.0,
+   "mean_I_mA": 104.0,
+   "rms_I_mA": 404.0,
+   "eyes": 0.0,
+   "carrier": false
+  },
+  {
+   "t": 1.329,
+   "phase": "baseline",
+   "state": "lost",
+   "gap_mm": 24.9,
+   "i_est_A": 0.0,
+   "mean_I_mA": 104.0,
+   "rms_I_mA": 404.0,
+   "eyes": 0.0,
+   "carrier": false
+  },
+  {
+   "t": 1.462,
+   "phase": "baseline",
+   "state": "lost",
+   "gap_mm": 24.9,
+   "i_est_A": 0.0,
+   "mean_I_mA": 104.0,
+   "rms_I_mA": 404.0,
+   "eyes": 0.0,
+   "carrier": false
+  },
+  {
+   "t": 1.597,
+   "phase": "baseline",
+   "state": "lost",
+   "gap_mm": 24.9,
+   "i_est_A": 0.0,
+   "mean_I_mA": 104.0,
+   "rms_I_mA": 404.0,
+   "eyes": 0.0,
+   "carrier": false
+  },
+  {
+   "t": 1.73,
+   "phase": "baseline",
+   "state": "lost",
+   "gap_mm": 24.9,
+   "i_est_A": 0.0,
+   "mean_I_mA": 104.0,
+   "rms_I_mA": 404.0,
+   "eyes": 0.0,
+   "carrier": false
+  },
+  {
+   "t": 1.864,
+   "phase": "baseline",
+   "state": "lost",
+   "gap_mm": 24.9,
+   "i_est_A": 0.0,
+   "mean_I_mA": 104.0,
+   "rms_I_mA": 404.0,
+   "eyes": 0.0,
+   "carrier": false
+  },
+  {
+   "t": 1.998,
+   "phase": "baseline",
+   "state": "lost",
+   "gap_mm": 24.9,
+   "i_est_A": 0.0,
+   "mean_I_mA": 104.0,
+   "rms_I_mA": 404.0,
+   "eyes": 0.0,
+   "carrier": false
+  }
+ ],
+ "bursts": [],
+ "events": [
+  {
+   "event": "lev",
+   "state": "lost",
+   "reason": "lost: the gap left the window",
+   "gap_mm": 15.41,
+   "t": 0.72
+  }
+ ],
+ "found": {
+  "g0_mm": 9.5,
+  "zp_range_mm": 2.0
+ }
+}

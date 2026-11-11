@@ -259,6 +259,8 @@ static void window_stats(const run *r, catch_result *cr)
     cr->gap_err_mm = (mg - PLANT_G0_M) * 1e3;
 }
 
+static float case_zp_i;      /* the walk's target current for catch_case (0: zero power) */
+
 /* released at rest d mm from the float point: in the cradle (d > 0) or held by a hand
  * that lets go 20 ms after the catch (d < 0) */
 static catch_result catch_case(double d_mm, double ramp, double vq_err, int coil_sign, int mount, bool calibrate,
@@ -272,6 +274,7 @@ static catch_result catch_case(double d_mm, double ramp, double vq_err, int coil
     r.p.mount = mount;
     r.p.vq_err_mT = vq_err;
     lev_set_param(&r.c, "ramp_mm_s", (float)ramp);
+    lev_set_param(&r.c, "zp_i", case_zp_i);
     if (!calibrate) {
         lev_set_param(&r.c, "auto_cal", 0);
         lev_set_param(&r.c, "coil_pol", (float)-coil_sign);   /* what a CAL would find */
@@ -339,6 +342,19 @@ int main(void)
         print_case(name, &cr);
         CHECK(cr.held_at_end && fabs(cr.mean_mA) < 10.0, "%s: held %d, mean %.2f mA", name, cr.held_at_end,
               cr.mean_mA);
+    }
+    /* 3b. the walk's target current (main.c sets LEV_ZP_I_A at boot): the bat hangs lower,
+     * where holding it takes zp_i; still steady */
+    {
+        case_zp_i = LEV_ZP_I_A;
+        catch_result cr = catch_case(3, 6.0, 0.0, 1, 1, true, 8.0, NULL);
+        case_zp_i = 0.0f;
+        print_case("cradle +3 mm, zp_i = LEV_ZP_I_A", &cr);
+        CHECK(cr.held_at_end, "zp_i: not holding");
+        CHECK(fabs(cr.mean_mA - 1e3 * LEV_ZP_I_A) < 0.25e3 * LEV_ZP_I_A, "zp_i %.2f A: mean current %.1f mA",
+              (double)LEV_ZP_I_A, cr.mean_mA);
+        CHECK(cr.gap_err_mm > 0.1 && cr.gap_err_mm < 2.0, "zp_i: hangs %.3f mm below the float point", cr.gap_err_mm);
+        CHECK(cr.jitter_um < 30.0, "zp_i: jitter %.1f um", cr.jitter_um);
     }
     /* 4. CAL with the coil wired the other way, and with the sensor mounted the other way */
     {
@@ -476,6 +492,22 @@ int main(void)
         CHECK(fabsf(r->c.gap - (float)PLANT_G0_M) < 0.05e-3f, "with the zero CAL the gap reads %.3f mm",
               r->c.gap * 1e3);
         free(r);
+    }
+
+    /* 7b. kcs set by hand (lev tune kcs) is kept as the calibration, so that a save keeps it
+     * (2026-11-10: lev cal coil read 2.2 where 3.64 flies) */
+    {
+        static lev_ctrl a, b;
+        lev_init(&a);
+        lev_set_param(&a, "coil_pol", -1.0f);
+        lev_set_param(&a, "kcs", 3.64f);
+        lev_cal_data cd;
+        lev_get_cal(&a, &cd);
+        lev_init(&b);
+        lev_set_cal(&b, &cd);
+        printf("  kcs by hand: saved and loaded, %.3f mT/A, coil_pol %+.0f\n", b.kcs, b.coil_pol);
+        CHECK(cd.coil_valid && fabsf(b.kcs - 3.64f) < 1e-4f && b.coil_pol == -1.0f,
+              "kcs by hand: loaded %.3f mT/A, coil_pol %+.0f", b.kcs, b.coil_pol);
     }
 
     /* 8. the faults: an open coil, a hand holding the bat, the thermal model, the rail */

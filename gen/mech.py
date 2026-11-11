@@ -30,11 +30,15 @@ COIL_TURNS = 14          # (gen/parts.py COILS["COIL_LEV"], drawn by gen/coils.p
 # The owl holds the bias magnet: its body stands over the coil's centre, and two
 # springy arms snap round the perch's side edges into notches that fix it in y.
 # The magnet's bottom face sits OWL_LIFT above the perch's top copper.
-OWL_LIFT = 12.5          # was 14.0 (rev A's first print).  The bat as built weighs 4.7 g with
-                         # its printed cap, 4.2 g without (3.6 g assumed), and floated on the
-                         # magnets alone at about 6.6 mm, against 8.5 designed.  12.5 floats a
-                         # 4.2-4.3 g bat (no cap, its magnet taped to the PCB) at about 8.9 mm
-                         # (sim/physics; bringup/REVB.md 1.11, 2026-11-09)
+OWL_LIFT = 11.4          # was 14.0 (rev A's first print), then 12.5 (2026-11-09).  The bat as
+                         # built weighs 4.70 g with its printed cap.  With the 12.5 owl it
+                         # floated on the magnets alone at 7.40 mm (2026-11-10,
+                         # bringup/results/2026-11-10/151305_lev_setpoint.json): gap + lift =
+                         # 19.85 mm, about 0.9 mm under the model's 20.75.  11.4 (11.45 as
+                         # printed) floats it near 8.4 mm, the design's 8.5, with no current.
+                         # Jason: lowest robust hover looks best.  The firmware's tables
+                         # (firmware/tools/gen_lev_tables.py) follow OWL_LIFT: regenerate them
+                         # only once this owl is on the perch.
 OWL_NOTCH_Y = (-3.0, 3.0)    # notches in both side edges (x = +-PERCH_W/2), this long
 OWL_NOTCH_D = 1.0            # and this deep
 OWL_HOOK = 0.8               # how far each arm's hook reaches under the board

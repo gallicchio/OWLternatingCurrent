@@ -271,14 +271,27 @@ static void test_play(void)
     play_frames(&in, 3.0f, f);
     CHECK(f[LED_GROUP_PUMPKIN[0]] > 0.35f, "PLAY: idle pumpkins dark (%.2f)", f[LED_GROUP_PUMPKIN[0]]);
     CHECK(f[LED_GROUP_STAR[5]] == 0.0f && f[LED_GROUP_PERCH_DOWN[0]] == 0.0f, "PLAY: idle, something lit that should not be");
-    {
-        float lo = 1.0f, hi = 0.0f;
+    {   /* the rings' breathing chase: two neighbours trade, round once a second (Jason, 2026-11-10) */
+        float lo = 1.0f, hi = 0.0f, smin = 1.0f, smax = 0.0f;
+        int most_lit = 0;
         for (int k = 0; k < 4 * (int)LED_FPS; k++) {
             play_frames(&in, 1.0f / (float)LED_FPS, f);
             lo = fminf(lo, f[LED_GROUP_OWLRING[0]]);
             hi = fmaxf(hi, f[LED_GROUP_OWLRING[0]]);
+            float sum = 0.0f;
+            int lit = 0;
+            for (int i = 0; i < 3; i++) {
+                sum += f[LED_GROUP_CATRING[i]];
+                lit += f[LED_GROUP_CATRING[i]] > 0.01f;
+            }
+            smin = fminf(smin, sum);
+            smax = fmaxf(smax, sum);
+            most_lit = lit > most_lit ? lit : most_lit;
         }
-        CHECK(lo > 0.08f && hi < 0.4f && hi - lo > 0.1f, "PLAY: a ring should turn softly (%.2f..%.2f)", lo, hi);
+        CHECK(lo < 0.01f && hi > 0.3f && hi < 0.4f, "PLAY: a ring's LED should breathe from dark to its peak (%.2f..%.2f)",
+              lo, hi);
+        CHECK(smin > 0.3f && smax < 0.4f && most_lit <= 2, "PLAY: a ring's chase: two LEDs share one brightness "
+              "(sum %.2f..%.2f, up to %d lit)", smin, smax, most_lit);
     }
     CHECK(scenes_current(&S) == SCENE_PLAY, "PLAY: left play in daylight");
 

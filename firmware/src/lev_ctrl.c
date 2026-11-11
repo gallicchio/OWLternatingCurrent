@@ -14,7 +14,8 @@
  *      Kp = m wc^2 + k_neg(gap) and the current I = F / k_coil(gap), both read from
  *      the table at the estimated gap (sched = 0 freezes them at the float gap, as
  *      the simulation's controller); the zero-power loop moves the set-point by
- *      -zp_rate * I;
+ *      -zp_rate * (I - zp_i): zp_i 0 finds the magnets' own float, a positive zp_i
+ *      hangs the bat lower, where holding it takes zp_i;
  *   5. the bridge: u = I (R + R_bridge) / v12, limited to +-1.
  * Single precision only: it runs at 10 kHz on a Cortex-M33.
  */
@@ -113,6 +114,7 @@ static const param_def PARAMS[] = {
     P(dfilt_hz, 5.0f, 1000.0f, true),   /* the derivative's low-pass */
     P(zp_rate, 0.0f, 50.0f, false),     /* zero-power loop: set-point mm/s per lifting A */
     P(zp_range_mm, 0.0f, 4.0f, false),  /* how far it may move the set-point from g0 */
+    P(zp_i, -0.5f, 0.5f, false),        /* the walk's target lifting current (0: zero power) */
     P(g0_mm, 4.0f, 14.0f, true),        /* the float gap it starts from */
     P(mass_g, 1.0f, 10.0f, true),       /* the bat */
     P(i_max, 0.1f, LEV_I_MAX_A, false), /* lifting current limit */
@@ -181,6 +183,10 @@ bool lev_set_param(lev_ctrl *c, const char *name, float v)
             update_gains(c);
         if (!strcmp(name, "bat_sign"))
             apply_cal(c);                                    /* re-derive the polarity and offset */
+        if (!strcmp(name, "kcs")) {            /* by hand: kept as the calibration, so `save` keeps it */
+            c->cal.coil_raw_mT_per_A = v * c->coil_pol * c->bat_sign;
+            c->cal.coil_valid = 1;
+        }
         if (!strcmp(name, "g0_mm")) {
             c->gzp = v * 1e-3f;
             c->ramping = c->ramp_mm_s > 0.0f;                /* walk there, do not jump */
@@ -216,6 +222,7 @@ void lev_init(lev_ctrl *c)
     c->dfilt_hz = 50.0f;         /* the sim's 80 Hz doubles the noise current with the A4's coarser 7.5 mV/mT */
     c->zp_rate = 4.0f;           /* mm/s per A: ~1 s to find the float point */
     c->zp_range_mm = 2.0f;
+    c->zp_i = 0.0f;              /* zero power; main.c sets LEV_ZP_I_A at boot */
     c->g0_mm = LEV_G0_BENCH_MM;
     c->mass_g = LEV_MASS_KG * 1e3f;
     c->i_max = LEV_I_MAX_A;
@@ -556,7 +563,7 @@ void lev_step(lev_ctrl *c, const lev_input *in, lev_output *out)
             }
         } else {
             float zr = c->zp_range_mm * 1e-3f;
-            c->gzp = clampf(c->gzp - c->zp_rate * 1e-3f * c->i_cmd * DT, g0 - zr, g0 + zr);
+            c->gzp = clampf(c->gzp - c->zp_rate * 1e-3f * (c->i_cmd - c->zp_i) * DT, g0 - zr, g0 + zr);
             c->gref = c->gzp;
         }
         float e = gap - c->gref;                     /* + : too low, lift */

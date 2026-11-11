@@ -103,16 +103,16 @@ These numbers are re-measured from the meshes by `check.py` against `gen/mech.py
 
 <!-- numbers: begin (build.py writes this block) -->
 ```
-magnet bottom above the perch's top copper  12.45 mm  (OWL_LIFT 12.5; on the 0.2 mm layer grid)
+magnet bottom above the perch's top copper  11.45 mm  (OWL_LIFT 11.4; on the 0.2 mm layer grid)
 no pause: both magnets go in after printing, glued with epoxy (magnet 10 x 2)
-owl  slot 10.25 x 2.2 out through its back; 4.7 mm of epoxy behind the magnet
+owl  slot 10.25 x 2.2 out through its back; 4.8 mm of epoxy behind the magnet
 cap  no floor; pocket 10.35 across, magnet top 2.6 mm above the bat, against the roof
 owl hooks  0.8 mm under the perch, slot 2.0 for a 1.6 board
 cap hooks  0.8 under the head (y -12.5) and tail (y 11.5), slot 1.60
 snap strains  owl wing-arm 1.0 %, cap arm 1.6 %, foot prong 1.6 %  (PLA: keep < 2 %)
 cap preload  1.8 / 3.5 N per hook (arm stress 17 / 33 MPa) when the board is 0.1 / 0.2 mm thicker than the slot
 cap mass  0.45 g of PLA (it prints solid; 1.24 g/cm3)
-owl  30.1 mm tall above the perch; bat floats 10.1 mm below the perch (sim/physics)
+owl  30.1 mm tall above the perch; bat floats 11.1 mm below the perch (sim/physics)
 overhangs  no floating islands; farthest unsupported spot owl 5.2 mm, bat cap 5.2 mm, foot 0.4 mm (the pockets' roofs are bridges)
 ```
 <!-- numbers: end -->

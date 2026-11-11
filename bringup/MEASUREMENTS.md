@@ -42,11 +42,16 @@ raised edge gave more lift and the loop drew less current.
 | Quantity | Value | Design | Kind | How | Record |
 |---|---|---|---|---|---|
 | Owl magnet's bottom above the perch's top copper, first print | 14.05 mm | `OWL_LIFT` 14.0 | computed | printed geometry (`check.py`) | `print/README.md` |
-| Same, new owl (to be printed) | 12.45 mm | `OWL_LIFT` 12.5 | computed | `check.py`, 2026-11-09 | `print/out/owl.stl` |
+| Same, second owl (flying since 2026-11-10) | 12.45 mm | `OWL_LIFT` 12.5 | computed | `check.py`, 2026-11-09 | git `34c519a`'s `print/out/owl.stl` |
+| Same, third owl (printed next) | 11.45 mm | `OWL_LIFT` 11.4 | computed | `check.py`, 2026-11-10 | `print/out/owl.stl` |
 | Owl's slot for the magnet | 10.25 × 2.2 mm | magnet 10 × 2 | computed | `check.py` | `print/out/owl.stl` |
 | Float gap with no current, 14.05 mm lift, 4.70 g bat | 6-6.6 mm | 8.5 mm designed | board | the zero-power walk's end point | `results/2026-11-08/*_lev_try.json` |
 | Same, from the model at 4.70 g | 6.7 mm | | fit | `sim/physics/levitation_onemagnet.py` (gap + lift = 23.1 mm) | REVB 1.11 finding 8 |
 | Expected with the new owl, a bat of 4.2-4.3 g | about 8.9 mm | | fit | same model | HANDOFF.md |
+| **Float gap with no current, 12.45 mm lift, 4.70 g bat (cap on, the magnet flipped)** | **7.40-7.44 mm**, sd 0.015-0.02 mm | about 8.3 mm (the model's 20.75 − 12.45) | board | the zero-power walk's end point, 40 s and 120 s | `results/2026-11-10/151305_lev_setpoint.json`, `153907_lev_eyes_ir.json` |
+| Gap + lift, measured | 19.85 mm (14.05 owl: 20.1-20.65) | 20.75 mm (model at 4.70 g) | computed | the rows above | |
+| Expected with the third owl (11.45 mm), same bat | about 8.4 mm with no current | | computed | 19.85 − 11.45 | |
+| Owl magnet's field at the perch's sensor, second owl | 1.37 mT zero offset | | board | `lev cal zero`, bat away | `results/2026-11-10/150904_lev_try.json` |
 | Owl magnet's field at the perch's sensor | 7.48 mT, of which about 1.1 mT is the desk's stray field | 6.36 mT modelled | board | `lev cal` with the bat away | REVB 1.11 |
 
 **What a lower float costs:**
@@ -115,6 +120,68 @@ the 80 kHz carrier's loss is measured.
 **The bat's motion** (Jason): it turns about the vertical, sways and bobs, tilted 10-20°.
 Stopped with a finger, it starts again.
 
+## The second owl (12.45 mm), 2026-11-10
+
+Bat 4.70 g with its cap, the magnet clipped the flipped way (flatter). `kcs` 3.64 by hand,
+zero offset 1.37 mT, `mass_g` 3.6, eyes off, thermal cutoff on. The set-point fixed
+(`zp_range_mm 0`), 25 s at each, the first 4 s left out. Record:
+`results/2026-11-10/151305_lev_setpoint.json`.
+
+| Set-point | Gap sd | Gap p-p | Mean current (sensed) | rms | Model copper at the end |
+|---|---|---|---|---|---|
+| natural float, 7.44 (zero-power walk) | 0.017 mm | 0.105 mm | 0 | 91 mA | 24.9 °C |
+| 7.50 | 0.020 | 0.123 | 18 mA | 98 mA | 25.1 |
+| 7.75 | 0.022 | 0.124 | 111 mA | 150 mA | 25.2 |
+| 8.00 | 0.021 | 0.112 | 190 mA | 209 mA | 26.4 |
+| 8.25 | 0.022 | 0.139 | 242 mA | 254 mA | 28.8 |
+| 8.50 | 0.021 | 0.141 | 300 mA | 310 mA | 32.8 |
+| 8.75 | 0.028 | 0.179 | 378 mA | 389 mA | 41.4 |
+| 9.00 | 0.031 | 0.192 | 471 mA | 483 mA | 51.3 (rising fast) |
+| 9.50 | lost | | the mean-current trip (0.6 A, `MEAN_TRIP_A`) released the bat | | |
+
+- About **0.36 A sensed per mm** below the natural float. The bat is just as steady at
+  every set-point to 8.5 mm; past that the gap's spread grows with the current.
+- **The firmware's default since 2026-11-10:** the zero-power walk aims at 0.2 A
+  (`LEV_ZP_I_A`, Jason: "as low as possible while maintaining stability and only moderate
+  temperature"). With this owl that is about 7.95 mm. Not yet flown.
+- Peaks reach the 2.6 A limit at every set-point (the bat's sway).
+
+**The eyes (80 kHz carrier)** at the natural float, Jason reading the IR camera (the
+hottest spot on the perch board he can see from above or the side; the flat bat hides
+the underside). Record: `results/2026-11-10/153907_lev_eyes_ir.json`.
+
+| Eyes | Seconds | Gap sd | rms current | IR | Jason |
+|---|---|---|---|---|---|
+| 0 | 120 | 0.015 mm | 59 mA | 36 °C (heat left from the 8.6 mm run), 31-32 at the end | |
+| 0.05 | 180 | 0.017 | 72 mA | 30, then 28 | visible; one eye slightly brighter |
+| 0.1 | 180 | 0.019 | 73 mA | 29, then 29 | "dim, but visible" |
+| 0.15 | 180 | **0.033** | 77 mA | not read | |
+| 0 | 120 | 0.016 | 68 mA | not read | |
+
+- The coil's model ended each stage at 23-27 °C: at 0.1 the IR reads about 4-5 K over it.
+- 0.15 doubles the gap's spread. **The firmware's default since 2026-11-10: 0.1, breathing**
+  (a raised cosine with a 2 s period, `LEV_EYE_PERIOD_TICKS`).
+- At a fixed 8.6 mm (0.32 A) the coil's thermometer rose 34 to 42 °C in the 60 s baseline,
+  so the ladder stopped (at 42 °C) after the 0.05 burst, which added nothing measurable
+  (`153625_lev_eyes.json`). `153521_lev_eyes.json` lost the bat: `zp_range_mm 0` was set
+  before `g0_mm` (the scripts now fix `g0_mm` first).
+
+**The coil's calibration on this owl:** `lev cal coil` says "IPROPI disagrees" and gives
+`kcs` 2.18-2.25 mT/A; a console drive gives 3.9 per sensed A; 3.64 (the 2026-11-08 value)
+flies. Not understood (`results/2026-11-10/150820_coil_probe.json`).
+
+**The tokens on their perches** (bat hovering, eyes off).
+
+| Mode | Token | Owl perch (fam1) | Cat perch (fam2) | Record |
+|---|---|---|---|---|
+| live | none, owl, both, cat, none | 63.40-63.60 mA, 183 mW; `present` always true | 25.0 mA, 94 mW; `present` always true | `results/2026-11-10/155222_fam_token.json` |
+| sweep | none | 1.4 mA mean | 1.1-1.2 mA | `161345_fam_token.json` |
+| sweep | on | owl found at **147.6 kHz** about 10 s after the prompt | cat at **353.8 kHz**, within the 12 s | same |
+| sweep | taken off | owl still `present` 30 s and more after it was lifted | cat `left` about 10 s after | same |
+
+In live mode the averaged current moves 0.2 mA at most with a token on: nothing to see.
+Sweep mode sees the tokens but is slow to see them go.
+
 ## The rest of the board
 
 | Quantity | Value | Kind | Record |
@@ -130,7 +197,8 @@ Stopped with a finger, it starts again.
 ## Not yet measured
 
 - The cap-less bat's real weight, with the magnet taped on.
-- The new owl's float gap.
-- The eye carrier's real loss.
+- The third owl's (11.45 mm) float gap, and the hover at 0.2 A with it.
+- The eye carrier's real loss in watts (the IR says a few kelvin at 0.1; nothing measured
+  at 0.2 and over since the 67 °C of 2026-11-09).
 - The pendulum coils' resistance with a meter (2.29 Ω drawn; 3.0 Ω from the single-duty step).
 - The rest of REVB 3.4.

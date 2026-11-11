@@ -290,6 +290,8 @@ static void scene_theremin(scenes *s, const scene_inputs *in, float dt, float *f
 }
 
 /* ---- play: every input lights its own LEDs at once (scenes.h) ------------------------ */
+#define PLAY_RING_TURN_S 1.0f  /* a token ring's breathing chase goes round once in this (Jason, 2026-11-10) */
+#define PLAY_RING_PEAK   0.35f /* its brightest LED (L*): under the tokens' own LEDs */
 #define PLAY_LOCK_MM   0.5f    /* locked: the gap within this of the set-point */
 #define PLAY_CATCH_MM  1.5f    /* catching: further off than this, or in the hold's first second */
 #define PLAY_LEV_WAIT 2
@@ -427,18 +429,24 @@ static void scene_play(scenes *s, const scene_inputs *in, float dt, float *f)
             s->wake_t = -1.0f;
     }
 
-    /* the familiars' perches: each ring glows softly, turning slowly, to say "put a token
-     * here", dim enough that a token's own LEDs are the brightest thing there, and it
-     * shines through the token's board (its coil in silhouette).  A perch in live mode
-     * drives all the time and cannot tell whether a token is on it (familiar[] stays
-     * set), so the ring does not change with it (2026-11-09) */
+    /* the familiars' perches: each ring "breathes" round, to say "put a token here"
+     * (Jason, 2026-11-10): two neighbouring LEDs trade their brightness, then the one that
+     * has become bright trades with the next, once round in PLAY_RING_TURN_S; no blinking.
+     * Dim enough that a token's own LEDs are the brightest thing there, and it shines
+     * through the token's board (its coil in silhouette).  A perch in live mode drives all
+     * the time and cannot yet tell whether a token is on it (familiar[] stays set; the
+     * current does not change, the fam_token records in results/2026-11-10), so the ring does not
+     * change with it yet */
     static const uint8_t *const RING[2] = {LED_GROUP_OWLRING, LED_GROUP_CATRING};
     for (int p = 0; p < 2; p++) {
         s->ring_idle[p] = approach(s->ring_idle[p], 1.0f, 2.0f, dt);
-        for (int i = 0; i < 3; i++) {
-            float c = 0.5f + 0.5f * cosf(2.0f * PI * 0.25f * t - 2.0f * PI * (float)i / 3.0f);
-            f[RING[p][i]] = s->ring_idle[p] * (0.12f + 0.2f * c * c);
-        }
+        float x = 3.0f * (t / PLAY_RING_TURN_S - floorf(t / PLAY_RING_TURN_S));   /* 0..3 */
+        int k = (int)x % 3;
+        float u = 0.5f - 0.5f * cosf(PI * (x - floorf(x)));                       /* 0..1, smooth */
+        for (int i = 0; i < 3; i++)
+            f[RING[p][i]] = 0.0f;
+        f[RING[p][k]] = s->ring_idle[p] * PLAY_RING_PEAK * (1.0f - u);
+        f[RING[p][(k + 1) % 3]] = s->ring_idle[p] * PLAY_RING_PEAK * u;
     }
 
     /* the bat: the perch's downlights show the loop, owl A's eyes the height */

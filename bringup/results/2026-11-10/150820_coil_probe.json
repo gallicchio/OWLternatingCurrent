@@ -1,0 +1,26 @@
+{
+ "what": "2026-11-10 after flashing the 12.5 mm tables: short console drives, no bat, to see why lev cal coil says IPROPI disagrees",
+ "rows": [
+  {
+   "duty": 0.1,
+   "v12": 11.73,
+   "i": 0.259,
+   "u": 0.1,
+   "hall": 8.73
+  },
+  {
+   "duty": 0.15,
+   "v12": 11.7,
+   "i": 0.387,
+   "u": 0.15,
+   "hall": 7.91
+  },
+  {
+   "duty": -0.15,
+   "v12": 11.72,
+   "i": 0.373,
+   "u": -0.153,
+   "hall": 10.85
+  }
+ ]
+}

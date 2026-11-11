@@ -744,6 +744,7 @@ int main(void)
     rt_start(!warm, &cfg.lev);           /* core 1: the tick, the ADC, the safety, the coils */
     rt.lev_eyes = LEV_EYES_DEFAULT;          /* the bat's eyes whenever it is held (after rt_start, which
                                                 clears rt) */
+    lev_set_param(&rt_lev, "zp_i", LEV_ZP_I_A);   /* hang the bat a little below its float (config.h) */
     if (wd)
         rt.faults |= RT_FAULT_WATCHDOG;
     perch_init();

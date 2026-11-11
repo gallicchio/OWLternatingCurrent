@@ -279,9 +279,10 @@ static void tick_isr(void)
         align_lev_and_tick();
         resync = 0;
     } else {
-        /* the eyes' carrier while the bat is held, blinking (Jason, 2026-11-09): every 2 s
-         * the eyes close over 0.2 s, stay closed 0.5 s, open over 0.2 s.  The carrier stays
-         * on through the blink, only its strength (eye_env) going to nothing: switching it
+        /* the eyes' carrier while the bat is held, breathing (Jason, 2026-11-10; a 2 s blink
+         * with 0.2 s fades before): its strength follows a raised cosine, full to nothing
+         * and back every 2 s.  The carrier stays on throughout, only its strength (eye_env)
+         * going to nothing: switching it
          * off and on changes the coil's PWM frequency and jolted the loop every blink (the
          * gap's sd 0.34 mm against 0.23 without eyes).  So the thermometer (6b) does not
          * read while the eyes are on; it read 17 K high in the blinks anyway, and the
@@ -290,15 +291,8 @@ static void tick_isr(void)
         bool held = rt.lev_eyes > 0.0f && rt_lev.state == LEV_HOLD;
         eye_ticks = held ? eye_ticks + 1u : 0u;
         uint32_t ph = eye_ticks % LEV_EYE_PERIOD_TICKS;
-        const uint32_t open_end = LEV_EYE_PERIOD_TICKS - 2u * LEV_EYE_FADE_TICKS - LEV_EYE_OFF_TICKS;
-        if (ph < open_end)
-            eye_env = 1.0f;
-        else if (ph < open_end + LEV_EYE_FADE_TICKS)
-            eye_env = 1.0f - (float)(ph - open_end) / (float)LEV_EYE_FADE_TICKS;
-        else if (ph < open_end + LEV_EYE_FADE_TICKS + LEV_EYE_OFF_TICKS)
-            eye_env = 0.0f;
-        else
-            eye_env = (float)(ph - open_end - LEV_EYE_FADE_TICKS - LEV_EYE_OFF_TICKS) / (float)LEV_EYE_FADE_TICKS;
+        /* breathing (Jason, 2026-11-10): full at the catch, dark half a period later, no edges */
+        eye_env = 0.5f + 0.5f * cosf(6.28318531f * (float)ph / (float)LEV_EYE_PERIOD_TICKS);
         bool want = held;
         if (want != carrier_now) {
             coil_lev_frequency(want);       /* both TOPs latch at their next wraps */

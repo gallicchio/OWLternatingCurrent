@@ -80,13 +80,21 @@
 #define LEV_THERMAL_C_BOARD_J_PER_K    8.0f   /* was 2.5 (thermal.h) */
 #define LEV_THERMAL_R_CU_BOARD_K_PER_W 7.5f   /* was 3 */
 #define LEV_THERMAL_R_BOARD_AMB_K_PER_W 38.0f /* was 40 */
-#define LEV_EYE_PERIOD_TICKS  20000u      /* [Jason 2026-11-09] the bat blinks every 2 s: */
-#define LEV_EYE_FADE_TICKS    2000u       /* closing and opening over 0.2 s each, */
-#define LEV_EYE_OFF_TICKS     5000u       /* closed 0.5 s (the thermometer's windows) */
-#define LEV_EYES_DEFAULT      0.0f         /* [2026-11-09, 15:00] OFF: with 0.3 the owl's underside reached
-                                              67 C (IR) while the model said < 50 (REVB.md 1.11 finding 9).
-                                              Was 0.3: the bat's eyes on whenever it is held
-                                              (rt.lev_eyes; `lev eyes 0` turns them off) */
+#define LEV_EYE_PERIOD_TICKS  20000u      /* [Jason 2026-11-10] the bat's eyes breathe: a raised cosine,
+                                              full to dark and back every 2 s, no edges (was a 2 s blink,
+                                              0.2 s fades, 0.5 s dark) */
+#define LEV_EYES_DEFAULT      0.1f         /* [BENCH 2026-11-10] on whenever the bat is held, at 0.1: visible
+                                              from 0.05, "dim, but visible" at 0.1; the IR camera put 0.1 at
+                                              about +4-5 K over the model (which leaves the carrier out); at
+                                              0.15 the gap's sd doubled (the lev_eyes records in results/2026-11-10).
+                                              With 0.3 the owl's underside reached 67 C (REVB.md 1.11
+                                              finding 9).  `lev eyes 0` turns them off */
+#define LEV_ZP_I_A            0.2f         /* [Jason 2026-11-10: as low as is stable at a moderate
+                                              temperature] the zero-power walk's target current, set at
+                                              boot (lev tune zp_i): the bat hangs where holding it takes
+                                              0.2 A, about 0.55 mm below its natural float (0.36 A/mm),
+                                              the coil about 10 K over the room; it follows the bat's mass
+                                              and the owl by itself (the lev_setpoint record in results/2026-11-10) */
 #define LEV_RMEAS_TICKS          500u      /* [CHOICE] the lev coil's V/I window: 50 ms (rt.c 6b) */
 #define AMBIENT_DEFAULT_C     25.0f        /* until a board temperature sensor has answered */
 

@@ -8,13 +8,45 @@ the procedure. This file holds the context around it.
 machine setup and every decision in the repo, where he and any agent can read it (Jason,
 2026-11-08). Update "Where the bench stands" at the end of each session.
 
-## Where the bench stands (2026-11-09, morning)
+## Where the bench stands (2026-11-10, evening)
 
 Board 1 is on the bench PC `bell`, with the tree and the perch; board 2 is still
-sealed. Everything below up to 2026-11-09 16:45 is committed (Jason pushes).
+sealed. Everything up to 2026-11-10 evening is committed (Jason pushes).
 **Every number measured on the bench (masses, coil ohms, sense gain, thermal fits, IR
 readings, what worked and what failed) is in `bringup/MEASUREMENTS.md`.** Add new ones there.
-- **State now (12:10, 2026-11-09):** board 1 on, from the BK 9130's channel 1 set **by hand**
+- **State now (2026-11-10, evening).** Where this block and the 2026-11-09 bullets below
+  disagree, this block is right.
+  - Board 1 on the BK 9130 by hand (12 V, 3 A), V12 11.74 V. The second owl is on the perch
+    (`OWL_LIFT` 12.5, magnet 12.45 mm over the copper); the bat is 4.70 g, cap on, magnet
+    flipped. Results: `bringup/results/2026-11-10/`, summed up in MEASUREMENTS.md "The
+    second owl" and REVB.md 1.12.
+  - **Flashed last** (`firmware/build-bell-next/owlternating.uf2`): the tables for 12.5,
+    the eyes breathing at 0.1 by default, the rings' breathing chase (1 s a turn), the
+    zero-power walk aiming at 0.2 A (`zp_i`), and `lev tune kcs` that `save` keeps.
+  - **Not done yet on that firmware, with the bat away:** the flash still holds the first
+    owl's zero (−0.71 mT; this owl's is about 1.37). Run `lev cal zero`, then `lev tune
+    kcs 3.64` (`lev cal coil` is wrong on this owl, REVB 1.12 item 4), then `save`. Then
+    `lev on`, a `lev_watch.py` logger, and tell Jason in bold to lift the bat. Expect
+    about 7.95 mm at about 0.2 A mean. At the last look the bat was stuck up on the perch
+    (gap 4.4 mm): ask Jason to take it off first.
+  - **Next** (all eleven host test suites pass on this firmware):
+    1. Fly the defaults above; check by eye the eyes and rings breathing.
+    2. The live presence probe (REVB 1.12 item 5), then the rings fade out under a token.
+    3. When Jason prints the third owl (`print/out/owl.stl`, `OWL_LIFT` 11.4): regenerate
+       the tables (`~/.local/venvs/owl/bin/python firmware/tools/gen_lev_tables.py`),
+       rebuild, run the tests, flash, then zero, kcs and save as above. Expect about 8.4 mm
+       with no current.
+    4. `lev cal coil`'s "IPROPI disagrees".
+  - **Bench scripts added on 2026-11-10** (each records to `results/<date>/`, never sends
+    `lev off`, and voids any stretch in which the IMU counted a tap, a bump to the board):
+    `lev_setpoint.py` (set-point steps), `lev_eyes.py` (eyes bursts, with the thermometer),
+    `lev_eyes_ir.py` (eyes stages for the IR camera), `fam_token.py [sweep]` (tokens on
+    and off, with prompts for Jason). Move the set-point only by `g0_mm` in 0.1 mm steps,
+    and set `g0_mm` to the walk's `gzp_mm` before any `zp_range_mm` change: the other order
+    dropped the bat.
+  - **The serial port takes one script at a time.** Stop a logger with SIGINT, so it saves
+    its record.
+- **Earlier (12:10, 2026-11-09):** board 1 on, from the BK 9130's channel 1 set **by hand**
   (12 V, 3 A; no serial cable yet). It runs `firmware/build-bell-next/owlternating.uf2`
   (12:08), which starts in **`play`**: the demo mode for Friday, where every input lights its
   own LEDs at once (`firmware/src/scenes.h`; `scene auto` gives the old show).

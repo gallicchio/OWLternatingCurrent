@@ -252,6 +252,17 @@ offset of **0.83 mT**, `lev cal coil` **3.553 mT/A** (h+ 10.24, h− 11.52 mT at
   0.55 mm under the natural float, so this owl's natural float is about 8.2-8.4 mm, as
   forecast from 19.85 mm.
 - Jason: "This all looks great ... Keep this for the demo."
+- **A slow spin drops it.** After that hover Jason spun the bat slowly by hand; the wobble
+  grew and grew (his words). Logged from shortly after: the gap swung 7.7-10.3 mm (sd 0.63
+  mm per 30 s), rms current 445-570 mA against 190 before, peaks at the 2.6 A limit every
+  second, the coil's model 44 to 63 °C. About 83 s into the log the bat swung out of the
+  ±5 mm window and fell (Jason: "bat fell"); the thermal limit (80 °C) never acted
+  (`135649_lev_try.json`). The likely cause: the bat's
+  centre of mass sits off its magnet (REVB 1.11), so a spin drives a tilt and sway the
+  vertical loop can only push against.
+- **Caught again** off a flat palm and left alone: 27.7 minutes at **8.72 mm**, sd 0.085 mm
+  overall (8.46-8.96), with no growth this time; mean 164 mA; the coil's model cooled from
+  the wobble's 46 to 29 °C (same record, from 140 s).
 
 ## The rest of the board
 

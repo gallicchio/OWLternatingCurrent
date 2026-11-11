@@ -40,7 +40,11 @@ readings, what worked and what failed) is in `bringup/MEASUREMENTS.md`.** Add ne
     1. A long hover on the third owl at the default 0.2 A, with the IR camera: the coil's
        temperature and the sway over 10-30 minutes.
     2. Which of the bat's eyes is brighter (ask Jason): rev B note.
-    3. Rev B items in REVB.md.
+    3. **Don't spin the bat** in the demo: a slow spin grew a wobble that dropped it in
+       about 80 s (REVB 1.12 item 7). If it sways, steady it with a finger.
+    4. After the demo: the coil's thermometer in the dark of the eyes' breath and at low
+       current (REVB 1.12 item 8).
+    5. Rev B items in REVB.md.
   - **Bench scripts added on 2026-11-11:** `fam_scan.py PHASE "what"` (the perch current
     against frequency, `fam scan`), `fam_watch.py SECONDS "what"` (token presence, prints
     every change), `lev_eyes_ab.py` (eyes off and on, alternating, bat hovering).

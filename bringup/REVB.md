@@ -594,6 +594,18 @@ The numbers are in `MEASUREMENTS.md` ("The second owl"). What they mean:
    it from gap + lift = 19.85 mm for the bat as built.
    **Flown 2026-11-11:** the third owl (11.4) holds the bat at 8.77 mm on 0.16 A, the coil's
    model levelling at 28 °C after 12 minutes; kept for the demo.
+7. **A slow spin of the bat grows a wobble that drops it** (2026-11-11, third owl): the
+   current hit its 2.6 A limit every second and the gap's swing grew to past ±5 mm in
+   about 80 s. Without a spin the sway crept up once (sd 0.04 to 0.10 mm in 12 minutes)
+   and once didn't (sd 0.085 mm flat over 28 minutes).
+   Rev B: put the bat's centre of mass on its magnet's axis; and try the pendulum coils
+   as a damper of the sway, which the levitation coil alone can't see or push sideways.
+8. **The levitation coil's thermometer never reads in a hover now.** It waits for the eyes'
+   carrier to be off (it never is while the eyes breathe: the eyes dim to nothing on the
+   carrier) and for 0.3 A one way over 50 ms (the hover takes about 0.16 A). The coil's
+   limit runs on the thermal model alone, which matched the IR camera (1.11). A fix: read
+   in the dark part of each breath (about 0.3 s under 5 % every 2 s), and at low current
+   read the resistance from a short known pulse or the catch's current. Firmware only.
 3. **Eyes at 0.1 are enough** (Jason: "dim, but visible"), for a few kelvin by IR. At 0.15
    the gap's spread doubles. One eye is slightly brighter than the other: rev B, match
    the two LEDs or their resistors. The eyes now breathe (a 2 s raised cosine) instead of

@@ -311,15 +311,16 @@ static void expect_token(const char *what, double ft, double M, double gain, dou
     CHECK(r.led_mod < 0.10, "%s: the LEDs flicker %.0f %% at the dither", what, r.led_mod * 100);
 }
 
-/* live mode: the perch drives its own token's tuning all the time; present = the power
- * it draws beyond an empty perch's, within tens of ms; the glow follows the coupling */
+/* live mode: the perch drives its own token's tuning all the time; present = the probe
+ * at the coupled mode (FAM_PROBE_*): seen within one probe period, gone within two; the
+ * glow follows the coupling */
 static void expect_live(const char *what, int perch, double ft, double M, bool coin, bool want_present, bool want_lit)
 {
     const double t_off = 1.5;
     printf("live, %s:\n", what);
     perch_index = perch;
     live_mode = true;
-    result r = run(ft, M, t_off + 0.5, t_off, 1.0, 2.5e-3, coin, true);
+    result r = run(ft, M, t_off + 2.5 * FAM_PROBE_PERIOD_S, t_off, 1.0, 2.5e-3, coin, true);
     live_mode = false;
     perch_index = 0;
     CHECK(r.arrived == want_present, "%s: %s", what, r.arrived ? "taken for present" : "not seen");
@@ -327,10 +328,10 @@ static void expect_live(const char *what, int perch, double ft, double M, bool c
         CHECK(r.who == (perch == 0 ? FAM_OWL : FAM_CAT), "%s: named %s", what, fam_who_name(r.who));
         CHECK(r.t_arrived < 0.1, "%s: seen only after %.3f s", what, r.t_arrived);
         if (ft > 0)
-            CHECK(r.left && r.t_left - t_off < 0.2, "%s: lifting it off went unnoticed (%.2f s)", what,
+            CHECK(r.left && r.t_left - t_off < 2.0 * FAM_PROBE_PERIOD_S + 0.05, "%s: lifting it off went unnoticed (%.2f s)", what,
                   r.left ? r.t_left - t_off : -1.0);
     }
-    CHECK(r.led_o_max > 3e-3 == want_lit, "%s: the token %s (%.1f mA)", what, want_lit ? "never lit" : "lit", r.led_o_max * 1e3);
+    CHECK((r.led_o_max > 3e-3) == want_lit, "%s: the token %s (%.1f mA)", what, want_lit ? "never lit" : "lit", r.led_o_max * 1e3);
     /* the cap is set for an empty perch; a coin (a shorted turn) lowers the perch's
      * inductance and lets 10 % more through */
     CHECK(r.i_max <= (coin ? 1.1 : 1.0) * FAM_I_MAX_A, "%s: the perch carried %.1f mA", what, r.i_max * 1e3);
@@ -397,10 +398,20 @@ int main(void)
     adc_v_per_a = 0.0;
 
     const double M0b = 8.53e-6, M5b = M0b * 0.38 / 0.471, M8b = M0b * 0.20 / 0.471;
-    expect_live("the owl on its perch, 3 mm", 0, FAM_OWL_HZ, M0b, false, true, true);
-    expect_live("the cat on its perch, 3 mm", 1, FAM_CAT_HZ, M0b, false, true, true);
-    expect_live("the owl held 5 mm up (k 0.38)", 0, FAM_OWL_HZ, M5b, false, true, true);
-    expect_live("the owl held further (k 0.20): present, a faint glow", 0, FAM_OWL_HZ, M8b, false, true, false);
+    const double Mon = M0b * 0.75 / 0.471;     /* a token lying on the copper (bench 2026-11-07, -11) */
+    expect_live("the owl lying on its target (k 0.75)", 0, FAM_OWL_HZ, Mon, false, true, true);
+    expect_live("the cat lying on its target (k 0.75)", 1, FAM_CAT_HZ, Mon, false, true, true);
+    /* a token 3 mm or more up: its coupled mode moves away from the probe (1.5 x its
+     * tuning) and the probe's reading falls under FAM_PROBE_ON_MIN_A; it glows but reads
+     * absent.  A known limit, chosen (bench 2026-11-11): empty perches came too near the
+     * lower thresholds, and rev A's tokens lie on the copper */
+    expect_live("the owl 3 mm up (k 0.47): lit, but not on its target", 0, FAM_OWL_HZ, M0b, false, false, true);
+    expect_live("the cat 3 mm up (k 0.47): lit, but not on its target", 1, FAM_CAT_HZ, M0b, false, false, true);
+    expect_live("the owl held 5 mm up (k 0.38): lit, but not on its target", 0, FAM_OWL_HZ, M5b, false, false,
+                true);
+    /* held 8 mm up it glows faintly, but it is not on its target: the probe says absent */
+    expect_live("the owl held further (k 0.20): a faint glow, not on the target", 0, FAM_OWL_HZ, M8b, false,
+                false, false);
     expect_live("the cat on the owl's perch: dark", 0, FAM_CAT_HZ, M0b, false, false, false);
     expect_live("an empty perch", 0, 0, M0b, false, false, false);
     expect_live("a coin on the perch", 0, 0, M0b, true, false, false);

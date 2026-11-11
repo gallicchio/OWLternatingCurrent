@@ -60,6 +60,7 @@ typedef struct {
     const char *(*pend)(int mode);
     const char *(*theremin)(int op);
     const char *(*fam)(int live);                       /* 1: live mode, 0: sweep and fit */
+    const char *(*fam_scan)(int perch, float frac);     /* bench: a scan at frac x the live duty cap */
     const char *(*film)(bool on);
     const char *(*volume)(float v);
     const char *(*clear)(void);

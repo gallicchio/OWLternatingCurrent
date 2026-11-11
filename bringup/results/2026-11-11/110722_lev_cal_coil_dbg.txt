@@ -1,0 +1,8 @@
+  {"ok": true, "cmd": "lev", "cal": "coil"}
+"cal": "coil ok, but IPROPI disagrees with the command"
+"kcs_mT_per_A": 2.164
+"cal_dbg": {"n": 400, "h_plus": 8.947, "h_minus": 10.245, "i_plus": 0.1938, "i_minus": 0.1751, "i_off": 0.0707, "h_off0": 9.593, "h_off1": 9.575}}}
+  {"ok": true, "cmd": "lev", "cal": "coil"}
+"cal": "coil ok, but IPROPI disagrees with the command"
+"kcs_mT_per_A": 2.177
+"cal_dbg": {"n": 400, "h_plus": 8.942, "h_minus": 10.248, "i_plus": 0.1946, "i_minus": 0.1755, "i_off": 0.0704, "h_off0": 9.597, "h_off1": 9.599}}}

@@ -8,14 +8,43 @@ the procedure. This file holds the context around it.
 machine setup and every decision in the repo, where he and any agent can read it (Jason,
 2026-11-08). Update "Where the bench stands" at the end of each session.
 
-## Where the bench stands (2026-11-10, evening)
+## Where the bench stands (2026-11-11, afternoon)
 
 Board 1 is on the bench PC `bell`, with the tree and the perch; board 2 is still
-sealed. Everything up to 2026-11-10 evening is committed (Jason pushes).
+sealed. Everything up to 2026-11-11 afternoon is committed (Jason pushes).
 **Every number measured on the bench (masses, coil ohms, sense gain, thermal fits, IR
 readings, what worked and what failed) is in `bringup/MEASUREMENTS.md`.** Add new ones there.
-- **State now (2026-11-10, evening).** Where this block and the 2026-11-09 bullets below
+- **State now (2026-11-11, afternoon).** Where this block and the older ones below
   disagree, this block is right.
+  - Board 1 on the BK 9130 by hand (12 V, 3 A). **The third owl is on the perch** (Jason's
+    print, `OWL_LIFT` 11.4); the bat is 4.70 g, cap on. Results:
+    `bringup/results/2026-11-11/`, summed up in MEASUREMENTS.md "The coil's calibration,
+    the defaults flown, the token probe" and "The third owl", and REVB.md 1.12.
+  - **Flashed last:** the levitation tables for 11.4 (`gen_lev_tables.py`), the coil cal
+    that coasts in its off windows (fixed), the token probe (live drive breathes over 3 s,
+    a two-duty probe at 1.5 × the token's tuning in each trough), the rings shown with no
+    token and faded under one. **Saved in flash** for this owl: zero offset 0.83 mT, `kcs`
+    3.553 mT/A (both from `lev cal zero` and `lev cal coil` with the bat away).
+  - **The bat flies on the third owl** at about 8.4-8.8 mm and about 0.17 A (the walk aims
+    at 0.2 A). The first catches off Jason's palm can fail ("the current stayed at its
+    limit") while the owl pulls the bat up: that is normal, the loop catches again. **Never
+    send `lev off` because of a loss in the log; look at the state first** (on 2026-11-11 an
+    agent dropped a hovering bat that way).
+  - **This is the demo set-up** (Jason, 2026-11-11: "Keep this for the demo"): the third
+    owl, the firmware and flash settings above, the defaults (`zp_i` 0.2, eyes 0.1
+    breathing, `g0_mm` 9.5, `zp_range_mm` 2.0, play mode). Don't change them before the demo
+    without asking him.
+  - **The tokens:** live presence works on the bench (every arrival and departure seen,
+    no false ones). Not seen: a token 3 mm or more off the copper.
+  - **Next:**
+    1. A long hover on the third owl at the default 0.2 A, with the IR camera: the coil's
+       temperature and the sway over 10-30 minutes.
+    2. Which of the bat's eyes is brighter (ask Jason): rev B note.
+    3. Rev B items in REVB.md.
+  - **Bench scripts added on 2026-11-11:** `fam_scan.py PHASE "what"` (the perch current
+    against frequency, `fam scan`), `fam_watch.py SECONDS "what"` (token presence, prints
+    every change), `lev_eyes_ab.py` (eyes off and on, alternating, bat hovering).
+- **Earlier (2026-11-10, evening).**
   - Board 1 on the BK 9130 by hand (12 V, 3 A), V12 11.74 V. The second owl is on the perch
     (`OWL_LIFT` 12.5, magnet 12.45 mm over the copper); the bat is 4.70 g, cap on, magnet
     flipped. Results: `bringup/results/2026-11-10/`, summed up in MEASUREMENTS.md "The

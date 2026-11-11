@@ -326,6 +326,7 @@ static void end_cal(lev_ctrl *c, const char *msg, bool ok)
 static float cal_step(lev_ctrl *c, const lev_input *in)
 {
     uint32_t j = c->ticks - 1;
+    c->cal_coast = 0;
     if (c->cal_kind == LEV_CAL_ZERO) {
         if (j >= N_ZERO_SETTLE) {
             c->cal_acc_h += in->hall_mT;
@@ -349,7 +350,13 @@ static float cal_step(lev_ctrl *c, const lev_input *in)
     const uint32_t np = N_P_SETTLE + N_P_ACC;
     const uint32_t b_end = a_end + CAL_CYCLES * 2 * np;
     const uint32_t c_end = b_end + N_OFF_SETTLE + N_OFF_ACC;
+    /* The off windows coast the bridge, not drive it at zero: at zero the PWM still makes
+     * its shortest pulses both ways, a zero-mean ripple of about 0.07 A that the mirror
+     * (|I|, no sign) reads as current, which was then taken off both pulses as an offset
+     * ("IPROPI disagrees" and kcs 2.15 against 3.5, bench 2026-11-11).  Coasting, only the
+     * mirror's own offset is left. */
     if (j < a_end) {                                     /* off: the reading without the coil */
+        c->cal_coast = 1;
         if (j >= N_OFF_SETTLE) {
             c->cal_acc_h += in->hall_mT;
             c->cal_i_off += in->iprop_A;     /* the mirror's offset (when it is positive) */
@@ -379,6 +386,7 @@ static float cal_step(lev_ctrl *c, const lev_input *in)
         return (j + 1 == b_end) ? 0.0f : (plus ? c->i_cal : -c->i_cal);
     }
     if (j < c_end) {                                     /* off again: did the bat move? */
+        c->cal_coast = 1;
         if (j >= b_end + N_OFF_SETTLE) {
             c->cal_acc_h += in->hall_mT;
             c->cal_n_end += 1.0f;
@@ -515,7 +523,7 @@ void lev_step(lev_ctrl *c, const lev_input *in, lev_output *out)
         break;
     case LEV_CAL:
         i_fwd = cal_step(c, in);
-        active = c->state == LEV_CAL;
+        active = c->state == LEV_CAL && !c->cal_coast;
         if (!active)
             i_fwd = 0.0f;
         break;

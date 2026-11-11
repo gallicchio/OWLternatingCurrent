@@ -245,6 +245,14 @@ void console_command(char *line)
         }
         snprintf(extra, sizeof extra, "\"theremin\":\"%s\"", OPS[op]);
         done(cmd, ops->theremin(op), extra);
+    } else if (!strcmp(cmd, "fam") && tok[1] && !strcmp(tok[1], "scan")) {
+        int pp = tok[2] && !strcmp(tok[2], "fam1") ? 0 : tok[2] && !strcmp(tok[2], "fam2") ? 1 : -1;
+        if (n != 4 || pp < 0 || !number(tok[3], &v) || v <= 0.0f || v > 1.0f) {
+            fail(cmd, "fam scan <fam1|fam2> <0..1 of the live duty cap>");
+            return;
+        }
+        snprintf(extra, sizeof extra, "\"scan\":\"fam%d\",\"frac\":%.2f", pp + 1, (double)v);
+        done(cmd, ops->fam_scan(pp, v), extra);
     } else if (!strcmp(cmd, "fam")) {
         int live = tok[1] && !strcmp(tok[1], "live") ? 1 : tok[1] && !strcmp(tok[1], "sweep") ? 0 : -1;
         if (live < 0) {

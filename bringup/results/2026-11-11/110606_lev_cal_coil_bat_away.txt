@@ -1,0 +1,18 @@
+  {"ok": true, "cmd": "lev", "cal": "coil"}
+"bbat_mT": 0.08
+"cal": "coil ok,
+"coil_pol": -1
+"kcs_mT_per_A": 2.156
+"coil_pol": -1.0
+  {"ok": true, "cmd": "lev", "cal": "coil"}
+"bbat_mT": 0.16
+"cal": "coil ok,
+"coil_pol": -1
+"kcs_mT_per_A": 2.141
+"coil_pol": -1.0
+  {"ok": true, "cmd": "lev", "cal": "coil"}
+"bbat_mT": 0.17
+"cal": "coil ok,
+"coil_pol": -1
+"kcs_mT_per_A": 2.152
+"coil_pol": -1.0

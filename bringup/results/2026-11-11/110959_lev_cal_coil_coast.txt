@@ -1,0 +1,15 @@
+    raise TimeoutError(f"no reply to {line!r} within {timeout or self.timeout} s")
+"bbat_mT": -0.0
+"cal": "never", "bat_sign": 1
+"kcs_mT_per_A": 3.64
+"cal_dbg": {"n": 0, "h_plus": 0.0, "h_minus": 0.0, "i_plus": 0.0, "i_minus": 0.0, "i_off": 0.0, "h_off0": 0.0, "h_off1": 0.0}}}
+  {"ok": true, "cmd": "lev", "cal": "coil"}
+"bbat_mT": -0.03
+"cal": "coil ok", "bat_sign": 1
+"kcs_mT_per_A": 3.56
+"cal_dbg": {"n": 400, "h_plus": 8.972, "h_minus": 10.26, "i_plus": 0.194, "i_minus": 0.1756, "i_off": 0.0039, "h_off0": 9.631, "h_off1": 9.647}}}
+  {"ok": true, "cmd": "lev", "cal": "coil"}
+"bbat_mT": -0.13
+"cal": "coil ok", "bat_sign": 1
+"kcs_mT_per_A": 3.566
+"cal_dbg": {"n": 400, "h_plus": 8.981, "h_minus": 10.272, "i_plus": 0.1949, "i_minus": 0.1752, "i_off": 0.004, "h_off0": 9.628, "h_off1": 9.646}}}

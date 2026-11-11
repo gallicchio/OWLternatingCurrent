@@ -75,6 +75,7 @@ static const char *a_lev(int op, const char *param, float v)
 static const char *a_pend(int m) { snprintf(call, sizeof call, "pend %d", m); return NULL; }
 static const char *a_theremin(int op) { snprintf(call, sizeof call, "theremin %d", op); return NULL; }
 static const char *a_fam(int live) { snprintf(call, sizeof call, "fam %d", live); return NULL; }
+static const char *a_fam_scan(int p, float f) { snprintf(call, sizeof call, "fam scan %d %.2f", p, (double)f); return NULL; }
 static const char *a_film(bool on) { snprintf(call, sizeof call, "film %d", on); return NULL; }
 static const char *a_volume(float v) { snprintf(call, sizeof call, "volume %.3f", (double)v); return NULL; }
 static const char *a_clear(void) { snprintf(call, sizeof call, "clear"); return NULL; }
@@ -87,7 +88,7 @@ static void a_reboot(bool b) { snprintf(call, sizeof call, "reboot %d", b); }
 
 static const console_ops OPS = {
     .reply = reply, .scene = a_scene, .led = a_led, .coil = a_coil, .sweep = a_sweep, .lev = a_lev,
-    .pend = a_pend, .theremin = a_theremin, .fam = a_fam, .film = a_film, .volume = a_volume, .clear = a_clear,
+    .pend = a_pend, .theremin = a_theremin, .fam = a_fam, .fam_scan = a_fam_scan, .film = a_film, .volume = a_volume, .clear = a_clear,
     .save = a_save, .status_json = a_status, .lev_json = a_levj, .i2c_scan_json = a_i2c,
     .adc_dump_json = a_adc, .reboot = a_reboot,
 };
@@ -177,6 +178,9 @@ int main(void)
     expect("fam live", true, "fam 1");
     expect("fam sweep", true, "fam 0");
     expect("fam maybe", false, "");
+    expect("fam scan fam2 0.5", true, "fam scan 1 0.50");
+    expect("fam scan fam3 0.5", false, "");
+    expect("fam scan fam1 2", false, "");
     expect("film on", true, "film 1");
     expect("film off", true, "film 0");
     expect("film maybe", false, "");

@@ -71,10 +71,37 @@
 #define FAM_CAP_MARGIN         0.92f      /* [CHOICE] the cap aims this far under FAM_I_MAX_A */
 #define FAM_RAMP_S             0.8f       /* [CHOICE] dark to lit: orange first, then violet (2.5 s until 2026-11-07) */
 #define FAM_RAMP_DOWN_S        0.5f
-#define FAM_LIVE_ON_W          0.05f      /* [BENCH 2026-11-07] a token on the perch draws >= 0.15 W beyond empty */
-#define FAM_LIVE_OFF_W         0.025f
-#define FAM_LIVE_ON_S          0.02f      /* debounce, either way */
-#define FAM_LIVE_OFF_S         0.10f
+/* Live mode's presence probe (bench 2026-11-11, the fam_scan records in results/2026-11-11).
+ * At the live drive (the token's design tuning) a token on its target changes the perch's
+ * supply current by nothing: it is where the change turns from negative (below) to
+ * positive (above).  At the coupled mode, ft / sqrt(1 - k^2) with k ~0.75 for a token
+ * lying on the copper, about 1.5 ft, it draws several times an empty perch's current
+ * even at a low duty: owl perch at 213 kHz, duty 0.05, 1.8 mA empty and 12.4 mA with the
+ * owl; the cat's mode (455 kHz) is above the PWM's range, so the cat perch looks at its
+ * 3rd-harmonic image, 152 kHz: 2.5 mA empty, 11.0 mA with the cat.  Every
+ * FAM_PROBE_PERIOD_S the live drive steps aside for a short probe there, at two duties
+ * (as a sweep's step): their currents' difference, with the drivers' own draw cancelled,
+ * against an empty perch's (modelled over the 1st, 3rd and 5th harmonics, then learned). */
+#define FAM_PROBE_PERIOD_S     3.0f       /* [Jason 2026-11-11] the token breathes: its drive fades down and
+                                              back up once in this, raised-cosine, and the probe sits in
+                                              the trough (a probe every 0.5 s made the tokens blink:
+                                              "annoying"); a token is seen, or seen to leave, within this */
+#define FAM_BREATH_MIN         0.3f       /* [CHOICE] the trough's duty, a fraction of the cap: about a
+                                              fifth of the power, near the probe's own glow */
+#define FAM_PROBE_RATIO        1.5f       /* [BENCH 2026-11-11] the coupled mode over the design tuning */
+#define FAM_PROBE_DUTY         0.06f      /* [BENCH 2026-11-11] the upper level ... */
+#define FAM_PROBE_DUTY_LO      0.03f      /* ... and the lower (not lower: the token would dip) */
+#define FAM_PROBE_SETTLE_S     0.006f     /* ISENSE's filter from the live drive's 60 mA to the probe's 2 mA */
+#define FAM_PROBE_AVG_S        0.004f
+#define FAM_PROBE_ON           2.5f       /* [CHOICE] present above this x an empty perch's difference ... */
+#define FAM_PROBE_ON_MIN_A     0.003f     /* [BENCH 2026-11-11] ... and above this: empty perches read 0.3-0.9 mA
+                                              (owl) and 1.4-1.6 (cat), and each was once taken for a token
+                                              against 2.5 x its modelled empty alone; tokens read 6-13 mA */
+#define FAM_PROBE_OFF          0.35f      /* [BENCH 2026-11-11] ... and gone below this x the token's own:
+                                              owl 10-13 mA on, 0.4-1.5 off; cat 11-12 on, 1.8 off (the
+                                              empty perch's model is 1.4-2.7 x low, so not against that) ... */
+#define FAM_PROBE_OFF_EMPTY    1.5f       /* ... or below this x an empty perch's (a weakly coupled token) */
+#define FAM_PROBE_LEARN        0.1f       /* [CHOICE] each empty probe moves the learned empty difference this far */
 #define FAM_DITHER             0.01f      /* [CHOICE] +-1 % frequency dither in DRIVE ... */
 #define FAM_DITHER_HALF_S      0.005f     /* ... 5 ms each side: 100 Hz */
 #define FAM_L1_H               30.3e-6f   /* [SIM] gen/coils.py: the perch coil as drawn (familiar.py's
@@ -152,9 +179,17 @@ typedef struct {
     float t_prev;
     /* live mode (FAM_ST_LIVE): the perch drives its own token's tuning all the time */
     bool live;                   /* asked for (fam_set_live) */
-    bool live_present;           /* a token is drawing power on the perch */
-    float t_live_edge;           /* when the presence reading last crossed a threshold */
-    float p_live_f;              /* the token's power, filtered (W) */
+    bool live_present;           /* a token is on the perch (the probe) */
+    float p_live_f;              /* the power delivered beyond an empty perch's, filtered (W): reported only */
+    bool probing;
+    float t_probe, t_probe_next;
+    float f_probe;               /* Hz */
+    float probe_acc, probe_i_hi;
+    int probe_n, probe_level, probe_low;  /* samples; 0 upper duty, 1 lower; probes in a row under
+                                             the leaving threshold */
+    float probe_di;              /* the last probe's supply current, upper level minus lower, A */
+    float probe_on;              /* the token's own, while present (filtered), A */
+    float probe_empty;           /* an empty perch's: modelled, then learned, A */
 } fam_perch;
 
 void fam_init(fam_perch *p, int index);
@@ -162,11 +197,14 @@ void fam_init(fam_perch *p, int index);
 void fam_enable(fam_perch *p, bool on);
 /* live: no sweep and no fit.  The perch drives its own token's tuning (perch 0 the owl's,
  * perch 1 the cat's) at the empty-perch current cap all the time, so the token's glow
- * follows the hand that brings it in, instantly; "present" (FAM_EV_ARRIVED / LEFT) is the
- * power the perch delivers beyond an empty perch's, read every millisecond.  Safe at any
+ * follows the hand that brings it in, instantly; "present" (FAM_EV_ARRIVED / LEFT) is
+ * the probe's (FAM_PROBE_*): seen, or gone, within FAM_PROBE_PERIOD_S; the drive breathes
+ * with that period, the probe in its trough.  Safe at any
  * coupling: at its tuning a token only raises the perch's impedance.  (Jason, bench
  * 2026-11-07: the sweep's seconds of lag on a put-down token were "annoyingly long".) */
 void fam_set_live(fam_perch *p, bool live);
 void fam_step(fam_perch *p, float t_s, float isense_A, const fam_cmd *applied, fam_cmd *cmd, fam_event *ev);
+/* the duty at f that puts FAM_CAP_MARGIN x FAM_I_MAX_A into an empty perch (the live drive's) */
+float fam_duty_cap(float f_hz);
 const char *fam_who_name(fam_who w);
 const char *fam_state_name(fam_state s);

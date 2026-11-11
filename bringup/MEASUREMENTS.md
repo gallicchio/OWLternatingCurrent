@@ -168,7 +168,8 @@ the underside). Record: `results/2026-11-10/153907_lev_eyes_ir.json`.
 
 **The coil's calibration on this owl:** `lev cal coil` says "IPROPI disagrees" and gives
 `kcs` 2.18-2.25 mT/A; a console drive gives 3.9 per sensed A; 3.64 (the 2026-11-08 value)
-flies. Not understood (`results/2026-11-10/150820_coil_probe.json`).
+flies. Not understood (`results/2026-11-10/150820_coil_probe.json`); found and fixed on
+2026-11-11 (below).
 
 **The tokens on their perches** (bat hovering, eyes off).
 
@@ -180,7 +181,77 @@ flies. Not understood (`results/2026-11-10/150820_coil_probe.json`).
 | sweep | taken off | owl still `present` 30 s and more after it was lifted | cat `left` about 10 s after | same |
 
 In live mode the averaged current moves 0.2 mA at most with a token on: nothing to see.
-Sweep mode sees the tokens but is slow to see them go.
+Sweep mode sees the tokens but is slow to see them go. Explained and solved on 2026-11-11
+(below).
+
+## The coil's calibration, the defaults flown, the token probe (2026-11-11)
+
+**`lev cal coil` fixed.** With the bridge asked for 0 A, the 100 kHz PWM still makes its
+minimum pulses both ways: a zero-mean ripple of about 0.07 A. The IPROPI mirror reads |I|,
+so the ripple read as an offset of the same size, and the cal subtracted it from each
+pulse ("IPROPI disagrees", `kcs` 2.2). The cal now coasts the bridge in its off windows.
+With the bat away it gives **`kcs` 3.566 mT/A** (h+ 8.98, h− 10.27 mT at +0.195 / −0.175 A;
+off 9.63 / 9.65 mT; i_off 4 mA), and the zero offset **1.40 mT**; both saved. Records:
+`results/2026-11-11/110606_*` to `110959_lev_cal_coil_coast.txt` (the last is the fix).
+
+**The defaults flown** (`zp_i` 0.2 A, eyes 0.1 breathing, rings' chase): the bat floats at
+**8.46 mm, 0.13-0.16 A sensed** mean, 0.19-0.22 A rms. The sway grows over minutes with the
+eyes on or off: gap sd 0.05, 0.08, 0.10, 0.17, 0.17, 0.23 mm in six 30 s stages that
+alternate eyes 0 and 0.1 (`111448_lev_eyes_ab.json`; `111038_lev_try.json`). Jason: "Rocking
+the loop a little bit isn't bad"; left as it is.
+
+**The perch current against frequency** (`fam scan`, bat off; drive at a duty fraction of
+the cap and a third of it, 6 ms settle, 12 ms average; records `112515_fam_scan_none.json`,
+`112557_fam_scan_owl.json`, `112713_fam_scan_owl+cat.json`). At a fixed duty the sensed
+supply current is the real power over 4.8 V, so it follows Re(1/Z):
+- At the token's own tuning (the live drive, 142 / 303 kHz) the reflected load is
+  resistive: the perch's current redistributes and the net change is about zero. That is
+  why live mode saw nothing (2026-11-09, 2026-11-10).
+- Below the token's tuning the reflection is inductive (current down). Above it the
+  reflection cancels the perch coil's inductance and the current peaks at the coupled mode,
+  ft/√(1−k²), about **1.5 ft** for a token lying on the copper (k about 0.75).
+- Owl perch at 213 kHz: 1.8 → 12.4 mA at duty about 0.05; 33 → 325 mA at the full cap.
+  Cat perch at 146 kHz (its 3rd harmonic lands on 1.5 ft): 2.5 → 11 mA; at 426 kHz
+  1.65 → 8.9 mA. The two perches don't see each other's tokens.
+
+**The live probe** (firmware since 2026-11-11, `familiar.h` `FAM_PROBE_*`): live drive
+breathes (a 3 s raised cosine, 0.3 of the cap to the cap); in each trough, 20 ms at 1.5 ft
+(the cat's perch at a third of that), at duty 0.06 then 0.03, and the difference of the two
+currents cancels the drivers' own draw. Arrival above max(2.5 × the learned empty, 3 mA);
+leaving below max(0.35 × the token's own level, 1.5 × empty). Jason: "The Breathing is fine".
+
+| Perch | Empty | Token on | Record |
+|---|---|---|---|
+| owl (fam1) | 0.3-0.9 mA | 8-13 mA | `120007_fam_watch.json`, `131321_fam_watch.json` |
+| cat (fam2) | 1.4-1.9 mA (higher with the owl on) | 6-11 mA | same |
+
+- The last run (`131321`): both off and empty, owl on (seen at 10.5 mA), cat on (6.8 mA),
+  cat off, owl off: every edge seen, nothing false. The first two tries (`113258`, a probe
+  every 0.5 s, which blinked the tokens; `114155`, no floor) read empty perches at 0.9 and
+  1.6 mA as tokens, so the rings never showed.
+- Known limit, from the simulation: a token raised 3 mm or more lights but reads absent.
+
+## The third owl (11.4 mm), 2026-11-11
+
+Jason's print of `OWL_LIFT` 11.4, magnet glued in; bat 4.70 g, cap on. Tables regenerated
+(the model's 3.6 g bat floats at 11.14 mm). With the bat away: `lev cal zero` gives an
+offset of **0.83 mT**, `lev cal coil` **3.553 mT/A** (h+ 10.24, h− 11.52 mT at
++0.193 / −0.174 A); saved (`results/2026-11-11/131806_lev_cal_third_owl.txt`).
+
+- **The catch:** the owl pulls the bat off a flat palm up to the perch, and the loop lets
+  it down gently (Jason: "which is great"). The first one or two catches can end "the current
+  stayed at its limit" while the bat snaps up; the next catch holds.
+- **The hover on the defaults** (`zp_i` 0.2, eyes 0.1 breathing), 12.5 minutes
+  (`132110_lev_try.json`; the first flight, `131855_lev_try.json`, held the same way until
+  an agent's `lev off`): gap **8.77 mm** mean, sd 0.086 mm overall (8.55-9.05); the
+  per-minute sd grew from 0.04 to 0.10 mm. Mean current **162 mA** sensed (134-177), rms
+  193 mA, peaks to 1.8 A. The coil's model went 22.9 to 28.0 °C, levelling off; the
+  board's sensor 21.1 to 26.6 °C. The resistance thermometer doesn't read while the eyes
+  are on (by design, `rt.c`), so it gave nothing.
+- Gap + lift: 8.77 + 11.4 = 20.2 mm at 0.16 A. On the second owl, 0.2 A hung the bat about
+  0.55 mm under the natural float, so this owl's natural float is about 8.2-8.4 mm, as
+  forecast from 19.85 mm.
+- Jason: "This all looks great ... Keep this for the demo."
 
 ## The rest of the board
 
@@ -197,7 +268,7 @@ Sweep mode sees the tokens but is slow to see them go.
 ## Not yet measured
 
 - The cap-less bat's real weight, with the magnet taped on.
-- The third owl's (11.45 mm) float gap, and the hover at 0.2 A with it.
+- The third owl's natural float (`zp_i` 0): about 8.2-8.4 mm by the second owl's slope, not flown.
 - The eye carrier's real loss in watts (the IR says a few kelvin at 0.1; nothing measured
   at 0.2 and over since the 67 °C of 2026-11-09).
 - The pendulum coils' resistance with a meter (2.29 Ω drawn; 3.0 Ω from the single-duty step).

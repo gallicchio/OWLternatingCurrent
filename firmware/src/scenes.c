@@ -433,13 +433,12 @@ static void scene_play(scenes *s, const scene_inputs *in, float dt, float *f)
      * (Jason, 2026-11-10): two neighbouring LEDs trade their brightness, then the one that
      * has become bright trades with the next, once round in PLAY_RING_TURN_S; no blinking.
      * Dim enough that a token's own LEDs are the brightest thing there, and it shines
-     * through the token's board (its coil in silhouette).  A perch in live mode drives all
-     * the time and cannot yet tell whether a token is on it (familiar[] stays set; the
-     * current does not change, the fam_token records in results/2026-11-10), so the ring does not
-     * change with it yet */
+     * through the token's board (its coil in silhouette).  With a token on its target the
+     * ring fades out, and comes back when it leaves (Jason, 2026-11-10; live mode's probe,
+     * familiar.h FAM_PROBE_*) */
     static const uint8_t *const RING[2] = {LED_GROUP_OWLRING, LED_GROUP_CATRING};
     for (int p = 0; p < 2; p++) {
-        s->ring_idle[p] = approach(s->ring_idle[p], 1.0f, 2.0f, dt);
+        s->ring_idle[p] = approach(s->ring_idle[p], in->familiar[p] != FAMILIAR_NONE ? 0.0f : 1.0f, 2.0f, dt);
         float x = 3.0f * (t / PLAY_RING_TURN_S - floorf(t / PLAY_RING_TURN_S));   /* 0..3 */
         int k = (int)x % 3;
         float u = 0.5f - 0.5f * cosf(PI * (x - floorf(x)));                       /* 0..1, smooth */

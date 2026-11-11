@@ -1,0 +1,23 @@
+# 2026-11-11 third owl (OWL_LIFT 11.4, Jason's print, magnet in), tables regenerated, bat away: lev cal zero, lev cal coil, save
+== console
+  {"ok": true, "cmd": "lev", "cal": "zero"}
+done
+== console
+  {"ok": true, "cmd": "lev", "cal": "coil"}
+done
+Traceback (most recent call last):
+  File "<stdin>", line 2, in <module>
+ImportError: cannot import name 'Board' from 'owlboard' (/home/jason/mnt/local4TB/2TBext4/frank/stuff/mudd/pcbs/OWLternatingCurrent/bringup/owlboard.py)
+{"state": "off", "gap_mm": 24.9}
+['gap_mm', 'mean_I_mA', 'reason', 'state']
+{"state": "off", "gap_mm": 24.9, "gzp_mm": 9.5, "bbat_mT": -0.04, "cal": "coil ok", "bat_sign": 1, "coil_pol": -1, "kcs_mT_per_A": 3.553, "hall_offset_mT": 0.83, "eyes": 0.1, "cal_dbg": {"n": 400, "h_plus": 10.236, "h_minus": 11.515, "i_plus": 0.1933, "i_minus": 0.1744, "i_off": 0.0039, "h_off0": 10.871, "h_off1": 10.863}}
+== console
+  {"ok": true, "cmd": "save"}
+done
+== console
+  {"ok": true, "cmd": "lev", "lev": "on"}
+done
+"state": "wait"
+"gap_mm": 24.9
+"gzp_mm": 9.5
+"reason": ""

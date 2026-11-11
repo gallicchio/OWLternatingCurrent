@@ -139,9 +139,20 @@ static void enter_live(fam_perch *p, float t)
     p->f_token = p->f_drive = p->index == 0 ? FAM_OWL_HZ : FAM_CAT_HZ;
     p->iq_drive = interp(p, p->iq, p->f_drive);
     p->live_present = false;
-    p->t_live_edge = -1.0f;
     p->p_live_f = 0.0f;
     p->cmd = (fam_cmd){true, p->f_drive, duty_cap_at(p->f_drive)};
+    /* the probe: the owl's coupled mode, or the cat's 3rd-harmonic image of its own */
+    p->f_probe = p->index == 0 ? FAM_PROBE_RATIO * FAM_OWL_HZ : FAM_PROBE_RATIO * FAM_CAT_HZ / 3.0f;
+    p->probe_empty = 0.0f;
+    for (int h = 1; h <= 5; h += 2)
+        p->probe_empty += (half_sq(vn(h, FAM_PROBE_DUTY)) - half_sq(vn(h, FAM_PROBE_DUTY_LO))) *
+                          ge_model((float)h * p->f_probe) / FAM_VDRIVE_V;
+    p->probing = false;
+    p->t_probe_next = t + 0.02f;          /* the first breath starts in its trough, with a probe */
+    p->t_probe = t;
+    p->probe_on = 0.0f;
+    p->probe_low = 0;
+    p->probe_di = 0.0f;
     set_state(p, FAM_ST_LIVE, t);
 }
 
@@ -397,6 +408,8 @@ static float duty_cap_at(float f)
     return clampf(c, 0.0f, 0.5f);
 }
 
+float fam_duty_cap(float f_hz) { return duty_cap_at(f_hz); }
+
 static void power_loop(fam_perch *p, float isense, float dt)
 {
     float p_meas = FAM_VDRIVE_V * (isense - p->iq_drive);
@@ -485,27 +498,71 @@ void fam_step(fam_perch *p, float t, float isense, const fam_cmd *applied, fam_c
 
     case FAM_ST_LIVE: {
         float cap = duty_cap_at(p->f_drive);
-        p->cmd = (fam_cmd){true, p->f_drive, cap};
-        /* the power beyond an empty perch's at this drive: the drivers' draw, and the
-         * fundamental into the empty perch's conductance (the baseline, as modelled or
-         * learned); the 3rd harmonic adds under a tenth of that here */
+        if (!p->probing && t >= p->t_probe_next) {
+            p->probing = true;
+            p->t_probe = t;
+            p->probe_acc = 0.0f;
+            p->probe_n = 0;
+            p->probe_level = 0;
+        }
+        if (p->probing) {
+            float d_hi = FAM_PROBE_DUTY, d_lo = FAM_PROBE_DUTY_LO;
+            p->cmd = (fam_cmd){true, p->f_probe, p->probe_level ? d_lo : d_hi};
+            float since = t - p->t_probe;
+            if (since >= FAM_PROBE_SETTLE_S) {
+                p->probe_acc += isense;
+                p->probe_n++;
+            }
+            if (since >= FAM_PROBE_SETTLE_S + FAM_PROBE_AVG_S && p->probe_n > 0 && p->probe_level == 0) {
+                p->probe_i_hi = p->probe_acc / (float)p->probe_n;  /* the upper level done: the lower */
+                p->probe_level = 1;
+                p->probe_acc = 0.0f;
+                p->probe_n = 0;
+                p->t_probe = t;
+                p->cmd.duty = d_lo;
+            } else if (since >= FAM_PROBE_SETTLE_S + FAM_PROBE_AVG_S && p->probe_n > 0) {
+                /* the owl's perch sees its token in the fundamental; the cat's in the 3rd
+                 * harmonic (the narrow pulses' 3rd is nearly as strong as their 1st) */
+                float g = p->probe_i_hi - p->probe_acc / (float)p->probe_n;
+                float e = p->probe_empty;
+                p->probe_di = g;
+                p->probing = false;
+                p->t_probe_next += FAM_PROBE_PERIOD_S;
+                if (p->t_probe_next < t)
+                    p->t_probe_next = t + FAM_PROBE_PERIOD_S;
+                p->t_probe = t;                             /* the breath's clock: from the trough */
+                p->cmd = (fam_cmd){true, p->f_drive, cap * FAM_BREATH_MIN};
+                float on_at = fmaxf(FAM_PROBE_ON * e, FAM_PROBE_ON_MIN_A);
+                if (!p->live_present && g > on_at) {
+                    p->live_present = true;
+                    p->probe_on = g;
+                    ev->kind = FAM_EV_ARRIVED;
+                } else if (p->live_present && g < fmaxf(FAM_PROBE_OFF * p->probe_on, FAM_PROBE_OFF_EMPTY * e)) {
+                    p->live_present = false;
+                    ev->kind = FAM_EV_LEFT;
+                } else if (p->live_present) {
+                    p->probe_on += 0.3f * (g - p->probe_on);  /* the token settles, or is nudged */
+                }
+                if (!p->live_present && g > 0.0f && g < on_at)
+                    p->probe_empty += FAM_PROBE_LEARN * (g - e);   /* an empty perch teaches its reading */
+                ev->who = p->who;
+                ev->freq_hz = p->f_token;
+            }
+            break;
+        }
+        /* the breath: the probe was in its trough */
+        float ph = (t - p->t_probe) / FAM_PROBE_PERIOD_S;
+        float env = 0.5f - 0.5f * cosf(2.0f * PI_F * (ph - floorf(ph)));
+        p->cmd = (fam_cmd){true, p->f_drive, cap * (FAM_BREATH_MIN + (1.0f - FAM_BREATH_MIN) * env)};
+        /* reported only: the power beyond an empty perch's at this drive (the drivers'
+         * draw, and the fundamental into the empty perch's conductance as modelled or
+         * learned); right after a probe ISENSE is still settling, so wait */
+        if (t - p->t_probe < FAM_PROBE_SETTLE_S + FAM_PROBE_AVG_S + 0.01f)
+            break;
         float d = app.enable ? app.duty : cap;
         float g_empty = interp(p, p->base, p->f_drive);
         float i_empty = p->iq_drive + half_sq(vn(1, d)) * g_empty / FAM_VDRIVE_V;
-        float p_tok = FAM_VDRIVE_V * (isense - i_empty);
-        p->p_live_f += 0.3f * (p_tok - p->p_live_f);           /* ~3 ms */
-        bool over = p->p_live_f > (p->live_present ? FAM_LIVE_OFF_W : FAM_LIVE_ON_W);
-        if (over == p->live_present) {
-            p->t_live_edge = -1.0f;
-        } else if (p->t_live_edge < 0.0f) {
-            p->t_live_edge = t;
-        } else if (t - p->t_live_edge >= (over ? FAM_LIVE_ON_S : FAM_LIVE_OFF_S)) {
-            p->live_present = over;
-            p->t_live_edge = -1.0f;
-            ev->kind = over ? FAM_EV_ARRIVED : FAM_EV_LEFT;
-            ev->who = p->who;
-            ev->freq_hz = p->f_token;
-        }
+        p->p_live_f += 0.3f * (FAM_VDRIVE_V * (isense - i_empty) - p->p_live_f);
         p->p_meas_f = p->p_live_f;
         break;
     }

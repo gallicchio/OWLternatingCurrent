@@ -127,6 +127,7 @@ typedef struct {
     /* calibration */
     lev_cal_data cal;
     int cal_kind, cal_return;
+    uint8_t cal_coast;                   /* this CAL tick drives nothing (the bridge coasts) */
     float cal_acc_h, cal_n, cal_n_end;
     float cal_h_off0, cal_h_plus, cal_h_minus, cal_i_plus, cal_i_minus, cal_i_off, cal_n_pulse;
 } lev_ctrl;

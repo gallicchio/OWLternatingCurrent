@@ -69,6 +69,21 @@ static theremin thr;
 static settings_data cfg;
 static bool theremin_on, familiars_on;
 static int sweep_watch[2];               /* 1: report this perch's next sweep; 2: in progress */
+/* bench: `fam scan`.  The perch leaves its own logic and steps FAM_SCAN_N log-spaced
+ * frequencies, each at two duties (frac and frac/3 of the live duty cap there), and
+ * reports the mean ISENSE at each: with the tokens on and off, where a token shows at
+ * the live mode's drive level (2026-11-11: at the live drive's frequency it does not) */
+#define FAM_SCAN_N      48
+#define FAM_SCAN_F_LO   100000.0f
+#define FAM_SCAN_F_HI   440000.0f
+#define FAM_SCAN_SETTLE 0.006f
+#define FAM_SCAN_AVG    0.012f
+static struct {
+    bool on;
+    float frac, t_step, acc;
+    int step, level, n;
+    float f[FAM_SCAN_N], d[FAM_SCAN_N][2], i[FAM_SCAN_N][2];
+} scan[2];
 static int pend_cal_left;                /* TMAG readings still to average for `pend cal` */
 static float pend_cal_sum[3];
 static uint64_t t0_us;
@@ -163,7 +178,16 @@ static void lev_json(char *buf, size_t n)
            (double)t.hall_offset_mT, (double)rt.lev_eyes, rt.carrier_on ? "true" : "false");
     for (int i = 0; i < lev_param_count(); i++)
         jb_add(&j, "%s\"%s\":%g", i ? "," : "", lev_param_name(i), (double)lev_get_param(&rt_lev, i));
-    jb_add(&j, "}}");
+    /* the last coil calibration's means (bench, 2026-11-11: "IPROPI disagrees" on every
+     * cal with the second owl): the field and the mirror at +i_cal and -i_cal, the mirror
+     * with the coil off, and the field before and after */
+    float np = rt_lev.cal_n_pulse > 0.0f ? rt_lev.cal_n_pulse : 1.0f;
+    float ne = rt_lev.cal_n_end > 0.0f ? rt_lev.cal_n_end : 1.0f;
+    jb_add(&j, "},\"cal_dbg\":{\"n\":%.0f,\"h_plus\":%.3f,\"h_minus\":%.3f,\"i_plus\":%.4f,\"i_minus\":%.4f,"
+               "\"i_off\":%.4f,\"h_off0\":%.3f,\"h_off1\":%.3f}}",
+           (double)rt_lev.cal_n_pulse, (double)(rt_lev.cal_h_plus / np), (double)(rt_lev.cal_h_minus / np),
+           (double)(rt_lev.cal_i_plus / np), (double)(rt_lev.cal_i_minus / np), (double)rt_lev.cal_i_off,
+           (double)rt_lev.cal_h_off0, (double)(rt_lev.cal_acc_h / ne));
 }
 
 static void status_json(char *buf, size_t n)
@@ -209,10 +233,11 @@ static void status_json(char *buf, size_t n)
     jb_add(&j, "\"familiars\":[");
     for (int p = 0; p < 2; p++)
         jb_add(&j, "%s{\"perch\":\"fam%d\",\"state\":\"%s\",\"who\":\"%s\",\"present\":%s,\"f_hz\":%.0f,\"duty\":%.3f,"
-               "\"isense_A\":%.3f,\"p_W\":%.3f}",
+               "\"isense_A\":%.3f,\"p_W\":%.3f,\"probe_mA\":%.2f,\"probe_empty_mA\":%.2f}",
                p ? "," : "", p + 1, fam_state_name(perch[p].state), fam_who_name(perch[p].who),
                (perch[p].state == FAM_ST_LIVE ? perch[p].live_present : perch[p].who != FAM_NONE) ? "true" : "false",
-               (double)perch_freq(p), (double)perch_duty(p), (double)rt.fam_isense[p], (double)perch[p].p_meas_f);
+               (double)perch_freq(p), (double)perch_duty(p), (double)rt.fam_isense[p], (double)perch[p].p_meas_f,
+               (double)(perch[p].probe_di * 1e3f), (double)(perch[p].probe_empty * 1e3f));
     jb_add(&j, "],\"scene\":{\"name\":\"%s\",\"manual\":%s,\"kuramoto_r\":%.2f},",
            scene_name(scenes_current(&show)), scenes_is_manual(&show) ? "true" : "false", (double)show.kuramoto_r);
     jb_add(&j, "\"theremin\":{\"on\":%s,\"ok\":%s,\"active\":%s,\"f_pitch\":%.0f,\"f_vol\":%.0f,\"pitch_hz\":%.0f,"
@@ -298,6 +323,61 @@ static const char *a_sweep(int p)
     perch[p].t_last_sweep = -1e9f;      /* sweep at its next idle moment */
     sweep_watch[p] = 1;
     return NULL;
+}
+
+static const char *a_fam_scan(int p, float frac)
+{
+    if (!familiars_on || !rt.power_ok || rt.v5 < V5_PRESENT_V)
+        return "the familiars are off, or no 12 V / 5 V";
+    if (scan[p].on)
+        return "already scanning";
+    scan[p].frac = frac;
+    scan[p].step = scan[p].level = scan[p].n = 0;
+    scan[p].acc = 0.0f;
+    scan[p].t_step = now_s();
+    scan[p].on = true;
+    return NULL;
+}
+
+/* one millisecond of a scan: returns true while it runs (the perch's own logic waits) */
+static bool scan_tick(int p, float t)
+{
+    if (!scan[p].on)
+        return false;
+    int k = scan[p].step;
+    float f = FAM_SCAN_F_LO * powf(FAM_SCAN_F_HI / FAM_SCAN_F_LO, (float)k / (FAM_SCAN_N - 1));
+    float d = scan[p].frac * fam_duty_cap(f) * (scan[p].level ? 1.0f / 3.0f : 1.0f);
+    perch_set(p, true, f, d);
+    float dt = t - scan[p].t_step;
+    if (dt >= FAM_SCAN_SETTLE) {
+        scan[p].acc += rt.fam_isense[p];
+        scan[p].n++;
+    }
+    if (dt >= FAM_SCAN_SETTLE + FAM_SCAN_AVG) {
+        scan[p].f[k] = perch_freq(p);
+        scan[p].d[k][scan[p].level] = perch_duty(p);
+        scan[p].i[k][scan[p].level] = scan[p].n ? scan[p].acc / (float)scan[p].n : 0.0f;
+        scan[p].acc = 0.0f;
+        scan[p].n = 0;
+        scan[p].t_step = t;
+        if (++scan[p].level == 2) {
+            scan[p].level = 0;
+            if (++scan[p].step == FAM_SCAN_N) {
+                scan[p].on = false;
+                static char buf[CONSOLE_REPLY_MAX];
+                jsonbuf j = jb_start(buf, sizeof buf);
+                jb_add(&j, "{\"event\":\"scan\",\"perch\":\"fam%d\",\"frac\":%.2f,\"rows\":[", p + 1,
+                       (double)scan[p].frac);
+                for (int q = 0; q < FAM_SCAN_N; q++)
+                    jb_add(&j, "%s[%.0f,%.4f,%.2f,%.4f,%.2f]", q ? "," : "", (double)scan[p].f[q],
+                           (double)scan[p].d[q][0], (double)(scan[p].i[q][0] * 1e3f),
+                           (double)scan[p].d[q][1], (double)(scan[p].i[q][1] * 1e3f));
+                jb_add(&j, "]}");
+                out_line(buf);
+            }
+        }
+    }
+    return true;
 }
 
 static const char *a_lev(int op, const char *param, float v)
@@ -425,7 +505,7 @@ static void a_reboot(bool bootsel) { do_reboot(bootsel); }
 
 static const console_ops OPS = {
     .reply = out_line, .scene = a_scene, .led = a_led, .coil = a_coil, .sweep = a_sweep, .lev = a_lev,
-    .pend = a_pend, .theremin = a_theremin, .fam = a_fam, .film = a_film, .volume = a_volume, .clear = a_clear,
+    .pend = a_pend, .theremin = a_theremin, .fam = a_fam, .fam_scan = a_fam_scan, .film = a_film, .volume = a_volume, .clear = a_clear,
     .save = a_save,
     .status_json = status_json, .lev_json = lev_json, .i2c_scan_json = i2c_scan_json,
     .adc_dump_json = adc_dump_json, .reboot = a_reboot,
@@ -562,6 +642,10 @@ static void familiars_tick(void)
     for (int p = 0; p < 2; p++) {
         if (allowed != perch[p].enabled)
             fam_enable(&perch[p], allowed);
+        if (!allowed)
+            scan[p].on = false;
+        if (scan_tick(p, t))
+            continue;
         fam_cmd cmd;
         fam_event ev = {0};
         fam_state before = perch[p].state;

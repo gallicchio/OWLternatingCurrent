@@ -1,6 +1,6 @@
 /* lev_table.h: the levitation's nominal calibration, from the field computations.
  * WRITTEN BY firmware/tools/gen_lev_tables.py FROM sim/physics/ AND gen/mech.py: rerun that.
- * one-magnet design: two 10 x 2 mm N52 discs, bias 12.5 mm above the perch, bat 3.60 g.
+ * one-magnet design: two 10 x 2 mm N52 discs, bias 11.4 mm above the perch, bat 3.60 g.
  *
  * The firmware's frame (lev_ctrl.c): a field counts positive along the bat's own field at
  * the Hall sensor; a current counts positive when it lifts the bat; force up is positive.
@@ -11,11 +11,11 @@
 #define LEV_TAB_GAP0_MM    1.5000f   /* first gap of the tables */
 #define LEV_TAB_STEP_MM    0.2000f   /* uniform step */
 #define LEV_MASS_KG        0.003600f   /* the bat, levitation_onemagnet.py */
-#define LEV_G0_MM          10.0370f   /* where the bias magnet alone carries the bat */
+#define LEV_G0_MM          11.1370f   /* where the bias magnet alone carries the bat */
 #define LEV_KNEG_N_PER_M   5.0080f   /* -dF_bias/dgap there: the instability */
-#define LEV_KCOIL_N_PER_A  0.014558f   /* the coil's lift per amp there */
-#define LEV_DB_MT_PER_MM   5.4752f   /* the bat's field at the sensor per mm of gap there */
-#define LEV_BBIAS_MT       8.1952f   /* the bias magnet's field at the sensor (same sense as the bat's) */
+#define LEV_KCOIL_N_PER_A  0.012089f   /* the coil's lift per amp there */
+#define LEV_DB_MT_PER_MM   3.9906f   /* the bat's field at the sensor per mm of gap there */
+#define LEV_BBIAS_MT       9.9945f   /* the bias magnet's field at the sensor (same sense as the bat's) */
 #define LEV_BCOIL_MT_PER_A 2.8900f   /* the coil's field at the sensor per lifting amp: aligned with the bat's */
 
 /* the bat's field at the sensor (mT, falling with the gap) */
@@ -44,26 +44,26 @@ static const float LEV_TAB_BBAT_MT[118] = {
 
 /* the bias magnet's pull on the bat (N, up) */
 static const float LEV_TAB_FBIAS_N[118] = {
-    0.145182f, 0.139675f, 0.134419f, 0.129401f, 0.124608f, 0.120030f,
-    0.115655f, 0.111471f, 0.107471f, 0.103644f, 0.099982f, 0.096476f,
-    0.093118f, 0.089903f, 0.086821f, 0.083868f, 0.081036f, 0.078320f,
-    0.075714f, 0.073214f, 0.070814f, 0.068509f, 0.066296f, 0.064169f,
-    0.062125f, 0.060161f, 0.058272f, 0.056455f, 0.054707f, 0.053025f,
-    0.051406f, 0.049847f, 0.048346f, 0.046899f, 0.045506f, 0.044163f,
-    0.042869f, 0.041620f, 0.040417f, 0.039255f, 0.038135f, 0.037053f,
-    0.036009f, 0.035001f, 0.034028f, 0.033087f, 0.032179f, 0.031300f,
-    0.030452f, 0.029631f, 0.028838f, 0.028070f, 0.027328f, 0.026609f,
-    0.025914f, 0.025241f, 0.024589f, 0.023958f, 0.023347f, 0.022755f,
-    0.022182f, 0.021626f, 0.021087f, 0.020565f, 0.020059f, 0.019567f,
-    0.019091f, 0.018629f, 0.018181f, 0.017746f, 0.017324f, 0.016914f,
-    0.016516f, 0.016129f, 0.015754f, 0.015389f, 0.015035f, 0.014691f,
-    0.014356f, 0.014031f, 0.013715f, 0.013408f, 0.013109f, 0.012818f,
-    0.012536f, 0.012261f, 0.011993f, 0.011733f, 0.011479f, 0.011233f,
-    0.010993f, 0.010759f, 0.010531f, 0.010309f, 0.010093f, 0.009883f,
-    0.009678f, 0.009478f, 0.009284f, 0.009094f, 0.008909f, 0.008729f,
-    0.008553f, 0.008381f, 0.008214f, 0.008051f, 0.007892f, 0.007737f,
-    0.007586f, 0.007438f, 0.007294f, 0.007153f, 0.007015f, 0.006881f,
-    0.006750f, 0.006622f, 0.006498f, 0.006376f,
+    0.180646f, 0.173478f, 0.166651f, 0.160146f, 0.153946f, 0.148035f,
+    0.142396f, 0.137016f, 0.131881f, 0.126977f, 0.122293f, 0.117818f,
+    0.113540f, 0.109449f, 0.105536f, 0.101793f, 0.098210f, 0.094779f,
+    0.091493f, 0.088346f, 0.085329f, 0.082437f, 0.079664f, 0.077004f,
+    0.074451f, 0.072002f, 0.069650f, 0.067391f, 0.065222f, 0.063137f,
+    0.061133f, 0.059207f, 0.057354f, 0.055572f, 0.053858f, 0.052208f,
+    0.050619f, 0.049089f, 0.047616f, 0.046196f, 0.044829f, 0.043510f,
+    0.042239f, 0.041013f, 0.039831f, 0.038690f, 0.037589f, 0.036527f,
+    0.035501f, 0.034510f, 0.033553f, 0.032629f, 0.031736f, 0.030872f,
+    0.030038f, 0.029231f, 0.028451f, 0.027696f, 0.026965f, 0.026259f,
+    0.025575f, 0.024912f, 0.024271f, 0.023650f, 0.023049f, 0.022466f,
+    0.021902f, 0.021354f, 0.020824f, 0.020310f, 0.019811f, 0.019328f,
+    0.018858f, 0.018403f, 0.017962f, 0.017533f, 0.017117f, 0.016713f,
+    0.016321f, 0.015940f, 0.015570f, 0.015211f, 0.014862f, 0.014522f,
+    0.014193f, 0.013872f, 0.013560f, 0.013257f, 0.012963f, 0.012676f,
+    0.012397f, 0.012126f, 0.011862f, 0.011605f, 0.011355f, 0.011112f,
+    0.010875f, 0.010644f, 0.010420f, 0.010201f, 0.009988f, 0.009780f,
+    0.009578f, 0.009380f, 0.009188f, 0.009001f, 0.008818f, 0.008640f,
+    0.008467f, 0.008297f, 0.008132f, 0.007971f, 0.007814f, 0.007661f,
+    0.007511f, 0.007365f, 0.007223f, 0.007084f,
 };
 
 /* the coil's lift on the bat per lifting amp (N/A) */

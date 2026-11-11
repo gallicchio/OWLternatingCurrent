@@ -87,9 +87,12 @@ typedef struct {
     double vq_err_mT;       /* the sensor's VQ minus nominal */
     double R;               /* the coil's real resistance */
     double mirror_off_A;    /* IPROPI offset */
+    double ripple_A;        /* the PWM's ripple, peak, while the bridge switches: even at u = 0 its
+                               shortest pulses both ways make a zero-mean ripple (bench 2026-11-11) */
     /* state */
     double gap, vdown, I;   /* m, m/s (+: falling), forward A */
     double u;               /* applied */
+    int driving;            /* the bridge switches (else it coasts) */
     double cradle;          /* > 0: the cradle's floor (largest gap) */
     int held;               /* a hand holds the bat still */
     double f_ext;           /* N, + up */
@@ -139,7 +142,10 @@ static double hall_code(const plant *p)
 
 static double iprop_code(const plant *p)
 {
-    double i = fabs(p->I) + p->mirror_off_A;
+    /* the mirror reads |I| averaged over the burst: a triangular ripple of peak a about a
+     * mean I reads |I| while |I| >= a, and (I^2 + a^2) / 2a nearer zero */
+    double a = p->driving ? p->ripple_A : 0.0, im = fabs(p->I);
+    double i = (a > 0.0 && im < a ? (im * im + a * a) / (2.0 * a) : im) + p->mirror_off_A;
     if (i < 0)
         i = 0;
     double v = i * IPROPI_V_PER_A;
@@ -177,10 +183,15 @@ static void run_init(run *r, double gap, double cradle_gap, int held)
     r->p.mount = 1;
     r->p.R = 2.4;
     r->p.mirror_off_A = 0.02;
+    r->p.ripple_A = 0.06;
     r->p.gap = gap;
     r->p.cradle = cradle_gap;
     r->p.held = held;
     lev_init(&r->c);
+    /* centre the walk on the model's float, as the bench centres it (g0_mm) on the real
+     * bat's: LEV_G0_BENCH_MM fits the real 4.70 g bat, and the model's 3.6 g one floats
+     * 1.6 mm higher with the 11.4 mm owl, past the walk's reach with a VQ error */
+    r->c.g0_mm = (float)(PLANT_G0_M * 1e3);
     r->c.u_lag = 1;
     r->release_after = -1;
     r->win_from = r->win_to = -1;
@@ -211,8 +222,10 @@ static void tick(run *r)
             if (fabs(r->out.u) > r->max_u)
                 r->max_u = fabs(r->out.u);
         }
-        if (s == 10)            /* the PWM wrap after this tick's burst */
+        if (s == 10) {          /* the PWM wrap after this tick's burst */
             r->p.u = r->u_next;
+            r->p.driving = r->out.active;
+        }
         plant_step(&r->p);
         if (fabs(r->p.I) > r->max_I)
             r->max_I = fabs(r->p.I);
@@ -334,11 +347,13 @@ int main(void)
         CHECK(fabs(cr.mean_mA) < 10.0, "%s: mean current %.2f mA", name, cr.mean_mA);
     }
     /* 3. a VQ error the firmware does not know about, and a mirror offset of the other sign */
+    /* (10 s: with the 11.4 mm owl's tables the bat's field changes 4.0 mT per mm, not 5.5,
+     * and the walk takes longer to undo the 0.75 mm that 3 mT now stands for) */
     const double vqs[] = {-3.0, 3.0};
     for (int i = 0; i < 2; i++) {
         char name[64];
         snprintf(name, sizeof name, "cradle +3 mm, VQ off by %+.0f mT", vqs[i]);
-        catch_result cr = catch_case(3, 6.0, vqs[i], 1, 1, true, 6.0, NULL);
+        catch_result cr = catch_case(3, 6.0, vqs[i], 1, 1, true, 10.0, NULL);
         print_case(name, &cr);
         CHECK(cr.held_at_end && fabs(cr.mean_mA) < 10.0, "%s: held %d, mean %.2f mA", name, cr.held_at_end,
               cr.mean_mA);
@@ -364,6 +379,8 @@ int main(void)
         CHECK(cr.held_at_end && fabs(cr.mean_mA) < 10.0, "reversed coil: held %d, mean %.2f mA", cr.held_at_end,
               cr.mean_mA);
         CHECK(r->c.coil_pol == 1.0f, "CAL found coil_pol %+.0f for a reversed coil (want +1)", r->c.coil_pol);
+        CHECK(!strcmp(r->c.cal_msg, "coil ok"), "CAL said \"%s\" (the mirror's ripple taken for an offset?)",
+              r->c.cal_msg);
         CHECK(fabsf(r->c.kcs - (float)(PLANT_BCOIL_T_PER_A * 1e3)) < 0.1f * (float)(PLANT_BCOIL_T_PER_A * 1e3),
               "CAL measured %.2f mT/A, the coil makes %.2f", r->c.kcs, PLANT_BCOIL_T_PER_A * 1e3);
         printf("    CAL: %s, coil_pol %+.0f, %.3f mT/A (plant %.3f)\n", r->c.cal_msg, r->c.coil_pol, r->c.kcs,

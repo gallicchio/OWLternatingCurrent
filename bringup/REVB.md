@@ -592,19 +592,31 @@ The numbers are in `MEASUREMENTS.md` ("The second owl"). What they mean:
    the natural float. The third owl (`OWL_LIFT` 11.4) moves the natural float to about
    8.4 mm, and 0.2 A to about 8.9. Rev B: the owl's height is the cheapest knob; choose
    it from gap + lift = 19.85 mm for the bat as built.
+   **Flown 2026-11-11:** the third owl (11.4) holds the bat at 8.77 mm on 0.16 A, the coil's
+   model levelling at 28 °C after 12 minutes; kept for the demo.
 3. **Eyes at 0.1 are enough** (Jason: "dim, but visible"), for a few kelvin by IR. At 0.15
    the gap's spread doubles. One eye is slightly brighter than the other: rev B, match
    the two LEDs or their resistors. The eyes now breathe (a 2 s raised cosine) instead of
    switching, which the loop never sees as a step.
 4. **`lev cal coil` is wrong on this owl** ("IPROPI disagrees", `kcs` 2.2 against the 3.64
    that flies). `lev tune kcs` now writes the calibration, so `save` keeps a hand value.
-   The routine still needs a look.
+   **Fixed 2026-11-11:** at 0 A asked, the PWM's minimum pulses make a zero-mean ripple
+   that the |I| mirror reads as about 0.07 A of offset. The cal now coasts the bridge in
+   its off windows and measures 3.566 mT/A. Rev B: a signed current sense (or one that
+   reads during a known pulse phase) would avoid the trap.
 5. **Live mode cannot see a token** (1.3): the perch current moved 0.2 mA at most at
    63 mA. Sweep mode sees each token at its bump (owl 147.6 kHz, cat 353.8 kHz) but is
    slow to see it go: more than 30 s for the owl, about 10 s for the cat. Planned for rev A:
    live drive, with a short probe at the token's bump every 0.5 s; then the ring round a
    target can fade out when its token is on (Jason's wish). Rev B: a sense that sees the
    load (a series capacitor or a phase measure, 1.3, 1.8).
+   **Solved on rev A, 2026-11-11** (MEASUREMENTS "The coil's calibration, the defaults
+   flown, the token probe"). At the token's own tuning the reflected load is resistive and
+   the supply current doesn't move; at 1.5 × the token's tuning (the coupled mode) it rises
+   5-10 times. The live drive breathes over 3 s and probes there, at two duties, in each
+   trough; every arrival and departure was seen on the bench, and the rings now fade under
+   a token. Limits for rev B: a token 3 mm or more off the copper lights but reads absent;
+   a series capacitor (1.8) or a phase sense would give reach and a quieter probe.
 6. **The rings round the targets** now breathe round once a second: two neighbouring LEDs
    trade their brightness, then the brighter trades with the next (Jason, 2026-11-10).
    Before, all three glowed at once, and Jason saw them "always on".

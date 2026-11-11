@@ -307,13 +307,31 @@ static void test_play(void)
     play_frames(&in, 1.5f, f);
     CHECK(f[LED_GROUP_STAR[0]] < 0.05f, "PLAY: the arc stays after the hand leaves (%.2f)", f[LED_GROUP_STAR[0]]);
 
-    in.familiar[0] = FAMILIAR_OWL;
-    play_frames(&in, 2.0f, f);
-    CHECK(f[LED_GROUP_OWLRING[0]] < 0.4f, "PLAY: owl token, its ring too bright (%.2f)", f[LED_GROUP_OWLRING[0]]);
-    in.familiar[0] = FAMILIAR_NONE; in.familiar[1] = FAMILIAR_CAT;
-    play_frames(&in, 2.0f, f);
-    CHECK(f[LED_GROUP_CATRING[2]] < 0.4f, "PLAY: cat token, its ring too bright (%.2f)", f[LED_GROUP_CATRING[2]]);
-    in.familiar[1] = FAMILIAR_NONE;
+    {   /* a token on its target: its ring fades out, the other keeps turning; back when it leaves */
+        in.familiar[0] = FAMILIAR_OWL;
+        play_frames(&in, 1.0f, f);
+        float owl = 0.0f, cat = 0.0f;
+        for (int k = 0; k < (int)LED_FPS; k++) {
+            play_frames(&in, 1.0f / (float)LED_FPS, f);
+            for (int i = 0; i < 3; i++) {
+                owl = fmaxf(owl, f[LED_GROUP_OWLRING[i]]);
+                cat = fmaxf(cat, f[LED_GROUP_CATRING[i]]);
+            }
+        }
+        CHECK(owl < 0.01f && cat > 0.3f, "PLAY: owl token on: its ring %.2f (want dark), the cat's %.2f", owl, cat);
+        in.familiar[0] = FAMILIAR_NONE; in.familiar[1] = FAMILIAR_CAT;
+        play_frames(&in, 1.0f, f);
+        owl = cat = 0.0f;
+        for (int k = 0; k < (int)LED_FPS; k++) {
+            play_frames(&in, 1.0f / (float)LED_FPS, f);
+            for (int i = 0; i < 3; i++) {
+                owl = fmaxf(owl, f[LED_GROUP_OWLRING[i]]);
+                cat = fmaxf(cat, f[LED_GROUP_CATRING[i]]);
+            }
+        }
+        CHECK(cat < 0.01f && owl > 0.3f, "PLAY: cat token on: its ring %.2f (want dark), the owl's back %.2f", cat, owl);
+        in.familiar[1] = FAMILIAR_NONE;
+    }
 
     /* the bat */
     float lo = 1.0f, hi = 0.0f;

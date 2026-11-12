@@ -40,6 +40,9 @@ readings, what worked and what failed) is in `bringup/MEASUREMENTS.md`.** Add ne
     lets it down. USB from `bell` (the console) or a USB power brick is optional. A barrel
     supply that isn't the bench one: check it with a meter first (centre positive, under
     13.5 V), and give it 3 A (the coil peaks at 2.6 A).
+    **Verified 2026-11-11:** 12 V only, no USB: the bat caught off a palm, and the tokens,
+    taps and theremin all worked (Jason: "Everything worked"). Afterwards Jason
+    desoldered the wires that went to the oscilloscope.
   - **The tokens:** live presence works on the bench (every arrival and departure seen,
     no false ones). Not seen: a token 3 mm or more off the copper.
   - **Next:**

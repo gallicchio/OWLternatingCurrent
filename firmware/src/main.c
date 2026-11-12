@@ -829,6 +829,8 @@ int main(void)
     rt.lev_eyes = LEV_EYES_DEFAULT;          /* the bat's eyes whenever it is held (after rt_start, which
                                                 clears rt) */
     lev_set_param(&rt_lev, "zp_i", LEV_ZP_I_A);   /* hang the bat a little below its float (config.h) */
+    if (LEV_ON_AT_BOOT)
+        lev_enable(&rt_lev, true);           /* the demo starts from the 12 V barrel alone (config.h) */
     if (wd)
         rt.faults |= RT_FAULT_WATCHDOG;
     perch_init();

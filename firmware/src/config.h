@@ -89,6 +89,11 @@
                                               0.15 the gap's sd doubled (the lev_eyes records in results/2026-11-10).
                                               With 0.3 the owl's underside reached 67 C (REVB.md 1.11
                                               finding 9).  `lev eyes 0` turns them off */
+#define LEV_ON_AT_BOOT        1            /* [Jason 2026-11-11: plug in the 12 V barrel, no USB, and it
+                                              goes] the levitation loop is enabled at power-up: without
+                                              12 V it waits (INHIBIT), without a bat it waits with the
+                                              coil off, and a bat lifted under the perch is caught.
+                                              `lev off` still turns it off until the next boot */
 #define LEV_ZP_I_A            0.2f         /* [Jason 2026-11-10: as low as is stable at a moderate
                                               temperature] the zero-power walk's target current, set at
                                               boot (lev tune zp_i): the bat hangs where holding it takes

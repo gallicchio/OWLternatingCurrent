@@ -607,8 +607,8 @@ The numbers are in `MEASUREMENTS.md` ("The second owl"). What they mean:
    in the dark part of each breath (about 0.3 s under 5 % every 2 s), and at low current
    read the resistance from a short known pulse or the catch's current. Firmware only.
 3. **Eyes at 0.1 are enough** (Jason: "dim, but visible"), for a few kelvin by IR. At 0.15
-   the gap's spread doubles. One eye is slightly brighter than the other: rev B, match
-   the two LEDs or their resistors. The eyes now breathe (a 2 s raised cosine) instead of
+   the gap's spread doubles. One eye is slightly brighter than the other (the bat's left,
+   Jason 2026-11-11): rev B, match the two LEDs or their resistors. The eyes now breathe (a 2 s raised cosine) instead of
    switching, which the loop never sees as a step.
 4. **`lev cal coil` is wrong on this owl** ("IPROPI disagrees", `kcs` 2.2 against the 3.64
    that flies). `lev tune kcs` now writes the calibration, so `save` keeps a hand value.

@@ -263,6 +263,10 @@ offset of **0.83 mT**, `lev cal coil` **3.553 mT/A** (h+ 10.24, h− 11.52 mT at
 - **Caught again** off a flat palm and left alone: 27.7 minutes at **8.72 mm**, sd 0.085 mm
   overall (8.46-8.96), with no growth this time; mean 164 mA; the coil's model cooled from
   the wobble's 46 to 29 °C (same record, from 140 s).
+- **A tap** (Jason) started the same wobble: the swing's sd went 0.54, 0.22, 0.27, 0.56,
+  0.46 mm in 30 s steps, rms current 380-470 mA, the coil's model 38 to 56 °C, growing and
+  shrinking by turns (`161457_lev_try.json`); the bat was dropped on purpose at about 165 s
+  to flash the firmware that starts the loop at boot.
 
 ## The rest of the board
 

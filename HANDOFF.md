@@ -34,17 +34,22 @@ readings, what worked and what failed) is in `bringup/MEASUREMENTS.md`.** Add ne
     owl, the firmware and flash settings above, the defaults (`zp_i` 0.2, eyes 0.1
     breathing, `g0_mm` 9.5, `zp_range_mm` 2.0, play mode). Don't change them before the demo
     without asking him.
+    **To start it:** 12 V into J1, nothing else. Since 2026-11-11 (`LEV_ON_AT_BOOT`) the
+    board boots into play mode with the levitation loop on and waiting, using the zero and
+    `kcs` from flash; lift the bat with a flat palm until the owl pulls it up, and the loop
+    lets it down. USB from `bell` (the console) or a USB power brick is optional. A barrel
+    supply that isn't the bench one: check it with a meter first (centre positive, under
+    13.5 V), and give it 3 A (the coil peaks at 2.6 A).
   - **The tokens:** live presence works on the bench (every arrival and departure seen,
     no false ones). Not seen: a token 3 mm or more off the copper.
   - **Next:**
     1. A long hover on the third owl at the default 0.2 A, with the IR camera: the coil's
        temperature and the sway over 10-30 minutes.
-    2. Which of the bat's eyes is brighter (ask Jason): rev B note.
-    3. **Don't spin the bat** in the demo: a slow spin grew a wobble that dropped it in
+    2. **Don't spin the bat** in the demo: a slow spin grew a wobble that dropped it in
        about 80 s (REVB 1.12 item 7). If it sways, steady it with a finger.
-    4. After the demo: the coil's thermometer in the dark of the eyes' breath and at low
+    3. After the demo: the coil's thermometer in the dark of the eyes' breath and at low
        current (REVB 1.12 item 8).
-    5. Rev B items in REVB.md.
+    4. Rev B items in REVB.md.
   - **Bench scripts added on 2026-11-11:** `fam_scan.py PHASE "what"` (the perch current
     against frequency, `fam scan`), `fam_watch.py SECONDS "what"` (token presence, prints
     every change), `lev_eyes_ab.py` (eyes off and on, alternating, bat hovering).
